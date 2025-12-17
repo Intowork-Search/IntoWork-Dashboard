@@ -1,12 +1,29 @@
-# INTOWORK Search - Backend (Phase 1)
+# IntoWork Backend - Railway Deployment
 
-Scaffold minimal pour démarrer la Phase 1 : FastAPI + PostgreSQL en Docker.
+## 🐘 Backend Python/FastAPI
+
+Ce dossier contient le backend FastAPI de l'application IntoWork.
+
+### Configuration automatique :
+- **Language**: Python 3.11
+- **Framework**: FastAPI 
+- **Database**: PostgreSQL (à ajouter via Railway)
+- **Build**: Dockerfile
+
+### Variables d'environnement requises :
+```env
+DATABASE_URL=postgresql://... (automatique avec PostgreSQL Railway)
+CLERK_SECRET_KEY=sk_live_...
+PORT=8000 (automatique)
+ENVIRONMENT=production
+```
+
+### Déploiement :
+1. Railway détecte automatiquement le Dockerfile
+2. Le script `start.sh` exécute les migrations
+3. L'application démarre sur le port $PORT
 
 ## Structure
-
-- `app/` : code FastAPI minimal
-- `Dockerfile` et `docker-compose.yml` pour démarrer localement
-- `.env.example` variables d'environnement
 
 ## Usage rapide
 
