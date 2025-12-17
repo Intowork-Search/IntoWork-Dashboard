@@ -58,8 +58,9 @@ async def get_user(user_id: int, db: Session = Depends(get_db)):
 async def check_db_connection(db: Session = Depends(get_db)):
     """Vérifier la connexion à la base de données"""
     try:
-        # Test simple de la connexion
-        result = db.execute("SELECT 1").scalar()
+        from sqlalchemy import text
+        # Test simple de la connexion avec syntaxe SQLAlchemy 2.0
+        result = db.execute(text("SELECT 1")).scalar()
         user_count = db.query(User).count()
         return {
             "status": "connected",
