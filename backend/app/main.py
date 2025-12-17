@@ -25,7 +25,8 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",  # Next.js dev server
         "https://intowork-dashboard.vercel.app",  # Production frontend
-        "https://*.vercel.app"  # Autres deployments Vercel
+        "https://intowork-dashboard-git-main-intowork-searchs-projects.vercel.app",  # Git branch URL  
+        "https://intowork-dashboard-anna12345.vercel.app",  # Autres variantes possibles
     ],
     allow_credentials=True,
     allow_methods=["*"],
