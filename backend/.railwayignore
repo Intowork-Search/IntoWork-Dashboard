@@ -1,0 +1,33 @@
+# Railway Ignore File
+# Fichiers à ignorer lors du déploiement
+
+# Frontend (pas nécessaire pour le backend)
+frontend/
+vercel.json
+
+# Development files
+*.log
+.env.local
+.env.development
+**/__pycache__/
+**/*.pyc
+.pytest_cache/
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Documentation
+README.md
+docs/
+
+# Scripts locaux
+deploy.sh
+start-dev.sh
+Makefile
