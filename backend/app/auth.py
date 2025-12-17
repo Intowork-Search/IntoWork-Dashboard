@@ -10,7 +10,7 @@ import jwt
 from jwt.exceptions import InvalidTokenError
 
 # Configuration Clerk
-CLERK_SECRET_KEY = os.getenv("CLERK_SECRET", "")
+CLERK_SECRET_KEY = os.getenv("CLERK_SECRET_KEY", os.getenv("CLERK_SECRET", ""))
 CLERK_PEM_PUBLIC_KEY = os.getenv("CLERK_PEM_PUBLIC_KEY", "")
 
 # Client Clerk
