@@ -1,14 +1,19 @@
 import axios from 'axios';
 
-// Configuration de l'API client - VERSION FINALE - ANTI-INTERCEPTION
+// Configuration de l'API client - VERSION ULTIMATE - CACHE BUSTER
 export const getBaseUrl = () => {
-  // CONSTRUCTION DYNAMIQUE pour éviter les interceptions
-  const protocol = 'https:';
-  const domain = 'intowork-dashboard-production.up.railway.app';
-  const path = '/api';
-  const finalUrl = `${protocol}//${domain}${path}`;
+  // SOLUTION ULTIMATE: Utiliser une méthode différente pour construire l'URL
+  const parts = ['https:', '', 'intowork-dashboard-production', 'up', 'railway', 'app', 'api'];
+  const finalUrl = parts[0] + '//' + parts[2] + '.' + parts[3] + '.' + parts[4] + '.' + parts[5] + '/' + parts[6];
   
-  console.log('🔒 URL ANTI-INTERCEPTION CONSTRUITE:', finalUrl);
+  console.log('🚀 CACHE BUSTER URL:', finalUrl);
+  
+  // Double vérification que l'URL est bien HTTPS
+  if (!finalUrl.startsWith('https://')) {
+    console.error('� ERREUR: URL non HTTPS détectée!', finalUrl);
+    return 'https://intowork-dashboard-production.up.railway.app/api';
+  }
+  
   return finalUrl;
 };
 

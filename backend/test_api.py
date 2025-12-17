@@ -9,23 +9,37 @@ import requests
 import json
 from datetime import datetime
 
-BASE_URL = "https://localhost:8000"
+# URL du déploiement Railway
+BASE_URL = "https://intowork-dashboard-production.up.railway.app"
 
 def test_endpoint(method, endpoint, data=None):
     """Tester un endpoint de l'API"""
     url = f"{BASE_URL}{endpoint}"
+    print(f"🔍 Testing: {method} {url}")
+    
     try:
         if method == "GET":
-            response = requests.get(url)
+            response = requests.get(url, timeout=10)
         elif method == "POST":
-            response = requests.post(url, json=data)
+            response = requests.post(url, json=data, timeout=10)
         
         print(f"✅ {method} {endpoint}")
         print(f"   Status: {response.status_code}")
-        print(f"   Response: {response.json()}")
-        return response.json()
+        
+        # Essayer de parser JSON, sinon afficher le texte
+        try:
+            json_response = response.json()
+            print(f"   Response: {json_response}")
+            return json_response
+        except:
+            print(f"   Response (text): {response.text[:200]}")
+            return response.text
+            
     except requests.exceptions.ConnectionError:
         print(f"❌ {method} {endpoint} - Serveur non accessible")
+        return None
+    except requests.exceptions.Timeout:
+        print(f"❌ {method} {endpoint} - Timeout")
         return None
     except Exception as e:
         print(f"❌ {method} {endpoint} - Erreur: {e}")
