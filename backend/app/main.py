@@ -22,7 +22,11 @@ app = FastAPI(
 # CORS middleware pour le frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Next.js dev server
+    allow_origins=[
+        "http://localhost:3000",  # Next.js dev server
+        "https://intowork-dashboard.vercel.app",  # Production frontend
+        "https://*.vercel.app"  # Autres deployments Vercel
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
