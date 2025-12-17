@@ -1,12 +1,15 @@
 import axios from 'axios';
 
-// Configuration de l'API client - VERSION NUCLÉAIRE - HTTPS HARD-CODÉ PARTOUT
+// Configuration de l'API client - VERSION FINALE - ANTI-INTERCEPTION
 export const getBaseUrl = () => {
-  console.log('🚀 SOLUTION NUCLÉAIRE: HTTPS HARD-CODÉ');
+  // CONSTRUCTION DYNAMIQUE pour éviter les interceptions
+  const protocol = 'https:';
+  const domain = 'intowork-dashboard-production.up.railway.app';
+  const path = '/api';
+  const finalUrl = `${protocol}//${domain}${path}`;
   
-  // SOLUTION NUCLÉAIRE: TOUJOURS Railway HTTPS - AUCUNE CONDITION
-  console.log('✅ HTTPS Railway FORCÉ - Aucune variable d\'environnement');
-  return 'https://intowork-dashboard-production.up.railway.app/api';
+  console.log('🔒 URL ANTI-INTERCEPTION CONSTRUITE:', finalUrl);
+  return finalUrl;
 };
 
 const apiClient = axios.create({
@@ -15,6 +18,8 @@ const apiClient = axios.create({
     'Content-Type': 'application/json',
   },
   timeout: 10000, // Timeout de 10 secondes
+  // FORCE HTTPS - AUCUNE REDIRECTION VERS HTTP AUTORISÉE
+  maxRedirects: 0,
 });
 
 // Function to create authenticated axios instance
@@ -29,6 +34,24 @@ export const createAuthenticatedClient = (token: string) => {
   });
   return client;
 };
+
+// Intercepteur pour FORCER HTTPS et gérer les erreurs
+apiClient.interceptors.request.use(
+  (config) => {
+    // INTERCEPTER ET CORRIGER toute URL HTTP
+    if (config.url && config.url.startsWith('http://')) {
+      console.warn('🚨 URL HTTP DÉTECTÉE ET CORRIGÉE:', config.url);
+      config.url = config.url.replace('http://', 'https://');
+    }
+    if (config.baseURL && config.baseURL.startsWith('http://')) {
+      console.warn('🚨 BASE URL HTTP DÉTECTÉE ET CORRIGÉE:', config.baseURL);
+      config.baseURL = config.baseURL.replace('http://', 'https://');
+    }
+    console.log('📤 Requête finale:', (config.baseURL || '') + (config.url || ''));
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 // Intercepteur pour gérer les erreurs
 apiClient.interceptors.response.use(
