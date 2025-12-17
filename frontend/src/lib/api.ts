@@ -1,27 +1,34 @@
 import axios from 'axios';
 
-// Configuration de l'API client - VERSION CORRIGÉE v3 - FORCE DEPLOYMENT
+// Configuration de l'API client - VERSION CORRIGÉE v4 - FORCE HTTPS ABSOLUE
 export const getBaseUrl = () => {
-  // En production (Vercel), toujours utiliser HTTPS - FORCE ABSOLUE
-  if (typeof window !== 'undefined' && (window.location.hostname.includes('vercel.app') || window.location.protocol === 'https:')) {
-    console.log('🚀 Force HTTPS URL en production');
+  console.log('🚀 Force HTTPS URL en production');
+  
+  // FORCE ABSOLUE : En production, TOUJOURS HTTPS - AUCUNE EXCEPTION
+  if (typeof window !== 'undefined') {
+    const isProduction = window.location.hostname.includes('vercel.app') || window.location.protocol === 'https:';
+    if (isProduction) {
+      console.log('✅ Mode production détecté - Force HTTPS Railway');
+      return 'https://intowork-dashboard-production.up.railway.app/api';
+    }
+  }
+  
+  // Sur le serveur (build time), également forcer HTTPS si en production
+  if (process.env.NODE_ENV === 'production' || process.env.VERCEL === '1') {
+    console.log('✅ Build production - Force HTTPS Railway');
     return 'https://intowork-dashboard-production.up.railway.app/api';
   }
   
-  // Récupérer l'URL de l'environnement
+  // Récupérer l'URL de l'environnement pour le développement local
   const url = process.env.NEXT_PUBLIC_API_URL;
   
   // Si l'URL n'est pas définie, utiliser localhost en HTTPS (pour le dev local)
   if (!url) {
+    console.log('🔧 Fallback localhost HTTPS');
     return 'https://localhost:8000/api';
   }
   
-  // Force HTTPS en production si l'URL commence par http://
-  if (typeof window !== 'undefined' && window.location.protocol === 'https:' && url.startsWith('http://')) {
-    console.warn('⚠️ URL HTTP détectée en production, conversion en HTTPS');
-    return url.replace('http://', 'https://');
-  }
-  
+  console.log('🔧 URL d\'environnement:', url);
   return url;
 };
 
