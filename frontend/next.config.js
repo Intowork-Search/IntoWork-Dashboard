@@ -8,9 +8,6 @@ const nextConfig = {
       },
     ],
   },
-  // Configuration minimale pour Vercel
-  compress: true,
-  poweredByHeader: false,
 };
 
 module.exports = nextConfig;
