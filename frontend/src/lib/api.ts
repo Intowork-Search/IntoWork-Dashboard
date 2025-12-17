@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Configuration de l'API client - VERSION CORRIGÉE v3 - FORCE DEPLOYMENT
-const getBaseUrl = () => {
+export const getBaseUrl = () => {
   // En production (Vercel), toujours utiliser HTTPS - FORCE ABSOLUE
   if (typeof window !== 'undefined' && (window.location.hostname.includes('vercel.app') || window.location.protocol === 'https:')) {
     console.log('🚀 Force HTTPS URL en production');

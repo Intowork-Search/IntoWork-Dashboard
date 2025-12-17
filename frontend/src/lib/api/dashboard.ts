@@ -1,4 +1,5 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://localhost:8000/api';
+// Utiliser directement l'URL HTTPS Railway en production
+const API_BASE_URL = 'https://intowork-dashboard-production.up.railway.app/api';
 
 interface DashboardStat {
   title: string;
