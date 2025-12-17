@@ -1,12 +1,12 @@
 import axios from 'axios';
 
-// Configuration de l'API client - VERSION ULTIMATE - CACHE BUSTER
+// Configuration de l'API client - VERSION ULTIMATE - CACHE BUSTER - 17-DEC-2025
 export const getBaseUrl = () => {
   // SOLUTION ULTIMATE: Utiliser une méthode différente pour construire l'URL
   const parts = ['https:', '', 'intowork-dashboard-production', 'up', 'railway', 'app', 'api'];
   const finalUrl = parts[0] + '//' + parts[2] + '.' + parts[3] + '.' + parts[4] + '.' + parts[5] + '/' + parts[6];
   
-  console.log('🚀 CACHE BUSTER URL:', finalUrl);
+  console.log('🚀 CACHE BUSTER URL [2025-12-17]:', finalUrl);
   
   // Double vérification que l'URL est bien HTTPS
   if (!finalUrl.startsWith('https://')) {
