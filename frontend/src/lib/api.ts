@@ -1,35 +1,12 @@
 import axios from 'axios';
 
-// Configuration de l'API client - VERSION CORRIGÉE v4 - FORCE HTTPS ABSOLUE
+// Configuration de l'API client - VERSION NUCLÉAIRE - HTTPS HARD-CODÉ PARTOUT
 export const getBaseUrl = () => {
-  console.log('🚀 Force HTTPS URL en production');
+  console.log('🚀 SOLUTION NUCLÉAIRE: HTTPS HARD-CODÉ');
   
-  // FORCE ABSOLUE : En production, TOUJOURS HTTPS - AUCUNE EXCEPTION
-  if (typeof window !== 'undefined') {
-    const isProduction = window.location.hostname.includes('vercel.app') || window.location.protocol === 'https:';
-    if (isProduction) {
-      console.log('✅ Mode production détecté - Force HTTPS Railway');
-      return 'https://intowork-dashboard-production.up.railway.app/api';
-    }
-  }
-  
-  // Sur le serveur (build time), également forcer HTTPS si en production
-  if (process.env.NODE_ENV === 'production' || process.env.VERCEL === '1') {
-    console.log('✅ Build production - Force HTTPS Railway');
-    return 'https://intowork-dashboard-production.up.railway.app/api';
-  }
-  
-  // Récupérer l'URL de l'environnement pour le développement local
-  const url = process.env.NEXT_PUBLIC_API_URL;
-  
-  // Si l'URL n'est pas définie, utiliser localhost en HTTPS (pour le dev local)
-  if (!url) {
-    console.log('🔧 Fallback localhost HTTPS');
-    return 'https://localhost:8000/api';
-  }
-  
-  console.log('🔧 URL d\'environnement:', url);
-  return url;
+  // SOLUTION NUCLÉAIRE: TOUJOURS Railway HTTPS - AUCUNE CONDITION
+  console.log('✅ HTTPS Railway FORCÉ - Aucune variable d\'environnement');
+  return 'https://intowork-dashboard-production.up.railway.app/api';
 };
 
 const apiClient = axios.create({
@@ -332,7 +309,7 @@ export const candidatesAPI = {
   
   // Obtenir l'URL du CV pour prévisualisation
   getCVUrl: (token: string): string => {
-    return `${process.env.NEXT_PUBLIC_API_URL}/candidates/cv/download?token=${token}`;
+    return `https://intowork-dashboard-production.up.railway.app/api/candidates/cv/download?token=${token}`;
   },
   
   // Lister tous les CV
