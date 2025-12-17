@@ -3,6 +3,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.ping import router as ping_router
 from app.api.users import router as users_router
 from app.api.auth import router as auth_router
+from app.api.candidates import router as candidates_router
+from app.api.dashboard import router as dashboard_router
+from app.api.jobs import router as jobs_router
+from app.api.applications import router as applications_router
+from dotenv import load_dotenv
+import os
+
+# Charger les variables d'environnement depuis le fichier .env
+load_dotenv()
 
 app = FastAPI(
     title="INTOWORK Search - Backend",
@@ -23,6 +32,10 @@ app.add_middleware(
 app.include_router(ping_router, prefix="/api")
 app.include_router(users_router, prefix="/api")
 app.include_router(auth_router, prefix="/api")
+app.include_router(candidates_router, prefix="/api/candidates", tags=["candidates"])
+app.include_router(dashboard_router, prefix="/api", tags=["dashboard"])
+app.include_router(jobs_router, prefix="/api/jobs", tags=["jobs"])
+app.include_router(applications_router, prefix="/api", tags=["applications"])
 
 @app.get("/")
 async def root():

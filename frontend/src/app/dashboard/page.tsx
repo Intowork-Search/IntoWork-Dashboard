@@ -1,109 +1,569 @@
 'use client';
 
-import { useUser } from '@clerk/nextjs';
+import React, { useState, useEffect, useRef } from 'react';
+import { useUser, useAuth } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import DashboardLayout from '@/components/DashboardLayout';
+import { candidatesAPI, CandidateProfile, jobsAPI } from '@/lib/api';
+import { dashboardAPI, DashboardData } from '@/lib/api/dashboard';
+import { 
+  UserIcon, 
+  DocumentTextIcon, 
+  ChartBarIcon, 
+  BellIcon,
+  ArrowTrendingUpIcon,
+  EyeIcon,
+  BriefcaseIcon 
+} from '@heroicons/react/24/outline';
 
 export default function Dashboard() {
-  const { user, isLoaded } = useUser();
+  const { user } = useUser();
+  const { getToken } = useAuth();
   const router = useRouter();
-
-  useEffect(() => {
-    if (isLoaded && user) {
-      // Rediriger vers onboarding si l'utilisateur n'a pas encore choisi son rôle
-      const userRole = user.publicMetadata?.role;
-      
-      if (!userRole) {
-        router.push('/onboarding');
+  const userRole = user?.publicMetadata?.role as 'candidate' | 'employer' | 'admin';
+  
+  // États pour les données du dashboard
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const [profileCompletion, setProfileCompletion] = useState<number>(0);
+  const [realActivities, setRealActivities] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [isUploadingCV, setIsUploadingCV] = useState(false);
+  const [recentJobsCount, setRecentJobsCount] = useState<number>(0);
+  const [experiencesCount, setExperiencesCount] = useState<number>(0);
+  const [educationCount, setEducationCount] = useState<number>(0);
+  const [skillsCount, setSkillsCount] = useState<number>(0);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Fonction pour charger les données du dashboard
+  const loadDashboardData = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const token = await getToken();
+      if (!token) {
+        setError('Token d\'authentification manquant');
         return;
       }
       
-      // Sinon, afficher un dashboard temporaire
-      console.log('User role:', userRole);
+      // Toujours essayer de charger le profil pour le pourcentage de complétion
+      try {
+        const profileData = await candidatesAPI.getMyProfile(token);
+        
+        // Calculer le pourcentage de complétion réel (même logique que la page profil)
+        if (profileData && user) {
+          const fields = [
+            user.firstName,
+            user.lastName,
+            user.emailAddresses?.[0]?.emailAddress,
+            profileData.phone,
+            profileData.location,
+            profileData.title,
+            profileData.summary
+          ];
+          const filledFields = fields.filter(field => field && field.toString().trim().length > 0);
+          const profileCompletion = (filledFields.length / fields.length) * 100;
+          
+          // Ajouter les bonus pour expérience, éducation et compétences et compter les éléments
+          const experiencesCount = profileData.experiences?.length || 0;
+          const educationCount = profileData.education?.length || 0;
+          const skillsCount = profileData.skills?.length || 0;
+          
+          // Mettre à jour les compteurs
+          setExperiencesCount(experiencesCount);
+          setEducationCount(educationCount);
+          setSkillsCount(skillsCount);
+          
+          const hasExperience = experiencesCount > 0;
+          const hasEducation = educationCount > 0;
+          const hasSkills = skillsCount > 0;
+          
+          let totalCompletion = profileCompletion * 0.6;
+          if (hasExperience) totalCompletion += 15;
+          if (hasEducation) totalCompletion += 15;
+          if (hasSkills) totalCompletion += 10;
+          
+          const completion = Math.round(totalCompletion);
+          setProfileCompletion(completion);
+        }
+      } catch (profileError) {
+        console.warn('Erreur lors du chargement du profil:', profileError);
+      }
+      
+      // Essayer de charger les données du dashboard (optionnel)
+      try {
+        const [dashboardData, activities, recentJobs] = await Promise.all([
+          dashboardAPI.getDashboardData(token).catch(() => null),
+          dashboardAPI.getRecentActivities(token).catch(() => []),
+          jobsAPI.getRecentJobsCount(7).catch(() => ({ count: 0, days: 7 }))
+        ]);
+        
+        if (dashboardData) {
+          setDashboardData(dashboardData);
+        }
+        
+        if (activities && activities.length > 0) {
+          setRealActivities(activities);
+        }
+        
+        // Mettre à jour le nombre d'offres récentes
+        setRecentJobsCount(recentJobs.count);
+      } catch (dashboardError) {
+        console.warn('Erreur lors du chargement du dashboard:', dashboardError);
+        // Les données mockées seront utilisées automatiquement
+      }
+      
+      // Mettre à jour l'horodatage
+      setLastUpdated(new Date());
+      
+    } catch (error) {
+      console.error('Erreur générale:', error);
+      setError('Erreur lors du chargement des données');
+    } finally {
+      setIsLoading(false);
     }
-  }, [isLoaded, user, router]);
+  };
 
-  if (!isLoaded) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
+  // Fonction pour gérer le téléchargement de CV
+  const handleCVUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
 
-  if (!user) {
-    router.push('/sign-in');
-    return null;
-  }
+    // Vérifier le type de fichier
+    if (file.type !== 'application/pdf') {
+      alert('Veuillez sélectionner un fichier PDF.');
+      return;
+    }
 
-  const userRole = user.publicMetadata?.role;
+    // Vérifier la taille (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Le fichier ne peut pas dépasser 5MB.');
+      return;
+    }
+
+    try {
+      setIsUploadingCV(true);
+      const token = await getToken();
+      if (!token) {
+        alert('Erreur d\'authentification');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('cv', file);
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/candidates/cv`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (response.ok) {
+        alert('CV téléchargé avec succès !');
+        // Recharger les données du dashboard
+        loadDashboardData();
+        // Rediriger vers la page Mes CV
+        router.push('/dashboard/cv');
+      } else {
+        const errorData = await response.json();
+        alert(`Erreur lors du téléchargement: ${errorData.detail || 'Erreur inconnue'}`);
+      }
+    } catch (error) {
+      console.error('Erreur lors du téléchargement du CV:', error);
+      alert('Erreur lors du téléchargement du CV');
+    } finally {
+      setIsUploadingCV(false);
+      // Réinitialiser l'input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  // Ouvrir le sélecteur de fichiers
+  const openFileSelector = () => {
+    fileInputRef.current?.click();
+  };
+
+  // Charger les données du dashboard au montage
+  useEffect(() => {
+    if (user) {
+      loadDashboardData();
+    }
+  }, [user]);
+
+  // Actualiser les données lors du retour sur la page
+  useEffect(() => {
+    if (!user) return;
+
+    // Actualiser lors du focus de la fenêtre
+    const handleFocus = () => {
+      loadDashboardData();
+    };
+
+    // Actualiser lors du changement de visibilité
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        loadDashboardData();
+      }
+    };
+
+    // Détecter la navigation (when coming back from profile page)
+    const handleBeforeUnload = () => {
+      // Sauvegarder un timestamp pour détecter le retour
+      sessionStorage.setItem('dashboardLastLeft', Date.now().toString());
+    };
+
+    // Vérifier si on revient d'une autre page
+    const checkReturnFromOtherPage = () => {
+      const lastLeft = sessionStorage.getItem('dashboardLastLeft');
+      if (lastLeft && Date.now() - parseInt(lastLeft) > 1000) { // Plus d'1 seconde
+        loadDashboardData();
+        sessionStorage.removeItem('dashboardLastLeft');
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    // Vérifier immédiatement si on revient d'une autre page
+    checkReturnFromOtherPage();
+    
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [user]);
+
+  // Fonctions utilitaires pour les classes CSS
+  const getStatBgColor = (color: string) => {
+    switch (color) {
+      case 'blue': return 'bg-blue-100';
+      case 'green': return 'bg-green-100';
+      case 'purple': return 'bg-purple-100';
+      default: return 'bg-orange-100';
+    }
+  };
+
+  const getStatTextColor = (color: string) => {
+    switch (color) {
+      case 'blue': return 'text-blue-600';
+      case 'green': return 'text-green-600';
+      case 'purple': return 'text-purple-600';
+      default: return 'text-orange-600';
+    }
+  };
+
+  const getStatIcon = (title: string) => {
+    // Mapper les titres aux icônes appropriées
+    if (title.includes('Profil') || title.includes('Candidatures reçues')) return UserIcon;
+    if (title.includes('CV') || title.includes('Offres')) return DocumentTextIcon;
+    if (title.includes('Candidatures') || title.includes('Entretiens')) return ChartBarIcon;
+    if (title.includes('Vues') || title.includes('Taux')) return EyeIcon;
+    return ArrowTrendingUpIcon; // Icône par défaut
+  };
+
+  const getActivityBgColor = (type: string) => {
+    switch (type) {
+      case 'application': return 'bg-blue-100';
+      case 'view': return 'bg-green-100';
+      case 'interview': return 'bg-purple-100';
+      default: return 'bg-gray-100';
+    }
+  };
+
+  // Utiliser les vraies données ou fallback vers les données mockées
+  const stats = dashboardData?.stats || (userRole === 'candidate' ? [
+    {
+      title: 'Profil complété',
+      value: `${profileCompletion}%`,
+      icon: UserIcon,
+      change: '+5%',
+      changeType: 'increase' as const,
+      color: 'blue'
+    },
+    {
+      title: 'Expériences ajoutées',
+      value: experiencesCount.toString(),
+      icon: BriefcaseIcon,
+      change: experiencesCount > 0 ? '+' + experiencesCount : '0',
+      changeType: 'increase' as const,
+      color: 'green'
+    },
+    {
+      title: 'Formations ajoutées',
+      value: educationCount.toString(),
+      icon: DocumentTextIcon,
+      change: educationCount > 0 ? '+' + educationCount : '0',
+      changeType: 'increase' as const,
+      color: 'purple'
+    },
+    {
+      title: 'Compétences ajoutées',
+      value: skillsCount.toString(),
+      icon: ChartBarIcon,
+      change: skillsCount > 0 ? '+' + skillsCount : '0',
+      changeType: 'increase' as const,
+      color: 'orange'
+    }
+  ] : [
+    {
+      title: 'Offres actives',
+      value: '5',
+      icon: DocumentTextIcon,
+      change: '+2',
+      changeType: 'increase' as const,
+      color: 'blue'
+    },
+    {
+      title: 'Candidatures reçues',
+      value: '47',
+      icon: UserIcon,
+      change: '+15',
+      changeType: 'increase' as const,
+      color: 'green'
+    },
+    {
+      title: 'Entretiens prévus',
+      value: '6',
+      icon: ChartBarIcon,
+      change: '+2',
+      changeType: 'increase' as const,
+      color: 'purple'
+    },
+    {
+      title: 'Taux de réponse',
+      value: '68%',
+      icon: ArrowTrendingUpIcon,
+      change: '+8%',
+      changeType: 'increase' as const,
+      color: 'orange'
+    }
+  ]);
+
+  // Utiliser les vraies activités ou fallback vers mockées avec données en temps réel
+  const recentActivities = realActivities.length > 0 ? realActivities : (userRole === 'candidate' ? [
+    {
+      id: 1,
+      action: 'Profil créé avec succès',
+      target: `${user?.firstName} ${user?.lastName}`,
+      time: 'Aujourd\'hui',
+      type: 'update'
+    },
+    {
+      id: 2,
+      action: 'Connexion à la plateforme',
+      target: 'Session active',
+      time: 'Maintenant',
+      type: 'view'
+    },
+    {
+      id: 3,
+      action: 'Profil mis à jour',
+      target: `${profileCompletion}% complété`,
+      time: 'Dernière modification',
+      type: 'update'
+    }
+  ] : [
+    {
+      id: 1,
+      action: 'Nouveau candidat postulé',
+      target: 'Développeur Backend - Votre offre',
+      time: 'Il y a 1 heure',
+      type: 'application'
+    },
+    {
+      id: 2,
+      action: 'Offre consultée',
+      target: 'Data Scientist - Paris',
+      time: 'Il y a 3 heures',
+      type: 'view'
+    },
+    {
+      id: 3,
+      action: 'Entretien planifié',
+      target: 'Jean Dupont - Développeur Frontend',
+      time: 'Aujourd\'hui',
+      type: 'interview'
+    }
+  ]);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-lg shadow px-6 py-8">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">
-              Tableau de Bord - INTOWORK
-            </h1>
-            
-            <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
-              <p className="text-blue-800">
-                <strong>Bienvenue {user.firstName} !</strong>
-              </p>
-              <p className="text-blue-600 mt-2">
-                Rôle : {String(userRole || 'Non défini')}
-              </p>
+    <DashboardLayout 
+      title={`Bonjour ${user?.firstName} !`}
+      subtitle={`Bienvenue sur votre dashboard ${userRole === 'candidate' ? 'candidat' : 'employeur'}`}
+    >
+      {/* Statistiques principales */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {stats.map((stat) => (
+          <div key={stat.title} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 font-medium">{stat.title}</p>
+                <p className="text-3xl font-bold text-gray-900 mt-1">{stat.value}</p>
+                <div className="flex items-center mt-2">
+                  <span className={`text-sm font-medium ${
+                    stat.changeType === 'increase' ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                    {stat.change}
+                  </span>
+                  <span className="text-xs text-gray-500 ml-1">vs mois dernier</span>
+                </div>
+              </div>
+              <div className={`p-3 rounded-lg ${getStatBgColor(stat.color)}`}>
+                {React.createElement(getStatIcon(stat.title), { 
+                  className: `w-6 h-6 ${getStatTextColor(stat.color)}` 
+                })}
+              </div>
             </div>
+          </div>
+        ))}
+      </div>
 
-            {!userRole && (
-              <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-6">
-                <p className="text-yellow-800">
-                  Vous allez être redirigé vers la page d'onboarding pour choisir votre rôle...
+      {/* Contenu principal */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Activité récente */}
+        <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200">
+          <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">Activité récente</h2>
+              {lastUpdated && (
+                <p className="text-xs text-gray-500 mt-1">
+                  Dernière actualisation: {lastUpdated.toLocaleTimeString()}
                 </p>
-              </div>
-            )}
-
-            {userRole === 'candidate' && (
-              <div className="bg-green-50 border border-green-200 rounded-md p-4 mb-6">
-                <h3 className="text-lg font-semibold text-green-800 mb-2">
-                  Dashboard Candidat
-                </h3>
-                <p className="text-green-600">
-                  Cette fonctionnalité sera disponible dans la Phase 2 du projet.
-                </p>
-              </div>
-            )}
-
-            {userRole === 'employer' && (
-              <div className="bg-purple-50 border border-purple-200 rounded-md p-4 mb-6">
-                <h3 className="text-lg font-semibold text-purple-800 mb-2">
-                  Dashboard Employeur
-                </h3>
-                <p className="text-purple-600">
-                  Cette fonctionnalité sera disponible dans les phases ultérieures.
-                </p>
-              </div>
-            )}
-
-            <div className="mt-8 space-y-4">
-              <button
-                onClick={() => router.push('/onboarding')}
-                className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 mr-4"
-              >
-                Modifier mon rôle
-              </button>
-              
-              <button
-                onClick={() => router.push('/')}
-                className="bg-gray-600 text-white px-6 py-3 rounded-md hover:bg-gray-700"
-              >
-                Retour à l'accueil
-              </button>
+              )}
+            </div>
+            <button 
+              onClick={loadDashboardData}
+              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Actualisation...' : 'Actualiser'}
+            </button>
+          </div>
+          <div className="p-6">
+            <div className="space-y-4">
+              {recentActivities.map((activity) => (
+                <div key={activity.id} className="flex items-start space-x-3">
+                  <div className={`p-2 rounded-full ${getActivityBgColor(activity.type)}`}>
+                    {activity.type === 'application' && <DocumentTextIcon className="w-4 h-4 text-blue-600" />}
+                    {activity.type === 'view' && <EyeIcon className="w-4 h-4 text-green-600" />}
+                    {activity.type === 'interview' && <UserIcon className="w-4 h-4 text-purple-600" />}
+                    {activity.type === 'update' && <DocumentTextIcon className="w-4 h-4 text-gray-600" />}
+                    {activity.type === 'job_post' && <BellIcon className="w-4 h-4 text-gray-600" />}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-900">
+                      <span className="font-medium">{activity.action}</span>
+                      <span className="text-gray-600 ml-1">{activity.target}</span>
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">{activity.time}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
+
+        {/* Actions rapides */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900">Actions rapides</h2>
+          </div>
+          <div className="p-6 space-y-3">
+            {userRole === 'candidate' ? (
+              <>
+                <button className="w-full flex items-center justify-between p-3 text-left bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
+                  <div>
+                    <p className="font-medium text-blue-900">Compléter mon profil</p>
+                    <p className="text-xs text-blue-700">{profileCompletion}% complété</p>
+                  </div>
+                  <UserIcon className="w-5 h-5 text-blue-600" />
+                </button>
+                <button 
+                  onClick={openFileSelector}
+                  disabled={isUploadingCV}
+                  className="w-full flex items-center justify-between p-3 text-left bg-green-50 hover:bg-green-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <div>
+                    <p className="font-medium text-green-900">
+                      {isUploadingCV ? 'Téléchargement...' : 'Télécharger un CV'}
+                    </p>
+                    <p className="text-xs text-green-700">
+                      {isUploadingCV ? 'Traitement en cours' : 'Formats PDF acceptés (max 5MB)'}
+                    </p>
+                  </div>
+                  <DocumentTextIcon className="w-5 h-5 text-green-600" />
+                </button>
+                <button 
+                  onClick={() => router.push('/dashboard/jobs')}
+                  className="w-full flex items-center justify-between p-3 text-left bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors"
+                >
+                  <div>
+                    <p className="font-medium text-purple-900">Rechercher des emplois</p>
+                    <p className="text-xs text-purple-700">
+                      {recentJobsCount > 0 
+                        ? `${recentJobsCount} nouvelle${recentJobsCount > 1 ? 's' : ''} offre${recentJobsCount > 1 ? 's' : ''}` 
+                        : 'Aucune nouvelle offre'
+                      }
+                    </p>
+                  </div>
+                  <ChartBarIcon className="w-5 h-5 text-purple-600" />
+                </button>
+                <button 
+                  onClick={() => router.push('/dashboard/cv')}
+                  className="w-full flex items-center justify-between p-3 text-left bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <div>
+                    <p className="font-medium text-gray-900">Voir tous mes CV</p>
+                    <p className="text-xs text-gray-700">Gérer mes documents</p>
+                  </div>
+                  <DocumentTextIcon className="w-5 h-5 text-gray-600" />
+                </button>
+              </>
+            ) : (
+              <>
+                <button className="w-full flex items-center justify-between p-3 text-left bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
+                  <div>
+                    <p className="font-medium text-blue-900">Publier une offre</p>
+                    <p className="text-xs text-blue-700">Créer un nouveau poste</p>
+                  </div>
+                  <DocumentTextIcon className="w-5 h-5 text-blue-600" />
+                </button>
+                <button className="w-full flex items-center justify-between p-3 text-left bg-green-50 hover:bg-green-100 rounded-lg transition-colors">
+                  <div>
+                    <p className="font-medium text-green-900">Voir les candidats</p>
+                    <p className="text-xs text-green-700">47 nouvelles candidatures</p>
+                  </div>
+                  <UserIcon className="w-5 h-5 text-green-600" />
+                </button>
+                <button className="w-full flex items-center justify-between p-3 text-left bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors">
+                  <div>
+                    <p className="font-medium text-purple-900">Gérer les entretiens</p>
+                    <p className="text-xs text-purple-700">6 entretiens planifiés</p>
+                  </div>
+                  <ChartBarIcon className="w-5 h-5 text-purple-600" />
+                </button>
+              </>
+            )}
+          </div>
+        </div>
       </div>
-    </div>
+
+      {/* Input file caché pour le téléchargement de CV */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleCVUpload}
+        accept=".pdf"
+        className="hidden"
+        aria-label="Sélectionner un fichier CV"
+      />
+    </DashboardLayout>
   );
 }

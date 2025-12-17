@@ -1,0 +1,32 @@
+/* Styles personnalisés pour la page de profil */
+
+.progress-bar {
+  transition: width 0.5s ease-in-out;
+}
+
+.progress-bar[data-width="0"] { width: 0%; }
+.progress-bar[data-width="10"] { width: 10%; }
+.progress-bar[data-width="20"] { width: 20%; }
+.progress-bar[data-width="30"] { width: 30%; }
+.progress-bar[data-width="40"] { width: 40%; }
+.progress-bar[data-width="50"] { width: 50%; }
+.progress-bar[data-width="60"] { width: 60%; }
+.progress-bar[data-width="70"] { width: 70%; }
+.progress-bar[data-width="80"] { width: 80%; }
+.progress-bar[data-width="90"] { width: 90%; }
+.progress-bar[data-width="100"] { width: 100%; }
+
+.progress-circle {
+  transform: rotate(-90deg);
+  transition: stroke-dashoffset 0.5s ease-in-out;
+}
+
+/* Animation pour la sauvegarde */
+@keyframes pulse-save {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.saving-animation {
+  animation: pulse-save 1s infinite;
+}

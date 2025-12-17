@@ -53,7 +53,8 @@ class ClerkAuth:
             if not clerk_client:
                 raise HTTPException(status_code=500, detail="Clerk client not configured")
             
-            user = clerk_client.users.get(user_id)
+            # Nouvelle syntaxe de l'API Clerk
+            user = clerk_client.users.get(user_id=user_id)
             return {
                 "clerk_id": user.id,
                 "email": user.email_addresses[0].email_address if user.email_addresses else None,
@@ -88,30 +89,58 @@ def get_current_user(
         print(f"DEBUG: Clerk user ID: {clerk_user_id}")
         
         # Récupérer l'utilisateur depuis la DB
+        print(f"DEBUG: Searching for user with clerk_id: {clerk_user_id}")
         user = db.query(User).filter(User.clerk_id == clerk_user_id).first()
         
         if not user:
             print("DEBUG: User not found in DB, creating new user")
-            # Si l'utilisateur n'existe pas, le créer automatiquement
-            user_info = ClerkAuth.get_user_info(clerk_user_id)
-            user = User(
-                clerk_id=clerk_user_id,
-                email=user_info["email"],
-                first_name=user_info["first_name"],
-                last_name=user_info["last_name"],
-                role=UserRole.CANDIDATE,  # Rôle par défaut
-                is_active=True
-            )
-            db.add(user)
-            db.commit()
-            db.refresh(user)
+            try:
+                # Si l'utilisateur n'existe pas, le créer automatiquement
+                print("DEBUG: Calling ClerkAuth.get_user_info()")
+                user_info = ClerkAuth.get_user_info(clerk_user_id)
+                print(f"DEBUG: User info retrieved: {user_info}")
+                
+                user = User(
+                    clerk_id=clerk_user_id,
+                    email=user_info["email"],
+                    first_name=user_info["first_name"],
+                    last_name=user_info["last_name"],
+                    role=UserRole.CANDIDATE,  # Rôle par défaut
+                    is_active=True
+                )
+                print("DEBUG: User object created, adding to DB")
+                db.add(user)
+                db.commit()
+                db.refresh(user)
+                print("DEBUG: User successfully created and committed to DB")
+            except HTTPException as http_error:
+                print(f"DEBUG: HTTP Error creating user: {http_error.detail}")
+                raise
+            except Exception as create_error:
+                print(f"DEBUG: Unexpected error creating user: {type(create_error).__name__}: {str(create_error)}")
+                # Pour le développement, créons un utilisateur minimal sans appeler l'API Clerk
+                print("DEBUG: Creating minimal user without Clerk API call")
+                user = User(
+                    clerk_id=clerk_user_id,
+                    email=f"{clerk_user_id}@example.com",  # Email temporaire
+                    first_name="Utilisateur",
+                    last_name="Test",
+                    role=UserRole.CANDIDATE,
+                    is_active=True
+                )
+                db.add(user)
+                db.commit()
+                db.refresh(user)
+                print("DEBUG: Minimal user created successfully")
         
         print(f"DEBUG: User found/created: {user.email}")
         return user
         
-    except HTTPException:
+    except HTTPException as http_ex:
+        print(f"DEBUG: HTTPException in get_current_user: {http_ex.detail}")
         raise
     except Exception as e:
+        print(f"DEBUG: Unexpected exception in get_current_user: {type(e).__name__}: {str(e)}")
         raise HTTPException(status_code=401, detail=f"Authentication failed: {str(e)}")
 
 def require_user(

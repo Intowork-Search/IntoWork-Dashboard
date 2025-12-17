@@ -1,14 +1,15 @@
-# INTOWORK Search - Phase 1 ✅
+# INTOWORK Search - Phase 2 🚀
 
-Plateforme de recrutement B2B2C avec matching IA - **Phase 1 : Fondation (Terminée)**
+Plateforme de recrutement B2B2C avec matching IA - **Phase 2 : Dashboard Candidat (En cours)**
 
 ## 🎯 Vue d'ensemble
 
 INTOWORK Search est une plateforme complète de recrutement avec :
-- **Dashboard candidat** : Profil, CV, candidatures, alertes
-- **Dashboard entreprise** : ATS complet avec pipeline Kanban
-- **Système de matching IA** pour optimiser les candidatures
-- **Authentification Clerk** avec support Microsoft/Azure AD
+
+- **Dashboard candidat** : Profil complet, paramètres, notifications ✅
+- **Dashboard entreprise** : ATS complet avec pipeline Kanban (Phase 3)
+- **Système de matching IA** pour optimiser les candidatures (Phase 4)
+- **Authentification Clerk** avec support Microsoft/Azure AD ✅
 
 ## 🏗️ Architecture
 
@@ -155,12 +156,20 @@ NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/onboarding
 - [x] Onboarding post-inscription
 - [x] Middleware de protection des routes
 
-## 🔜 Phase 2 - Dashboard Candidat (Prochaine)
+## ✅ Phase 2 - Dashboard Candidat (En cours)
 
-- [ ] Profil candidat complet (expériences, formations, compétences)
+### Nouveau : Page de paramètres complète
+- [x] **Profil personnel** : Nom, téléphone, localisation, bio, liens sociaux
+- [x] **Préférences de notification** : Email, alertes emploi, marketing, push
+- [x] **Paramètres de confidentialité** : Profil public, visibilité email/téléphone
+- [x] **Gestion du compte** : Informations utilisateur, suppression compte
+- [x] **Design moderne** : Interface cohérente avec sidebar, composants réutilisables
+- [x] **Accessibilité** : Labels ARIA, navigation clavier, contraste optimisé
+
+### À venir dans Phase 2
 - [ ] CV Builder avec templates
-- [ ] Système de candidatures
-- [ ] Dashboard de suivi
+- [ ] Système de candidatures  
+- [ ] Dashboard de suivi des candidatures
 - [ ] Upload de fichiers (S3)
 
 ## 🔜 Phase 3 - Dashboard Entreprise + ATS (Après Phase 2)
@@ -207,7 +216,9 @@ npm test
 - SQLAlchemy 2.0+ (ORM)
 - PostgreSQL 15 (Base de données)
 - Alembic (Migrations)
-- Clerk Backend API (Auth)
+- Clerk Backend API 4.2+ (Auth)
+- Python Multipart (Upload fichiers)
+- Pydantic Email Validator
 - Docker (Containerisation)
 
 **Frontend :**
@@ -215,6 +226,8 @@ npm test
 - TypeScript (Types)
 - Tailwind CSS (Styles)
 - Clerk Next.js (Auth)
+- React Hot Toast (Notifications)
+- Heroicons (Icônes)
 - Axios (HTTP Client)
 
 **Authentification :**

@@ -23,7 +23,7 @@ dev:
 # Lancer uniquement le backend
 backend:
 	@echo "🐍 Démarrage du backend FastAPI..."
-	@cd backend && PYTHONPATH=$(PWD)/backend $(PWD)/.venv/bin/python -m uvicorn app.main:app --reload --port 8001
+	@cd backend && source venv/bin/activate && uvicorn app.main:app --reload --port 8001
 
 # Lancer uniquement le frontend  
 frontend:
@@ -35,8 +35,8 @@ install: install-backend install-frontend
 
 install-backend:
 	@echo "🐍 Installation des dépendances Python..."
-	@python -m venv .venv || true
-	@.venv/bin/pip install -r backend/requirements.txt
+	@cd backend && python3 -m venv venv || true
+	@cd backend && source venv/bin/activate && pip install -r requirements.txt
 
 install-frontend:
 	@echo "📦 Installation des dépendances Node.js..."

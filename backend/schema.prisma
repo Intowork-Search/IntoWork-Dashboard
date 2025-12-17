@@ -1,0 +1,161 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider             = "prisma-client-py"
+  recursive_type_depth = 5
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  CANDIDATE
+  EMPLOYER
+  ADMIN
+}
+
+enum SkillCategory {
+  TECHNICAL
+  SOFT
+  LANGUAGE
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  clerkId    String   @unique @map("clerk_id")
+  email      String   @unique
+  role       UserRole
+  firstName  String   @map("first_name")
+  lastName   String   @map("last_name")
+  isActive   Boolean  @default(true) @map("is_active")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  candidate Candidate?
+  employer  Employer?
+
+  @@map("users")
+}
+
+model Candidate {
+  id                   Int     @id @default(autoincrement())
+  userId               Int     @unique @map("user_id")
+  phone                String?
+  location             String?
+  linkedinUrl          String? @map("linkedin_url")
+  websiteUrl           String? @map("website_url")
+  profilePictureUrl    String? @map("profile_picture_url")
+  title                String?
+  summary              String?
+  yearsExperience      Int?    @map("years_experience")
+  salaryExpectationMin Int?    @map("salary_expectation_min")
+  salaryExpectationMax Int?    @map("salary_expectation_max")
+  cvUrl                String? @map("cv_url")
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user        User         @relation(fields: [userId], references: [id])
+  experiences Experience[]
+  educations  Education[]
+  skills      Skill[]
+
+  @@map("candidates")
+}
+
+model Experience {
+  id          Int      @id @default(autoincrement())
+  candidateId Int      @map("candidate_id")
+  title       String
+  company     String
+  location    String?
+  startDate   String   @map("start_date") // Format YYYY-MM
+  endDate     String?  @map("end_date") // Format YYYY-MM
+  isCurrent   Boolean  @default(false) @map("is_current")
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  candidate Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+
+  @@map("experiences")
+}
+
+model Education {
+  id          Int      @id @default(autoincrement())
+  candidateId Int      @map("candidate_id")
+  degree      String
+  school      String
+  location    String?
+  startDate   String   @map("start_date") // Format YYYY-MM
+  endDate     String   @map("end_date") // Format YYYY-MM
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  candidate Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+
+  @@map("educations")
+}
+
+model Skill {
+  id          Int           @id @default(autoincrement())
+  candidateId Int           @map("candidate_id")
+  name        String
+  level       Int // 1-5
+  category    SkillCategory
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  // Relations
+  candidate Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+
+  @@map("skills")
+}
+
+model Company {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  industry    String?
+  size        String? // "1-10", "11-50", "51-200", "201-500", "500+"
+  websiteUrl  String?  @map("website_url")
+  linkedinUrl String?  @map("linkedin_url")
+  address     String?
+  city        String?
+  country     String?
+  logoUrl     String?  @map("logo_url")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  employers Employer[]
+
+  @@map("companies")
+}
+
+model Employer {
+  id                 Int     @id @default(autoincrement())
+  userId             Int     @unique @map("user_id")
+  companyId          Int     @map("company_id")
+  position           String?
+  department         String?
+  phone              String?
+  canCreateJobs      Boolean @default(true) @map("can_create_jobs")
+  canManageCandidates Boolean @default(true) @map("can_manage_candidates")
+  isAdmin            Boolean @default(false) @map("is_admin")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user    User    @relation(fields: [userId], references: [id])
+  company Company @relation(fields: [companyId], references: [id])
+
+  @@map("employers")
+}

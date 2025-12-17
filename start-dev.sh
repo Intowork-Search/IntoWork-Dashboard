@@ -28,9 +28,9 @@ if [ ! -d "backend" ] || [ ! -d "frontend" ]; then
 fi
 
 # Vérifier que l'environnement virtuel Python existe
-if [ ! -d ".venv" ]; then
-    echo "❌ Erreur: Environnement virtuel Python non trouvé (.venv)"
-    echo "   Créez l'environnement virtuel d'abord avec: python -m venv .venv"
+if [ ! -d "backend/venv" ]; then
+    echo "❌ Erreur: Environnement virtuel Python non trouvé (backend/venv)"
+    echo "   Créez l'environnement virtuel d'abord avec: cd backend && python3 -m venv venv"
     exit 1
 fi
 
@@ -47,7 +47,8 @@ echo ""
 # Démarrer le backend FastAPI en arrière-plan
 echo "🐍 Démarrage du backend FastAPI (port 8001)..."
 cd backend
-PYTHONPATH=/home/anna/Documents/IntoWork/backend /home/anna/Documents/IntoWork/.venv/bin/python -m uvicorn app.main:app --reload --port 8001 &
+source venv/bin/activate
+uvicorn app.main:app --reload --port 8001 &
 BACKEND_PID=$!
 cd ..
 
