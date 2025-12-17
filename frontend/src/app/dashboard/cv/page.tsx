@@ -238,7 +238,7 @@ export default function MesCVPage() {
       const formData = new FormData();
       formData.append('cv', file);
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/candidates/cv`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://localhost:8000/api'}/candidates/cv`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
