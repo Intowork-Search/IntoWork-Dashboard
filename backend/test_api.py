@@ -9,7 +9,7 @@ import requests
 import json
 from datetime import datetime
 
-BASE_URL = "http://localhost:8001"
+BASE_URL = "https://localhost:8000"
 
 def test_endpoint(method, endpoint, data=None):
     """Tester un endpoint de l'API"""

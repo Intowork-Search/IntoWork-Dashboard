@@ -11,9 +11,9 @@ export const getBaseUrl = () => {
   // Récupérer l'URL de l'environnement
   const url = process.env.NEXT_PUBLIC_API_URL;
   
-  // Si l'URL n'est pas définie, utiliser localhost en HTTP (pour le dev local)
+  // Si l'URL n'est pas définie, utiliser localhost en HTTPS (pour le dev local)
   if (!url) {
-    return 'http://localhost:8000/api';
+    return 'https://localhost:8000/api';
   }
   
   // Force HTTPS en production si l'URL commence par http://
