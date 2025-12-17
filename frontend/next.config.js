@@ -20,7 +20,8 @@ const nextConfig = {
   // Configuration pour éviter les Mixed Content
   env: {
     FORCE_HTTPS_API: 'true',
-    CACHE_BUSTER_TIMESTAMP: '2025-12-17-18-15'
+    CACHE_BUSTER_TIMESTAMP: '2025-12-17-18-33',
+    VERCEL_REDEPLOY_FORCE: 'true'
   },
   images: {
     remotePatterns: [
