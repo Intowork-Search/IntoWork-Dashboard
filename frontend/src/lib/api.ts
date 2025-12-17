@@ -1,12 +1,26 @@
 import axios from 'axios';
 
-// Configuration de l'API client
+// Configuration de l'API client - VERSION CORRIGÉE
 const getBaseUrl = () => {
-  const url = process.env.NEXT_PUBLIC_API_URL || 'https://localhost:8000/api';
-  // Force HTTPS en production
+  // En production (Vercel), toujours utiliser HTTPS
+  if (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app')) {
+    return 'https://intowork-dashboard-production.up.railway.app/api';
+  }
+  
+  // Récupérer l'URL de l'environnement
+  const url = process.env.NEXT_PUBLIC_API_URL;
+  
+  // Si l'URL n'est pas définie, utiliser localhost en HTTP (pour le dev local)
+  if (!url) {
+    return 'http://localhost:8000/api';
+  }
+  
+  // Force HTTPS en production si l'URL commence par http://
   if (typeof window !== 'undefined' && window.location.protocol === 'https:' && url.startsWith('http://')) {
+    console.warn('⚠️ URL HTTP détectée en production, conversion en HTTPS');
     return url.replace('http://', 'https://');
   }
+  
   return url;
 };
 
@@ -15,6 +29,7 @@ const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 10000, // Timeout de 10 secondes
 });
 
 // Function to create authenticated axios instance
@@ -25,6 +40,7 @@ export const createAuthenticatedClient = (token: string) => {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
     },
+    timeout: 10000,
   });
   return client;
 };
