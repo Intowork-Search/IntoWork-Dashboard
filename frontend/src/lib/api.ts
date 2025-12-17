@@ -1,9 +1,10 @@
 import axios from 'axios';
 
-// Configuration de l'API client - VERSION CORRIGÉE
+// Configuration de l'API client - VERSION CORRIGÉE v2
 const getBaseUrl = () => {
-  // En production (Vercel), toujours utiliser HTTPS
-  if (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app')) {
+  // En production (Vercel), toujours utiliser HTTPS - FORCE ABSOLUE
+  if (typeof window !== 'undefined' && (window.location.hostname.includes('vercel.app') || window.location.protocol === 'https:')) {
+    console.log('🚀 Force HTTPS URL en production');
     return 'https://intowork-dashboard-production.up.railway.app/api';
   }
   
