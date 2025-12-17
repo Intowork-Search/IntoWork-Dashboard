@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Configuration de l'API client
 const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://localhost:8000/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -11,7 +11,7 @@ const apiClient = axios.create({
 // Function to create authenticated axios instance
 export const createAuthenticatedClient = (token: string) => {
   const client = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api',
+    baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://localhost:8000/api',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
