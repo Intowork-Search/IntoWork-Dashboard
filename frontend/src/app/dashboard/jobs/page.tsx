@@ -1,5 +1,7 @@
 'use client';
 
+// Cache buster: 2025-12-18-15h00
+
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import { jobsAPI, Job, JobFilters } from '@/lib/api';
