@@ -6,10 +6,10 @@ from fastapi import status, APIRouter, Depends, HTTPException, Query, Response
 import logging
 from datetime import timezone, datetime, timedelta
 
-from app.auth import require_user
+from app.auth import require_user, get_current_user
 from app.models.base import (
     User, UserRole, Job, Employer, Company, 
-    JobLocation, JobType, JobStatus
+    JobLocation, JobType, JobStatus, JobApplication
 )
 from app.database import get_db
 
@@ -47,6 +47,7 @@ class JobResponse(BaseModel):
     is_featured: bool = False
     views_count: int = 0
     applications_count: int = 0
+    has_applied: bool = False  # Nouveau champ pour savoir si l'utilisateur a déjà postulé
 
 class JobDetailResponse(JobResponse):
     requirements: Optional[str] = None
@@ -79,11 +80,20 @@ async def get_jobs(
     job_type: Optional[str] = None,
     location_type: Optional[str] = None,
     salary_min: Optional[int] = None,
+    current_user: Optional[User] = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
     Récupérer la liste des offres d'emploi avec filtres et pagination
     """
+    # Si l'utilisateur est authentifié, récupérer ses candidatures
+    user_applications = set()
+    if current_user:
+        applications = db.query(JobApplication.job_id).filter(
+            JobApplication.candidate_id == current_user.id
+        ).all()
+        user_applications = {app.job_id for app in applications}
+    
     query = db.query(Job, Company).join(Company, Job.company_id == Company.id)
     query = query.filter(Job.status == JobStatus.PUBLISHED)
     
@@ -138,7 +148,8 @@ async def get_jobs(
             posted_at=job.posted_at,
             is_featured=job.is_featured,
             views_count=job.views_count,
-            applications_count=job.applications_count
+            applications_count=job.applications_count,
+            has_applied=job.id in user_applications
         ))
     
     total_pages = (total + limit - 1) // limit
@@ -379,7 +390,11 @@ async def delete_job(
 
 # ⚠️ Cette route DOIT être en DERNIER car elle capture tout
 @router.get("/{job_id}", response_model=JobDetailResponse)
-async def get_job(job_id: int, db: Session = Depends(get_db)):
+async def get_job(
+    job_id: int, 
+    current_user: Optional[User] = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """
     Récupérer les détails d'une offre d'emploi
     """
@@ -392,6 +407,15 @@ async def get_job(job_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Job not found")
     
     job, company = result
+    
+    # Vérifier si l'utilisateur a déjà postulé
+    has_applied = False
+    if current_user:
+        application = db.query(JobApplication).filter(
+            JobApplication.candidate_id == current_user.id,
+            JobApplication.job_id == job_id
+        ).first()
+        has_applied = application is not None
     
     # Incrémenter le compteur de vues
     job.views_count += 1
@@ -421,6 +445,7 @@ async def get_job(job_id: int, db: Session = Depends(get_db)):
         is_featured=job.is_featured,
         views_count=job.views_count,
         applications_count=job.applications_count,
+        has_applied=has_applied,
         status=job.status.value,
         created_at=job.created_at
     )

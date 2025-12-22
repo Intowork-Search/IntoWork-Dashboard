@@ -56,14 +56,7 @@ function getEmployerNavigation(jobsCount: number): NavItem[] {
       href: '/dashboard/candidates', 
       icon: UserIcon, 
       badge: undefined, // À rendre dynamique si besoin
-      description: 'Parcourir les profils de candidats'
-    },
-    { 
-      name: 'Candidatures', 
-      href: '/dashboard/applications', 
-      icon: ChartBarIcon, 
-      badge: undefined, // À rendre dynamique si besoin
-      description: 'Gérer les candidatures reçues'
+      description: 'Voir toutes les candidatures reçues'
     },
     { 
       name: 'Paramètres', 

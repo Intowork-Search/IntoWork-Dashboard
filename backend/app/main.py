@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from app.api.ping import router as ping_router
 from app.api.users import router as users_router
 from app.api.auth import router as auth_router
@@ -10,6 +11,7 @@ from app.api.applications import router as applications_router
 from app.api.companies import router as companies_router
 from dotenv import load_dotenv
 import os
+from pathlib import Path
 
 # Charger les variables d'environnement depuis le fichier .env
 load_dotenv()
@@ -42,8 +44,13 @@ app.include_router(auth_router, prefix="/api")
 app.include_router(candidates_router, prefix="/api/candidates", tags=["candidates"])
 app.include_router(dashboard_router, prefix="/api", tags=["dashboard"])
 app.include_router(jobs_router, prefix="/api/jobs", tags=["jobs"])
-app.include_router(applications_router, prefix="/api", tags=["applications"])
+app.include_router(applications_router, prefix="/api/applications", tags=["applications"])
 app.include_router(companies_router, prefix="/api/companies", tags=["companies"])
+
+# Servir les fichiers uploadés (CV, photos, etc.)
+uploads_path = Path(__file__).parent.parent / "uploads"
+uploads_path.mkdir(exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=str(uploads_path)), name="uploads")
 
 @app.get("/")
 async def root():

@@ -33,7 +33,7 @@ class ApplicationsListResponse(BaseModel):
     limit: int
     total_pages: int
 
-@router.get("/candidates/applications", response_model=ApplicationsListResponse)
+@router.get("/my/applications", response_model=ApplicationsListResponse)
 async def get_my_applications(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=50),
@@ -44,10 +44,11 @@ async def get_my_applications(
     """Récupérer les candidatures du candidat connecté"""
     
     # Construire la query de base
+    from app.models.base import Company
     query = db.query(JobApplication).filter(
         JobApplication.candidate_id == current_user.id
     ).options(
-        selectinload(JobApplication.job)
+        selectinload(JobApplication.job).selectinload(Job.company)
     )
     
     # Filtrer par statut si spécifié
@@ -70,7 +71,7 @@ async def get_my_applications(
         job_data = {
             'id': app.job.id,
             'title': app.job.title,
-            'company_name': app.job.company_name,
+            'company_name': app.job.company.name if app.job.company else "Entreprise inconnue",
             'location': app.job.location,
             'location_type': app.job.location_type,
             'job_type': app.job.job_type,
@@ -98,7 +99,7 @@ async def get_my_applications(
         total_pages=total_pages
     )
 
-@router.post("/candidates/applications", response_model=JobApplicationResponse)
+@router.post("/my/applications", response_model=JobApplicationResponse)
 async def create_application(
     application_data: JobApplicationCreate,
     current_user: User = Depends(get_current_user),
@@ -121,27 +122,29 @@ async def create_application(
         raise HTTPException(status_code=400, detail="Vous avez déjà postulé à cette offre")
     
     # Créer la candidature
+    from app.models.base import ApplicationStatus
     application = JobApplication(
         job_id=application_data.job_id,
         candidate_id=current_user.id,
-        status="pending",
-        applied_at=datetime.utcnow(),
-        notes=application_data.cover_letter
+        status=ApplicationStatus.APPLIED,
+        cover_letter=application_data.cover_letter,
+        applied_at=datetime.utcnow()
     )
     
     db.add(application)
     db.commit()
     db.refresh(application)
     
-    # Récupérer avec les données du job
+    # Récupérer avec les données du job et de la company
+    from app.models.base import Company
     application_with_job = db.query(JobApplication).options(
-        selectinload(JobApplication.job)
+        selectinload(JobApplication.job).selectinload(Job.company)
     ).filter(JobApplication.id == application.id).first()
     
     job_data = {
         'id': application_with_job.job.id,
         'title': application_with_job.job.title,
-        'company_name': application_with_job.job.company_name,
+        'company_name': application_with_job.job.company.name if application_with_job.job.company else "Entreprise inconnue",
         'location': application_with_job.job.location,
         'location_type': application_with_job.job.location_type,
         'job_type': application_with_job.job.job_type,
@@ -160,7 +163,7 @@ async def create_application(
         job=job_data
     )
 
-@router.get("/candidates/applications/{application_id}", response_model=JobApplicationResponse)
+@router.get("/my/applications/{application_id}", response_model=JobApplicationResponse)
 async def get_application(
     application_id: int,
     current_user: User = Depends(get_current_user),
@@ -200,7 +203,7 @@ async def get_application(
         job=job_data
     )
 
-@router.delete("/candidates/applications/{application_id}")
+@router.delete("/my/applications/{application_id}")
 async def withdraw_application(
     application_id: int,
     current_user: User = Depends(get_current_user),
@@ -224,3 +227,197 @@ async def withdraw_application(
     db.commit()
     
     return {"message": "Candidature retirée avec succès"}
+
+# ===== ENDPOINTS EMPLOYEUR =====
+
+class CandidateApplicationResponse(BaseModel):
+    id: int
+    job_id: int
+    job_title: str
+    candidate_id: int
+    candidate_name: str
+    candidate_email: str
+    candidate_phone: Optional[str] = None
+    status: str
+    applied_at: datetime
+    cover_letter: Optional[str] = None
+    notes: Optional[str] = None
+    cv_url: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+class EmployerApplicationsListResponse(BaseModel):
+    applications: List[CandidateApplicationResponse]
+    total: int
+    page: int
+    limit: int
+    total_pages: int
+
+class UpdateApplicationStatusRequest(BaseModel):
+    status: str  # pending, viewed, shortlisted, interview, accepted, rejected
+    
+class UpdateApplicationNotesRequest(BaseModel):
+    notes: str
+
+@router.get("/employer/applications", response_model=EmployerApplicationsListResponse)
+async def get_employer_applications(
+    page: int = Query(1, ge=1),
+    limit: int = Query(20, ge=1, le=100),
+    status: Optional[str] = Query(None),
+    job_id: Optional[int] = Query(None),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Récupérer toutes les candidatures des offres de l'employeur"""
+    from app.models.base import Employer, Candidate, UserRole
+    
+    if current_user.role != UserRole.EMPLOYER:
+        raise HTTPException(status_code=403, detail="Accès réservé aux employeurs")
+    
+    # Récupérer l'employeur
+    employer = db.query(Employer).filter(Employer.user_id == current_user.id).first()
+    if not employer:
+        raise HTTPException(status_code=404, detail="Employeur introuvable")
+    
+    # Construire la query - candidatures pour les jobs de cet employeur
+    query = db.query(JobApplication).join(Job).filter(
+        Job.employer_id == employer.id
+    ).options(
+        selectinload(JobApplication.job),
+        selectinload(JobApplication.candidate).selectinload(Candidate.user)
+    )
+    
+    # Filtrer par statut si spécifié
+    if status:
+        from app.models.base import ApplicationStatus
+        try:
+            status_enum = ApplicationStatus(status)
+            query = query.filter(JobApplication.status == status_enum)
+        except ValueError:
+            pass
+    
+    # Filtrer par job_id si spécifié
+    if job_id:
+        query = query.filter(JobApplication.job_id == job_id)
+    
+    # Ordre anti-chronologique
+    query = query.order_by(JobApplication.applied_at.desc())
+    
+    # Pagination
+    total = query.count()
+    total_pages = (total + limit - 1) // limit
+    applications = query.offset((page - 1) * limit).limit(limit).all()
+    
+    # Formater les résultats
+    applications_data = []
+    for app in applications:
+        candidate_user = app.candidate.user if app.candidate else None
+        applications_data.append(CandidateApplicationResponse(
+            id=app.id,
+            job_id=app.job_id,
+            job_title=app.job.title,
+            candidate_id=app.candidate_id,
+            candidate_name=f"{candidate_user.first_name} {candidate_user.last_name}" if candidate_user else "Inconnu",
+            candidate_email=candidate_user.email if candidate_user else "",
+            candidate_phone=app.candidate.phone if app.candidate else None,
+            status=app.status.value,
+            applied_at=app.applied_at,
+            cover_letter=app.cover_letter,
+            notes=app.notes,
+            cv_url=app.candidate.cv_url if app.candidate else None
+        ))
+    
+    return EmployerApplicationsListResponse(
+        applications=applications_data,
+        total=total,
+        page=page,
+        limit=limit,
+        total_pages=total_pages
+    )
+
+@router.put("/employer/applications/{application_id}/status")
+async def update_application_status(
+    application_id: int,
+    request: UpdateApplicationStatusRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Mettre à jour le statut d'une candidature (employeur uniquement)"""
+    from app.models.base import Employer, ApplicationStatus, UserRole
+    
+    if current_user.role != UserRole.EMPLOYER:
+        raise HTTPException(status_code=403, detail="Accès réservé aux employeurs")
+    
+    # Récupérer l'employeur
+    employer = db.query(Employer).filter(Employer.user_id == current_user.id).first()
+    if not employer:
+        raise HTTPException(status_code=404, detail="Employeur introuvable")
+    
+    # Récupérer la candidature
+    application = db.query(JobApplication).options(
+        selectinload(JobApplication.job)
+    ).filter(JobApplication.id == application_id).first()
+    
+    if not application:
+        raise HTTPException(status_code=404, detail="Candidature introuvable")
+    
+    # Vérifier que le job appartient à cet employeur
+    if application.job.employer_id != employer.id:
+        raise HTTPException(status_code=403, detail="Vous ne pouvez pas modifier cette candidature")
+    
+    # Valider et mettre à jour le statut
+    try:
+        new_status = ApplicationStatus(request.status)
+        application.status = new_status
+        db.commit()
+        db.refresh(application)
+        
+        return {
+            "message": "Statut mis à jour avec succès",
+            "application_id": application.id,
+            "new_status": application.status.value
+        }
+    except ValueError:
+        raise HTTPException(status_code=400, detail=f"Statut invalide: {request.status}")
+
+@router.put("/employer/applications/{application_id}/notes")
+async def update_application_notes(
+    application_id: int,
+    request: UpdateApplicationNotesRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Ajouter ou mettre à jour les notes d'une candidature (employeur uniquement)"""
+    from app.models.base import Employer, UserRole
+    
+    if current_user.role != UserRole.EMPLOYER:
+        raise HTTPException(status_code=403, detail="Accès réservé aux employeurs")
+    
+    # Récupérer l'employeur
+    employer = db.query(Employer).filter(Employer.user_id == current_user.id).first()
+    if not employer:
+        raise HTTPException(status_code=404, detail="Employeur introuvable")
+    
+    # Récupérer la candidature
+    application = db.query(JobApplication).options(
+        selectinload(JobApplication.job)
+    ).filter(JobApplication.id == application_id).first()
+    
+    if not application:
+        raise HTTPException(status_code=404, detail="Candidature introuvable")
+    
+    # Vérifier que le job appartient à cet employeur
+    if application.job.employer_id != employer.id:
+        raise HTTPException(status_code=403, detail="Vous ne pouvez pas modifier cette candidature")
+    
+    # Mettre à jour les notes
+    application.notes = request.notes
+    db.commit()
+    db.refresh(application)
+    
+    return {
+        "message": "Notes mises à jour avec succès",
+        "application_id": application.id,
+        "notes": application.notes
+    }

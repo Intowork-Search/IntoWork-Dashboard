@@ -53,6 +53,15 @@ export default function ApplicationsPage() {
     loadApplications();
   }, [currentPage]);
 
+  // Polling pour les mises à jour en temps réel (toutes les 30 secondes)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      loadApplications();
+    }, 30000); // 30 secondes
+
+    return () => clearInterval(interval);
+  }, [currentPage]);
+
   // Retirer une candidature
   const handleWithdrawApplication = async (applicationId: number) => {
     if (!confirm('Êtes-vous sûr de vouloir retirer cette candidature ?')) {
@@ -74,17 +83,30 @@ export default function ApplicationsPage() {
   // Icône et couleur selon le statut
   const getStatusInfo = (status: string) => {
     switch (status) {
+      case 'applied':
       case 'pending':
         return {
           icon: <ClockIcon className="w-5 h-5" />,
           label: 'En attente',
           color: 'text-yellow-600 bg-yellow-100'
         };
-      case 'under_review':
+      case 'viewed':
         return {
           icon: <EyeIcon className="w-5 h-5" />,
-          label: 'En cours d\'examen',
+          label: 'Vue',
           color: 'text-blue-600 bg-blue-100'
+        };
+      case 'shortlisted':
+        return {
+          icon: <CheckCircleIcon className="w-5 h-5" />,
+          label: 'Présélectionné',
+          color: 'text-purple-600 bg-purple-100'
+        };
+      case 'interview':
+        return {
+          icon: <EyeIcon className="w-5 h-5" />,
+          label: 'Entretien',
+          color: 'text-indigo-600 bg-indigo-100'
         };
       case 'accepted':
         return {
@@ -162,10 +184,21 @@ export default function ApplicationsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Mes candidatures</h1>
-          <p className="text-gray-600">
-            Suivez l'évolution de vos {totalApplications} candidature{totalApplications > 1 ? 's' : ''}
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Mes candidatures</h1>
+              <p className="text-gray-600">
+                Suivez l'évolution de vos {totalApplications} candidature{totalApplications > 1 ? 's' : ''}
+              </p>
+            </div>
+            <div className="flex items-center gap-2 px-3 py-2 bg-green-50 text-green-700 rounded-lg border border-green-200">
+              <div className="relative flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+              </div>
+              <span className="text-sm font-medium">Mise à jour auto</span>
+            </div>
+          </div>
         </div>
 
         {/* Statistiques rapides */}
@@ -178,7 +211,7 @@ export default function ApplicationsPage() {
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">En attente</p>
                 <p className="text-2xl font-semibold text-gray-900">
-                  {applications.filter(app => app.status === 'pending').length}
+                  {applications.filter(app => app.status === 'applied' || app.status === 'pending').length}
                 </p>
               </div>
             </div>
@@ -190,9 +223,9 @@ export default function ApplicationsPage() {
                 <EyeIcon className="w-6 h-6 text-blue-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">En examen</p>
+                <p className="text-sm font-medium text-gray-600">Vues</p>
                 <p className="text-2xl font-semibold text-gray-900">
-                  {applications.filter(app => app.status === 'under_review').length}
+                  {applications.filter(app => app.status === 'viewed' || app.status === 'shortlisted').length}
                 </p>
               </div>
             </div>
@@ -307,18 +340,20 @@ export default function ApplicationsPage() {
                     <div className="flex items-center gap-2 ml-6">
                       <Link
                         href={`/dashboard/jobs/${application.job.id}`}
-                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        className="flex items-center gap-1 px-3 py-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors text-sm font-medium"
                         title="Voir l'offre"
                       >
                         <EyeIcon className="w-5 h-5" />
+                        <span>Voir</span>
                       </Link>
-                      {application.status === 'pending' && (
+                      {(application.status === 'applied' || application.status === 'pending') && (
                         <button
                           onClick={() => handleWithdrawApplication(application.id)}
-                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          className="flex items-center gap-1 px-3 py-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors text-sm font-medium"
                           title="Retirer la candidature"
                         >
                           <TrashIcon className="w-5 h-5" />
+                          <span>Supprimer</span>
                         </button>
                       )}
                     </div>

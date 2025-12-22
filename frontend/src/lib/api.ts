@@ -356,6 +356,7 @@ export interface Job {
   is_featured: boolean;
   views_count: number;
   applications_count: number;
+  has_applied: boolean;
 }
 
 export interface JobDetail extends Job {
@@ -394,7 +395,7 @@ export interface JobApplication {
   id: number;
   job_id: number;
   candidate_id: number;
-  status: 'pending' | 'under_review' | 'accepted' | 'rejected';
+  status: 'applied' | 'pending' | 'viewed' | 'shortlisted' | 'interview' | 'accepted' | 'rejected';
   applied_at: string;
   notes?: string;
   // Données relationnelles
@@ -443,6 +444,13 @@ export const jobsAPI = {
     return response.data;
   },
 
+  // Récupérer les détails d'une offre d'emploi (avec authentification pour has_applied)
+  getJobById: async (token: string, jobId: number): Promise<JobDetail> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.get(`/jobs/${jobId}`);
+    return response.data;
+  },
+
   // Récupérer les statistiques (nombre d'offres récentes)
   getRecentJobsCount: async (days: number = 7): Promise<{ count: number; days: number }> => {
     const response = await apiClient.get(`/jobs/stats/recent?days=${days}`);
@@ -469,40 +477,52 @@ export const applicationsAPI = {
   // Récupérer mes candidatures
   getMyApplications: async (token: string, page: number = 1, limit: number = 10): Promise<ApplicationsResponse> => {
     const client = createAuthenticatedClient(token);
-    const response = await client.get(`/candidates/applications?page=${page}&limit=${limit}`);
+    const response = await client.get(`/applications/my/applications?page=${page}&limit=${limit}`);
     return response.data;
   },
 
   // Postuler à une offre
   applyToJob: async (token: string, applicationData: CreateApplicationData): Promise<JobApplication> => {
     const client = createAuthenticatedClient(token);
-    const response = await client.post('/candidates/applications', applicationData);
+    const response = await client.post('/applications/my/applications', applicationData);
     return response.data;
   },
 
   // Récupérer une candidature spécifique
   getApplication: async (token: string, applicationId: number): Promise<JobApplication> => {
     const client = createAuthenticatedClient(token);
-    const response = await client.get(`/candidates/applications/${applicationId}`);
+    const response = await client.get(`/applications/my/applications/${applicationId}`);
     return response.data;
   },
 
   // Retirer une candidature
   withdrawApplication: async (token: string, applicationId: number): Promise<void> => {
     const client = createAuthenticatedClient(token);
-    await client.delete(`/candidates/applications/${applicationId}`);
+    await client.delete(`/applications/my/applications/${applicationId}`);
   },
 
   // Récupérer le nombre total de candidatures
   getApplicationsCount: async (token: string): Promise<number> => {
     try {
       const client = createAuthenticatedClient(token);
-      const response = await client.get('/candidates/applications?limit=1');
+      const response = await client.get('/applications/my/applications?limit=1');
       return response.data.total || 0;
     } catch (error) {
       console.warn('Erreur lors de la récupération du nombre de candidatures:', error);
       return 0; // Retourner 0 en cas d'erreur
     }
+  },
+
+  // === EMPLOYEUR: Mettre à jour le statut d'une candidature ===
+  updateApplicationStatus: async (token: string, applicationId: number, status: string): Promise<void> => {
+    const client = createAuthenticatedClient(token);
+    await client.put(`/applications/employer/applications/${applicationId}/status`, { status });
+  },
+
+  // === EMPLOYEUR: Mettre à jour les notes d'une candidature ===
+  updateApplicationNotes: async (token: string, applicationId: number, notes: string): Promise<void> => {
+    const client = createAuthenticatedClient(token);
+    await client.put(`/applications/employer/applications/${applicationId}/notes`, { notes });
   }
 };
 

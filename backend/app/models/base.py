@@ -265,9 +265,11 @@ class JobApplication(Base):
     candidate_id = Column(Integer, ForeignKey("candidates.id"), nullable=False)
     
     # Candidature
-    status = Column(SQLEnum(ApplicationStatus), nullable=False, default=ApplicationStatus.APPLIED)
-    cover_letter = Column(Text)
+    status = Column(SQLEnum(ApplicationStatus, values_callable=lambda x: [e.value for e in x]), nullable=False, default=ApplicationStatus.APPLIED)
+    cover_letter = Column(Text)  # Lettre de motivation en texte
+    cover_letter_url = Column(String)  # URL du fichier de lettre de motivation
     cv_url = Column(String)  # CV spécifique à cette candidature
+    notes = Column(Text)  # Notes de l'employeur sur cette candidature
     
     # Suivi
     applied_at = Column(DateTime(timezone=True), server_default=func.now())

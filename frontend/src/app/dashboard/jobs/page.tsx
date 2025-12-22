@@ -4,7 +4,8 @@
 
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
-import { jobsAPI, Job, JobFilters } from '@/lib/api';
+import { jobsAPI, Job, JobFilters, applicationsAPI } from '@/lib/api';
+import { useAuth } from '@clerk/nextjs';
 import { 
   MagnifyingGlassIcon,
   MapPinIcon,
@@ -19,6 +20,7 @@ import {
 import { StarIcon } from '@heroicons/react/24/solid';
 
 export default function JobsPage() {
+  const { getToken } = useAuth();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -28,6 +30,10 @@ export default function JobsPage() {
   });
   const [totalJobs, setTotalJobs] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [showApplicationModal, setShowApplicationModal] = useState(false);
+  const [coverLetter, setCoverLetter] = useState('');
+  const [applying, setApplying] = useState(false);
 
   // Charger les offres d'emploi
   const loadJobs = async () => {
@@ -109,6 +115,49 @@ export default function JobsPage() {
       case 'remote': return <ComputerDesktopIcon className="w-4 h-4" />;
       case 'hybrid': return <BriefcaseIcon className="w-4 h-4" />;
       default: return <HomeIcon className="w-4 h-4" />;
+    }
+  };
+
+  // Ouvrir le modal de candidature
+  const handleApply = (job: Job) => {
+    setSelectedJob(job);
+    setCoverLetter('');
+    setShowApplicationModal(true);
+  };
+
+  // Soumettre la candidature
+  const handleSubmitApplication = async () => {
+    if (!selectedJob) return;
+
+    try {
+      setApplying(true);
+      const token = await getToken();
+      if (!token) {
+        alert('Vous devez être connecté pour postuler');
+        return;
+      }
+
+      await applicationsAPI.applyToJob(token, {
+        job_id: selectedJob.id,
+        cover_letter: coverLetter || undefined
+      });
+
+      alert('✅ Candidature envoyée avec succès !');
+      setShowApplicationModal(false);
+      setSelectedJob(null);
+      setCoverLetter('');
+      
+      // Recharger automatiquement les jobs pour mettre à jour le bouton
+      loadJobs();
+    } catch (error: any) {
+      console.error('Erreur lors de la candidature:', error);
+      if (error.response?.status === 400 && error.response?.data?.detail?.includes('déjà postulé')) {
+        alert('❌ Vous avez déjà postulé à cette offre');
+      } else {
+        alert('❌ Erreur lors de l\'envoi de la candidature');
+      }
+    } finally {
+      setApplying(false);
     }
   };
 
@@ -329,9 +378,21 @@ export default function JobsPage() {
 
                 {/* Bouton d'action */}
                 <div className="mt-4">
-                  <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
-                    Voir les détails
-                  </button>
+                  {job.has_applied ? (
+                    <button 
+                      disabled
+                      className="w-full bg-gray-400 text-white font-medium py-2 px-4 rounded-lg cursor-not-allowed"
+                    >
+                      Déjà postulé ✓
+                    </button>
+                  ) : (
+                    <button 
+                      onClick={() => handleApply(job)}
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                    >
+                      Postuler
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
@@ -363,6 +424,82 @@ export default function JobsPage() {
           </div>
         )}
       </div>
+
+      {/* Modal de candidature */}
+      {showApplicationModal && selectedJob && (
+        <div className="fixed inset-0 bg-white/40 backdrop-blur-md flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            {/* Header */}
+            <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
+              <h3 className="text-xl font-bold text-gray-900">Postuler à cette offre</h3>
+              <button
+                onClick={() => setShowApplicationModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+                aria-label="Fermer"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Contenu */}
+            <div className="p-6 space-y-6">
+              {/* Détails de l'offre */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h4 className="font-semibold text-gray-900 text-lg mb-2">{selectedJob.title}</h4>
+                <p className="text-gray-600 mb-1">{selectedJob.company_name}</p>
+                <p className="text-gray-600">{selectedJob.location}</p>
+                {selectedJob.salary_min && (
+                  <p className="text-blue-600 font-medium mt-2">
+                    {formatSalary(selectedJob.salary_min, selectedJob.salary_max)}
+                  </p>
+                )}
+              </div>
+
+              {/* Lettre de motivation */}
+              <div>
+                <label htmlFor="coverLetter" className="block text-sm font-medium text-gray-700 mb-2">
+                  Lettre de motivation (optionnel)
+                </label>
+                <textarea
+                  id="coverLetter"
+                  value={coverLetter}
+                  onChange={(e) => setCoverLetter(e.target.value)}
+                  rows={8}
+                  placeholder="Expliquez pourquoi vous êtes intéressé par ce poste..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                />
+              </div>
+
+              {/* Informations */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-sm text-blue-800">
+                  💡 <strong>Astuce :</strong> Une lettre de motivation personnalisée augmente vos chances d'être sélectionné !
+                </p>
+              </div>
+
+              {/* Boutons */}
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowApplicationModal(false)}
+                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+                  disabled={applying}
+                >
+                  Annuler
+                </button>
+                <button
+                  onClick={handleSubmitApplication}
+                  disabled={applying}
+                  className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {applying ? 'Envoi en cours...' : 'Envoyer ma candidature'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 }
