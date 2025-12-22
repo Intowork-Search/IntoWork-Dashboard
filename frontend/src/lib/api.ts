@@ -450,7 +450,7 @@ export const jobsAPI = {
   },
 
   // Créer une nouvelle offre d'emploi (employeur)
-  createJob: async (jobData: Partial<Job>, token: string): Promise<{ job: Job }> => {
+  createJob: async (jobData: Partial<Job>, token: string): Promise<Job> => {
     const client = createAuthenticatedClient(token);
     const response = await client.post('/jobs/create', jobData);
     return response.data;

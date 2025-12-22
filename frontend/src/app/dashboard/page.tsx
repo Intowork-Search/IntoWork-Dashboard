@@ -47,48 +47,50 @@ export default function Dashboard() {
         return;
       }
       
-      // Toujours essayer de charger le profil pour le pourcentage de complétion
-      try {
-        const profileData = await candidatesAPI.getMyProfile(token);
-        
-        // Calculer le pourcentage de complétion réel (même logique que la page profil)
-        if (profileData && user) {
-          const fields = [
-            user.firstName,
-            user.lastName,
-            user.emailAddresses?.[0]?.emailAddress,
-            profileData.phone,
-            profileData.location,
-            profileData.title,
-            profileData.summary
-          ];
-          const filledFields = fields.filter(field => field && field.toString().trim().length > 0);
-          const profileCompletion = (filledFields.length / fields.length) * 100;
+      // Charger le profil uniquement pour les candidats
+      if (userRole === 'candidate') {
+        try {
+          const profileData = await candidatesAPI.getMyProfile(token);
           
-          // Ajouter les bonus pour expérience, éducation et compétences et compter les éléments
-          const experiencesCount = profileData.experiences?.length || 0;
-          const educationCount = profileData.education?.length || 0;
-          const skillsCount = profileData.skills?.length || 0;
-          
-          // Mettre à jour les compteurs
-          setExperiencesCount(experiencesCount);
-          setEducationCount(educationCount);
-          setSkillsCount(skillsCount);
-          
-          const hasExperience = experiencesCount > 0;
-          const hasEducation = educationCount > 0;
-          const hasSkills = skillsCount > 0;
-          
-          let totalCompletion = profileCompletion * 0.6;
-          if (hasExperience) totalCompletion += 15;
-          if (hasEducation) totalCompletion += 15;
-          if (hasSkills) totalCompletion += 10;
-          
-          const completion = Math.round(totalCompletion);
-          setProfileCompletion(completion);
+          // Calculer le pourcentage de complétion réel (même logique que la page profil)
+          if (profileData && user) {
+            const fields = [
+              user.firstName,
+              user.lastName,
+              user.emailAddresses?.[0]?.emailAddress,
+              profileData.phone,
+              profileData.location,
+              profileData.title,
+              profileData.summary
+            ];
+            const filledFields = fields.filter(field => field && field.toString().trim().length > 0);
+            const profileCompletion = (filledFields.length / fields.length) * 100;
+            
+            // Ajouter les bonus pour expérience, éducation et compétences et compter les éléments
+            const experiencesCount = profileData.experiences?.length || 0;
+            const educationCount = profileData.education?.length || 0;
+            const skillsCount = profileData.skills?.length || 0;
+            
+            // Mettre à jour les compteurs
+            setExperiencesCount(experiencesCount);
+            setEducationCount(educationCount);
+            setSkillsCount(skillsCount);
+            
+            const hasExperience = experiencesCount > 0;
+            const hasEducation = educationCount > 0;
+            const hasSkills = skillsCount > 0;
+            
+            let totalCompletion = profileCompletion * 0.6;
+            if (hasExperience) totalCompletion += 15;
+            if (hasEducation) totalCompletion += 15;
+            if (hasSkills) totalCompletion += 10;
+            
+            const completion = Math.round(totalCompletion);
+            setProfileCompletion(completion);
+          }
+        } catch (profileError) {
+          console.warn('Erreur lors du chargement du profil:', profileError);
         }
-      } catch (profileError) {
-        console.warn('Erreur lors du chargement du profil:', profileError);
       }
       
       // Essayer de charger les données du dashboard (optionnel)

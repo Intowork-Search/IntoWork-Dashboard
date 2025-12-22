@@ -1,5 +1,10 @@
-// Utiliser directement l'URL HTTPS Railway en production
-const API_BASE_URL = 'https://intowork-dashboard-production.up.railway.app/api';
+// Utiliser la variable d'environnement pour l'URL de l'API
+const getApiBaseUrl = () => {
+  if (typeof window !== 'undefined') {
+    return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api';
+  }
+  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api';
+};
 
 interface DashboardStat {
   title: string;
@@ -25,6 +30,7 @@ interface DashboardData {
 
 class DashboardAPI {
   async getDashboardData(token: string): Promise<DashboardData> {
+    const API_BASE_URL = getApiBaseUrl();
     const response = await fetch(`${API_BASE_URL}/dashboard`, {
       method: 'GET',
       headers: {
@@ -41,6 +47,7 @@ class DashboardAPI {
   }
 
   async getRecentActivities(token: string): Promise<RecentActivity[]> {
+    const API_BASE_URL = getApiBaseUrl();
     const response = await fetch(`${API_BASE_URL}/dashboard/activities`, {
       method: 'GET',
       headers: {
