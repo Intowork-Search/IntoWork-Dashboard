@@ -1,18 +1,20 @@
 import axios from 'axios';
 
-// CACHE BUSTER - Version 18-DEC-2025-14h30
-const BUILD_TIMESTAMP = '2025-12-18T14:30:00Z';
+// CACHE BUSTER - Version 22-DEC-2025
+const BUILD_TIMESTAMP = '2025-12-22T00:00:00Z';
 
-// Configuration de l'API client - HTTPS FORCÉ
+// Configuration de l'API client - Supporte dev local (HTTP) et production (HTTPS)
 export const getBaseUrl = () => {
-  // URL HARDCODÉE en HTTPS - AUCUNE VARIABLE D'ENVIRONNEMENT
-  const url = 'https://intowork-dashboard-production.up.railway.app/api';
+  // Utiliser la variable d'environnement ou fallback vers Railway en production
+  const url = process.env.NEXT_PUBLIC_API_URL || 'https://intowork-dashboard-production.up.railway.app/api';
   
   console.log(`🚀 [${BUILD_TIMESTAMP}] Base URL:`, url);
+  console.log(`🔧 Environment:`, process.env.NODE_ENV);
   
-  // Vérification de sécurité
-  if (!url.startsWith('https://')) {
-    throw new Error('❌ ERREUR CRITIQUE: URL non HTTPS détectée!');
+  // Vérification de sécurité uniquement en production
+  if (process.env.NODE_ENV === 'production' && !url.startsWith('https://')) {
+    console.error('❌ ERREUR: URL non HTTPS en production!');
+    throw new Error('URL non HTTPS détectée en production');
   }
   
   return url;
@@ -37,16 +39,19 @@ export const createAuthenticatedClient = (token: string) => {
     timeout: 15000,
   });
   
-  // Intercepteur pour forcer HTTPS
+  // Intercepteur - forcer HTTPS uniquement en production
   client.interceptors.request.use(
     (config) => {
-      if (config.url && config.url.includes('http://')) {
-        console.error('🚨 URL HTTP détectée dans authenticated client:', config.url);
-        config.url = config.url.replace('http://', 'https://');
-      }
-      if (config.baseURL && config.baseURL.includes('http://')) {
-        console.error('🚨 BaseURL HTTP détectée dans authenticated client:', config.baseURL);
-        config.baseURL = config.baseURL.replace('http://', 'https://');
+      // En production, forcer HTTPS
+      if (process.env.NODE_ENV === 'production') {
+        if (config.url && config.url.includes('http://')) {
+          console.warn('⚠️ URL HTTP convertie en HTTPS en production');
+          config.url = config.url.replace('http://', 'https://');
+        }
+        if (config.baseURL && config.baseURL.includes('http://')) {
+          console.warn('⚠️ BaseURL HTTP convertie en HTTPS en production');
+          config.baseURL = config.baseURL.replace('http://', 'https://');
+        }
       }
       return config;
     },
@@ -56,24 +61,27 @@ export const createAuthenticatedClient = (token: string) => {
   return client;
 };
 
-// Intercepteur global pour forcer HTTPS
+// Intercepteur global - forcer HTTPS uniquement en production
 apiClient.interceptors.request.use(
   (config) => {
     // Log pour debug
     console.log('📤 Requête:', {
       baseURL: config.baseURL,
       url: config.url,
-      fullURL: (config.baseURL || '') + (config.url || '')
+      fullURL: (config.baseURL || '') + (config.url || ''),
+      env: process.env.NODE_ENV
     });
     
-    // Forcer HTTPS si HTTP détecté
-    if (config.url && config.url.includes('http://')) {
-      console.error('🚨 URL HTTP DÉTECTÉE ET CORRIGÉE:', config.url);
-      config.url = config.url.replace('http://', 'https://');
-    }
-    if (config.baseURL && config.baseURL.includes('http://')) {
-      console.error('🚨 BASE URL HTTP DÉTECTÉE ET CORRIGÉE:', config.baseURL);
-      config.baseURL = config.baseURL.replace('http://', 'https://');
+    // En production, forcer HTTPS
+    if (process.env.NODE_ENV === 'production') {
+      if (config.url && config.url.includes('http://')) {
+        console.warn('⚠️ URL HTTP convertie en HTTPS en production');
+        config.url = config.url.replace('http://', 'https://');
+      }
+      if (config.baseURL && config.baseURL.includes('http://')) {
+        console.warn('⚠️ BaseURL HTTP convertie en HTTPS en production');
+        config.baseURL = config.baseURL.replace('http://', 'https://');
+      }
     }
     
     return config;
