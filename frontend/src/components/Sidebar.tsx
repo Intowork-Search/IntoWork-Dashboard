@@ -30,47 +30,49 @@ interface NavItem {
   description: string;
 }
 
-const employerNavigation: NavItem[] = [
-  { 
-    name: 'Dashboard', 
-    href: '/dashboard', 
-    icon: HomeIcon, 
-    description: 'Vue d\'ensemble de votre activité'
-  },
-  { 
-    name: 'Mon Entreprise', 
-    href: '/dashboard/company', 
-    icon: BuildingOfficeIcon, 
-    description: 'Gérer votre profil d\'entreprise'
-  },
-  { 
-    name: 'Offres d\'emploi', 
-    href: '/dashboard/job-posts', 
-    icon: DocumentTextIcon, 
-    badge: 5,
-    description: 'Gérer vos offres d\'emploi'
-  },
-  { 
-    name: 'Candidats', 
-    href: '/dashboard/candidates', 
-    icon: UserIcon, 
-    badge: 25,
-    description: 'Parcourir les profils de candidats'
-  },
-  { 
-    name: 'Candidatures', 
-    href: '/dashboard/applications', 
-    icon: ChartBarIcon, 
-    badge: 8,
-    description: 'Gérer les candidatures reçues'
-  },
-  { 
-    name: 'Paramètres', 
-    href: '/dashboard/settings', 
-    icon: Cog6ToothIcon, 
-    description: 'Configuration de votre compte'
-  },
-];
+function getEmployerNavigation(jobsCount: number): NavItem[] {
+  return [
+    { 
+      name: 'Dashboard', 
+      href: '/dashboard', 
+      icon: HomeIcon, 
+      description: "Vue d'ensemble de votre activité"
+    },
+    { 
+      name: 'Mon Entreprise', 
+      href: '/dashboard/company', 
+      icon: BuildingOfficeIcon, 
+      description: "Gérer votre profil d'entreprise"
+    },
+    { 
+      name: "Offres d'emploi", 
+      href: '/dashboard/job-posts', 
+      icon: DocumentTextIcon, 
+      badge: jobsCount,
+      description: "Gérer vos offres d'emploi"
+    },
+    { 
+      name: 'Candidats', 
+      href: '/dashboard/candidates', 
+      icon: UserIcon, 
+      badge: undefined, // À rendre dynamique si besoin
+      description: 'Parcourir les profils de candidats'
+    },
+    { 
+      name: 'Candidatures', 
+      href: '/dashboard/applications', 
+      icon: ChartBarIcon, 
+      badge: undefined, // À rendre dynamique si besoin
+      description: 'Gérer les candidatures reçues'
+    },
+    { 
+      name: 'Paramètres', 
+      href: '/dashboard/settings', 
+      icon: Cog6ToothIcon, 
+      description: 'Configuration de votre compte'
+    },
+  ];
+}
 
 export default function Sidebar({ userRole }: SidebarProps) {
   const { user } = useUser();
@@ -85,36 +87,27 @@ export default function Sidebar({ userRole }: SidebarProps) {
   // Récupérer le nombre de CV pour les candidats, le nombre d'emplois et de candidatures
   useEffect(() => {
     const fetchData = async () => {
-      if (userRole === 'candidate' && user) {
-        try {
-          const token = await getToken();
-          if (token) {
-            // Récupérer le nombre de CV
-            const cvs = await candidatesAPI.listCVs(token);
-            setCvCount(cvs.length);
-            
-            // Récupérer le nombre d'emplois récents
-            const recentJobs = await jobsAPI.getRecentJobsCount(7);
-            setJobsCount(recentJobs.count);
-            
-            // Récupérer le nombre de candidatures
-            try {
-              const applicationsCount = await applicationsAPI.getApplicationsCount(token);
-              setApplicationsCount(applicationsCount);
-            } catch (applicationsError) {
-              console.warn('Erreur lors de la récupération des candidatures:', applicationsError);
-              setApplicationsCount(0);
-            }
-          }
-        } catch (error) {
-          console.error('Erreur lors de la récupération des données:', error);
-          setCvCount(0);
-          setJobsCount(0);
-          setApplicationsCount(0);
+      try {
+        const token = await getToken();
+        if (userRole === 'candidate' && user && token) {
+          // Récupérer le nombre de CV
+          const cvs = await candidatesAPI.listCVs(token);
+          setCvCount(cvs.length);
+          // Récupérer le nombre d'emplois récents (pour candidats)
+          const recentJobs = await jobsAPI.getRecentJobsCount(7);
+          setJobsCount(recentJobs.count);
+          // Récupérer le nombre de candidatures
+          const applicationsCount = await applicationsAPI.getApplicationsCount(token);
+          setApplicationsCount(applicationsCount);
+        } else if (userRole === 'employer' && user) {
+          // Récupérer le nombre d'offres actives de l'employeur
+          const response = await jobsAPI.getJobs();
+          setJobsCount(response.jobs ? response.jobs.length : 0);
         }
+      } finally {
+        // rien à faire ici, mais le finally est requis pour la syntaxe
       }
     };
-
     fetchData();
   }, [userRole, user, getToken]);
 
@@ -161,7 +154,7 @@ export default function Sidebar({ userRole }: SidebarProps) {
     },
   ];
 
-  const navigation = userRole === 'candidate' ? candidateNavigation : employerNavigation;
+  const navigation = userRole === 'candidate' ? candidateNavigation : getEmployerNavigation(jobsCount);
   const roleLabel = userRole === 'candidate' ? 'Candidat' : 'Employeur';
   const roleColor = userRole === 'candidate' ? 'bg-blue-500' : 'bg-green-500';
 
@@ -181,7 +174,7 @@ export default function Sidebar({ userRole }: SidebarProps) {
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
           {!isCollapsed && (
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-linear-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">IW</span>
               </div>
               <span className="font-bold text-gray-900 text-lg">INTOWORK</span>

@@ -154,7 +154,7 @@ async def complete_registration(
                     position=registration_data.position,
                     can_create_jobs=True,
                     can_manage_candidates=True,
-                    is_admin=False
+                    is_admin=True  # Premier employeur = admin de l'entreprise
                 )
                 db.add(employer)
         

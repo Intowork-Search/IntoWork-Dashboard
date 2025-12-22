@@ -277,121 +277,43 @@ export default function Dashboard() {
     }
   };
 
-  // Utiliser les vraies données ou fallback vers les données mockées
-  const stats = dashboardData?.stats || (userRole === 'candidate' ? [
-    {
-      title: 'Profil complété',
-      value: `${profileCompletion}%`,
-      icon: UserIcon,
-      change: '+5%',
-      changeType: 'increase' as const,
-      color: 'blue'
-    },
-    {
-      title: 'Expériences ajoutées',
-      value: experiencesCount.toString(),
-      icon: BriefcaseIcon,
-      change: experiencesCount > 0 ? '+' + experiencesCount : '0',
-      changeType: 'increase' as const,
-      color: 'green'
-    },
-    {
-      title: 'Formations ajoutées',
-      value: educationCount.toString(),
-      icon: DocumentTextIcon,
-      change: educationCount > 0 ? '+' + educationCount : '0',
-      changeType: 'increase' as const,
-      color: 'purple'
-    },
-    {
-      title: 'Compétences ajoutées',
-      value: skillsCount.toString(),
-      icon: ChartBarIcon,
-      change: skillsCount > 0 ? '+' + skillsCount : '0',
-      changeType: 'increase' as const,
-      color: 'orange'
-    }
-  ] : [
-    {
-      title: 'Offres actives',
-      value: '5',
-      icon: DocumentTextIcon,
-      change: '+2',
-      changeType: 'increase' as const,
-      color: 'blue'
-    },
-    {
-      title: 'Candidatures reçues',
-      value: '47',
-      icon: UserIcon,
-      change: '+15',
-      changeType: 'increase' as const,
-      color: 'green'
-    },
-    {
-      title: 'Entretiens prévus',
-      value: '6',
-      icon: ChartBarIcon,
-      change: '+2',
-      changeType: 'increase' as const,
-      color: 'purple'
-    },
-    {
-      title: 'Taux de réponse',
-      value: '68%',
-      icon: ArrowTrendingUpIcon,
-      change: '+8%',
-      changeType: 'increase' as const,
-      color: 'orange'
-    }
-  ]);
+  // Utiliser les vraies données du backend pour stats
+  let stats = dashboardData?.stats || [];
+  if (!stats.length && userRole === 'candidate') {
+    stats = [
+      {
+        title: 'Profil complété',
+        value: `${profileCompletion}%`,
+        change: '+5%',
+        changeType: 'increase',
+        color: 'blue'
+      },
+      {
+        title: 'Expériences ajoutées',
+        value: experiencesCount.toString(),
+        change: experiencesCount > 0 ? '+' + experiencesCount : '0',
+        changeType: 'increase',
+        color: 'green'
+      },
+      {
+        title: 'Formations ajoutées',
+        value: educationCount.toString(),
+        change: educationCount > 0 ? '+' + educationCount : '0',
+        changeType: 'increase',
+        color: 'purple'
+      },
+      {
+        title: 'Compétences ajoutées',
+        value: skillsCount.toString(),
+        change: skillsCount > 0 ? '+' + skillsCount : '0',
+        changeType: 'increase',
+        color: 'orange'
+      }
+    ];
+  }
 
-  // Utiliser les vraies activités ou fallback vers mockées avec données en temps réel
-  const recentActivities = realActivities.length > 0 ? realActivities : (userRole === 'candidate' ? [
-    {
-      id: 1,
-      action: 'Profil créé avec succès',
-      target: `${user?.firstName} ${user?.lastName}`,
-      time: 'Aujourd\'hui',
-      type: 'update'
-    },
-    {
-      id: 2,
-      action: 'Connexion à la plateforme',
-      target: 'Session active',
-      time: 'Maintenant',
-      type: 'view'
-    },
-    {
-      id: 3,
-      action: 'Profil mis à jour',
-      target: `${profileCompletion}% complété`,
-      time: 'Dernière modification',
-      type: 'update'
-    }
-  ] : [
-    {
-      id: 1,
-      action: 'Nouveau candidat postulé',
-      target: 'Développeur Backend - Votre offre',
-      time: 'Il y a 1 heure',
-      type: 'application'
-    },
-    {
-      id: 2,
-      action: 'Offre consultée',
-      target: 'Data Scientist - Paris',
-      time: 'Il y a 3 heures',
-      type: 'view'
-    },
-    {
-      id: 3,
-      action: 'Entretien planifié',
-      target: 'Jean Dupont - Développeur Frontend',
-      time: 'Aujourd\'hui',
-      type: 'interview'
-    }
-  ]);
+  // Utiliser les vraies activités du backend
+  const recentActivities = realActivities.length > 0 ? realActivities : [];
 
   return (
     <DashboardLayout 
@@ -528,24 +450,24 @@ export default function Dashboard() {
               </>
             ) : (
               <>
-                <button className="w-full flex items-center justify-between p-3 text-left bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
+                <button className="w-full flex items-center justify-between p-3 text-left bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors" onClick={() => router.push('/dashboard/job-posts')}>
                   <div>
                     <p className="font-medium text-blue-900">Publier une offre</p>
                     <p className="text-xs text-blue-700">Créer un nouveau poste</p>
                   </div>
                   <DocumentTextIcon className="w-5 h-5 text-blue-600" />
                 </button>
-                <button className="w-full flex items-center justify-between p-3 text-left bg-green-50 hover:bg-green-100 rounded-lg transition-colors">
+                <button className="w-full flex items-center justify-between p-3 text-left bg-green-50 hover:bg-green-100 rounded-lg transition-colors" onClick={() => router.push('/dashboard/applications')}>
                   <div>
                     <p className="font-medium text-green-900">Voir les candidats</p>
-                    <p className="text-xs text-green-700">47 nouvelles candidatures</p>
+                    <p className="text-xs text-green-700">Voir toutes les candidatures reçues</p>
                   </div>
                   <UserIcon className="w-5 h-5 text-green-600" />
                 </button>
-                <button className="w-full flex items-center justify-between p-3 text-left bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors">
+                <button className="w-full flex items-center justify-between p-3 text-left bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors" onClick={() => router.push('/dashboard/interviews')}>
                   <div>
                     <p className="font-medium text-purple-900">Gérer les entretiens</p>
-                    <p className="text-xs text-purple-700">6 entretiens planifiés</p>
+                    <p className="text-xs text-purple-700">Voir les entretiens planifiés</p>
                   </div>
                   <ChartBarIcon className="w-5 h-5 text-purple-600" />
                 </button>

@@ -1,101 +1,31 @@
 import axios from 'axios';
 
-// CACHE BUSTER - Version 22-DEC-2025
-const BUILD_TIMESTAMP = '2025-12-22T00:00:00Z';
-
-// Configuration de l'API client - Supporte dev local (HTTP) et production (HTTPS)
-export const getBaseUrl = () => {
-  // Utiliser la variable d'environnement ou fallback vers Railway en production
-  const url = process.env.NEXT_PUBLIC_API_URL || 'https://intowork-dashboard-production.up.railway.app/api';
-  
-  console.log(`🚀 [${BUILD_TIMESTAMP}] Base URL:`, url);
-  console.log(`🔧 Environment:`, process.env.NODE_ENV);
-  
-  // Vérification de sécurité uniquement en production
-  if (process.env.NODE_ENV === 'production' && !url.startsWith('https://')) {
-    console.error('❌ ERREUR: URL non HTTPS en production!');
-    throw new Error('URL non HTTPS détectée en production');
-  }
-  
-  return url;
-};
-
+// Configuration de l'API client
 const apiClient = axios.create({
-  baseURL: getBaseUrl(),
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api',
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 15000,
 });
 
 // Function to create authenticated axios instance
 export const createAuthenticatedClient = (token: string) => {
   const client = axios.create({
-    baseURL: getBaseUrl(),
+    baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
     },
-    timeout: 15000,
   });
-  
-  // Intercepteur - forcer HTTPS uniquement en production
-  client.interceptors.request.use(
-    (config) => {
-      // En production, forcer HTTPS
-      if (process.env.NODE_ENV === 'production') {
-        if (config.url && config.url.includes('http://')) {
-          console.warn('⚠️ URL HTTP convertie en HTTPS en production');
-          config.url = config.url.replace('http://', 'https://');
-        }
-        if (config.baseURL && config.baseURL.includes('http://')) {
-          console.warn('⚠️ BaseURL HTTP convertie en HTTPS en production');
-          config.baseURL = config.baseURL.replace('http://', 'https://');
-        }
-      }
-      return config;
-    },
-    (error) => Promise.reject(error)
-  );
-  
   return client;
 };
-
-// Intercepteur global - forcer HTTPS uniquement en production
-apiClient.interceptors.request.use(
-  (config) => {
-    // Log pour debug
-    console.log('📤 Requête:', {
-      baseURL: config.baseURL,
-      url: config.url,
-      fullURL: (config.baseURL || '') + (config.url || ''),
-      env: process.env.NODE_ENV
-    });
-    
-    // En production, forcer HTTPS
-    if (process.env.NODE_ENV === 'production') {
-      if (config.url && config.url.includes('http://')) {
-        console.warn('⚠️ URL HTTP convertie en HTTPS en production');
-        config.url = config.url.replace('http://', 'https://');
-      }
-      if (config.baseURL && config.baseURL.includes('http://')) {
-        console.warn('⚠️ BaseURL HTTP convertie en HTTPS en production');
-        config.baseURL = config.baseURL.replace('http://', 'https://');
-      }
-    }
-    
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
 
 // Intercepteur pour gérer les erreurs
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error('❌ Erreur API:', error);
-    
     if (error.response?.status === 401) {
+      // Token expiré ou invalide - rediriger vers login
       if (typeof window !== 'undefined') {
         window.location.href = '/sign-in';
       }
@@ -134,6 +64,7 @@ export interface CompleteRegistration {
   position?: string;
 }
 
+// Types pour les profils candidats
 export interface Experience {
   id?: number;
   title: string;
@@ -197,19 +128,23 @@ export interface CandidateProfile {
   updated_at?: string;
 }
 
+// Services API
 export const authAPI = {
+  // Synchroniser l'utilisateur avec le backend après auth Clerk
   syncUser: async (userProfile: UserProfile, token?: string): Promise<User> => {
     const client = token ? createAuthenticatedClient(token) : apiClient;
     const response = await client.post('/auth/sync', userProfile);
     return response.data;
   },
   
+  // Compléter l'inscription
   completeRegistration: async (data: CompleteRegistration, token: string) => {
     const client = createAuthenticatedClient(token);
     const response = await client.post('/auth/complete-registration', data);
     return response.data;
   },
   
+  // Récupérer le profil utilisateur
   getCurrentUser: async (token: string): Promise<User> => {
     const client = createAuthenticatedClient(token);
     const response = await client.get('/auth/me');
@@ -218,17 +153,20 @@ export const authAPI = {
 };
 
 export const usersAPI = {
+  // Récupérer tous les utilisateurs (admin)
   getUsers: async (): Promise<User[]> => {
     const response = await apiClient.get('/users');
     return response.data;
   },
   
+  // Récupérer un utilisateur par ID
   getUser: async (userId: number): Promise<User> => {
     const response = await apiClient.get(`/users/${userId}`);
     return response.data;
   }
 };
 
+// Types pour le Dashboard
 export interface DashboardStat {
   title: string;
   value: string;
@@ -251,6 +189,7 @@ export interface DashboardData {
   profileCompletion: number;
 }
 
+// API Dashboard
 export const dashboardAPI = {
   getDashboardData: async (token: string): Promise<DashboardData> => {
     const client = createAuthenticatedClient(token);
@@ -259,12 +198,15 @@ export const dashboardAPI = {
   }
 };
 
+// API simplifiée pour les candidats (pour les paramètres)
 export const candidateAPI = {
+  // Récupérer le profil
   getProfile: async () => {
     const response = await apiClient.get('/candidates/profile');
     return response;
   },
   
+  // Mettre à jour le profil
   updateProfile: async (profileData: any) => {
     const response = await apiClient.put('/candidates/profile', profileData);
     return response;
@@ -272,69 +214,81 @@ export const candidateAPI = {
 };
 
 export const candidatesAPI = {
+  // Récupérer le profil du candidat connecté
   getMyProfile: async (token: string): Promise<CandidateProfile> => {
     const client = createAuthenticatedClient(token);
     const response = await client.get('/candidates/profile');
     return response.data;
   },
   
+  // Mettre à jour le profil du candidat connecté
   updateMyProfile: async (token: string, profileData: Partial<CandidateProfile>): Promise<CandidateProfile> => {
     const client = createAuthenticatedClient(token);
     const response = await client.put('/candidates/profile', profileData);
     return response.data;
   },
   
+  // Ajouter une expérience
   addExperience: async (token: string, experienceData: Omit<Experience, 'id'>): Promise<Experience> => {
     const client = createAuthenticatedClient(token);
     const response = await client.post('/candidates/profile/experiences', experienceData);
     return response.data;
   },
   
+  // Mettre à jour une expérience
   updateExperience: async (token: string, experienceId: number, experienceData: Partial<Experience>): Promise<Experience> => {
     const client = createAuthenticatedClient(token);
     const response = await client.put(`/candidates/profile/experiences/${experienceId}`, experienceData);
     return response.data;
   },
   
+  // Supprimer une expérience
   deleteExperience: async (token: string, experienceId: number): Promise<void> => {
     const client = createAuthenticatedClient(token);
     await client.delete(`/candidates/profile/experiences/${experienceId}`);
   },
   
+  // Ajouter une formation
   addEducation: async (token: string, educationData: Omit<Education, 'id'>): Promise<Education> => {
     const client = createAuthenticatedClient(token);
     const response = await client.post('/candidates/profile/education', educationData);
     return response.data;
   },
   
+  // Mettre à jour une formation
   updateEducation: async (token: string, educationId: number, educationData: Partial<Education>): Promise<Education> => {
     const client = createAuthenticatedClient(token);
     const response = await client.put(`/candidates/profile/education/${educationId}`, educationData);
     return response.data;
   },
   
+  // Supprimer une formation
   deleteEducation: async (token: string, educationId: number): Promise<void> => {
     const client = createAuthenticatedClient(token);
     await client.delete(`/candidates/profile/education/${educationId}`);
   },
   
+  // Ajouter une compétence
   addSkill: async (token: string, skillData: Omit<Skill, 'id'>): Promise<Skill> => {
     const client = createAuthenticatedClient(token);
     const response = await client.post('/candidates/profile/skills', skillData);
     return response.data;
   },
   
+  // Mettre à jour une compétence
   updateSkill: async (token: string, skillId: number, skillData: Partial<Skill>): Promise<Skill> => {
     const client = createAuthenticatedClient(token);
     const response = await client.put(`/candidates/profile/skills/${skillId}`, skillData);
     return response.data;
   },
   
+  // Supprimer une compétence
   deleteSkill: async (token: string, skillId: number): Promise<void> => {
     const client = createAuthenticatedClient(token);
     await client.delete(`/candidates/profile/skills/${skillId}`);
   },
   
+  // Télécharger le CV
   downloadCV: async (token: string): Promise<Blob> => {
     const client = createAuthenticatedClient(token);
     const response = await client.get('/candidates/cv/download', {
@@ -343,16 +297,19 @@ export const candidatesAPI = {
     return response.data;
   },
   
+  // Obtenir l'URL du CV pour prévisualisation
   getCVUrl: (token: string): string => {
-    return `https://intowork-dashboard-production.up.railway.app/api/candidates/cv/download?token=${token}`;
+    return `${process.env.NEXT_PUBLIC_API_URL}/candidates/cv/download?token=${token}`;
   },
   
+  // Lister tous les CV
   listCVs: async (token: string): Promise<CV[]> => {
     const client = createAuthenticatedClient(token);
     const response = await client.get('/candidates/cvs');
     return response.data;
   },
   
+  // Télécharger un CV spécifique
   downloadSpecificCV: async (token: string, cvId: number): Promise<Blob> => {
     const client = createAuthenticatedClient(token);
     const response = await client.get(`/candidates/cvs/${cvId}/download`, {
@@ -361,6 +318,7 @@ export const candidatesAPI = {
     return response.data;
   },
   
+  // Supprimer un CV spécifique
   deleteCV: async (token: string, cvId: number): Promise<void> => {
     const client = createAuthenticatedClient(token);
     await client.delete(`/candidates/cvs/${cvId}`);
@@ -368,17 +326,20 @@ export const candidatesAPI = {
 };
 
 export const systemAPI = {
+  // Vérifier le statut de la base de données
   checkDbStatus: async () => {
     const response = await apiClient.get('/db-status');
     return response.data;
   },
   
+  // Test de connectivité
   ping: async () => {
     const response = await apiClient.get('/ping');
     return response.data;
   }
 };
 
+// Interfaces pour les offres d'emploi
 export interface Job {
   id: number;
   title: string;
@@ -404,6 +365,10 @@ export interface JobDetail extends Job {
   company_description?: string;
   company_industry?: string;
   company_size?: string;
+  status: string;
+  created_at?: string;
+  employment_type?: string;
+  salary_range?: string;
 }
 
 export interface JobListResponse {
@@ -424,6 +389,7 @@ export interface JobFilters {
   salary_min?: number;
 }
 
+// Interface pour les candidatures
 export interface JobApplication {
   id: number;
   job_id: number;
@@ -431,6 +397,7 @@ export interface JobApplication {
   status: 'pending' | 'under_review' | 'accepted' | 'rejected';
   applied_at: string;
   notes?: string;
+  // Données relationnelles
   job: Job;
 }
 
@@ -447,7 +414,14 @@ export interface ApplicationsResponse {
   total_pages: number;
 }
 
+// API pour les offres d'emploi
 export const jobsAPI = {
+  // Supprimer une offre d'emploi (employeur)
+  deleteJob: async (jobId: number, token: string): Promise<void> => {
+    const client = createAuthenticatedClient(token);
+    await client.delete(`/jobs/${jobId}`);
+  },
+  // Récupérer la liste des offres d'emploi avec filtres
   getJobs: async (filters?: JobFilters): Promise<JobListResponse> => {
     const params = new URLSearchParams();
     
@@ -463,41 +437,63 @@ export const jobsAPI = {
     return response.data;
   },
 
+  // Récupérer les détails d'une offre d'emploi
   getJob: async (jobId: number): Promise<JobDetail> => {
     const response = await apiClient.get(`/jobs/${jobId}`);
     return response.data;
   },
 
+  // Récupérer les statistiques (nombre d'offres récentes)
   getRecentJobsCount: async (days: number = 7): Promise<{ count: number; days: number }> => {
     const response = await apiClient.get(`/jobs/stats/recent?days=${days}`);
+    return response.data;
+  },
+
+  // Créer une nouvelle offre d'emploi (employeur)
+  createJob: async (jobData: Partial<Job>, token: string): Promise<{ job: Job }> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.post('/jobs/create', jobData);
+    return response.data;
+  },
+
+  // Mettre à jour une offre d'emploi (employeur)
+  updateJob: async (jobId: number, jobData: Partial<Job>, token: string): Promise<Job> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.put(`/jobs/${jobId}`, jobData);
     return response.data;
   }
 };
 
+// API pour les candidatures
 export const applicationsAPI = {
+  // Récupérer mes candidatures
   getMyApplications: async (token: string, page: number = 1, limit: number = 10): Promise<ApplicationsResponse> => {
     const client = createAuthenticatedClient(token);
     const response = await client.get(`/candidates/applications?page=${page}&limit=${limit}`);
     return response.data;
   },
 
+  // Postuler à une offre
   applyToJob: async (token: string, applicationData: CreateApplicationData): Promise<JobApplication> => {
     const client = createAuthenticatedClient(token);
     const response = await client.post('/candidates/applications', applicationData);
     return response.data;
   },
 
+  // Récupérer une candidature spécifique
   getApplication: async (token: string, applicationId: number): Promise<JobApplication> => {
     const client = createAuthenticatedClient(token);
     const response = await client.get(`/candidates/applications/${applicationId}`);
     return response.data;
   },
 
+  // Retirer une candidature
   withdrawApplication: async (token: string, applicationId: number): Promise<void> => {
     const client = createAuthenticatedClient(token);
     await client.delete(`/candidates/applications/${applicationId}`);
   },
 
+  // Récupérer le nombre total de candidatures
   getApplicationsCount: async (token: string): Promise<number> => {
     try {
       const client = createAuthenticatedClient(token);
@@ -505,8 +501,54 @@ export const applicationsAPI = {
       return response.data.total || 0;
     } catch (error) {
       console.warn('Erreur lors de la récupération du nombre de candidatures:', error);
-      return 0;
+      return 0; // Retourner 0 en cas d'erreur
     }
+  }
+};
+
+// Types pour les entreprises
+export interface Company {
+  id: number;
+  name: string;
+  description?: string;
+  industry?: string;
+  size?: string;
+  website_url?: string;
+  linkedin_url?: string;
+  address?: string;
+  city?: string;
+  country?: string;
+  logo_url?: string;
+}
+
+export interface CompanyStats {
+  active_jobs: number;
+  total_jobs: number;
+  total_employers: number;
+  total_applications: number;
+}
+
+// API pour les entreprises
+export const companiesAPI = {
+  // Récupérer les informations de mon entreprise
+  getMyCompany: async (token: string): Promise<Company> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.get('/companies/my-company');
+    return response.data;
+  },
+
+  // Mettre à jour mon entreprise
+  updateMyCompany: async (token: string, companyData: Partial<Company>): Promise<Company> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.put('/companies/my-company', companyData);
+    return response.data;
+  },
+
+  // Récupérer les statistiques de mon entreprise
+  getCompanyStats: async (token: string): Promise<CompanyStats> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.get('/companies/my-company/stats');
+    return response.data;
   }
 };
 

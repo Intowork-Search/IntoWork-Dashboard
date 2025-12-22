@@ -7,6 +7,7 @@ from app.api.candidates import router as candidates_router
 from app.api.dashboard import router as dashboard_router
 from app.api.jobs import router as jobs_router
 from app.api.applications import router as applications_router
+from app.api.companies import router as companies_router
 from dotenv import load_dotenv
 import os
 
@@ -42,6 +43,7 @@ app.include_router(candidates_router, prefix="/api/candidates", tags=["candidate
 app.include_router(dashboard_router, prefix="/api", tags=["dashboard"])
 app.include_router(jobs_router, prefix="/api/jobs", tags=["jobs"])
 app.include_router(applications_router, prefix="/api", tags=["applications"])
+app.include_router(companies_router, prefix="/api/companies", tags=["companies"])
 
 @app.get("/")
 async def root():
