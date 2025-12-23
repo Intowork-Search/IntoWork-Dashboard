@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '@clerk/nextjs';
+import { useAuth } from '@/hooks/useNextAuth';
 import { companiesAPI, Company, CompanyStats } from '@/lib/api';
 import { toast } from 'react-hot-toast';
 import DashboardLayout from '@/components/DashboardLayout';

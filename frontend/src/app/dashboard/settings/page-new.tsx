@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useUser } from '@clerk/nextjs';
+import { useUser } from '@/hooks/useNextAuth';
 import { toast } from 'react-hot-toast';
 import {
   UserIcon,

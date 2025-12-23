@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { ClerkProvider } from '@clerk/nextjs';
 import { Geist, Geist_Mono } from "next/font/google";
+import SessionProvider from '@/components/SessionProvider';
 import ToastProvider from '@/components/ToastProvider';
 import "./globals.css";
 
@@ -25,26 +25,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider
-      appearance={{
-        elements: {
-          formButtonPrimary: 'bg-blue-600 hover:bg-blue-700 text-white',
-          card: 'bg-white shadow-lg',
-          headerTitle: 'text-2xl font-bold text-gray-900',
-          socialButtonsBlockButton: 'border border-gray-300 hover:bg-gray-50',
-          dividerLine: 'bg-gray-200',
-          dividerText: 'text-gray-500',
-        }
-      }}
-    >
-      <html lang="fr">
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50`}
-        >
+    <html lang="fr">
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50`}
+      >
+        <SessionProvider>
           {children}
           <ToastProvider />
-        </body>
-      </html>
-    </ClerkProvider>
+        </SessionProvider>
+      </body>
+    </html>
   );
 }

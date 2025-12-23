@@ -5,7 +5,8 @@
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import { jobsAPI, Job, JobFilters, applicationsAPI } from '@/lib/api';
-import { useAuth } from '@clerk/nextjs';
+import { useAuth } from '@/hooks/useNextAuth';
+import toast from 'react-hot-toast';
 import { 
   MagnifyingGlassIcon,
   MapPinIcon,
@@ -142,7 +143,7 @@ export default function JobsPage() {
         cover_letter: coverLetter || undefined
       });
 
-      alert('✅ Candidature envoyée avec succès !');
+      toast.success('✅ Candidature envoyée avec succès !');
       setShowApplicationModal(false);
       setSelectedJob(null);
       setCoverLetter('');
@@ -152,9 +153,9 @@ export default function JobsPage() {
     } catch (error: any) {
       console.error('Erreur lors de la candidature:', error);
       if (error.response?.status === 400 && error.response?.data?.detail?.includes('déjà postulé')) {
-        alert('❌ Vous avez déjà postulé à cette offre');
+        toast.error('❌ Vous avez déjà postulé à cette offre');
       } else {
-        alert('❌ Erreur lors de l\'envoi de la candidature');
+        toast.error('❌ Erreur lors de l\'envoi de la candidature');
       }
     } finally {
       setApplying(false);

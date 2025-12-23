@@ -2,8 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session, selectinload
 from typing import List, Optional
 from app.database import get_db
-from app.models.base import JobApplication, Job, User
+from app.models.base import JobApplication, Job, User, Employer, NotificationType, Candidate
 from app.auth import get_current_user
+from app.api.notifications import create_notification
 from pydantic import BaseModel
 from datetime import datetime
 
@@ -134,6 +135,24 @@ async def create_application(
     db.add(application)
     db.commit()
     db.refresh(application)
+    
+    # Créer une notification pour l'employeur
+    try:
+        # Récupérer le job avec l'employeur
+        job_with_employer = db.query(Job).options(selectinload(Job.employer)).filter(Job.id == application_data.job_id).first()
+        if job_with_employer and job_with_employer.employer:
+            create_notification(
+                db=db,
+                user_id=job_with_employer.employer.user_id,
+                type=NotificationType.NEW_APPLICATION,
+                title="📝 Nouvelle candidature reçue",
+                message=f"{current_user.first_name} {current_user.last_name} a postulé pour le poste de {job.title}",
+                related_job_id=application_data.job_id,
+                related_application_id=application.id
+            )
+    except Exception as e:
+        print(f"Erreur lors de la création de la notification: {e}")
+        # Ne pas bloquer si la notification échoue
     
     # Récupérer avec les données du job et de la company
     from app.models.base import Company
@@ -354,9 +373,10 @@ async def update_application_status(
     if not employer:
         raise HTTPException(status_code=404, detail="Employeur introuvable")
     
-    # Récupérer la candidature
+    # Récupérer la candidature avec le candidat
     application = db.query(JobApplication).options(
-        selectinload(JobApplication.job)
+        selectinload(JobApplication.job),
+        selectinload(JobApplication.candidate)
     ).filter(JobApplication.id == application_id).first()
     
     if not application:
@@ -368,10 +388,38 @@ async def update_application_status(
     
     # Valider et mettre à jour le statut
     try:
+        old_status = application.status
         new_status = ApplicationStatus(request.status)
         application.status = new_status
         db.commit()
         db.refresh(application)
+        
+        # Créer une notification pour le candidat si le statut a changé
+        if old_status != new_status:
+            try:
+                status_messages = {
+                    ApplicationStatus.VIEWED: "👁️ Votre candidature a été vue",
+                    ApplicationStatus.SHORTLISTED: "⭐ Vous avez été présélectionné(e)",
+                    ApplicationStatus.INTERVIEW: "🎯 Vous êtes convoqué(e) en entretien",
+                    ApplicationStatus.ACCEPTED: "🎉 Félicitations! Votre candidature a été acceptée",
+                    ApplicationStatus.REJECTED: "❌ Votre candidature n'a pas été retenue"
+                }
+                
+                title = status_messages.get(new_status, "📬 Mise à jour de votre candidature")
+                message = f"Votre candidature pour le poste de {application.job.title} a été mise à jour: {new_status.value}"
+                
+                create_notification(
+                    db=db,
+                    user_id=application.candidate.user_id,
+                    type=NotificationType.STATUS_CHANGE,
+                    title=title,
+                    message=message,
+                    related_job_id=application.job_id,
+                    related_application_id=application.id
+                )
+            except Exception as e:
+                print(f"Erreur lors de la création de la notification: {e}")
+                # Ne pas bloquer si la notification échoue
         
         return {
             "message": "Statut mis à jour avec succès",

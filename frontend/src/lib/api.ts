@@ -572,4 +572,57 @@ export const companiesAPI = {
   }
 };
 
+// API pour les notifications
+export interface Notification {
+  id: number;
+  type: 'new_application' | 'status_change' | 'new_job' | 'message' | 'system';
+  title: string;
+  message: string;
+  related_job_id?: number;
+  related_application_id?: number;
+  is_read: boolean;
+  read_at?: string;
+  created_at: string;
+}
+
+export interface NotificationListResponse {
+  notifications: Notification[];
+  total: number;
+  unread_count: number;
+}
+
+export const notificationsAPI = {
+  // Récupérer les notifications
+  getNotifications: async (token: string, limit: number = 20, offset: number = 0, unreadOnly: boolean = false): Promise<NotificationListResponse> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.get(`/notifications?limit=${limit}&offset=${offset}&unread_only=${unreadOnly}`);
+    return response.data;
+  },
+
+  // Récupérer le nombre de notifications non lues
+  getUnreadCount: async (token: string): Promise<number> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.get('/notifications/unread-count');
+    return response.data.unread_count;
+  },
+
+  // Marquer une notification comme lue
+  markAsRead: async (token: string, notificationId: number): Promise<void> => {
+    const client = createAuthenticatedClient(token);
+    await client.put(`/notifications/${notificationId}/read`);
+  },
+
+  // Marquer toutes les notifications comme lues
+  markAllAsRead: async (token: string): Promise<void> => {
+    const client = createAuthenticatedClient(token);
+    await client.put('/notifications/mark-all-read');
+  },
+
+  // Supprimer une notification
+  deleteNotification: async (token: string, notificationId: number): Promise<void> => {
+    const client = createAuthenticatedClient(token);
+    await client.delete(`/notifications/${notificationId}`);
+  }
+};
+
 export default apiClient;

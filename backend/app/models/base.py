@@ -13,8 +13,18 @@ class User(Base):
     __tablename__ = "users"
     
     id = Column(Integer, primary_key=True, index=True)
-    clerk_id = Column(String, unique=True, nullable=False, index=True)  # ID Clerk
+    
+    # NextAuth fields
     email = Column(String, unique=True, nullable=False, index=True)
+    email_verified = Column(DateTime(timezone=True), nullable=True)
+    password_hash = Column(String, nullable=True)  # Nullable pour OAuth providers
+    name = Column(String, nullable=True)  # Combinaison first_name + last_name
+    image = Column(String, nullable=True)  # URL de l'avatar
+    
+    # Legacy Clerk (garde pour transition)
+    clerk_id = Column(String, unique=True, nullable=True, index=True)
+    
+    # App-specific fields
     role = Column(SQLEnum(UserRole), nullable=False)
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
@@ -25,6 +35,8 @@ class User(Base):
     # Relations
     candidate = relationship("Candidate", back_populates="user", uselist=False)
     employer = relationship("Employer", back_populates="user", uselist=False)
+    accounts = relationship("Account", back_populates="user", cascade="all, delete-orphan")
+    sessions = relationship("Session", back_populates="user", cascade="all, delete-orphan")
 
 class Candidate(Base):
     __tablename__ = "candidates"
@@ -279,3 +291,107 @@ class JobApplication(Base):
     # Relations
     job = relationship("Job", back_populates="applications")
     candidate = relationship("Candidate")
+
+
+class NotificationType(enum.Enum):
+    """Types de notifications"""
+    NEW_APPLICATION = "new_application"  # Nouvelle candidature reçue (employeur)
+    STATUS_CHANGE = "status_change"  # Changement de statut de candidature (candidat)
+    NEW_JOB = "new_job"  # Nouvelle offre d'emploi (candidat)
+    MESSAGE = "message"  # Message générique
+    SYSTEM = "system"  # Notification système
+
+
+class Notification(Base):
+    __tablename__ = "notifications"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    
+    # Contenu
+    type = Column(SQLEnum(NotificationType), nullable=False)
+    title = Column(String, nullable=False)  # Titre de la notification
+    message = Column(Text, nullable=False)  # Message complet
+    
+    # Métadonnées
+    related_job_id = Column(Integer, ForeignKey("jobs.id"), nullable=True)  # Job lié si applicable
+    related_application_id = Column(Integer, ForeignKey("job_applications.id"), nullable=True)  # Candidature liée
+    
+    # Statut
+    is_read = Column(Boolean, default=False, index=True)
+    read_at = Column(DateTime(timezone=True), nullable=True)
+    
+    # Timestamps
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), index=True)
+    
+    # Relations
+    user = relationship("User")
+    job = relationship("Job")
+    application = relationship("JobApplication")
+
+
+# NextAuth Models
+
+class Account(Base):
+    """NextAuth Account model - pour OAuth providers (Google, GitHub, etc.)"""
+    __tablename__ = "accounts"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    
+    type = Column(String, nullable=False)  # oauth, email, credentials
+    provider = Column(String, nullable=False)  # google, github, credentials
+    provider_account_id = Column(String, nullable=False)  # ID from provider
+    
+    refresh_token = Column(Text, nullable=True)
+    access_token = Column(Text, nullable=True)
+    expires_at = Column(Integer, nullable=True)
+    token_type = Column(String, nullable=True)
+    scope = Column(String, nullable=True)
+    id_token = Column(Text, nullable=True)
+    session_state = Column(String, nullable=True)
+    
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    
+    # Relations
+    user = relationship("User", back_populates="accounts")
+    
+    __table_args__ = (
+        # Un provider_account_id unique par provider
+        {'extend_existing': True}
+    )
+
+
+class Session(Base):
+    """NextAuth Session model - pour database sessions"""
+    __tablename__ = "sessions"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    
+    session_token = Column(String, unique=True, nullable=False, index=True)
+    expires = Column(DateTime(timezone=True), nullable=False)
+    
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    
+    # Relations
+    user = relationship("User", back_populates="sessions")
+
+
+class VerificationToken(Base):
+    """NextAuth VerificationToken - pour email verification"""
+    __tablename__ = "verification_tokens"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    identifier = Column(String, nullable=False)  # email
+    token = Column(String, unique=True, nullable=False, index=True)
+    expires = Column(DateTime(timezone=True), nullable=False)
+    
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    __table_args__ = (
+        # Un token unique par identifier
+        {'extend_existing': True}
+    )

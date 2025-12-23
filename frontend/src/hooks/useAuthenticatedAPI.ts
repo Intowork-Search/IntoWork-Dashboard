@@ -1,4 +1,4 @@
-import { useAuth } from '@clerk/nextjs';
+import { useAuth } from '@/hooks/useNextAuth';
 import { createAuthenticatedClient } from '@/lib/api';
 
 export const useAuthenticatedAPI = () => {

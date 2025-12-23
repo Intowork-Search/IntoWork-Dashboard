@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useAuth, useUser } from '@clerk/nextjs';
+import { useAuth, useUser } from '@/hooks/useNextAuth';
 import DashboardLayout from '@/components/DashboardLayout';
 import ProfileHeader from '@/components/profile/ProfileHeader';
 import SectionNavigation from '@/components/profile/SectionNavigation';

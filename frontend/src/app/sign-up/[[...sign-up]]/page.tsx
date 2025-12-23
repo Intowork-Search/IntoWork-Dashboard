@@ -1,6 +1,6 @@
 'use client';
 
-import { SignUp } from '@clerk/nextjs';
+import { SignUp } from '@/hooks/useNextAuth';
 
 export default function SignUpPage() {
   return (

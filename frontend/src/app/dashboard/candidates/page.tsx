@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '@clerk/nextjs';
+import { useAuth } from '@/hooks/useNextAuth';
+import toast from 'react-hot-toast';
 import DashboardLayout from '@/components/DashboardLayout';
 import { 
   UserGroupIcon, 
@@ -48,6 +49,8 @@ export default function CandidatesPage(): React.JSX.Element {
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState('');
   const [viewingApplication, setViewingApplication] = useState<CandidateApplication | null>(null);
+  const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [updatingNotes, setUpdatingNotes] = useState(false);
 
   useEffect(() => {
     fetchApplications();
@@ -56,11 +59,14 @@ export default function CandidatesPage(): React.JSX.Element {
   // Polling automatique toutes les 30 secondes
   useEffect(() => {
     const interval = setInterval(() => {
-      fetchApplications(true);
+      // Ne pas faire de polling si une mise à jour est en cours
+      if (!updatingStatus && !updatingNotes) {
+        fetchApplications(true);
+      }
     }, 30000);
 
     return () => clearInterval(interval);
-  }, [page, statusFilter]);
+  }, [page, statusFilter, updatingStatus, updatingNotes]);
 
   const fetchApplications = async (silent = false) => {
     try {
@@ -107,6 +113,7 @@ export default function CandidatesPage(): React.JSX.Element {
   // Changer le statut d'une candidature
   const handleStatusChange = async (applicationId: number, newStatus: string) => {
     try {
+      setUpdatingStatus(true);
       const token = await getToken();
       if (!token) return;
 
@@ -127,19 +134,24 @@ export default function CandidatesPage(): React.JSX.Element {
       // Rafraîchir la liste
       await fetchApplications(true);
       
+      toast.success('✅ Statut mis à jour avec succès');
+      
       // Si la modal est ouverte, mettre à jour l'application affichée
       if (viewingApplication && viewingApplication.id === applicationId) {
         setViewingApplication({ ...viewingApplication, status: newStatus });
       }
     } catch (error) {
       console.error('Erreur:', error);
-      alert('Erreur lors de la mise à jour du statut');
+      toast.error('❌ Erreur lors de la mise à jour du statut');
+    } finally {
+      setUpdatingStatus(false);
     }
   };
 
   // Mettre à jour les notes
   const handleNotesUpdate = async (applicationId: number, notes: string) => {
     try {
+      setUpdatingNotes(true);
       const token = await getToken();
       if (!token) return;
 
@@ -160,13 +172,17 @@ export default function CandidatesPage(): React.JSX.Element {
       // Rafraîchir la liste
       await fetchApplications(true);
       
+      toast.success('✅ Notes sauvegardées avec succès');
+      
       // Si la modal est ouverte, mettre à jour l'application affichée
       if (viewingApplication && viewingApplication.id === applicationId) {
         setViewingApplication({ ...viewingApplication, notes });
       }
     } catch (error) {
       console.error('Erreur:', error);
-      alert('Erreur lors de la mise à jour des notes');
+      toast.error('❌ Erreur lors de la mise à jour des notes');
+    } finally {
+      setUpdatingNotes(false);
     }
   };
 
@@ -449,19 +465,27 @@ export default function CandidatesPage(): React.JSX.Element {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <h4 className="text-lg font-semibold text-gray-900 mb-3">📊 Statut</h4>
-                  <select
-                    value={viewingApplication.status}
-                    onChange={(e) => handleStatusChange(viewingApplication.id, e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
-                    aria-label="Changer le statut"
-                  >
-                    <option value="applied">En attente</option>
-                    <option value="viewed">Vue</option>
-                    <option value="shortlisted">Présélectionné</option>
-                    <option value="interview">Entretien</option>
-                    <option value="accepted">Accepté</option>
-                    <option value="rejected">Rejeté</option>
-                  </select>
+                  <div className="relative">
+                    <select
+                      value={viewingApplication.status}
+                      onChange={(e) => handleStatusChange(viewingApplication.id, e.target.value)}
+                      disabled={updatingStatus}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                      aria-label="Changer le statut"
+                    >
+                      <option value="applied">En attente</option>
+                      <option value="viewed">Vue</option>
+                      <option value="shortlisted">Présélectionné</option>
+                      <option value="interview">Entretien</option>
+                      <option value="accepted">Accepté</option>
+                      <option value="rejected">Rejeté</option>
+                    </select>
+                    {updatingStatus && (
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <div>
                   <h4 className="text-lg font-semibold text-gray-900 mb-3">📅 Date de candidature</h4>
@@ -501,19 +525,29 @@ export default function CandidatesPage(): React.JSX.Element {
               {/* Notes */}
               <div>
                 <h4 className="text-lg font-semibold text-gray-900 mb-3">📝 Notes internes</h4>
-                <textarea
-                  value={viewingApplication.notes || ''}
-                  onChange={(e) => {
-                    setViewingApplication({ ...viewingApplication, notes: e.target.value });
-                  }}
-                  onBlur={() => {
-                    handleNotesUpdate(viewingApplication.id, viewingApplication.notes || '');
-                  }}
-                  placeholder="Ajouter des notes sur ce candidat..."
-                  rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
-                />
-                <p className="text-sm text-gray-500 mt-1">Les notes se sauvegardent automatiquement</p>
+                <div className="relative">
+                  <textarea
+                    value={viewingApplication.notes || ''}
+                    onChange={(e) => {
+                      setViewingApplication({ ...viewingApplication, notes: e.target.value });
+                    }}
+                    onBlur={() => {
+                      handleNotesUpdate(viewingApplication.id, viewingApplication.notes || '');
+                    }}
+                    disabled={updatingNotes}
+                    placeholder="Ajouter des notes sur ce candidat..."
+                    rows={4}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                  />
+                  {updatingNotes && (
+                    <div className="absolute right-3 top-3">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+                    </div>
+                  )}
+                </div>
+                <p className="text-sm text-gray-500 mt-1">
+                  {updatingNotes ? 'Sauvegarde en cours...' : 'Les notes se sauvegardent automatiquement'}
+                </p>
               </div>
 
               {/* Actions rapides */}
@@ -522,19 +556,22 @@ export default function CandidatesPage(): React.JSX.Element {
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     onClick={() => handleStatusChange(viewingApplication.id, 'interview')}
-                    className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+                    disabled={updatingStatus}
+                    className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Convoquer en entretien
                   </button>
                   <button
                     onClick={() => handleStatusChange(viewingApplication.id, 'accepted')}
-                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+                    disabled={updatingStatus}
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Accepter
                   </button>
                   <button
                     onClick={() => handleStatusChange(viewingApplication.id, 'shortlisted')}
-                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
+                    disabled={updatingStatus}
+                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Présélectionner
                   </button>
@@ -544,7 +581,8 @@ export default function CandidatesPage(): React.JSX.Element {
                         handleStatusChange(viewingApplication.id, 'rejected');
                       }
                     }}
-                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+                    disabled={updatingStatus}
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Rejeter
                   </button>

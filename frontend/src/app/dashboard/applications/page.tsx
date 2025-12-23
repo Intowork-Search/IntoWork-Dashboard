@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '@clerk/nextjs';
+import { useAuth } from '@/hooks/useNextAuth';
 import Link from 'next/link';
+import toast from 'react-hot-toast';
 import DashboardLayout from '@/components/DashboardLayout';
 import { applicationsAPI, JobApplication } from '@/lib/api';
 import {
@@ -26,6 +27,7 @@ export default function ApplicationsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [totalApplications, setTotalApplications] = useState(0);
+  const [withdrawing, setWithdrawing] = useState(false);
 
   // Charger les candidatures
   const loadApplications = async () => {
@@ -56,11 +58,14 @@ export default function ApplicationsPage() {
   // Polling pour les mises à jour en temps réel (toutes les 30 secondes)
   useEffect(() => {
     const interval = setInterval(() => {
-      loadApplications();
+      // Ne pas faire de polling si une action est en cours
+      if (!withdrawing && !loading) {
+        loadApplications();
+      }
     }, 30000); // 30 secondes
 
     return () => clearInterval(interval);
-  }, [currentPage]);
+  }, [currentPage, withdrawing, loading]);
 
   // Retirer une candidature
   const handleWithdrawApplication = async (applicationId: number) => {
@@ -69,14 +74,19 @@ export default function ApplicationsPage() {
     }
 
     try {
+      setWithdrawing(true);
       const token = await getToken();
       if (!token) return;
 
       await applicationsAPI.withdrawApplication(token, applicationId);
+      toast.success('✅ Candidature retirée avec succès');
       // Recharger la liste
       loadApplications();
     } catch (error) {
       console.error('Erreur lors du retrait de la candidature:', error);
+      toast.error('❌ Erreur lors du retrait de la candidature');
+    } finally {
+      setWithdrawing(false);
     }
   };
 
@@ -349,10 +359,15 @@ export default function ApplicationsPage() {
                       {(application.status === 'applied' || application.status === 'pending') && (
                         <button
                           onClick={() => handleWithdrawApplication(application.id)}
-                          className="flex items-center gap-1 px-3 py-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors text-sm font-medium"
+                          disabled={withdrawing}
+                          className="flex items-center gap-1 px-3 py-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                           title="Retirer la candidature"
                         >
-                          <TrashIcon className="w-5 h-5" />
+                          {withdrawing ? (
+                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-red-600"></div>
+                          ) : (
+                            <TrashIcon className="w-5 h-5" />
+                          )}
                           <span>Supprimer</span>
                         </button>
                       )}

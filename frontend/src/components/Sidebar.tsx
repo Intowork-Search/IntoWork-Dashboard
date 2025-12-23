@@ -1,10 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useUser, UserButton, useAuth } from '@clerk/nextjs';
+import { useUser, useAuth } from '@/hooks/useNextAuth';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { candidatesAPI, jobsAPI, applicationsAPI } from '@/lib/api';
+import NotificationPanel from './NotificationPanel';
+import UserButton from './UserButton';
 import { 
   HomeIcon, 
   UserIcon, 
@@ -173,29 +175,29 @@ export default function Sidebar({ userRole }: SidebarProps) {
               <span className="font-bold text-gray-900 text-lg">INTOWORK</span>
             </div>
           )}
-          <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
-          >
-            {isCollapsed ? (
-              <ChevronRightIcon className="w-5 h-5 text-gray-600" />
-            ) : (
-              <ChevronLeftIcon className="w-5 h-5 text-gray-600" />
-            )}
-          </button>
+          <div className="flex items-center gap-2">
+            {/* Notification Panel */}
+            {!isCollapsed && <NotificationPanel />}
+            
+            <button
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+              title={isCollapsed ? "Étendre" : "Réduire"}
+            >
+              {isCollapsed ? (
+                <ChevronRightIcon className="w-5 h-5 text-gray-600" />
+              ) : (
+                <ChevronLeftIcon className="w-5 h-5 text-gray-600" />
+              )}
+            </button>
+          </div>
         </div>
 
         {/* Profil utilisateur */}
         <div className="p-4 border-b border-gray-200">
           <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'}`}>
             <div className="relative">
-              <UserButton 
-                appearance={{
-                  elements: {
-                    avatarBox: "w-10 h-10"
-                  }
-                }}
-              />
+              <UserButton />
               <div className={`absolute -bottom-1 -right-1 w-4 h-4 ${roleColor} rounded-full border-2 border-white flex items-center justify-center`}>
                 <span className="text-xs text-white font-bold">
                   {userRole === 'candidate' ? 'C' : 'E'}

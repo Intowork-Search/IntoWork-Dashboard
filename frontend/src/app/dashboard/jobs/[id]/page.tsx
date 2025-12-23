@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '@clerk/nextjs';
+import { useAuth } from '@/hooks/useNextAuth';
 import { useRouter, useParams } from 'next/navigation';
+import toast from 'react-hot-toast';
 import DashboardLayout from '@/components/DashboardLayout';
 import { jobsAPI, applicationsAPI } from '@/lib/api';
 import {
@@ -76,7 +77,7 @@ export default function JobDetailPage() {
       setApplying(true);
       const token = await getToken();
       if (!token) {
-        alert('Vous devez être connecté pour postuler');
+        toast.error('Vous devez être connecté pour postuler');
         return;
       }
 
@@ -85,7 +86,7 @@ export default function JobDetailPage() {
         cover_letter: coverLetter || undefined
       });
 
-      alert('✅ Candidature envoyée avec succès !');
+      toast.success('✅ Candidature envoyée avec succès !');
       setShowApplicationModal(false);
       setCoverLetter('');
       
@@ -94,9 +95,9 @@ export default function JobDetailPage() {
     } catch (error: any) {
       console.error('Erreur lors de la candidature:', error);
       if (error.response?.status === 400 && error.response?.data?.detail?.includes('déjà postulé')) {
-        alert('❌ Vous avez déjà postulé à cette offre');
+        toast.error('❌ Vous avez déjà postulé à cette offre');
       } else {
-        alert('❌ Erreur lors de l\'envoi de la candidature');
+        toast.error('❌ Erreur lors de l\'envoi de la candidature');
       }
     } finally {
       setApplying(false);

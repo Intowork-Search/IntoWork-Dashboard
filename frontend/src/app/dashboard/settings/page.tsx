@@ -1,16 +1,19 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useUser } from '@clerk/nextjs';
+import { useUser, useAuth } from '@/hooks/useNextAuth';
 import { toast } from 'react-hot-toast';
 import {
   UserIcon,
   BellIcon,
   ShieldCheckIcon,
   KeyIcon,
-  TrashIcon
+  TrashIcon,
+  BuildingOfficeIcon,
+  PhotoIcon
 } from '@heroicons/react/24/outline';
 import { useAuthenticatedAPI } from '@/hooks/useAuthenticatedAPI';
+import { companiesAPI } from '@/lib/api';
 import ToggleButton from '@/components/ToggleButton';
 import DashboardLayout from '@/components/DashboardLayout';
 
@@ -47,10 +50,12 @@ interface PrivacySettings {
 
 export default function SettingsPage() {
   const { user } = useUser();
+  const { getToken } = useAuth();
   const { candidateAPI } = useAuthenticatedAPI();
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('profile');
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [userRole, setUserRole] = useState<'candidate' | 'employer' | null>(null);
   
   // États pour les différentes sections
   const [profileData, setProfileData] = useState({
@@ -62,6 +67,19 @@ export default function SettingsPage() {
     website: '',
     linkedin_url: '',
     github_url: ''
+  });
+
+  const [companyData, setCompanyData] = useState({
+    name: '',
+    description: '',
+    industry: '',
+    size: '',
+    website_url: '',
+    linkedin_url: '',
+    address: '',
+    city: '',
+    country: '',
+    logo_url: ''
   });
 
   const [notifications, setNotifications] = useState<NotificationSettings>({
@@ -78,39 +96,69 @@ export default function SettingsPage() {
     allow_recruiter_contact: true
   });
 
-  // Charger le profil utilisateur
+  // Charger le profil utilisateur ou les données de l'entreprise selon le rôle
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await candidateAPI.getProfile();
-        setProfile(response.data);
-        
-        // Remplir les formulaires avec les données existantes (ou données Clerk comme fallback)
-        setProfileData({
-          first_name: response.data.first_name || user?.firstName || '',
-          last_name: response.data.last_name || user?.lastName || '',
-          phone: response.data.phone || '',
-          location: response.data.location || '',
-          bio: response.data.bio || '',
-          website: response.data.website || '',
-          linkedin_url: response.data.linkedin_url || '',
-          github_url: response.data.github_url || ''
-        });
+        const token = await getToken();
+        if (!token) return;
 
-        setNotifications({
-          email_notifications: response.data.email_notifications ?? true,
-          job_alerts: response.data.job_alerts ?? true,
-          marketing_emails: response.data.marketing_emails ?? false,
-          push_notifications: true
-        });
+        // D'abord, détecter le rôle utilisateur en appelant l'API
+        try {
+          const response = await candidateAPI.getProfile();
+          setUserRole('candidate');
+          setProfile(response.data);
+          
+          // Remplir les formulaires avec les données existantes (ou données Clerk comme fallback)
+          setProfileData({
+            first_name: response.data.first_name || user?.firstName || '',
+            last_name: response.data.last_name || user?.lastName || '',
+            phone: response.data.phone || '',
+            location: response.data.location || '',
+            bio: response.data.bio || '',
+            website: response.data.website || '',
+            linkedin_url: response.data.linkedin_url || '',
+            github_url: response.data.github_url || ''
+          });
 
-        setPrivacy({
-          is_profile_public: response.data.is_profile_public ?? true,
-          show_email: false,
-          show_phone: false,
-          allow_recruiter_contact: true
-        });
+          setNotifications({
+            email_notifications: response.data.email_notifications ?? true,
+            job_alerts: response.data.job_alerts ?? true,
+            marketing_emails: response.data.marketing_emails ?? false,
+            push_notifications: true
+          });
+
+          setPrivacy({
+            is_profile_public: response.data.is_profile_public ?? true,
+            show_email: false,
+            show_phone: false,
+            allow_recruiter_contact: true
+          });
+        } catch (candidateError) {
+          // Si l'appel candidat échoue, essayer de charger les données de l'entreprise
+          console.log('Not a candidate, trying employer data...');
+          try {
+            const companyResponse = await companiesAPI.getMyCompany(token);
+            setUserRole('employer');
+            
+            setCompanyData({
+              name: companyResponse.name || '',
+              description: companyResponse.description || '',
+              industry: companyResponse.industry || '',
+              size: companyResponse.size || '',
+              website_url: companyResponse.website_url || '',
+              linkedin_url: companyResponse.linkedin_url || '',
+              address: companyResponse.address || '',
+              city: companyResponse.city || '',
+              country: companyResponse.country || '',
+              logo_url: companyResponse.logo_url || ''
+            });
+          } catch (employerError) {
+            console.error('Erreur lors du chargement des données:', employerError);
+            toast.error('Erreur lors du chargement de vos informations');
+          }
+        }
       } catch (error) {
         console.error('Erreur lors du chargement du profil:', error);
         toast.error('Erreur lors du chargement du profil');
@@ -131,8 +179,15 @@ export default function SettingsPage() {
       }
     };
 
-    fetchProfile();
-  }, [candidateAPI]);
+    fetchData();
+  }, [candidateAPI, getToken]);
+
+  // Ajuster l'onglet actif selon le rôle
+  useEffect(() => {
+    if (userRole === 'employer' && activeTab === 'profile') {
+      setActiveTab('company');
+    }
+  }, [userRole]);
 
   const updateProfile = async () => {
     try {
@@ -142,6 +197,22 @@ export default function SettingsPage() {
     } catch (error) {
       console.error('Erreur lors de la mise à jour:', error);
       toast.error('Erreur lors de la mise à jour du profil');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateCompany = async () => {
+    try {
+      setLoading(true);
+      const token = await getToken();
+      if (!token) return;
+      
+      await companiesAPI.updateMyCompany(token, companyData);
+      toast.success('✅ Informations de l\'entreprise mises à jour avec succès !');
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour:', error);
+      toast.error('❌ Erreur lors de la mise à jour des informations');
     } finally {
       setLoading(false);
     }
@@ -189,7 +260,11 @@ export default function SettingsPage() {
     }
   };
 
-  const tabs = [
+  const tabs = userRole === 'employer' ? [
+    { id: 'company', name: 'Entreprise', icon: BuildingOfficeIcon },
+    { id: 'notifications', name: 'Notifications', icon: BellIcon },
+    { id: 'account', name: 'Compte', icon: KeyIcon }
+  ] : [
     { id: 'profile', name: 'Profil', icon: UserIcon },
     { id: 'notifications', name: 'Notifications', icon: BellIcon },
     { id: 'privacy', name: 'Confidentialité', icon: ShieldCheckIcon },
@@ -365,6 +440,186 @@ export default function SettingsPage() {
           </div>
         )}
 
+        {/* Onglet Entreprise (pour employeurs) */}
+        {activeTab === 'company' && userRole === 'employer' && (
+          <div className="p-6 space-y-8">
+            <div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Informations de l'entreprise</h3>
+              <p className="text-gray-600 mb-6">Mettez à jour les informations de votre entreprise pour attirer les meilleurs talents.</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="md:col-span-2">
+                  <label htmlFor="company_name" className="block text-sm font-semibold text-gray-800 mb-2">
+                    Nom de l'entreprise *
+                  </label>
+                  <input
+                    id="company_name"
+                    type="text"
+                    value={companyData.name}
+                    onChange={(e) => setCompanyData(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-gray-900 placeholder-gray-500"
+                    placeholder="Nom de votre entreprise"
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label htmlFor="company_description" className="block text-sm font-semibold text-gray-800 mb-2">
+                    Description
+                  </label>
+                  <textarea
+                    id="company_description"
+                    value={companyData.description}
+                    onChange={(e) => setCompanyData(prev => ({ ...prev, description: e.target.value }))}
+                    rows={4}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-gray-900 placeholder-gray-500"
+                    placeholder="Décrivez votre entreprise, votre mission et votre culture..."
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="industry" className="block text-sm font-semibold text-gray-800 mb-2">
+                    Secteur d'activité
+                  </label>
+                  <input
+                    id="industry"
+                    type="text"
+                    value={companyData.industry}
+                    onChange={(e) => setCompanyData(prev => ({ ...prev, industry: e.target.value }))}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-gray-900 placeholder-gray-500"
+                    placeholder="ex: Technologie, Finance, Santé..."
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="size" className="block text-sm font-semibold text-gray-800 mb-2">
+                    Taille de l'entreprise
+                  </label>
+                  <select
+                    id="size"
+                    value={companyData.size}
+                    onChange={(e) => setCompanyData(prev => ({ ...prev, size: e.target.value }))}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-gray-900"
+                  >
+                    <option value="">Sélectionnez une taille</option>
+                    <option value="1-10">1-10 employés</option>
+                    <option value="11-50">11-50 employés</option>
+                    <option value="51-200">51-200 employés</option>
+                    <option value="201-500">201-500 employés</option>
+                    <option value="501-1000">501-1000 employés</option>
+                    <option value="1000+">1000+ employés</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="website_url" className="block text-sm font-semibold text-gray-800 mb-2">
+                    Site web
+                  </label>
+                  <input
+                    id="website_url"
+                    type="url"
+                    value={companyData.website_url}
+                    onChange={(e) => setCompanyData(prev => ({ ...prev, website_url: e.target.value }))}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-gray-900 placeholder-gray-500"
+                    placeholder="https://www.votresite.com"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="company_linkedin" className="block text-sm font-semibold text-gray-800 mb-2">
+                    LinkedIn
+                  </label>
+                  <input
+                    id="company_linkedin"
+                    type="url"
+                    value={companyData.linkedin_url}
+                    onChange={(e) => setCompanyData(prev => ({ ...prev, linkedin_url: e.target.value }))}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-gray-900 placeholder-gray-500"
+                    placeholder="https://linkedin.com/company/..."
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label htmlFor="address" className="block text-sm font-semibold text-gray-800 mb-2">
+                    Adresse
+                  </label>
+                  <input
+                    id="address"
+                    type="text"
+                    value={companyData.address}
+                    onChange={(e) => setCompanyData(prev => ({ ...prev, address: e.target.value }))}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-gray-900 placeholder-gray-500"
+                    placeholder="Adresse complète"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="city" className="block text-sm font-semibold text-gray-800 mb-2">
+                    Ville
+                  </label>
+                  <input
+                    id="city"
+                    type="text"
+                    value={companyData.city}
+                    onChange={(e) => setCompanyData(prev => ({ ...prev, city: e.target.value }))}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-gray-900 placeholder-gray-500"
+                    placeholder="Ville"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="country" className="block text-sm font-semibold text-gray-800 mb-2">
+                    Pays
+                  </label>
+                  <input
+                    id="country"
+                    type="text"
+                    value={companyData.country}
+                    onChange={(e) => setCompanyData(prev => ({ ...prev, country: e.target.value }))}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-gray-900 placeholder-gray-500"
+                    placeholder="Pays"
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label htmlFor="logo_url" className="block text-sm font-semibold text-gray-800 mb-2">
+                    Logo (URL)
+                  </label>
+                  <div className="flex items-center gap-4">
+                    {companyData.logo_url && (
+                      <img 
+                        src={companyData.logo_url} 
+                        alt="Logo" 
+                        className="w-16 h-16 object-cover rounded-lg border border-gray-200"
+                      />
+                    )}
+                    <input
+                      id="logo_url"
+                      type="url"
+                      value={companyData.logo_url}
+                      onChange={(e) => setCompanyData(prev => ({ ...prev, logo_url: e.target.value }))}
+                      className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-gray-900 placeholder-gray-500"
+                      placeholder="https://exemple.com/logo.png"
+                    />
+                  </div>
+                  <p className="text-sm text-gray-500 mt-2">
+                    <PhotoIcon className="w-4 h-4 inline mr-1" />
+                    Recommandé: 200x200px, format PNG ou JPG
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-8 flex justify-end">
+                <button
+                  onClick={updateCompany}
+                  disabled={loading}
+                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium"
+                >
+                  {loading ? 'Enregistrement...' : 'Enregistrer les modifications'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Onglet Notifications */}
         {activeTab === 'notifications' && (
           <div className="p-6 space-y-8">
@@ -516,15 +771,15 @@ export default function SettingsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="bg-white p-4 rounded-lg border border-gray-200">
                     <p className="text-sm font-medium text-gray-500 mb-1">Adresse email</p>
-                    <p className="text-sm font-semibold text-gray-900">{user?.emailAddresses[0]?.emailAddress}</p>
+                    <p className="text-sm font-semibold text-gray-900">{user?.email}</p>
                   </div>
                   <div className="bg-white p-4 rounded-lg border border-gray-200">
-                    <p className="text-sm font-medium text-gray-500 mb-1">Membre depuis</p>
-                    <p className="text-sm font-semibold text-gray-900">{user?.createdAt ? new Date(user.createdAt).toLocaleDateString('fr-FR') : 'N/A'}</p>
+                    <p className="text-sm font-medium text-gray-500 mb-1">Nom complet</p>
+                    <p className="text-sm font-semibold text-gray-900">{user?.fullName || 'N/A'}</p>
                   </div>
                   <div className="bg-white p-4 rounded-lg border border-gray-200">
-                    <p className="text-sm font-medium text-gray-500 mb-1">Dernière connexion</p>
-                    <p className="text-sm font-semibold text-gray-900">{user?.lastSignInAt ? new Date(user.lastSignInAt).toLocaleDateString('fr-FR') : 'N/A'}</p>
+                    <p className="text-sm font-medium text-gray-500 mb-1">Rôle</p>
+                    <p className="text-sm font-semibold text-gray-900">{user?.role === 'candidate' ? 'Candidat' : 'Employeur'}</p>
                   </div>
                 </div>
               </div>

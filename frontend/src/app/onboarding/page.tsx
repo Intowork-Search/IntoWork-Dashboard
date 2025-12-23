@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useUser, useAuth } from '@clerk/nextjs';
+import { useUser, useAuth } from '@/hooks/useNextAuth';
 import { authAPI, CompleteRegistration } from '@/lib/api';
 
 export default function OnboardingPage() {
