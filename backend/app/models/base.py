@@ -184,7 +184,7 @@ class Employer(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, unique=True)
-    company_id = Column(Integer, ForeignKey("companies.id"), nullable=False)
+    company_id = Column(Integer, ForeignKey("companies.id"), nullable=True)  # Nullable: l'employeur peut créer son entreprise plus tard
     
     # Informations du recruteur
     position = Column(String)  # Poste dans l'entreprise

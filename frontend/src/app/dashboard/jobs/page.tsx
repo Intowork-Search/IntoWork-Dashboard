@@ -5,7 +5,7 @@
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import { jobsAPI, Job, JobFilters, applicationsAPI } from '@/lib/api';
-import { useAuth } from '@/hooks/useNextAuth';
+import { useAuth, useUser } from '@/hooks/useNextAuth';
 import toast from 'react-hot-toast';
 import { 
   MagnifyingGlassIcon,
@@ -22,6 +22,7 @@ import { StarIcon } from '@heroicons/react/24/solid';
 
 export default function JobsPage() {
   const { getToken } = useAuth();
+  const { user, isLoaded } = useUser();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -36,26 +37,60 @@ export default function JobsPage() {
   const [coverLetter, setCoverLetter] = useState('');
   const [applying, setApplying] = useState(false);
 
+  // Vérifier si l'utilisateur est un employeur
+  const isEmployer = user?.role === 'employer';
+
+  console.log('🔍 Debug Jobs Page:', {
+    user,
+    role: user?.role,
+    isEmployer,
+    isLoaded
+  });
+
   // Charger les offres d'emploi
   const loadJobs = async () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await jobsAPI.getJobs(filters);
-      setJobs(response.jobs);
-      setTotalJobs(response.total);
-      setTotalPages(response.total_pages);
+      
+      console.log('📦 Loading jobs for:', isEmployer ? 'EMPLOYER (my jobs only)' : 'CANDIDATE (all jobs)');
+      
+      // Si c'est un employeur, charger uniquement ses offres
+      if (isEmployer) {
+        const token = await getToken();
+        if (!token) {
+          setError('Session expirée. Veuillez vous reconnecter.');
+          return;
+        }
+        console.log('🔑 Using getMyJobs with token');
+        const response = await jobsAPI.getMyJobs(token, filters);
+        setJobs(response.jobs);
+        setTotalJobs(response.total);
+        setTotalPages(response.total_pages);
+        console.log('✅ Loaded employer jobs:', response.jobs.length);
+      } else {
+        // Si c'est un candidat, charger toutes les offres publiques
+        console.log('📋 Using getJobs (public)');
+        const response = await jobsAPI.getJobs(filters);
+        setJobs(response.jobs);
+        setTotalJobs(response.total);
+        setTotalPages(response.total_pages);
+        console.log('✅ Loaded public jobs:', response.jobs.length);
+      }
     } catch (err) {
       setError('Erreur lors du chargement des offres d\'emploi');
-      console.error('Erreur:', err);
+      console.error('❌ Erreur:', err);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadJobs();
-  }, [filters]);
+    // Attendre que le user soit chargé avant de charger les jobs
+    if (isLoaded && user) {
+      loadJobs();
+    }
+  }, [filters, isEmployer, user, isLoaded]);
 
   // Polling désactivé pour meilleures performances
   // Réactiver en production si nécessaire avec un intervalle plus long (5 min)
@@ -218,18 +253,34 @@ export default function JobsPage() {
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Recherche d'emplois</h1>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                Recherche d'emplois {isEmployer && '(👔 Mes offres)'}
+              </h1>
               <p className="text-gray-600">
                 Découvrez {totalJobs} offre{totalJobs > 1 ? 's' : ''} d'emploi qui correspondent à votre profil
+                {isEmployer && ' - Vous voyez uniquement VOS offres publiées'}
               </p>
             </div>
-            {/* Badge En direct */}
-            <div className="flex items-center space-x-2 px-4 py-2 bg-green-50 border border-green-200 rounded-lg">
-              <div className="relative flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+            {/* Badge Debug + En direct */}
+            <div className="flex items-center gap-3">
+              {/* Badge Debug Role */}
+              <div className="px-4 py-2 bg-purple-50 border-2 border-purple-300 rounded-lg">
+                <div className="text-xs font-semibold text-purple-600 mb-1">DEBUG MODE</div>
+                <div className="text-sm font-medium text-purple-900">
+                  Rôle: <span className="font-bold">{user?.role || 'loading...'}</span>
+                </div>
+                <div className="text-xs text-purple-700">
+                  {isEmployer ? '✅ Mode EMPLOYEUR (mes offres)' : '📋 Mode CANDIDAT (toutes offres)'}
+                </div>
               </div>
-              <span className="text-sm font-medium text-green-700">Mises à jour en direct</span>
+              {/* Badge En direct */}
+              <div className="flex items-center space-x-2 px-4 py-2 bg-green-50 border border-green-200 rounded-lg">
+                <div className="relative flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                </div>
+                <span className="text-sm font-medium text-green-700">Mises à jour en direct</span>
+              </div>
             </div>
           </div>
         </div>

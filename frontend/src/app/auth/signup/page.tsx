@@ -69,7 +69,12 @@ export default function SignUpPage() {
           toast.error('Erreur lors de la connexion automatique');
           router.push('/auth/signin');
         } else {
-          router.push('/dashboard');
+          // Rediriger selon le rôle
+          if (formData.role === 'employer') {
+            router.push('/onboarding/employer');
+          } else {
+            router.push('/dashboard');
+          }
           router.refresh();
         }
       }

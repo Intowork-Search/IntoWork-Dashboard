@@ -44,13 +44,17 @@ export default function JobPostsPage(): React.JSX.Element {
 
   // Polling automatique toutes les 30 secondes pour synchroniser les stats en temps réel
   useEffect(() => {
-    const interval = setInterval(() => {
+    const interval = setInterval(async () => {
       // Recharger silencieusement les jobs sans afficher le loader
-      jobsAPI.getJobs().then(response => {
+      try {
+        const token = await getToken();
+        if (!token) return;
+        
+        const response = await jobsAPI.getMyJobs(token);
         setJobs(response.jobs || []);
-      }).catch(err => {
+      } catch (err) {
         console.error('Erreur lors du rafraîchissement automatique:', err);
-      });
+      }
     }, 30000); // 30 secondes
 
     return () => clearInterval(interval);
@@ -60,7 +64,14 @@ export default function JobPostsPage(): React.JSX.Element {
     try {
       setLoading(true);
       setError(null);
-      const response = await jobsAPI.getJobs();
+      
+      const token = await getToken();
+      if (!token) {
+        setError('Session expirée. Veuillez vous reconnecter.');
+        return;
+      }
+      
+      const response = await jobsAPI.getMyJobs(token);
       setJobs(response.jobs || []);
     } catch (err: any) {
       console.error('Erreur lors de la récupération des offres:', err);

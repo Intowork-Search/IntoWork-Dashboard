@@ -155,8 +155,7 @@ export default function Dashboard() {
       const formData = new FormData();
       formData.append('cv', file);
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api';
-      const response = await fetch(`${apiUrl}/candidates/cv`, {
+      const response = await fetch(`https://intowork-dashboard-production.up.railway.app/api/candidates/cv`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

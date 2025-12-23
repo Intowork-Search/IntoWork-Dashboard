@@ -49,6 +49,58 @@ async def get_dashboard_data(
             if not employer:
                 raise HTTPException(status_code=404, detail="Employeur non trouvé")
 
+            # Si l'employeur n'a pas encore d'entreprise, retourner un dashboard vide avec message
+            if not employer.company_id:
+                return {
+                    "stats": [
+                        {
+                            "title": "Entreprise",
+                            "value": "Non configurée",
+                            "change": "Créez votre entreprise",
+                            "changeType": "neutral",
+                            "color": "gray"
+                        },
+                        {
+                            "title": "Offres actives",
+                            "value": "0",
+                            "change": "+0",
+                            "changeType": "neutral",
+                            "color": "blue"
+                        },
+                        {
+                            "title": "Candidatures",
+                            "value": "0",
+                            "change": "+0",
+                            "changeType": "neutral",
+                            "color": "green"
+                        },
+                        {
+                            "title": "Entretiens",
+                            "value": "0",
+                            "change": "+0",
+                            "changeType": "neutral",
+                            "color": "purple"
+                        }
+                    ],
+                    "recentActivities": [
+                        {
+                            "id": 0,
+                            "action": "Bienvenue sur INTOWORK !",
+                            "target": f"{current_user.first_name} {current_user.last_name}",
+                            "time": _format_time_ago(current_user.created_at),
+                            "type": "welcome"
+                        },
+                        {
+                            "id": 1,
+                            "action": "Prochaine étape",
+                            "target": "Créez votre entreprise dans les paramètres",
+                            "time": "maintenant",
+                            "type": "info"
+                        }
+                    ],
+                    "profileCompletion": 30  # 30% car profil créé mais pas d'entreprise
+                }
+
             # Offres actives
             active_jobs = db.query(Job).filter(Job.employer_id == employer.id, Job.status == JobStatus.PUBLISHED).all()
             active_jobs_count = len(active_jobs)
@@ -264,10 +316,12 @@ async def get_dashboard_data(
             }
         
     except Exception as e:
+        import traceback
         logger.error(f"Error fetching dashboard data: {str(e)}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Erreur lors de la récupération des données du dashboard"
+            detail=f"Erreur lors de la récupération des données du dashboard: {str(e)}"
         )
 
 def _format_time_ago(dt: datetime) -> str:

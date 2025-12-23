@@ -157,11 +157,11 @@ export default function NotificationPanel() {
 
       {/* Panel des notifications */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-96 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 max-h-150 overflow-hidden flex flex-col">
+        <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 max-h-[32rem] overflow-hidden flex flex-col">
           {/* Header */}
-          <div className="p-4 border-b border-gray-200">
+          <div className="p-3 sm:p-4 border-b border-gray-200">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-lg font-semibold text-gray-900">Notifications</h3>
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900">Notifications</h3>
               <button
                 onClick={() => setIsOpen(false)}
                 className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
@@ -175,7 +175,7 @@ export default function NotificationPanel() {
               <button
                 onClick={handleMarkAllAsRead}
                 disabled={loading}
-                className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1 disabled:opacity-50"
+                className="text-xs sm:text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1 disabled:opacity-50"
               >
                 <CheckIcon className="w-4 h-4" />
                 Tout marquer comme lu
@@ -184,11 +184,11 @@ export default function NotificationPanel() {
           </div>
 
           {/* Liste des notifications */}
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto max-h-96">
             {notifications.length === 0 ? (
-              <div className="p-8 text-center text-gray-500">
-                <BellIcon className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                <p>Aucune notification</p>
+              <div className="p-6 sm:p-8 text-center text-gray-500">
+                <BellIcon className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 text-gray-300" />
+                <p className="text-sm">Aucune notification</p>
               </div>
             ) : (
               <div className="divide-y divide-gray-100">
@@ -202,23 +202,23 @@ export default function NotificationPanel() {
                       }
                       setIsOpen(false);
                     }}
-                    className={`block p-4 hover:bg-gray-50 transition-colors ${
+                    className={`block p-3 sm:p-4 hover:bg-gray-50 transition-colors ${
                       !notification.is_read ? 'bg-blue-50' : ''
                     }`}
                   >
-                    <div className="flex items-start gap-3">
-                      <div className="text-2xl shrink-0">
+                    <div className="flex items-start gap-2 sm:gap-3">
+                      <div className="text-xl sm:text-2xl shrink-0">
                         {getNotificationIcon(notification.type)}
                       </div>
                       
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 mb-1">
+                        <p className="text-xs sm:text-sm font-medium text-gray-900 mb-1">
                           {notification.title}
                         </p>
-                        <p className="text-sm text-gray-600 line-clamp-2">
+                        <p className="text-xs sm:text-sm text-gray-600 line-clamp-2">
                           {notification.message}
                         </p>
-                        <p className="text-xs text-gray-400 mt-1">
+                        <p className="text-[10px] sm:text-xs text-gray-400 mt-1">
                           {formatDistanceToNow(new Date(notification.created_at), { 
                             addSuffix: true,
                             locale: fr
@@ -226,14 +226,14 @@ export default function NotificationPanel() {
                         </p>
                       </div>
 
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-0.5 sm:gap-1">
                         {!notification.is_read && (
                           <button
                             onClick={(e) => handleMarkAsRead(notification.id, e)}
                             className="p-1 hover:bg-blue-100 rounded transition-colors"
                             title="Marquer comme lu"
                           >
-                            <CheckIcon className="w-4 h-4 text-blue-600" />
+                            <CheckIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600" />
                           </button>
                         )}
                         <button
@@ -241,7 +241,7 @@ export default function NotificationPanel() {
                           className="p-1 hover:bg-red-100 rounded transition-colors"
                           title="Supprimer"
                         >
-                          <XMarkIcon className="w-4 h-4 text-red-600" />
+                          <XMarkIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-600" />
                         </button>
                       </div>
                     </div>

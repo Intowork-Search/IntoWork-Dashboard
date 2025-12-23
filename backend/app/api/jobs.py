@@ -165,6 +165,81 @@ async def get_jobs(
         total_pages=total_pages
     )
 
+@router.get("/my-jobs", response_model=JobListResponse)
+async def get_my_jobs(
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=50),
+    search: Optional[str] = None,
+    status_filter: Optional[str] = None,
+    current_user: User = Depends(require_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Récupérer les offres d'emploi créées par l'employeur connecté
+    """
+    if current_user.role != UserRole.EMPLOYER:
+        raise HTTPException(status_code=403, detail="Seuls les employeurs peuvent accéder à cette ressource")
+    
+    # Récupérer l'employeur
+    employer = db.query(Employer).filter(Employer.user_id == current_user.id).first()
+    if not employer:
+        raise HTTPException(status_code=404, detail="Profil employeur non trouvé")
+    
+    # Query de base - uniquement les jobs de cet employeur
+    query = db.query(Job, Company).join(Company, Job.company_id == Company.id)
+    query = query.filter(Job.employer_id == employer.id)
+    
+    # Filtres
+    if search:
+        query = query.filter(
+            Job.title.ilike(f"%{search}%") | 
+            Job.description.ilike(f"%{search}%")
+        )
+    
+    if status_filter:
+        try:
+            status_enum = JobStatus(status_filter)
+            query = query.filter(Job.status == status_enum)
+        except ValueError:
+            pass  # Ignorer les valeurs invalides
+    
+    # Pagination
+    total = query.count()
+    offset = (page - 1) * limit
+    results = query.order_by(desc(Job.posted_at)).offset(offset).limit(limit).all()
+    
+    # Construire la réponse
+    jobs = []
+    for job, company in results:
+        jobs.append(JobResponse(
+            id=job.id,
+            title=job.title,
+            description=job.description[:300] + "..." if len(job.description) > 300 else job.description,
+            company_name=company.name,
+            company_logo_url=company.logo_url,
+            location=job.location,
+            location_type=job.location_type.value,
+            job_type=job.job_type.value,
+            salary_min=job.salary_min,
+            salary_max=job.salary_max,
+            currency=job.currency,
+            posted_at=job.posted_at,
+            is_featured=job.is_featured,
+            views_count=job.views_count,
+            applications_count=job.applications_count,
+            has_applied=False  # L'employeur ne postule pas à ses propres offres
+        ))
+    
+    total_pages = (total + limit - 1) // limit
+    
+    return JobListResponse(
+        jobs=jobs,
+        total=total,
+        page=page,
+        limit=limit,
+        total_pages=total_pages
+    )
+
 @router.get("/stats/recent")
 async def get_recent_jobs_count(
     days: int = Query(7, ge=1, le=30),

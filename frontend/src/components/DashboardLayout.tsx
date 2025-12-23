@@ -4,6 +4,7 @@ import { useUser } from '@/hooks/useNextAuth';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Sidebar from '@/components/Sidebar';
+import NotificationPanel from '@/components/NotificationPanel';
 import { Bars3Icon } from '@heroicons/react/24/outline';
 
 interface DashboardLayoutProps {
@@ -59,7 +60,7 @@ export default function DashboardLayout({
       {/* Sidebar mobile */}
       <div className={`lg:hidden fixed inset-0 z-50 ${sidebarOpen ? 'block' : 'hidden'}`}>
         <button 
-          className="fixed inset-0 bg-gray-600 bg-opacity-75 cursor-pointer"
+          className="fixed inset-0 bg-transparent cursor-pointer"
           onClick={() => setSidebarOpen(false)}
           onKeyDown={(e) => e.key === 'Escape' && setSidebarOpen(false)}
           aria-label="Fermer le menu"
@@ -102,9 +103,9 @@ export default function DashboardLayout({
                 )}
               </div>
               
-              {/* Actions supplémentaires peuvent être ajoutées ici */}
+              {/* Notifications */}
               <div className="flex items-center space-x-4">
-                {/* Boutons d'action selon la page */}
+                <NotificationPanel />
               </div>
             </div>
           </div>

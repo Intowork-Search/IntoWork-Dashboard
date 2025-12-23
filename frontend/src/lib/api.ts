@@ -465,6 +465,23 @@ export const jobsAPI = {
     return response.data;
   },
 
+  // Récupérer uniquement les offres d'emploi créées par l'employeur connecté
+  getMyJobs: async (token: string, filters?: JobFilters): Promise<JobListResponse> => {
+    const client = createAuthenticatedClient(token);
+    const params = new URLSearchParams();
+    
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          params.append(key, value.toString());
+        }
+      });
+    }
+    
+    const response = await client.get(`/jobs/my-jobs?${params.toString()}`);
+    return response.data;
+  },
+
   // Récupérer les détails d'une offre d'emploi
   getJob: async (jobId: number): Promise<JobDetail> => {
     const response = await apiClient.get(`/jobs/${jobId}`);

@@ -215,7 +215,7 @@ export default function CompanyPage(): React.JSX.Element {
                   type="text"
                   value={formData.name || ''}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-gray-900"
                   placeholder="Nom de votre entreprise"
                 />
               ) : (
@@ -234,7 +234,7 @@ export default function CompanyPage(): React.JSX.Element {
                   type="text"
                   value={formData.industry || ''}
                   onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
-                  className="w-full px-4 py-3 bg-white border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm"
+                  className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm"
                   placeholder="Ex: Technologie, Finance, Santé..."
                 />
               ) : (
@@ -253,7 +253,7 @@ export default function CompanyPage(): React.JSX.Element {
                   title="Taille de l'entreprise"
                   value={formData.size || ''}
                   onChange={(e) => setFormData({ ...formData, size: e.target.value })}
-                  className="w-full px-4 py-3 bg-white border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm"
+                  className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm"
                 >
                   <option value="">Sélectionner...</option>
                   <option value="1-10">1-10 employés</option>
@@ -278,7 +278,7 @@ export default function CompanyPage(): React.JSX.Element {
                   type="url"
                   value={formData.website_url || ''}
                   onChange={(e) => setFormData({ ...formData, website_url: e.target.value })}
-                  className="w-full px-4 py-3 bg-white border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm"
+                  className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm"
                   placeholder="https://www.exemple.com"
                 />
               ) : (
@@ -299,7 +299,7 @@ export default function CompanyPage(): React.JSX.Element {
                   type="url"
                   value={formData.linkedin_url || ''}
                   onChange={(e) => setFormData({ ...formData, linkedin_url: e.target.value })}
-                  className="w-full px-4 py-3 bg-white border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm"
+                  className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm"
                   placeholder="https://linkedin.com/company/..."
                 />
               ) : (
@@ -320,7 +320,7 @@ export default function CompanyPage(): React.JSX.Element {
                   type="url"
                   value={formData.logo_url || ''}
                   onChange={(e) => setFormData({ ...formData, logo_url: e.target.value })}
-                  className="w-full px-4 py-3 bg-white border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm"
+                  className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm"
                   placeholder="https://exemple.com/logo.png"
                 />
               ) : (
@@ -339,7 +339,7 @@ export default function CompanyPage(): React.JSX.Element {
                   value={formData.description || ''}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={6}
-                  className="w-full px-4 py-3 bg-white border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm resize-none"
+                  className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm resize-none"
                   placeholder="Décrivez votre entreprise, votre mission, votre culture..."
                 />
               ) : (
@@ -373,7 +373,7 @@ export default function CompanyPage(): React.JSX.Element {
                   type="text"
                   value={formData.address || ''}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  className="w-full px-4 py-3 bg-white border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm"
+                  className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm"
                   placeholder="Adresse complète"
                 />
               ) : (
@@ -392,7 +392,7 @@ export default function CompanyPage(): React.JSX.Element {
                   type="text"
                   value={formData.city || ''}
                   onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                  className="w-full px-4 py-3 bg-white border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm"
+                  className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm"
                   placeholder="Ville"
                 />
               ) : (
@@ -411,7 +411,7 @@ export default function CompanyPage(): React.JSX.Element {
                   type="text"
                   value={formData.country || ''}
                   onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                  className="w-full px-4 py-3 bg-white border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm"
+                  className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm"
                   placeholder="Pays"
                 />
               ) : (

@@ -5,7 +5,7 @@ from typing import Optional
 import logging
 
 from app.database import get_db
-from app.auth import get_current_user
+from app.auth import require_user
 from app.models.base import User, UserRole, Company, Employer, Job, JobStatus, JobApplication
 
 router = APIRouter()
@@ -38,6 +38,18 @@ class CompanyUpdateRequest(BaseModel):
     country: Optional[str] = None
     logo_url: Optional[str] = None
 
+class CompanyCreateRequest(BaseModel):
+    name: str
+    description: Optional[str] = None
+    industry: Optional[str] = None
+    size: Optional[str] = None
+    website_url: Optional[str] = None
+    linkedin_url: Optional[str] = None
+    address: Optional[str] = None
+    city: Optional[str] = None
+    country: Optional[str] = None
+    logo_url: Optional[str] = None
+
 class CompanyStatsResponse(BaseModel):
     active_jobs: int
     total_jobs: int
@@ -46,10 +58,59 @@ class CompanyStatsResponse(BaseModel):
 
 # ==================== Routes ====================
 
+@router.post("", response_model=CompanyResponse, status_code=201)
+async def create_company(
+    company_data: CompanyCreateRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_user)
+):
+    """
+    Créer une nouvelle entreprise (pour l'onboarding employeur)
+    """
+    logger.info(f"Création entreprise pour user_id={current_user.id}")
+    
+    if current_user.role != UserRole.EMPLOYER:
+        logger.warning("Accès refusé: utilisateur non employeur")
+        raise HTTPException(status_code=403, detail="Accès réservé aux employeurs")
+    
+    # Créer l'entreprise
+    new_company = Company(
+        name=company_data.name,
+        description=company_data.description,
+        industry=company_data.industry,
+        size=company_data.size,
+        website_url=company_data.website_url,
+        linkedin_url=company_data.linkedin_url,
+        address=company_data.address,
+        city=company_data.city,
+        country=company_data.country,
+        logo_url=company_data.logo_url
+    )
+    
+    db.add(new_company)
+    db.commit()
+    db.refresh(new_company)
+    
+    logger.info(f"Entreprise créée: id={new_company.id}, name={new_company.name}")
+    
+    return CompanyResponse(
+        id=new_company.id,
+        name=new_company.name,
+        description=new_company.description,
+        industry=new_company.industry,
+        size=new_company.size,
+        website_url=new_company.website_url,
+        linkedin_url=new_company.linkedin_url,
+        address=new_company.address,
+        city=new_company.city,
+        country=new_company.country,
+        logo_url=new_company.logo_url
+    )
+
 @router.get("/my-company", response_model=CompanyResponse)
 async def get_my_company(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(require_user)
 ):
     """
     Récupérer les informations de l'entreprise de l'employeur connecté
@@ -92,7 +153,7 @@ async def get_my_company(
 async def update_my_company(
     company_data: CompanyUpdateRequest,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(require_user)
 ):
     """
     Mettre à jour les informations de l'entreprise de l'employeur connecté
@@ -146,7 +207,7 @@ async def update_my_company(
 @router.get("/my-company/stats", response_model=CompanyStatsResponse)
 async def get_company_stats(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(require_user)
 ):
     """
     Récupérer les statistiques de l'entreprise de l'employeur connecté

@@ -5,7 +5,6 @@ import { useUser, useAuth } from '@/hooks/useNextAuth';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { candidatesAPI, jobsAPI, applicationsAPI } from '@/lib/api';
-import NotificationPanel from './NotificationPanel';
 import UserButton from './UserButton';
 import { 
   HomeIcon, 
@@ -16,7 +15,6 @@ import {
   Cog6ToothIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  BellIcon,
   BuildingOfficeIcon
 } from '@heroicons/react/24/outline';
 
@@ -74,7 +72,6 @@ export default function Sidebar({ userRole }: SidebarProps) {
   const { getToken } = useAuth();
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false);
   const [cvCount, setCvCount] = useState(0);
   const [jobsCount, setJobsCount] = useState(0);
   const [applicationsCount, setApplicationsCount] = useState(0);
@@ -94,9 +91,9 @@ export default function Sidebar({ userRole }: SidebarProps) {
           // Récupérer le nombre de candidatures
           const applicationsCount = await applicationsAPI.getApplicationsCount(token);
           setApplicationsCount(applicationsCount);
-        } else if (userRole === 'employer' && user) {
+        } else if (userRole === 'employer' && user && token) {
           // Récupérer le nombre d'offres actives de l'employeur
-          const response = await jobsAPI.getJobs();
+          const response = await jobsAPI.getMyJobs(token);
           setJobsCount(response.jobs ? response.jobs.length : 0);
         }
       } finally {
@@ -176,9 +173,6 @@ export default function Sidebar({ userRole }: SidebarProps) {
             </div>
           )}
           <div className="flex items-center gap-2">
-            {/* Notification Panel */}
-            {!isCollapsed && <NotificationPanel />}
-            
             <button
               onClick={() => setIsCollapsed(!isCollapsed)}
               className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
@@ -217,23 +211,6 @@ export default function Sidebar({ userRole }: SidebarProps) {
             )}
           </div>
         </div>
-
-        {/* Notifications */}
-        {!isCollapsed && (
-          <div className="px-4 py-3 bg-blue-50 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-blue-900">Notifications</span>
-              <button
-                onClick={() => setShowNotifications(!showNotifications)}
-                className="relative p-1 rounded-lg hover:bg-blue-100 transition-colors"
-                aria-label="Notifications"
-              >
-                <BellIcon className="w-4 h-4 text-blue-600" />
-                <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* Navigation */}
         <nav className="flex-1 px-2 py-4 space-y-1">
