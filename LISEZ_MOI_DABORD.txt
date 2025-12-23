@@ -1,0 +1,12 @@
+👋 NOUVEAU DÉVELOPPEUR ? LISEZ CECI !
+=====================================
+
+📖 Ouvrez ce fichier: START_HERE.md
+
+Il contient TOUT ce dont vous avez besoin pour lancer le projet en 5 minutes.
+
+Documentation:
+- START_HERE.md     → Démarrage rapide (COMMENCEZ ICI)
+- QUICKSTART.md     → Guide complet détaillé
+- INSTALLATION.md   → Installation par OS
+- README.md         → Architecture du projet
