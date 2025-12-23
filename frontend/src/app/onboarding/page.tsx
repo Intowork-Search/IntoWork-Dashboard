@@ -20,29 +20,14 @@ export default function OnboardingPage() {
 
     setLoading(true);
     try {
-      // Obtenir le token Clerk
+      // Obtenir le token
       const token = await getToken();
       if (!token) {
         throw new Error('Unable to get authentication token');
       }
 
-      // Synchroniser avec le backend
-      await authAPI.syncUser({
-        clerk_id: user.id,
-        email: user.emailAddresses[0].emailAddress,
-        first_name: user.firstName || '',
-        last_name: user.lastName || '',
-        role: formData.role as 'candidate' | 'employer' | 'admin'
-      }, token);
-
-      // Compléter l'inscription
+      // Compléter l'inscription avec les informations de l'onboarding
       await authAPI.completeRegistration(formData as CompleteRegistration, token);
-
-      // Attendre un peu pour que Clerk synchronise les métadonnées
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Forcer le rechargement des données utilisateur
-      await user.reload();
 
       // Rediriger vers le dashboard
       router.push('/dashboard');

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useUser, useAuth } from '@/hooks/useNextAuth';
 import DashboardLayout from '@/components/DashboardLayout';
-import { candidatesAPI, authAPI, CV } from '@/lib/api';
+import { candidatesAPI, CV } from '@/lib/api';
 import { 
   DocumentTextIcon,
   EyeIcon,
@@ -38,36 +38,18 @@ export default function MesCVPage() {
       
       try {
         setIsLoading(true);
+        setError(null);
         const token = await getToken();
         if (!token) {
-          setError('Token d&apos;authentification manquant');
+          setError('Token d\'authentification manquant');
+          setIsLoading(false);
           return;
         }
 
-        // Synchroniser l'utilisateur avec le backend (non bloquant)
-        const syncPromise = authAPI.syncUser({
-          clerk_id: user?.id || '',
-          email: user?.emailAddresses[0]?.emailAddress || '',
-          first_name: user?.firstName || '',
-          last_name: user?.lastName || '',
-          role: (user?.publicMetadata?.role as 'candidate' | 'employer' | 'admin') || 'candidate',
-        }, token).catch(syncError => {
-          console.log('Utilisateur déjà synchronisé ou erreur de sync:', syncError);
-        });
-
         // Charger les données en parallèle pour optimiser les performances
         const [profileData, cvsData] = await Promise.all([
-          candidatesAPI.getMyProfile(token).then(data => {
-            setLoadingStates(prev => ({ ...prev, profile: false }));
-            return data;
-          }),
-          candidatesAPI.listCVs(token).then(data => {
-            setLoadingStates(prev => ({ ...prev, cvs: false }));
-            return data;
-          }),
-          syncPromise.then(() => {
-            setLoadingStates(prev => ({ ...prev, sync: false }));
-          })
+          candidatesAPI.getMyProfile(token),
+          candidatesAPI.listCVs(token)
         ]);
 
         // Debug: Afficher les données du profil
@@ -79,7 +61,7 @@ export default function MesCVPage() {
 
         // Définir les CV chargés
         setCvs(cvsData);
-        console.log('📋 CV chargés depuis l\'API parallèle:', cvsData);
+        console.log('📋 CV chargés depuis l\'API:', cvsData);
         console.log('📊 Nombre de CV:', cvsData.length);
 
       } catch (error) {
@@ -87,11 +69,14 @@ export default function MesCVPage() {
         setError('Erreur lors du chargement des données');
       } finally {
         setIsLoading(false);
+        setLoadingStates({ profile: false, cvs: false, sync: false });
       }
     };
 
-    loadProfile();
-  }, [user, getToken]);
+    if (user) {
+      loadProfile();
+    }
+  }, [user?.id]); // Dépendance sur user.id uniquement pour éviter la boucle infinie
 
   // Fonction pour recharger les données
   const reloadData = async () => {
@@ -238,7 +223,8 @@ export default function MesCVPage() {
       const formData = new FormData();
       formData.append('cv', file);
 
-      const response = await fetch(`https://intowork-dashboard-production.up.railway.app/api/candidates/cv`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api';
+      const response = await fetch(`${apiUrl}/candidates/cv`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

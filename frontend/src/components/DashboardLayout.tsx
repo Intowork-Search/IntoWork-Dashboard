@@ -23,11 +23,11 @@ export default function DashboardLayout({
 
   useEffect(() => {
     if (isLoaded && !user) {
-      router.push('/sign-in');
+      router.push('/auth/signin');
       return;
     }
 
-    if (isLoaded && user && !user.publicMetadata?.role) {
+    if (isLoaded && user && !user.role) {
       router.push('/onboarding');
     }
   }, [isLoaded, user, router]);
@@ -47,7 +47,7 @@ export default function DashboardLayout({
     return null;
   }
 
-  const userRole = user.publicMetadata?.role as 'candidate' | 'employer' | 'admin';
+  const userRole = user.role as 'candidate' | 'employer' | 'admin';
 
   return (
     <div className="min-h-screen bg-gray-50">

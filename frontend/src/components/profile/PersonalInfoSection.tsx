@@ -1,5 +1,4 @@
 import React from 'react';
-import { UserResource } from '@clerk/types';
 import { CandidateProfile } from '@/lib/api';
 import { 
   UserIcon, 
@@ -9,8 +8,18 @@ import {
   BriefcaseIcon
 } from '@heroicons/react/24/outline';
 
+interface NextAuthUser {
+  id: string;
+  email: string | null | undefined;
+  firstName: string;
+  lastName: string;
+  fullName: string | null | undefined;
+  imageUrl: string | null | undefined;
+  role: string;
+}
+
 interface PersonalInfoSectionProps {
-  readonly user: UserResource | null | undefined;
+  readonly user: NextAuthUser | null | undefined;
   readonly profile: CandidateProfile;
   readonly isEditing: boolean;
   readonly onUpdateProfile: (updates: Partial<CandidateProfile>) => void;
@@ -34,7 +43,7 @@ export default function PersonalInfoSection({
             <input
               id="firstName"
               type="text"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
               value={user?.firstName || ''}
               disabled
               title="Prénom (non modifiable)"
@@ -56,7 +65,7 @@ export default function PersonalInfoSection({
             <input
               id="lastName"
               type="text"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
               value={user?.lastName || ''}
               disabled
               title="Nom de famille (non modifiable)"
@@ -76,7 +85,7 @@ export default function PersonalInfoSection({
           </div>
           <div className="flex items-center">
             <EnvelopeIcon className="h-4 w-4 text-gray-400 mr-2" />
-            <span className="text-gray-900">{user?.emailAddresses[0]?.emailAddress}</span>
+            <span className="text-gray-900">{user?.email}</span>
           </div>
         </div>
 
@@ -89,7 +98,7 @@ export default function PersonalInfoSection({
             <input
               id="phone"
               type="tel"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
               value={profile.phone || ''}
               onChange={(e) => onUpdateProfile({ phone: e.target.value })}
               placeholder="Ex: +33 6 12 34 56 78"
@@ -111,7 +120,7 @@ export default function PersonalInfoSection({
             <input
               id="location"
               type="text"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
               value={profile.location || ''}
               onChange={(e) => onUpdateProfile({ location: e.target.value })}
               placeholder="Paris, France"
@@ -133,7 +142,7 @@ export default function PersonalInfoSection({
             <input
               id="title"
               type="text"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
               value={profile.title || ''}
               onChange={(e) => onUpdateProfile({ title: e.target.value })}
               placeholder="Développeur Full Stack"
@@ -156,7 +165,7 @@ export default function PersonalInfoSection({
           <textarea
             id="summary"
             rows={4}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
             value={profile.summary || ''}
             onChange={(e) => onUpdateProfile({ summary: e.target.value })}
             placeholder="Décrivez-vous en quelques lignes..."
@@ -178,7 +187,7 @@ export default function PersonalInfoSection({
             <input
               id="linkedin"
               type="url"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
               value={profile.linkedin_url || ''}
               onChange={(e) => onUpdateProfile({ linkedin_url: e.target.value })}
               placeholder="https://linkedin.com/in/..."
@@ -204,7 +213,7 @@ export default function PersonalInfoSection({
             <input
               id="github"
               type="url"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
               value={profile.github_url || ''}
               onChange={(e) => onUpdateProfile({ github_url: e.target.value })}
               placeholder="https://github.com/..."
@@ -230,7 +239,7 @@ export default function PersonalInfoSection({
             <input
               id="portfolio"
               type="url"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
               value={profile.portfolio_url || ''}
               onChange={(e) => onUpdateProfile({ portfolio_url: e.target.value })}
               placeholder="https://monportfolio.com"

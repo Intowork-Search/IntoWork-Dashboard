@@ -55,17 +55,15 @@ export default function ApplicationsPage() {
     loadApplications();
   }, [currentPage]);
 
-  // Polling pour les mises à jour en temps réel (toutes les 30 secondes)
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Ne pas faire de polling si une action est en cours
-      if (!withdrawing && !loading) {
-        loadApplications();
-      }
-    }, 30000); // 30 secondes
-
-    return () => clearInterval(interval);
-  }, [currentPage, withdrawing, loading]);
+  // Polling désactivé pour meilleures performances
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     if (!withdrawing && !loading) {
+  //       loadApplications();
+  //     }
+  //   }, 300000); // 5 minutes si réactivé
+  //   return () => clearInterval(interval);
+  // }, [currentPage, withdrawing, loading]);
 
   // Retirer une candidature
   const handleWithdrawApplication = async (applicationId: number) => {

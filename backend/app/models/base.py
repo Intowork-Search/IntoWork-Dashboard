@@ -33,8 +33,8 @@ class User(Base):
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
     
     # Relations
-    candidate = relationship("Candidate", back_populates="user", uselist=False)
-    employer = relationship("Employer", back_populates="user", uselist=False)
+    candidate = relationship("Candidate", back_populates="user", uselist=False, cascade="all, delete-orphan")
+    employer = relationship("Employer", back_populates="user", uselist=False, cascade="all, delete-orphan")
     accounts = relationship("Account", back_populates="user", cascade="all, delete-orphan")
     sessions = relationship("Session", back_populates="user", cascade="all, delete-orphan")
 

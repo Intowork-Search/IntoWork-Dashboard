@@ -8,7 +8,7 @@ from datetime import timezone, datetime, timedelta
 
 from app.auth import require_user, get_current_user
 from app.models.base import (
-    User, UserRole, Job, Employer, Company, 
+    User, UserRole, Job, Employer, Company, Candidate,
     JobLocation, JobType, JobStatus, JobApplication
 )
 from app.database import get_db
@@ -89,10 +89,13 @@ async def get_jobs(
     # Si l'utilisateur est authentifié, récupérer ses candidatures
     user_applications = set()
     if current_user:
-        applications = db.query(JobApplication.job_id).filter(
-            JobApplication.candidate_id == current_user.id
-        ).all()
-        user_applications = {app.job_id for app in applications}
+        # Récupérer le profil candidat
+        candidate = db.query(Candidate).filter(Candidate.user_id == current_user.id).first()
+        if candidate:
+            applications = db.query(JobApplication.job_id).filter(
+                JobApplication.candidate_id == candidate.id
+            ).all()
+            user_applications = {app.job_id for app in applications}
     
     query = db.query(Job, Company).join(Company, Job.company_id == Company.id)
     query = query.filter(Job.status == JobStatus.PUBLISHED)
@@ -411,11 +414,14 @@ async def get_job(
     # Vérifier si l'utilisateur a déjà postulé
     has_applied = False
     if current_user:
-        application = db.query(JobApplication).filter(
-            JobApplication.candidate_id == current_user.id,
-            JobApplication.job_id == job_id
-        ).first()
-        has_applied = application is not None
+        # Récupérer le profil candidat
+        candidate = db.query(Candidate).filter(Candidate.user_id == current_user.id).first()
+        if candidate:
+            application = db.query(JobApplication).filter(
+                JobApplication.candidate_id == candidate.id,
+                JobApplication.job_id == job_id
+            ).first()
+            has_applied = application is not None
     
     # Incrémenter le compteur de vues
     job.views_count += 1

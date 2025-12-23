@@ -20,7 +20,7 @@ export default function Dashboard() {
   const { user } = useUser();
   const { getToken } = useAuth();
   const router = useRouter();
-  const userRole = user?.publicMetadata?.role as 'candidate' | 'employer' | 'admin';
+  const userRole = user?.role as 'candidate' | 'employer' | 'admin';
   
   // États pour les données du dashboard
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
@@ -57,7 +57,7 @@ export default function Dashboard() {
             const fields = [
               user.firstName,
               user.lastName,
-              user.emailAddresses?.[0]?.emailAddress,
+              user.email,
               profileData.phone,
               profileData.location,
               profileData.title,
@@ -155,7 +155,8 @@ export default function Dashboard() {
       const formData = new FormData();
       formData.append('cv', file);
 
-      const response = await fetch(`https://intowork-dashboard-production.up.railway.app/api/candidates/cv`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api';
+      const response = await fetch(`${apiUrl}/candidates/cv`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

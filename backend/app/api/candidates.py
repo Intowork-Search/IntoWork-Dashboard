@@ -316,8 +316,101 @@ async def delete_experience(
     
     return {"message": "Expérience supprimée avec succès"}
 
-# Endpoints similaires pour Education et Skills
-# (Pattern identique, je peux les ajouter si nécessaire)
+# Endpoints pour Education
+
+@router.post("/profile/education", response_model=EducationResponse)
+async def create_education(
+    education_data: EducationCreate,
+    current_user: User = Depends(require_user),
+    db: Session = Depends(get_db)
+):
+    """Ajouter une nouvelle formation"""
+    
+    if current_user.role.value != 'candidate':
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Seuls les candidats peuvent ajouter des formations"
+        )
+    
+    candidate = db.query(Candidate).filter(Candidate.user_id == current_user.id).first()
+    if not candidate:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Profil candidat non trouvé"
+        )
+    
+    education = Education(
+        candidate_id=candidate.id,
+        **education_data.model_dump()
+    )
+    
+    db.add(education)
+    db.commit()
+    db.refresh(education)
+    
+    return education
+
+@router.put("/profile/education/{education_id}", response_model=EducationResponse)
+async def update_education(
+    education_id: int,
+    education_data: EducationUpdate,
+    current_user: User = Depends(require_user),
+    db: Session = Depends(get_db)
+):
+    """Mettre à jour une formation"""
+    
+    if current_user.role.value != 'candidate':
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+    
+    candidate = db.query(Candidate).filter(Candidate.user_id == current_user.id).first()
+    if not candidate:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    
+    education = db.query(Education).filter(
+        Education.id == education_id,
+        Education.candidate_id == candidate.id
+    ).first()
+    
+    if not education:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    
+    for field, value in education_data.model_dump(exclude_unset=True).items():
+        setattr(education, field, value)
+    
+    db.commit()
+    db.refresh(education)
+    
+    return education
+
+@router.delete("/profile/education/{education_id}")
+async def delete_education(
+    education_id: int,
+    current_user: User = Depends(require_user),
+    db: Session = Depends(get_db)
+):
+    """Supprimer une formation"""
+    
+    if current_user.role.value != 'candidate':
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+    
+    candidate = db.query(Candidate).filter(Candidate.user_id == current_user.id).first()
+    if not candidate:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    
+    education = db.query(Education).filter(
+        Education.id == education_id,
+        Education.candidate_id == candidate.id
+    ).first()
+    
+    if not education:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    
+    db.delete(education)
+    db.commit()
+    
+    return {"message": "Formation supprimée avec succès"}
+
+# Endpoints pour Skills
 
 @router.post("/profile/skills", response_model=SkillResponse)
 async def create_skill(

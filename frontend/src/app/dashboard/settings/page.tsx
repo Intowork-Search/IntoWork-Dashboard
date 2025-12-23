@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useUser, useAuth } from '@/hooks/useNextAuth';
+import { signOut } from 'next-auth/react';
 import { toast } from 'react-hot-toast';
 import {
   UserIcon,
@@ -13,9 +14,11 @@ import {
   PhotoIcon
 } from '@heroicons/react/24/outline';
 import { useAuthenticatedAPI } from '@/hooks/useAuthenticatedAPI';
-import { companiesAPI } from '@/lib/api';
+import { companiesAPI, authAPI } from '@/lib/api';
 import ToggleButton from '@/components/ToggleButton';
 import DashboardLayout from '@/components/DashboardLayout';
+import ChangePasswordModal from '@/components/settings/ChangePasswordModal';
+import ChangeEmailModal from '@/components/settings/ChangeEmailModal';
 
 interface UserProfile {
   id: string;
@@ -96,17 +99,35 @@ export default function SettingsPage() {
     allow_recruiter_contact: true
   });
 
+  // États pour les modals
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showEmailModal, setShowEmailModal] = useState(false);
+
   // Charger le profil utilisateur ou les données de l'entreprise selon le rôle
   useEffect(() => {
     const fetchData = async () => {
+      console.log('🔄 Settings: fetchData démarré', { user: !!user });
+      if (!user) {
+        console.log('⚠️ Settings: Pas d\'utilisateur, loading=false');
+        setLoading(false);
+        return;
+      }
+      
       try {
+        console.log('⏳ Settings: setLoading(true)');
         setLoading(true);
         const token = await getToken();
-        if (!token) return;
+        if (!token) {
+          console.log('❌ Pas de token disponible');
+          setLoading(false);
+          return;
+        }
 
+        console.log('✅ Settings: Token obtenu, chargement du profil...');
         // D'abord, détecter le rôle utilisateur en appelant l'API
         try {
           const response = await candidateAPI.getProfile();
+          console.log('✅ Settings: Profil candidat chargé');
           setUserRole('candidate');
           setProfile(response.data);
           
@@ -137,7 +158,7 @@ export default function SettingsPage() {
           });
         } catch (candidateError) {
           // Si l'appel candidat échoue, essayer de charger les données de l'entreprise
-          console.log('Not a candidate, trying employer data...');
+          console.log('Not a candidate, trying employer data...', candidateError);
           try {
             const companyResponse = await companiesAPI.getMyCompany(token);
             setUserRole('employer');
@@ -175,12 +196,20 @@ export default function SettingsPage() {
           github_url: ''
         });
       } finally {
+        console.log('✅ Settings: fetchData terminé, setLoading(false)');
         setLoading(false);
       }
     };
 
-    fetchData();
-  }, [candidateAPI, getToken]);
+    if (user) {
+      console.log('👤 Settings: Utilisateur détecté, appel fetchData()');
+      fetchData();
+    } else {
+      console.log('⏳ En attente de l\'utilisateur...');
+      setLoading(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]); // Seulement user.id pour éviter la boucle infinie
 
   // Ajuster l'onglet actif selon le rôle
   useEffect(() => {
@@ -244,13 +273,46 @@ export default function SettingsPage() {
     }
   };
 
+  const handleChangePassword = async (currentPassword: string, newPassword: string) => {
+    const token = await getToken();
+    if (!token) throw new Error('Non authentifié');
+    
+    await authAPI.changePassword(token, currentPassword, newPassword);
+    toast.success('✅ Mot de passe changé avec succès !');
+  };
+
+  const handleChangeEmail = async (newEmail: string, password: string) => {
+    const token = await getToken();
+    if (!token) throw new Error('Non authentifié');
+    
+    await authAPI.changeEmail(token, newEmail, password);
+    toast.success('✅ Email changé avec succès !');
+    // Recharger pour mettre à jour l'email affiché
+    globalThis.location?.reload();
+  };
+
   const deleteAccount = async () => {
     if (globalThis.confirm?.('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.')) {
       try {
         setLoading(true);
+        
+        // Obtenir le token
+        const token = await getToken();
+        if (!token) {
+          toast.error('Non authentifié');
+          return;
+        }
+        
         // API call pour supprimer le compte
+        await authAPI.deleteAccount(token);
+        
         toast.success('Compte supprimé avec succès');
+        
+        // Déconnecter l'utilisateur
+        await signOut({ redirect: false });
+        
         // Rediriger vers la page de connexion
+        globalThis.location.href = '/auth/signin';
       } catch (error) {
         console.error('Erreur lors de la suppression:', error);
         toast.error('Erreur lors de la suppression du compte');
@@ -784,6 +846,55 @@ export default function SettingsPage() {
                 </div>
               </div>
 
+              {/* Section Sécurité */}
+              <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8">
+                <h4 className="text-lg font-semibold text-gray-900 mb-4">Sécurité</h4>
+                <p className="text-sm text-gray-600 mb-6">
+                  Gérez votre mot de passe et les paramètres de sécurité de votre compte.
+                </p>
+                
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between py-4 border-b border-gray-200">
+                    <div>
+                      <h5 className="text-base font-medium text-gray-900">Mot de passe</h5>
+                      <p className="text-sm text-gray-500 mt-1">Dernière modification: Il y a 30 jours</p>
+                    </div>
+                    <button
+                      onClick={() => setShowPasswordModal(true)}
+                      className="px-4 py-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors text-sm font-medium"
+                    >
+                      Changer le mot de passe
+                    </button>
+                  </div>
+                  
+                  <div className="flex items-center justify-between py-4 border-b border-gray-200">
+                    <div>
+                      <h5 className="text-base font-medium text-gray-900">Adresse email</h5>
+                      <p className="text-sm text-gray-500 mt-1">Actuellement: {user?.email}</p>
+                    </div>
+                    <button
+                      onClick={() => setShowEmailModal(true)}
+                      className="px-4 py-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors text-sm font-medium"
+                    >
+                      Modifier l&apos;email
+                    </button>
+                  </div>
+
+                  <div className="flex items-center justify-between py-4">
+                    <div>
+                      <h5 className="text-base font-medium text-gray-900">Authentification à deux facteurs</h5>
+                      <p className="text-sm text-gray-500 mt-1">Ajoutez une couche de sécurité supplémentaire</p>
+                    </div>
+                    <button
+                      onClick={() => toast('Fonctionnalité 2FA à venir')}
+                      className="px-4 py-2 text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors text-sm font-medium"
+                    >
+                      Activer la 2FA
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               <div className="bg-red-50 border border-red-200 rounded-lg p-6">
                 <div className="flex items-start space-x-4">
                   <TrashIcon className="w-6 h-6 text-red-500 mt-1 shrink-0" />
@@ -808,6 +919,20 @@ export default function SettingsPage() {
         )}
       </div>
       </div>
+
+      {/* Modals */}
+      <ChangePasswordModal 
+        isOpen={showPasswordModal}
+        onClose={() => setShowPasswordModal(false)}
+        onSubmit={handleChangePassword}
+      />
+      
+      <ChangeEmailModal
+        isOpen={showEmailModal}
+        onClose={() => setShowEmailModal(false)}
+        onSubmit={handleChangeEmail}
+        currentEmail={user?.email || ''}
+      />
     </DashboardLayout>
   );
 }

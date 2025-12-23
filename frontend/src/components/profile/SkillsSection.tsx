@@ -1,17 +1,19 @@
 import React from 'react';
-import { CheckCircleIcon, StarIcon } from '@heroicons/react/24/outline';
+import { CheckCircleIcon, StarIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { CandidateProfile } from '@/lib/api';
 
 interface SkillsSectionProps {
   readonly profile: CandidateProfile;
   readonly skillLevelToNumber: (level: string) => number;
   readonly getSkillColor: (category: string) => string;
+  readonly onAdd: () => void;
 }
 
 export default function SkillsSection({ 
   profile, 
   skillLevelToNumber, 
-  getSkillColor 
+  getSkillColor,
+  onAdd
 }: SkillsSectionProps) {
   const renderStars = (level: string | number) => {
     const numLevel = typeof level === 'string' ? skillLevelToNumber(level) : level;
@@ -27,6 +29,15 @@ export default function SkillsSection({
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-end">
+        <button
+          onClick={onAdd}
+          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          <PlusIcon className="h-5 w-5 mr-2" />
+          Ajouter une compétence
+        </button>
+      </div>
       {profile.skills && profile.skills.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {profile.skills.map((skill, index) => (

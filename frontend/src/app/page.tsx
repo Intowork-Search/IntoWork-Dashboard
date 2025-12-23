@@ -34,13 +34,13 @@ export default function Home() {
           </div>
           <div className="space-x-4">
             <Link 
-              href="/sign-in"
+              href="/auth/signin"
               className="text-gray-700 hover:text-blue-600 px-4 py-2 rounded-md transition-colors"
             >
               Connexion
             </Link>
             <Link 
-              href="/sign-up"
+              href="/auth/signup"
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors"
             >
               Inscription
@@ -64,7 +64,7 @@ export default function Home() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
             <Link 
-              href="/sign-up"
+              href="/auth/signup"
               className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg text-lg font-semibold transition-colors"
             >
               Commencer gratuitement

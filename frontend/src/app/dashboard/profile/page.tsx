@@ -10,8 +10,11 @@ import PersonalInfoSection from '@/components/profile/PersonalInfoSection';
 import ExperienceSection from '@/components/profile/ExperienceSection';
 import EducationSection from '@/components/profile/EducationSection';
 import SkillsSection from '@/components/profile/SkillsSection';
+import ExperienceModal from '@/components/profile/ExperienceModal';
+import EducationModal from '@/components/profile/EducationModal';
+import SkillModal from '@/components/profile/SkillModal';
 import '../../../styles/profile.css';
-import { candidatesAPI, CandidateProfile } from '@/lib/api';
+import { candidatesAPI, CandidateProfile, Experience, Education, Skill } from '@/lib/api';
 
 // Helpers pour les compétences et la progression
 const skillLevelToNumber = (level: string): number => {
@@ -62,6 +65,11 @@ export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // États pour les modaux
+  const [showExperienceModal, setShowExperienceModal] = useState(false);
+  const [showEducationModal, setShowEducationModal] = useState(false);
+  const [showSkillModal, setShowSkillModal] = useState(false);
+
   // État pour le profil complet
   const [profile, setProfile] = useState<CandidateProfile | null>(null);
 
@@ -107,10 +115,12 @@ export default function ProfilePage() {
       }
     };
 
-    if (user) {
+    // Charger uniquement si on n'a pas encore de profil et qu'on a un utilisateur
+    if (user && !profile) {
       loadProfile();
     }
-  }, [user, getToken]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]); // Utiliser user.id au lieu de user pour éviter les re-renders inutiles
 
   // Calculer le pourcentage de complétion basé sur le profil
   const completionPercentage = React.useMemo(() => {
@@ -119,7 +129,7 @@ export default function ProfilePage() {
     const fields = [
       user.firstName,
       user.lastName,
-      user.emailAddresses[0]?.emailAddress,
+      user.email,
       profile.phone,
       profile.location,
       profile.title,
@@ -168,6 +178,64 @@ export default function ProfilePage() {
   // Fonctions pour mettre à jour le profil localement
   const updateProfile = (updates: Partial<CandidateProfile>) => {
     setProfile(prev => prev ? { ...prev, ...updates } : null);
+  };
+
+  // Fonctions pour ajouter des éléments
+  const handleAddExperience = async (data: Omit<Experience, 'id'>) => {
+    try {
+      const token = await getToken();
+      if (!token) {
+        setError('Token d\'authentification manquant');
+        return;
+      }
+      
+      const newExperience = await candidatesAPI.addExperience(token, data);
+      setProfile(prev => prev ? {
+        ...prev,
+        experiences: [...(prev.experiences || []), newExperience]
+      } : null);
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout de l\'expérience:', error);
+      setError('Erreur lors de l\'ajout de l\'expérience');
+    }
+  };
+
+  const handleAddEducation = async (data: Omit<Education, 'id'>) => {
+    try {
+      const token = await getToken();
+      if (!token) {
+        setError('Token d\'authentification manquant');
+        return;
+      }
+      
+      const newEducation = await candidatesAPI.addEducation(token, data);
+      setProfile(prev => prev ? {
+        ...prev,
+        education: [...(prev.education || []), newEducation]
+      } : null);
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout de la formation:', error);
+      setError('Erreur lors de l\'ajout de la formation');
+    }
+  };
+
+  const handleAddSkill = async (data: Omit<Skill, 'id'>) => {
+    try {
+      const token = await getToken();
+      if (!token) {
+        setError('Token d\'authentification manquant');
+        return;
+      }
+      
+      const newSkill = await candidatesAPI.addSkill(token, data);
+      setProfile(prev => prev ? {
+        ...prev,
+        skills: [...(prev.skills || []), newSkill]
+      } : null);
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout de la compétence:', error);
+      setError('Erreur lors de l\'ajout de la compétence');
+    }
   };
 
   // États de chargement et d'erreur
@@ -253,11 +321,17 @@ export default function ProfilePage() {
               )}
 
               {activeSection === 'experience' && (
-                <ExperienceSection profile={profile} />
+                <ExperienceSection 
+                  profile={profile}
+                  onAdd={() => setShowExperienceModal(true)}
+                />
               )}
 
               {activeSection === 'education' && (
-                <EducationSection profile={profile} />
+                <EducationSection 
+                  profile={profile}
+                  onAdd={() => setShowEducationModal(true)}
+                />
               )}
 
               {activeSection === 'skills' && (
@@ -265,12 +339,32 @@ export default function ProfilePage() {
                   profile={profile}
                   skillLevelToNumber={skillLevelToNumber}
                   getSkillColor={getSkillColor}
+                  onAdd={() => setShowSkillModal(true)}
                 />
               )}
             </div>
           </div>
         </div>
       </div>
+
+      {/* Modaux */}
+      <ExperienceModal
+        isOpen={showExperienceModal}
+        onClose={() => setShowExperienceModal(false)}
+        onSave={handleAddExperience}
+      />
+      
+      <EducationModal
+        isOpen={showEducationModal}
+        onClose={() => setShowEducationModal(false)}
+        onSave={handleAddEducation}
+      />
+      
+      <SkillModal
+        isOpen={showSkillModal}
+        onClose={() => setShowSkillModal(false)}
+        onSave={handleAddSkill}
+      />
     </DashboardLayout>
   );
 }

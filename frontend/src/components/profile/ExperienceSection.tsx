@@ -1,14 +1,24 @@
 import React from 'react';
-import { BriefcaseIcon } from '@heroicons/react/24/outline';
+import { BriefcaseIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { CandidateProfile } from '@/lib/api';
 
 interface ExperienceSectionProps {
   readonly profile: CandidateProfile;
+  readonly onAdd: () => void;
 }
 
-export default function ExperienceSection({ profile }: ExperienceSectionProps) {
+export default function ExperienceSection({ profile, onAdd }: ExperienceSectionProps) {
   return (
     <div className="space-y-6">
+      <div className="flex justify-end">
+        <button
+          onClick={onAdd}
+          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          <PlusIcon className="h-5 w-5 mr-2" />
+          Ajouter une expérience
+        </button>
+      </div>
       {profile.experiences && profile.experiences.length > 0 ? (
         profile.experiences.map((exp, index) => (
           <div key={exp.id || index} className="border border-gray-200 rounded-lg p-4">

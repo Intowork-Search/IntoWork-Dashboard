@@ -149,6 +149,33 @@ export const authAPI = {
     const client = createAuthenticatedClient(token);
     const response = await client.get('/auth/me');
     return response.data;
+  },
+
+  // Changer le mot de passe
+  changePassword: async (token: string, currentPassword: string, newPassword: string) => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.post('/auth/change-password', {
+      current_password: currentPassword,
+      new_password: newPassword
+    });
+    return response.data;
+  },
+
+  // Changer l'email
+  changeEmail: async (token: string, newEmail: string, password: string) => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.post('/auth/change-email', {
+      new_email: newEmail,
+      password: password
+    });
+    return response.data;
+  },
+
+  // Supprimer le compte
+  deleteAccount: async (token: string) => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.delete('/auth/delete-account');
+    return response.data;
   }
 };
 

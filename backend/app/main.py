@@ -3,7 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from app.api.ping import router as ping_router
 from app.api.users import router as users_router
-from app.api.auth import router as auth_router
 from app.api.auth_routes import router as auth_routes_router
 from app.api.candidates import router as candidates_router
 from app.api.dashboard import router as dashboard_router
@@ -42,7 +41,6 @@ app.add_middleware(
 # Inclure les routers
 app.include_router(ping_router, prefix="/api")
 app.include_router(users_router, prefix="/api")
-app.include_router(auth_router, prefix="/api")
 app.include_router(auth_routes_router, prefix="/api/auth", tags=["authentication"])
 app.include_router(candidates_router, prefix="/api/candidates", tags=["candidates"])
 app.include_router(dashboard_router, prefix="/api", tags=["dashboard"])

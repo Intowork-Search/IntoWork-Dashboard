@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session, selectinload
 from typing import List, Optional
 from app.database import get_db
 from app.models.base import JobApplication, Job, User, Employer, NotificationType, Candidate
-from app.auth import get_current_user
+from app.auth import require_user
 from app.api.notifications import create_notification
 from pydantic import BaseModel
 from datetime import datetime
@@ -39,15 +39,30 @@ async def get_my_applications(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=50),
     status: Optional[str] = Query(None),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_user),
     db: Session = Depends(get_db)
 ):
     """Récupérer les candidatures du candidat connecté"""
     
+    # Vérifier que l'utilisateur est un candidat
+    if current_user.role.value != 'candidate':
+        raise HTTPException(status_code=403, detail="Seuls les candidats peuvent accéder à leurs candidatures")
+    
+    # Récupérer le profil candidat
+    candidate = db.query(Candidate).filter(Candidate.user_id == current_user.id).first()
+    if not candidate:
+        return ApplicationsListResponse(
+            applications=[],
+            total=0,
+            page=page,
+            limit=limit,
+            total_pages=0
+        )
+    
     # Construire la query de base
     from app.models.base import Company
     query = db.query(JobApplication).filter(
-        JobApplication.candidate_id == current_user.id
+        JobApplication.candidate_id == candidate.id
     ).options(
         selectinload(JobApplication.job).selectinload(Job.company)
     )
@@ -103,10 +118,19 @@ async def get_my_applications(
 @router.post("/my/applications", response_model=JobApplicationResponse)
 async def create_application(
     application_data: JobApplicationCreate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_user),
     db: Session = Depends(get_db)
 ):
     """Postuler à une offre d'emploi"""
+    
+    # Vérifier que l'utilisateur est un candidat
+    if current_user.role.value != 'candidate':
+        raise HTTPException(status_code=403, detail="Seuls les candidats peuvent postuler")
+    
+    # Récupérer le profil candidat
+    candidate = db.query(Candidate).filter(Candidate.user_id == current_user.id).first()
+    if not candidate:
+        raise HTTPException(status_code=404, detail="Profil candidat introuvable")
     
     # Vérifier si le job existe
     job = db.query(Job).filter(Job.id == application_data.job_id).first()
@@ -116,7 +140,7 @@ async def create_application(
     # Vérifier si l'utilisateur a déjà postulé à cette offre
     existing_application = db.query(JobApplication).filter(
         JobApplication.job_id == application_data.job_id,
-        JobApplication.candidate_id == current_user.id
+        JobApplication.candidate_id == candidate.id
     ).first()
     
     if existing_application:
@@ -126,7 +150,7 @@ async def create_application(
     from app.models.base import ApplicationStatus
     application = JobApplication(
         job_id=application_data.job_id,
-        candidate_id=current_user.id,
+        candidate_id=candidate.id,
         status=ApplicationStatus.APPLIED,
         cover_letter=application_data.cover_letter,
         applied_at=datetime.utcnow()
@@ -185,7 +209,7 @@ async def create_application(
 @router.get("/my/applications/{application_id}", response_model=JobApplicationResponse)
 async def get_application(
     application_id: int,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_user),
     db: Session = Depends(get_db)
 ):
     """Récupérer une candidature spécifique"""
@@ -225,7 +249,7 @@ async def get_application(
 @router.delete("/my/applications/{application_id}")
 async def withdraw_application(
     application_id: int,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_user),
     db: Session = Depends(get_db)
 ):
     """Retirer une candidature"""
@@ -285,7 +309,7 @@ async def get_employer_applications(
     limit: int = Query(20, ge=1, le=100),
     status: Optional[str] = Query(None),
     job_id: Optional[int] = Query(None),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_user),
     db: Session = Depends(get_db)
 ):
     """Récupérer toutes les candidatures des offres de l'employeur"""
@@ -359,7 +383,7 @@ async def get_employer_applications(
 async def update_application_status(
     application_id: int,
     request: UpdateApplicationStatusRequest,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_user),
     db: Session = Depends(get_db)
 ):
     """Mettre à jour le statut d'une candidature (employeur uniquement)"""
@@ -433,7 +457,7 @@ async def update_application_status(
 async def update_application_notes(
     application_id: int,
     request: UpdateApplicationNotesRequest,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_user),
     db: Session = Depends(get_db)
 ):
     """Ajouter ou mettre à jour les notes d'une candidature (employeur uniquement)"""

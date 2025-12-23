@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import Link from 'next/link';
-import { EnvelopeIcon, LockClosedIcon, UserIcon, BriefcaseIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
+import { EnvelopeIcon, LockClosedIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 
@@ -18,7 +18,7 @@ export default function SignUpPage() {
     confirmPassword: '',
     firstName: '',
     lastName: '',
-    role: 'candidate' as 'candidate' | 'employer',
+    role: 'candidate', // candidate ou employer
   });
   const [loading, setLoading] = useState(false);
 
@@ -52,7 +52,7 @@ export default function SignUpPage() {
         password: formData.password,
         first_name: formData.firstName,
         last_name: formData.lastName,
-        role: formData.role,
+        role: formData.role, // Utiliser le rôle sélectionné par l'utilisateur
       });
 
       if (response.data.access_token) {
@@ -106,39 +106,6 @@ export default function SignUpPage() {
         {/* Formulaire */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <form className="space-y-6" onSubmit={handleSubmit}>
-            {/* Role selection */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
-                Je suis
-              </label>
-              <div className="grid grid-cols-2 gap-4">
-                <button
-                  type="button"
-                  onClick={() => setFormData({ ...formData, role: 'candidate' })}
-                  className={`flex items-center justify-center gap-2 p-4 border-2 rounded-lg transition-all ${
-                    formData.role === 'candidate'
-                      ? 'border-blue-600 bg-blue-50 text-blue-700'
-                      : 'border-gray-300 hover:border-gray-400'
-                  }`}
-                >
-                  <UserIcon className="w-5 h-5" />
-                  <span className="font-medium">Candidat</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setFormData({ ...formData, role: 'employer' })}
-                  className={`flex items-center justify-center gap-2 p-4 border-2 rounded-lg transition-all ${
-                    formData.role === 'employer'
-                      ? 'border-green-600 bg-green-50 text-green-700'
-                      : 'border-gray-300 hover:border-gray-400'
-                  }`}
-                >
-                  <BriefcaseIcon className="w-5 h-5" />
-                  <span className="font-medium">Employeur</span>
-                </button>
-              </div>
-            </div>
-
             {/* Name fields */}
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -152,7 +119,7 @@ export default function SignUpPage() {
                   required
                   value={formData.firstName}
                   onChange={handleChange}
-                  className="block w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  className="block w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-gray-900"
                   placeholder="Jean"
                 />
               </div>
@@ -167,9 +134,48 @@ export default function SignUpPage() {
                   required
                   value={formData.lastName}
                   onChange={handleChange}
-                  className="block w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  className="block w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-gray-900"
                   placeholder="Dupont"
                 />
+              </div>
+            </div>
+
+            {/* Role selection */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Je suis
+              </label>
+              <div className="grid grid-cols-2 gap-4">
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, role: 'candidate' })}
+                  className={`p-4 border-2 rounded-lg transition-all ${
+                    formData.role === 'candidate'
+                      ? 'border-blue-600 bg-blue-50 text-blue-700'
+                      : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                  }`}
+                >
+                  <div className="text-center">
+                    <div className="text-2xl mb-2">👤</div>
+                    <div className="font-medium">Candidat</div>
+                    <div className="text-xs mt-1">Je cherche un emploi</div>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, role: 'employer' })}
+                  className={`p-4 border-2 rounded-lg transition-all ${
+                    formData.role === 'employer'
+                      ? 'border-blue-600 bg-blue-50 text-blue-700'
+                      : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                  }`}
+                >
+                  <div className="text-center">
+                    <div className="text-2xl mb-2">🏢</div>
+                    <div className="font-medium">Employeur</div>
+                    <div className="text-xs mt-1">Je recrute des talents</div>
+                  </div>
+                </button>
               </div>
             </div>
 
@@ -190,7 +196,7 @@ export default function SignUpPage() {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-gray-900"
                   placeholder="vous@exemple.com"
                 />
               </div>
@@ -213,7 +219,7 @@ export default function SignUpPage() {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-gray-900"
                   placeholder="••••••••"
                 />
               </div>
@@ -239,7 +245,7 @@ export default function SignUpPage() {
                   required
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-gray-900"
                   placeholder="••••••••"
                 />
               </div>

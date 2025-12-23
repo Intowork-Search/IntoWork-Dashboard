@@ -57,22 +57,20 @@ export default function JobsPage() {
     loadJobs();
   }, [filters]);
 
-  // Polling automatique toutes les 30 secondes pour les mises à jour en temps réel
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Recharger silencieusement sans afficher le loader
-      jobsAPI.getJobs(filters).then(response => {
-        setJobs(response.jobs);
-        setTotalJobs(response.total);
-        setTotalPages(response.total_pages);
-      }).catch(err => {
-        console.error('Erreur lors du rafraîchissement automatique:', err);
-      });
-    }, 30000); // 30 secondes
-
-    // Nettoyer l'interval quand le composant est démonté
-    return () => clearInterval(interval);
-  }, [filters]);
+  // Polling désactivé pour meilleures performances
+  // Réactiver en production si nécessaire avec un intervalle plus long (5 min)
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     jobsAPI.getJobs(filters).then(response => {
+  //       setJobs(response.jobs);
+  //       setTotalJobs(response.total);
+  //       setTotalPages(response.total_pages);
+  //     }).catch(err => {
+  //       console.error('Erreur lors du rafraîchissement automatique:', err);
+  //     });
+  //   }, 300000); // 5 minutes
+  //   return () => clearInterval(interval);
+  // }, [filters]);
 
   // Gérer les filtres
   const handleSearch = (searchTerm: string) => {
@@ -152,8 +150,19 @@ export default function JobsPage() {
       loadJobs();
     } catch (error: any) {
       console.error('Erreur lors de la candidature:', error);
-      if (error.response?.status === 400 && error.response?.data?.detail?.includes('déjà postulé')) {
-        toast.error('❌ Vous avez déjà postulé à cette offre');
+      
+      // Gérer les différents types d'erreurs
+      if (error.response?.status === 400) {
+        const errorMessage = error.response?.data?.detail || 'Erreur lors de l\'envoi';
+        if (errorMessage.includes('déjà postulé')) {
+          toast.error('❌ Vous avez déjà postulé à cette offre');
+        } else {
+          toast.error(`❌ ${errorMessage}`);
+        }
+      } else if (error.response?.status === 403) {
+        toast.error('❌ Vous n\'avez pas les permissions nécessaires');
+      } else if (error.response?.status === 404) {
+        toast.error('❌ Offre d\'emploi introuvable');
       } else {
         toast.error('❌ Erreur lors de l\'envoi de la candidature');
       }
