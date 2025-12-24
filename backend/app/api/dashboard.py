@@ -4,7 +4,7 @@ from sqlalchemy import func
 from app.database import get_db
 from app.models.base import (
     User, Candidate, Experience, Education, Skill,
-    Employer, Job, JobApplication, ApplicationStatus, JobStatus
+    Employer, Job, JobApplication, ApplicationStatus, JobStatus, UserRole
 )
 from app.auth import require_user
 from pydantic import BaseModel
@@ -43,6 +43,60 @@ async def get_dashboard_data(
     """Récupérer les données du dashboard pour l'utilisateur connecté"""
     
     try:
+        # Gestion du rôle ADMIN
+        if current_user.role == UserRole.ADMIN:
+            # Les admins doivent utiliser /api/admin/* endpoints
+            # Retourner un dashboard minimal pour éviter l'erreur
+            return {
+                "stats": [
+                    {
+                        "title": "Accès Admin",
+                        "value": "✓",
+                        "change": "Dashboard Admin Disponible",
+                        "changeType": "neutral",
+                        "color": "red"
+                    },
+                    {
+                        "title": "Utilisateurs",
+                        "value": str(db.query(User).count()),
+                        "change": "Total plateforme",
+                        "changeType": "neutral",
+                        "color": "blue"
+                    },
+                    {
+                        "title": "Offres",
+                        "value": str(db.query(Job).count()),
+                        "change": "Total plateforme",
+                        "changeType": "neutral",
+                        "color": "green"
+                    },
+                    {
+                        "title": "Candidatures",
+                        "value": str(db.query(JobApplication).count()),
+                        "change": "Total plateforme",
+                        "changeType": "neutral",
+                        "color": "purple"
+                    }
+                ],
+                "recentActivities": [
+                    {
+                        "id": 1,
+                        "action": "Accès administrateur actif",
+                        "target": f"{current_user.first_name} {current_user.last_name}",
+                        "time": "maintenant",
+                        "type": "admin"
+                    },
+                    {
+                        "id": 2,
+                        "action": "Dashboard admin disponible",
+                        "target": "Accédez à /dashboard/admin pour plus de détails",
+                        "time": "maintenant",
+                        "type": "info"
+                    }
+                ],
+                "profileCompletion": 100
+            }
+        
         if current_user.role.value == "employer":
             # Récupérer l'employeur lié à l'utilisateur
             employer = db.query(Employer).filter(Employer.user_id == current_user.id).first()

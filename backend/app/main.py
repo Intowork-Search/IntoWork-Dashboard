@@ -11,6 +11,7 @@ from app.api.jobs import router as jobs_router
 from app.api.applications import router as applications_router
 from app.api.companies import router as companies_router
 from app.api.notifications import router as notifications_router
+from app.api.admin import router as admin_router
 from dotenv import load_dotenv
 import os
 from pathlib import Path
@@ -50,6 +51,7 @@ app.include_router(jobs_router, prefix="/api/jobs", tags=["jobs"])
 app.include_router(applications_router, prefix="/api/applications", tags=["applications"])
 app.include_router(companies_router, prefix="/api/companies", tags=["companies"])
 app.include_router(notifications_router, prefix="/api/notifications", tags=["notifications"])
+app.include_router(admin_router, prefix="/api/admin", tags=["admin"])
 
 # Servir les fichiers uploadés (CV, photos, etc.)
 uploads_path = Path(__file__).parent.parent / "uploads"

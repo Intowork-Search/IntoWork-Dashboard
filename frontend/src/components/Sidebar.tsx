@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import { useUser, useAuth } from '@/hooks/useNextAuth';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { signOut } from 'next-auth/react';
 import { candidatesAPI, jobsAPI, applicationsAPI } from '@/lib/api';
-import UserButton from './UserButton';
 import { 
   HomeIcon, 
   UserIcon, 
@@ -15,7 +15,8 @@ import {
   Cog6ToothIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  BuildingOfficeIcon
+  BuildingOfficeIcon,
+  ArrowRightOnRectangleIcon
 } from '@heroicons/react/24/outline';
 
 interface SidebarProps {
@@ -67,6 +68,23 @@ function getEmployerNavigation(jobsCount: number): NavItem[] {
   ];
 }
 
+function getAdminNavigation(): NavItem[] {
+  return [
+    { 
+      name: 'Back-office Admin', 
+      href: '/dashboard/admin', 
+      icon: ChartBarIcon, 
+      description: "Gestion de la plateforme"
+    },
+    { 
+      name: 'Paramètres', 
+      href: '/dashboard/settings', 
+      icon: Cog6ToothIcon, 
+      description: 'Configuration de votre compte'
+    },
+  ];
+}
+
 export default function Sidebar({ userRole }: SidebarProps) {
   const { user } = useUser();
   const { getToken } = useAuth();
@@ -96,11 +114,16 @@ export default function Sidebar({ userRole }: SidebarProps) {
           const response = await jobsAPI.getMyJobs(token);
           setJobsCount(response.jobs ? response.jobs.length : 0);
         }
+        // Pour les admins, on ne charge aucune donnée ici
       } finally {
         // rien à faire ici, mais le finally est requis pour la syntaxe
       }
     };
-    fetchData();
+    
+    // Ne charger les données que si ce n'est pas un admin
+    if (userRole !== 'admin') {
+      fetchData();
+    }
   }, [userRole, user, getToken]);
 
   // Créer la navigation candidate avec le badge CV dynamique
@@ -146,9 +169,27 @@ export default function Sidebar({ userRole }: SidebarProps) {
     },
   ];
 
-  const navigation = userRole === 'candidate' ? candidateNavigation : getEmployerNavigation(jobsCount);
-  const roleLabel = userRole === 'candidate' ? 'Candidat' : 'Employeur';
-  const roleColor = userRole === 'candidate' ? 'bg-blue-500' : 'bg-green-500';
+  // Helper pour obtenir la lettre du badge
+  const getRoleBadgeLetter = (): string => {
+    if (userRole === 'admin') return 'A';
+    if (userRole === 'candidate') return 'C';
+    return 'E';
+  };
+
+  const navigation = 
+    userRole === 'admin' ? getAdminNavigation() :
+    userRole === 'candidate' ? candidateNavigation : 
+    getEmployerNavigation(jobsCount);
+  
+  const roleLabel = 
+    userRole === 'admin' ? 'Admin' :
+    userRole === 'candidate' ? 'Candidat' : 
+    'Employeur';
+  
+  const roleColor = 
+    userRole === 'admin' ? 'bg-red-500' :
+    userRole === 'candidate' ? 'bg-blue-500' : 
+    'bg-green-500';
 
   return (
     <>
@@ -191,10 +232,13 @@ export default function Sidebar({ userRole }: SidebarProps) {
         <div className="p-4 border-b border-gray-200">
           <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'}`}>
             <div className="relative">
-              <UserButton />
+              {/* Avatar */}
+              <div className="w-10 h-10 rounded-full bg-linear-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white font-semibold">
+                {user?.firstName?.[0]}{user?.lastName?.[0]}
+              </div>
               <div className={`absolute -bottom-1 -right-1 w-4 h-4 ${roleColor} rounded-full border-2 border-white flex items-center justify-center`}>
                 <span className="text-xs text-white font-bold">
-                  {userRole === 'candidate' ? 'C' : 'E'}
+                  {getRoleBadgeLetter()}
                 </span>
               </div>
             </div>
@@ -258,15 +302,33 @@ export default function Sidebar({ userRole }: SidebarProps) {
           })}
         </nav>
 
-        {/* Footer avec statut */}
-        {!isCollapsed && (
-          <div className="p-4 border-t border-gray-200">
-            <div className="flex items-center space-x-2 text-xs text-gray-500">
+        {/* Footer avec bouton déconnexion */}
+        <div className="p-4 border-t border-gray-200">
+          <button
+            onClick={() => signOut({ callbackUrl: '/auth/signin' })}
+            className={`w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 text-red-600 hover:bg-red-50 ${
+              isCollapsed ? 'justify-center' : 'gap-3'
+            }`}
+            title={isCollapsed ? 'Se déconnecter' : ''}
+          >
+            <ArrowRightOnRectangleIcon className={`shrink-0 ${isCollapsed ? 'w-6 h-6' : 'w-5 h-5'}`} />
+            {!isCollapsed && <span>Se déconnecter</span>}
+            
+            {/* Tooltip pour mode collapsed */}
+            {isCollapsed && (
+              <div className="absolute left-16 bg-gray-900 text-white px-2 py-1 rounded-lg text-xs opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+                Se déconnecter
+              </div>
+            )}
+          </button>
+          
+          {!isCollapsed && (
+            <div className="flex items-center space-x-2 text-xs text-gray-500 mt-3">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
               <span>En ligne</span>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </>
   );

@@ -669,4 +669,108 @@ export const notificationsAPI = {
   }
 };
 
+// ==================== ADMIN API ====================
+
+export interface AdminStats {
+  total_users: number;
+  total_candidates: number;
+  total_employers: number;
+  total_companies: number;
+  total_jobs: number;
+  total_applications: number;
+  total_notifications: number;
+  active_users: number;
+  inactive_users: number;
+  jobs_by_status: Record<string, number>;
+  recent_signups: number;
+}
+
+export interface AdminUser {
+  id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+  role: string;
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface AdminEmployer {
+  id: number;
+  user_id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+  company_name: string | null;
+  position: string | null;
+  phone: string | null;
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface AdminJob {
+  id: number;
+  title: string;
+  company_name: string;
+  employer_email: string;
+  status: string;
+  location: string | null;
+  applications_count: number;
+  created_at: string;
+}
+
+export const adminAPI = {
+  // Récupérer les statistiques
+  getStats: async (token: string): Promise<AdminStats> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.get('/admin/stats');
+    return response.data;
+  },
+
+  // Récupérer tous les utilisateurs
+  getUsers: async (
+    token: string,
+    params?: { skip?: number; limit?: number; role?: string; is_active?: boolean; search?: string }
+  ): Promise<AdminUser[]> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.get('/admin/users', { params });
+    return response.data;
+  },
+
+  // Récupérer tous les employeurs
+  getEmployers: async (token: string, params?: { skip?: number; limit?: number }): Promise<AdminEmployer[]> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.get('/admin/employers', { params });
+    return response.data;
+  },
+
+  // Récupérer toutes les offres d'emploi
+  getJobs: async (token: string, params?: { skip?: number; limit?: number; status?: string }): Promise<AdminJob[]> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.get('/admin/jobs', { params });
+    return response.data;
+  },
+
+  // Activer/Désactiver un utilisateur
+  toggleUserActivation: async (token: string, userId: number, is_active: boolean): Promise<AdminUser> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.put(`/admin/users/${userId}/activate`, { is_active });
+    return response.data;
+  },
+
+  // Supprimer un utilisateur
+  deleteUser: async (token: string, userId: number): Promise<{ message: string }> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.delete(`/admin/users/${userId}`);
+    return response.data;
+  },
+
+  // Récupérer les infos de l'admin connecté
+  getMe: async (token: string): Promise<AdminUser> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.get('/admin/me');
+    return response.data;
+  }
+};
+
 export default apiClient;

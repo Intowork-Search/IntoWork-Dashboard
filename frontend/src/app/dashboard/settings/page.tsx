@@ -58,7 +58,7 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('profile');
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [userRole, setUserRole] = useState<'candidate' | 'employer' | null>(null);
+  const [userRole, setUserRole] = useState<'candidate' | 'employer' | 'admin' | null>(null);
   
   // États pour les différentes sections
   const [profileData, setProfileData] = useState({
@@ -176,8 +176,25 @@ export default function SettingsPage() {
               logo_url: companyResponse.logo_url || ''
             });
           } catch (employerError) {
-            console.error('Erreur lors du chargement des données:', employerError);
-            toast.error('Erreur lors du chargement de vos informations');
+            // Si ni candidat ni employeur, c'est probablement un admin
+            console.log('Not an employer either, checking if admin...', employerError);
+            if (user?.role === 'admin') {
+              setUserRole('admin');
+              // Pour un admin, on charge juste les données de base
+              setProfileData({
+                first_name: user?.firstName || '',
+                last_name: user?.lastName || '',
+                phone: '',
+                location: '',
+                bio: '',
+                website: '',
+                linkedin_url: '',
+                github_url: ''
+              });
+            } else {
+              console.error('Erreur lors du chargement des données:', employerError);
+              toast.error('Erreur lors du chargement de vos informations');
+            }
           }
         }
       } catch (error) {
@@ -216,7 +233,10 @@ export default function SettingsPage() {
     if (userRole === 'employer' && activeTab === 'profile') {
       setActiveTab('company');
     }
-  }, [userRole]);
+    if (userRole === 'admin' && activeTab === 'company') {
+      setActiveTab('profile');
+    }
+  }, [userRole, activeTab]);
 
   const updateProfile = async () => {
     try {
@@ -322,7 +342,10 @@ export default function SettingsPage() {
     }
   };
 
-  const tabs = userRole === 'employer' ? [
+  const tabs = userRole === 'admin' ? [
+    { id: 'profile', name: 'Profil', icon: UserIcon },
+    { id: 'account', name: 'Compte', icon: KeyIcon }
+  ] : userRole === 'employer' ? [
     { id: 'company', name: 'Entreprise', icon: BuildingOfficeIcon },
     { id: 'notifications', name: 'Notifications', icon: BellIcon },
     { id: 'account', name: 'Compte', icon: KeyIcon }
