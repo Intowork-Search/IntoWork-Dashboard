@@ -1,5 +1,42 @@
 @import "tailwindcss";
 
+@plugin "daisyui";
+
+@plugin "daisyui/theme" {
+  name: "light";
+  default: false;
+  prefersdark: false;
+  color-scheme: "light";
+  --color-base-100: oklch(98% 0.001 106.423);
+  --color-base-200: oklch(97% 0.001 106.424);
+  --color-base-300: oklch(92% 0.003 48.717);
+  --color-base-content: oklch(21% 0.006 56.043);
+  --color-primary: oklch(64% 0.2 131.684);
+  --color-primary-content: oklch(98% 0.031 120.757);
+  --color-secondary: oklch(59% 0.249 0.584);
+  --color-secondary-content: oklch(97% 0.014 343.198);
+  --color-accent: oklch(62% 0.194 149.214);
+  --color-accent-content: oklch(98% 0.018 155.826);
+  --color-neutral: oklch(21% 0.006 56.043);
+  --color-neutral-content: oklch(98% 0.001 106.423);
+  --color-info: oklch(74% 0.16 232.661);
+  --color-info-content: oklch(29% 0.066 243.157);
+  --color-success: oklch(84% 0.238 128.85);
+  --color-success-content: oklch(27% 0.072 132.109);
+  --color-warning: oklch(75% 0.183 55.934);
+  --color-warning-content: oklch(26% 0.079 36.259);
+  --color-error: oklch(70% 0.191 22.216);
+  --color-error-content: oklch(25% 0.092 26.042);
+  --radius-selector: 1rem;
+  --radius-field: 0.5rem;
+  --radius-box: 2rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -23,4 +60,246 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Premium Sign-In Animations */
+
+/* Fade-in animation for sequential element appearance */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Blob animation for background decorative elements */
+@keyframes blob {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+}
+
+/* Glow effect for premium buttons */
+@keyframes glow {
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(var(--color-primary), 0.5);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(var(--color-primary), 0.8);
+  }
+}
+
+/* Pulse animation for loading states */
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Shake animation for error states */
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-4px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(4px);
+  }
+}
+
+/* Focus ring animation */
+@keyframes focusRing {
+  0% {
+    box-shadow: 0 0 0 3px rgba(var(--color-primary), 0);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(var(--color-primary), 0.3);
+  }
+  100% {
+    box-shadow: 0 0 0 3px rgba(var(--color-primary), 0);
+  }
+}
+
+/* Input focus glow */
+@keyframes inputFocus {
+  from {
+    border-color: oklch(92% 0.003 48.717);
+    box-shadow: 0 0 0 3px rgba(var(--color-primary), 0);
+  }
+  to {
+    border-color: oklch(64% 0.2 131.684);
+    box-shadow: 0 0 0 3px rgba(var(--color-primary), 0.1);
+  }
+}
+
+/* Utility classes for animations */
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+.animation-delay-100 {
+  animation-delay: 0.1s;
+}
+
+.animation-delay-200 {
+  animation-delay: 0.2s;
+}
+
+.animation-delay-300 {
+  animation-delay: 0.3s;
+}
+
+.animation-delay-400 {
+  animation-delay: 0.4s;
+}
+
+.animation-delay-500 {
+  animation-delay: 0.5s;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+.animate-shake {
+  animation: shake 0.5s;
+}
+
+.animate-focus-ring {
+  animation: focusRing 1.5s ease-in-out infinite;
+}
+
+/* Input focus enhancements */
+input:focus-visible {
+  outline: none;
+  animation: inputFocus 0.3s ease-out forwards;
+}
+
+/* Button hover effects */
+button:not(:disabled):hover {
+  transform: translateY(-2px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button:not(:disabled):active {
+  transform: translateY(0);
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+  @apply transition-colors duration-200;
+}
+
+button,
+input,
+textarea,
+select,
+a {
+  @apply transition-all duration-300;
+}
+
+/* Loading spinner animation enhancement */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+/* Accessibility: Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Dark mode support (future enhancement) */
+@media (prefers-color-scheme: dark) {
+  /* Animations remain the same, but colors adapt automatically */
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Input placeholder styling */
+input::placeholder {
+  color: oklch(21% 0.006 56.043 / 0.4);
+}
+
+/* Focus visible for keyboard navigation */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid oklch(64% 0.2 131.684);
+  outline-offset: 2px;
 }
