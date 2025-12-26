@@ -9,8 +9,8 @@ if [ -z "$DATABASE_URL" ]; then
     exit 1
 fi
 
-if [ -z "$CLERK_SECRET_KEY" ]; then
-    echo "❌ CLERK_SECRET_KEY non définie"
+if [ -z "$NEXTAUTH_SECRET" ]; then
+    echo "❌ NEXTAUTH_SECRET non définie"
     exit 1
 fi
 
