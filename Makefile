@@ -1,6 +1,6 @@
 # Makefile pour INTOWORK - Facilite le lancement et la gestion du projet
 
-.PHONY: help dev backend frontend install clean setup stop
+.PHONY: help dev backend frontend install clean setup stop push push-all sync commit status-all
 
 # Afficher l'aide par défaut
 help:
@@ -13,6 +13,12 @@ help:
 	@echo "  make setup    - Configuration initiale du projet"
 	@echo "  make stop     - Arrêter tous les services"
 	@echo "  make clean    - Nettoyer les fichiers temporaires"
+	@echo ""
+	@echo "🔄 Git - Synchronisation GitHub & GitLab:"
+	@echo "  make push     - Push vers GitHub et GitLab"
+	@echo "  make commit MSG=\"message\" - Commit et push vers les deux"
+	@echo "  make sync     - Synchroniser les deux dépôts"
+	@echo "  make status-all - Voir le statut des deux dépôts"
 	@echo ""
 
 # Lancer les deux services simultanément
@@ -63,3 +69,38 @@ clean:
 	@find . -name "__pycache__" -type d -exec rm -rf {} + || true
 	@cd frontend && rm -rf .next || true
 	@echo "✅ Nettoyage terminé"
+
+# ============================================
+# Commandes Git - Synchronisation Dual Repo
+# ============================================
+
+# Push vers GitHub et GitLab
+push:
+	@./scripts/push-all.sh
+
+push-all: push
+
+# Commit et push vers les deux dépôts
+commit:
+	@if [ -z "$(MSG)" ]; then \
+		echo "❌ Erreur: Message de commit requis"; \
+		echo "Usage: make commit MSG=\"Votre message\""; \
+		exit 1; \
+	fi
+	@./scripts/commit-and-push-all.sh "$(MSG)"
+
+# Synchroniser les deux dépôts
+sync: push
+
+# Voir le statut des deux dépôts
+status-all:
+	@echo "📊 Statut local:"
+	@git status -sb
+	@echo ""
+	@echo "📍 GitLab (origin):"
+	@git fetch origin -q 2>/dev/null || true
+	@git rev-list --left-right --count origin/$$(git branch --show-current)...HEAD 2>/dev/null | awk '{print "  En retard: "$$1" | En avance: "$$2}' || echo "  ⚠️  Impossible de comparer"
+	@echo ""
+	@echo "📍 GitHub (old-origin):"
+	@git fetch old-origin -q 2>/dev/null || true
+	@git rev-list --left-right --count old-origin/$$(git branch --show-current)...HEAD 2>/dev/null | awk '{print "  En retard: "$$1" | En avance: "$$2}' || echo "  ⚠️  Impossible de comparer"

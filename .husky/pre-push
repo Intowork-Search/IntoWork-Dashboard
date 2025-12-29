@@ -1,0 +1,35 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+echo "${BLUE}🔍 Running pre-push checks...${NC}"
+
+# Get the remote being pushed to
+remote="$1"
+url="$2"
+
+# Run tests before pushing
+echo "${YELLOW}Running tests...${NC}"
+if [ -f "backend/requirements.txt" ]; then
+    cd backend && python -m pytest tests/ -v || {
+        echo "${RED}❌ Backend tests failed!${NC}"
+        exit 1
+    }
+    cd ..
+fi
+
+if [ -f "frontend/package.json" ]; then
+    cd frontend && npm run test:unit -- --passWithNoTests || {
+        echo "${RED}❌ Frontend tests failed!${NC}"
+        exit 1
+    }
+    cd ..
+fi
+
+echo "${GREEN}✅ All pre-push checks passed!${NC}"

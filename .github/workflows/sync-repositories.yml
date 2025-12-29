@@ -1,0 +1,39 @@
+name: Sync GitHub and GitLab
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - 'feature/**'
+      - 'hotfix/**'
+
+jobs:
+  sync-to-gitlab:
+    name: Sync to GitLab
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for complete sync
+
+      - name: Push to GitLab
+        env:
+          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+        run: |
+          git remote add gitlab https://oauth2:${GITLAB_TOKEN}@gitlab.com/badalot/intowork-dashboard.git || true
+          git push gitlab ${GITHUB_REF#refs/heads/} --force-with-lease
+
+      - name: Sync tags
+        env:
+          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+        run: |
+          git push gitlab --tags --force-with-lease
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "⚠️ Failed to sync to GitLab"
+          echo "Branch: ${GITHUB_REF#refs/heads/}"
+          echo "Commit: ${GITHUB_SHA}"
