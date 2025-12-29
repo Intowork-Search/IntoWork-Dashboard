@@ -2,11 +2,16 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, EmailStr
 from app.database import get_db
-from app.models.base import User, UserRole, Candidate, Employer
+from app.models.base import User, UserRole, Candidate, Employer, PasswordResetToken
 from app.auth import PasswordHasher, Auth, require_user
+from app.services.email_service import email_service
 from typing import Optional
+from datetime import datetime, timedelta, timezone
+import secrets
+import logging
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 
 # Schemas
@@ -259,7 +264,7 @@ async def delete_account(
             db.query(JobApplication).filter(
                 JobApplication.candidate_id == user.candidate.id
             ).delete()
-        
+
         # Si c'est un employeur, supprimer les offres d'emploi et candidatures associées
         if user.role == UserRole.EMPLOYER and user.employer:
             from app.models.base import Job, JobApplication
@@ -270,11 +275,11 @@ async def delete_account(
                 db.query(JobApplication).filter(JobApplication.job_id == job.id).delete()
                 # Supprimer le job
                 db.delete(job)
-        
+
         # Maintenant supprimer l'utilisateur (cascade supprimera candidate/employer et autres relations)
         db.delete(user)
         db.commit()
-        
+
         return {"message": "Account deleted successfully"}
     except Exception as e:
         db.rollback()
@@ -282,3 +287,144 @@ async def delete_account(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error deleting account: {str(e)}"
         )
+
+
+# Schemas pour réinitialisation de mot de passe
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str
+
+
+@router.post("/forgot-password")
+async def forgot_password(
+    request: ForgotPasswordRequest,
+    db: Session = Depends(get_db)
+):
+    """
+    Demander une réinitialisation de mot de passe
+
+    Envoie un email avec un lien de réinitialisation sécurisé.
+    Pour des raisons de sécurité, retourne toujours un succès même si l'email n'existe pas.
+    """
+    try:
+        # Chercher l'utilisateur
+        user = db.query(User).filter(User.email == request.email).first()
+
+        if user:
+            # Invalider tous les tokens existants non utilisés de cet utilisateur
+            db.query(PasswordResetToken).filter(
+                PasswordResetToken.user_id == user.id,
+                PasswordResetToken.used_at.is_(None)
+            ).update({"used_at": datetime.now(timezone.utc)})
+
+            # Générer un token sécurisé
+            token = secrets.token_urlsafe(32)
+
+            # Créer le token de réinitialisation (expire dans 24h)
+            reset_token = PasswordResetToken(
+                user_id=user.id,
+                token=token,
+                expires_at=datetime.now(timezone.utc) + timedelta(hours=24)
+            )
+
+            db.add(reset_token)
+            db.commit()
+
+            # Envoyer l'email
+            email_sent = email_service.send_password_reset_email(
+                email=user.email,
+                token=token,
+                user_name=user.first_name or user.name
+            )
+
+            if not email_sent:
+                logger.error(f"Failed to send password reset email to {user.email}")
+                # Ne pas lever d'exception pour ne pas révéler si l'email existe
+
+        # Toujours retourner un succès (sécurité: ne pas révéler si l'email existe)
+        return {
+            "message": "If this email exists in our system, you will receive password reset instructions shortly."
+        }
+
+    except Exception as e:
+        logger.error(f"Error in forgot_password: {str(e)}")
+        db.rollback()
+        # Retourner un succès même en cas d'erreur (sécurité)
+        return {
+            "message": "If this email exists in our system, you will receive password reset instructions shortly."
+        }
+
+
+@router.post("/reset-password")
+async def reset_password(
+    request: ResetPasswordRequest,
+    db: Session = Depends(get_db)
+):
+    """
+    Réinitialiser le mot de passe avec un token valide
+    """
+    # Chercher le token
+    reset_token = db.query(PasswordResetToken).filter(
+        PasswordResetToken.token == request.token
+    ).first()
+
+    if not reset_token:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired reset token"
+        )
+
+    # Vérifier si le token a déjà été utilisé
+    if reset_token.used_at is not None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="This reset token has already been used"
+        )
+
+    # Vérifier si le token a expiré
+    if datetime.now(timezone.utc) > reset_token.expires_at:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="This reset token has expired. Please request a new one."
+        )
+
+    # Valider le nouveau mot de passe
+    if len(request.new_password) < 8:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password must be at least 8 characters long"
+        )
+
+    # Récupérer l'utilisateur
+    user = db.query(User).filter(User.id == reset_token.user_id).first()
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+
+    # Hasher et mettre à jour le mot de passe
+    user.password_hash = PasswordHasher.hash_password(request.new_password)
+
+    # Marquer le token comme utilisé
+    reset_token.used_at = datetime.now(timezone.utc)
+
+    # Invalider tous les autres tokens de cet utilisateur
+    db.query(PasswordResetToken).filter(
+        PasswordResetToken.user_id == user.id,
+        PasswordResetToken.id != reset_token.id,
+        PasswordResetToken.used_at.is_(None)
+    ).update({"used_at": datetime.now(timezone.utc)})
+
+    db.commit()
+
+    logger.info(f"Password successfully reset for user {user.email}")
+
+    return {
+        "message": "Password reset successfully. You can now sign in with your new password."
+    }

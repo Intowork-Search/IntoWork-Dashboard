@@ -1,0 +1,51 @@
+# Build stage for dependencies
+FROM python:3.12-slim as builder
+
+WORKDIR /app
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements and install Python dependencies
+COPY backend/requirements.txt .
+RUN pip install --user --no-cache-dir -r requirements.txt
+
+# Final stage
+FROM python:3.12-slim
+
+WORKDIR /app
+
+# Install runtime dependencies only
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy Python dependencies from builder
+COPY --from=builder /root/.local /root/.local
+
+# Ensure scripts in .local are usable
+ENV PATH=/root/.local/bin:$PATH \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PORT=8000
+
+# Copy backend code
+COPY backend /app/backend
+COPY .env.example /app/backend/.env
+
+WORKDIR /app/backend
+
+# Create uploads directory
+RUN mkdir -p uploads/cv && \
+    chmod +x start.sh
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:$PORT/health').read()"
+
+# Run the start script
+CMD ["bash", "start.sh"]

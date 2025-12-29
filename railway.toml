@@ -1,0 +1,25 @@
+# Railway configuration for IntoWork Backend
+# Reference: https://docs.railway.app/deploy/railway-toml
+
+[build]
+builder = "dockerfile"
+dockerfile = "Dockerfile.railway"
+
+[deploy]
+startCommand = "bash backend/start.sh"
+restartPolicyType = "always"
+restartPolicyMaxRetries = 5
+numReplicas = 1
+sleepApplication = false
+
+[deploy.healthchecks]
+[deploy.healthchecks.http]
+path = "/health"
+port = "$PORT"
+interval = 30000  # 30 seconds
+timeout = 5000    # 5 seconds
+
+[env]
+PORT = "8000"
+PYTHONUNBUFFERED = "1"
+PYTHONDONTWRITEBYTECODE = "1"

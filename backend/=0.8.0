@@ -1,0 +1,18 @@
+Collecting resend
+  Downloading resend-2.19.0-py2.py3-none-any.whl.metadata (2.5 kB)
+Collecting requests>=2.31.0 (from resend)
+  Downloading requests-2.32.5-py3-none-any.whl.metadata (4.9 kB)
+Requirement already satisfied: typing-extensions>=4.4.0 in ./venv/lib/python3.12/site-packages (from resend) (4.15.0)
+Collecting charset_normalizer<4,>=2 (from requests>=2.31.0->resend)
+  Downloading charset_normalizer-3.4.4-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (37 kB)
+Requirement already satisfied: idna<4,>=2.5 in ./venv/lib/python3.12/site-packages (from requests>=2.31.0->resend) (3.11)
+Collecting urllib3<3,>=1.21.1 (from requests>=2.31.0->resend)
+  Downloading urllib3-2.6.2-py3-none-any.whl.metadata (6.6 kB)
+Requirement already satisfied: certifi>=2017.4.17 in ./venv/lib/python3.12/site-packages (from requests>=2.31.0->resend) (2025.11.12)
+Downloading resend-2.19.0-py2.py3-none-any.whl (50 kB)
+Downloading requests-2.32.5-py3-none-any.whl (64 kB)
+Downloading charset_normalizer-3.4.4-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (153 kB)
+Downloading urllib3-2.6.2-py3-none-any.whl (131 kB)
+Installing collected packages: urllib3, charset_normalizer, requests, resend
+
+Successfully installed charset_normalizer-3.4.4 requests-2.32.5 resend-2.19.0 urllib3-2.6.2

@@ -6,11 +6,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 INTOWORK Search is a B2B2C recruitment platform with AI-powered job matching. The platform serves two main user types: candidates seeking jobs and employers managing hiring.
 
-**Current Status**: Phase 2 - Candidate Dashboard (Active Development)
-- Phase 1 (Complete): Foundation with authentication, basic user management
-- Phase 2 (In Progress): Candidate dashboard with profile, CV management, job applications
-- Phase 3 (Planned): Employer dashboard with ATS (Applicant Tracking System)
-- Phase 4 (Planned): AI matching system
+**Current Status**: Phase 2 - Multi-Role Dashboard (Complete)
+- Phase 1 (Complete): Foundation with NextAuth authentication, user management
+- Phase 2 (Complete): Candidate and Employer dashboards with full functionality
+  - Candidate: Profile, CV upload, job search, applications, notifications
+  - Employer: Company profile, job posting management, application tracking, notifications
+- Phase 3 (In Progress): Admin dashboard and platform management
+- Phase 4 (Planned): AI matching system and advanced analytics
 
 ## Architecture
 
@@ -21,41 +23,52 @@ INTOWORK Search is a B2B2C recruitment platform with AI-powered job matching. Th
 - SQLAlchemy 2.0+ ORM with declarative models
 - PostgreSQL 15 (development: port 5433)
 - Alembic for database migrations
-- Clerk Backend API 4.2+ for authentication
+- NextAuth v5 with JWT authentication (HS256)
+- bcrypt for password hashing
+- Resend for email delivery (password reset)
 
 **Frontend** (`/frontend`):
-- Next.js 14 (App Router with React Server Components)
+- Next.js 14+ (App Router with React Server Components)
 - TypeScript with strict type checking
 - Tailwind CSS 4 with PostCSS
-- Clerk Next.js for authentication
+- NextAuth v5 for authentication with JWT strategy
 - Axios for API communication
+- React Hot Toast for notifications
 
 ### Authentication Flow
 
-The application uses **Clerk** for authentication with a custom sync flow:
+The application uses **NextAuth v5** for authentication with native JWT:
 
-1. User signs up/signs in via Clerk (supports Microsoft/Azure AD)
-2. Frontend receives Clerk session and JWT token
-3. Frontend calls `/api/auth/sync` to create/update user in backend database
+1. User signs up via `/auth/signup` with email/password (bcrypt hashing)
+2. User signs in via `/auth/signin` - backend returns JWT access token
+3. NextAuth stores JWT in session (client-side, 24-hour expiration)
 4. User completes onboarding at `/onboarding` to set role (candidate/employer)
 5. Backend creates role-specific profile (Candidate or Employer record)
-6. All authenticated API calls include `Authorization: Bearer <clerk-token>` header
-7. Backend validates JWT using Clerk PEM public key (RS256 algorithm)
+6. All authenticated API calls include `Authorization: Bearer <jwt-token>` header
+7. Backend validates JWT using NEXTAUTH_SECRET (HS256 algorithm)
+8. Password reset via email tokens (Resend service, 24-hour expiration)
 
 **Key Authentication Files**:
-- Backend: `backend/app/auth.py` - ClerkAuth class with JWT verification
+- Backend: `backend/app/auth.py` - Auth class with JWT verification, PasswordHasher
+- Backend: `backend/app/services/email_service.py` - EmailService for password reset
+- Frontend: `frontend/src/auth.ts` - NextAuth v5 configuration with CredentialsProvider
 - Frontend: `frontend/src/lib/api.ts` - createAuthenticatedClient() function
-- Middleware: `frontend/src/middleware.ts.bak` - Route protection (currently not active)
+
+**Migration Note**: Project was migrated from Clerk to NextAuth v5, saving $300k-600k/year. Legacy `clerk_id` field remains in User model for transition purposes but is nullable.
 
 ### Database Schema
 
 **Core Models** (in `backend/app/models/base.py`):
 
-1. **User** - Base user account linked to Clerk
-   - `clerk_id` (unique): Links to Clerk authentication
+1. **User** - Base user account with NextAuth
+   - `email` (unique): User email address
+   - `password_hash`: bcrypt hashed password
    - `role`: Enum (candidate, employer, admin)
-   - `email`, `first_name`, `last_name`
-   - Relations: `candidate` (one-to-one), `employer` (one-to-one)
+   - `first_name`, `last_name`, `name`: User identification
+   - `email_verified`: Timestamp of email verification
+   - `image`: Avatar URL (optional)
+   - `clerk_id` (legacy, nullable): From previous Clerk migration
+   - Relations: `candidate` (one-to-one), `employer` (one-to-one), `accounts`, `sessions`
 
 2. **Candidate** - Candidate profile and preferences
    - Links to User via `user_id` (one-to-one)
@@ -88,16 +101,41 @@ The application uses **Clerk** for authentication with a custom sync flow:
    - `status`: applied, pending, viewed, shortlisted, interview, accepted, rejected
    - Tracks application lifecycle and has_applied flag
 
+9. **Session** - NextAuth session management
+   - Links to User via `user_id`
+   - `session_token`: Unique session identifier
+   - `expires`: Session expiration timestamp
+
+10. **Account** - OAuth provider accounts (NextAuth)
+   - Links to User via `user_id`
+   - Supports multiple OAuth providers per user
+
+11. **PasswordResetToken** - Password reset tokens
+   - `email`: User email requesting reset
+   - `token`: Unique reset token (UUID)
+   - `expires`: Token expiration (24 hours)
+   - Single-use tokens, deleted after use
+
+12. **Notification** - User notifications
+   - Links to User via `user_id`
+   - `type`: Notification type (new_application, status_change, etc.)
+   - `is_read`: Read status tracking
+   - Supports real-time notification system
+
 ### API Structure
 
 **Backend API** (`/backend/app/api`):
-- `auth.py` - Authentication, user sync, onboarding
-- `users.py` - User CRUD operations
+- `auth_routes.py` - Authentication (signup, signin, password reset request/reset)
+- `users.py` - User CRUD operations, profile management
 - `candidates.py` - Candidate profiles, CV upload, experiences, education, skills
+- `employers.py` - Employer-specific profile operations
 - `companies.py` - Company management for employers
-- `jobs.py` - Job posting CRUD, search with filters
+- `jobs.py` - Job posting CRUD, search with filters (role-aware)
 - `applications.py` - Job applications (candidate & employer views)
+- `applications_update.py` - Application status updates
 - `dashboard.py` - Dashboard stats and recent activities
+- `notifications.py` - Notification CRUD, mark as read
+- `admin.py` - Admin-only routes (user management, platform stats)
 - `ping.py` - Health check endpoint
 
 **Frontend API Client** (`/frontend/src/lib/api.ts`):
@@ -110,13 +148,15 @@ The application uses **Clerk** for authentication with a custom sync flow:
 
 **App Router Structure** (`/frontend/src/app`):
 - `/` - Marketing landing page
-- `/sign-in`, `/sign-up` - Clerk authentication pages
+- `/auth/signin`, `/auth/signup` - NextAuth authentication pages
+- `/auth/forgot-password` - Password reset request page
+- `/auth/reset-password` - Password reset form (with token)
 - `/onboarding` - Role selection after signup
 - `/dashboard` - Main dashboard (role-based routing)
   - `/dashboard/candidates` - Candidate pages (profile, CV, applications)
   - `/dashboard/job-posts` - Employer job management
   - `/dashboard/company` - Employer company settings
-  - `/dashboard/settings` - User settings (notifications, privacy)
+  - `/dashboard/settings` - User settings (account, notifications, privacy)
   - `/dashboard/jobs` - Job search and browsing
   - `/dashboard/jobs/[id]` - Job detail page with apply functionality
 
@@ -203,12 +243,21 @@ make clean      # Clean temporary files
 
 Required variables in `backend/.env`:
 ```env
-# Clerk authentication
-CLERK_SECRET_KEY=sk_test_xxxxx
-CLERK_PEM_PUBLIC_KEY=-----BEGIN PUBLIC KEY-----xxxxx
-
 # Database
 DATABASE_URL=postgresql://postgres:postgres@localhost:5433/intowork
+
+# NextAuth JWT Configuration (must match frontend)
+NEXTAUTH_SECRET=your-nextauth-secret-min-32-characters
+JWT_SECRET=your-super-secret-jwt-key-change-in-production
+JWT_ALGORITHM=HS256
+
+# Email Service (Resend) - for password reset
+RESEND_API_KEY=re_your_resend_api_key_here
+FROM_EMAIL=INTOWORK <noreply@intowork.com>
+FRONTEND_URL=http://localhost:3000
+
+# Optional: General security
+SECRET_KEY=your-super-secret-key-change-me-in-production
 
 # Optional: Deployment
 RAILWAY_ENVIRONMENT=production  # For Railway deployment
@@ -218,19 +267,17 @@ RAILWAY_ENVIRONMENT=production  # For Railway deployment
 
 Required variables in `frontend/.env.local`:
 ```env
-# Clerk public keys
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_xxxxx
-CLERK_SECRET_KEY=sk_test_xxxxx
-
-# Clerk routes
-NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
-NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
-NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/onboarding
-NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/onboarding
+# NextAuth Configuration (must match backend NEXTAUTH_SECRET)
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your-nextauth-secret-min-32-characters-same-as-backend
+AUTH_SECRET=your-nextauth-secret-min-32-characters-same-as-backend  # Alias for NextAuth v5
 
 # Backend API URL
 NEXT_PUBLIC_API_URL=http://localhost:8001/api  # Development
 # NEXT_PUBLIC_API_URL=https://your-api.railway.app/api  # Production
+
+# Environment
+NODE_ENV=development
 ```
 
 ## Key Development Patterns
@@ -239,15 +286,18 @@ NEXT_PUBLIC_API_URL=http://localhost:8001/api  # Development
 
 1. **Backend**:
    - Add route handler in appropriate file under `backend/app/api/`
-   - Use `ClerkAuth.get_current_user()` dependency for protected routes
+   - Use `require_user` dependency for basic authentication
+   - Use `require_role(UserRole.X)` for role-based access control
+   - Use `require_candidate`, `require_employer`, or `require_admin` shortcuts
    - Define Pydantic models for request/response validation
    - Add database operations using SQLAlchemy ORM
 
 2. **Frontend**:
    - Add TypeScript interface in `frontend/src/lib/api.ts`
    - Add API function to appropriate module (e.g., `candidatesAPI`)
-   - Use `createAuthenticatedClient(token)` for protected endpoints
-   - Handle errors with try/catch and toast notifications
+   - Get session with NextAuth: `const session = await auth()`
+   - Use `createAuthenticatedClient(session.accessToken)` for protected endpoints
+   - Handle errors with try/catch and toast notifications (react-hot-toast)
 
 ### Database Schema Changes
 
@@ -259,11 +309,15 @@ NEXT_PUBLIC_API_URL=http://localhost:8001/api  # Development
 
 ### Role-Based Access Control
 
-- Check user role via `user.role` (candidate, employer, admin)
-- Frontend: Use `useUser()` from Clerk to check authentication
-- Backend: Use `ClerkAuth.get_current_user()` to get authenticated user
+- Check user role via `user.role` enum: `UserRole.CANDIDATE`, `UserRole.EMPLOYER`, `UserRole.ADMIN`
+- Frontend: Use `await auth()` from NextAuth to get session with user role
+- Frontend: Access user info via `session.user.role`, `session.user.email`, etc.
+- Backend: Use `require_user` to get authenticated user (any role)
+- Backend: Use `require_role(UserRole.X)` to enforce specific roles
+- Backend shortcuts: `require_candidate`, `require_employer`, `require_admin`, `require_employer_or_admin`
 - Candidate routes: `/dashboard/candidates/*`, `/api/candidates/*`
-- Employer routes: `/dashboard/job-posts/*`, `/dashboard/company/*`, `/api/jobs/*`, `/api/companies/*`
+- Employer routes: `/dashboard/job-posts/*`, `/dashboard/company/*`, `/api/jobs/*`, `/api/companies/*`, `/api/employers/*`
+- Admin routes: `/dashboard/admin/*`, `/api/admin/*`
 
 ### Job Application System
 
@@ -272,6 +326,25 @@ The application system uses a `has_applied` flag for efficient checking:
 - Backend checks `JobApplication` table for existing application
 - Frontend uses this flag to show "Applied" vs "Apply Now" buttons
 - Applications are soft-deleted (status changes, not removed from DB)
+
+### Password Reset System
+
+Password reset uses email-based token flow:
+1. User requests reset at `/auth/forgot-password` (frontend)
+2. Backend generates UUID token, stores in `PasswordResetToken` table (24h expiration)
+3. Email sent via Resend service with reset link containing token
+4. User clicks link, redirected to `/auth/reset-password?token=xxx`
+5. Frontend submits new password with token to backend
+6. Backend validates token, hashes new password with bcrypt, updates user
+7. Token is deleted after successful use (single-use)
+
+**Key Files**:
+- Backend: `backend/app/api/auth_routes.py` - `/auth/forgot-password` and `/auth/reset-password` endpoints
+- Backend: `backend/app/services/email_service.py` - Email template and Resend integration
+- Frontend: `frontend/src/app/auth/forgot-password/page.tsx` - Request form
+- Frontend: `frontend/src/app/auth/reset-password/page.tsx` - Reset form with token
+
+**Note**: Email service gracefully degrades if Resend API key not configured (logs warning but doesn't crash)
 
 ## Deployment
 
@@ -291,7 +364,13 @@ The application system uses a `has_applied` flag for efficient checking:
 2. **PostgreSQL Port**: Development DB uses port 5433 (not default 5432)
 3. **CORS**: Backend explicitly allows frontend origins in `main.py`
 4. **Token Format**: Always use `Bearer <token>` in Authorization header
-5. **Clerk Issuer**: JWT validation requires correct issuer URL (check `auth.py`)
-6. **File Uploads**: Backend serves uploads via `/uploads` StaticFiles mount
-7. **has_applied Flag**: Only available when user is authenticated; computed per-request
-8. **Migration Order**: Always review autogenerated migrations before applying
+5. **NEXTAUTH_SECRET Sync**: Must be identical in both backend and frontend `.env` files
+6. **API URL**: Frontend `NEXT_PUBLIC_API_URL` MUST include `/api` suffix (e.g., `http://localhost:8001/api`) since all backend routes use this prefix
+7. **JWT Algorithm**: Backend uses HS256 (symmetric) not RS256 (asymmetric like Clerk)
+8. **Password Hashing**: Use `PasswordHasher.hash_password()` and `verify_password()` from `auth.py`
+9. **Email Service**: Resend API key required for password reset; gracefully disabled if not configured
+10. **File Uploads**: Backend serves uploads via `/uploads` StaticFiles mount
+11. **has_applied Flag**: Only available when user is authenticated; computed per-request
+12. **Migration Order**: Always review autogenerated migrations before applying
+13. **Session Strategy**: NextAuth uses JWT strategy (not database sessions) for performance
+14. **Legacy Fields**: `clerk_id` field in User model is nullable and kept for migration compatibility
