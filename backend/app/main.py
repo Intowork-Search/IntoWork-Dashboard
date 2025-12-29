@@ -1,6 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from starlette.middleware.base import BaseHTTPMiddleware
 from app.api.ping import router as ping_router
 from app.api.users import router as users_router
 from app.api.auth_routes import router as auth_routes_router
@@ -24,6 +25,25 @@ app = FastAPI(
     description="Plateforme de recrutement B2B2C - API Backend",
     version="1.0.0"
 )
+
+
+# Security Headers Middleware
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        # Ajouter les en-têtes de sécurité
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        # CSP - À adapter selon vos besoins
+        response.headers["Content-Security-Policy"] = "default-src 'self'"
+        return response
+
+
+# Ajouter le middleware de sécurité
+app.add_middleware(SecurityHeadersMiddleware)
 
 # CORS middleware pour le frontend
 app.add_middleware(

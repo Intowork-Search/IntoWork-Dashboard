@@ -11,7 +11,10 @@ from datetime import datetime, timedelta, timezone
 import bcrypt
 
 # Configuration NextAuth
-NEXTAUTH_SECRET = os.getenv("NEXTAUTH_SECRET", "your-secret-key-change-in-production-please-use-long-random-string")
+NEXTAUTH_SECRET = os.getenv("NEXTAUTH_SECRET")
+if not NEXTAUTH_SECRET:
+    raise ValueError("NEXTAUTH_SECRET environment variable is required. Generate one with: openssl rand -base64 32")
+
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRATION_HOURS = 24
 

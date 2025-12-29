@@ -2,9 +2,29 @@
 Script pour créer ou promouvoir l'utilisateur admin
 Email: software@hcexecutive.net
 """
+import os
+import secrets
+import string
 from app.database import SessionLocal
 from app.models.base import User, UserRole
 from app.auth import PasswordHasher
+
+
+def generate_secure_password(length=16):
+    """Génère un mot de passe sécurisé aléatoire"""
+    alphabet = string.ascii_letters + string.digits + string.punctuation
+    # Assurer qu'il y a au moins un de chaque type de caractère
+    password = [
+        secrets.choice(string.ascii_uppercase),
+        secrets.choice(string.ascii_lowercase),
+        secrets.choice(string.digits),
+        secrets.choice(string.punctuation),
+    ]
+    # Compléter avec des caractères aléatoires
+    password += [secrets.choice(alphabet) for _ in range(length - 4)]
+    # Mélanger
+    secrets.SystemRandom().shuffle(password)
+    return ''.join(password)
 
 def create_or_promote_admin():
     db = SessionLocal()
@@ -37,9 +57,9 @@ def create_or_promote_admin():
         else:
             # Créer un nouvel utilisateur admin
             print(f"✓ Création d'un nouvel utilisateur admin...")
-            
-            # Mot de passe par défaut (à changer après la première connexion)
-            default_password = "Admin@IntoWork2024"
+
+            # Générer un mot de passe sécurisé ou utiliser celui fourni via variable d'environnement
+            default_password = os.getenv("ADMIN_PASSWORD", generate_secure_password())
             password_hash = PasswordHasher.hash_password(default_password)
             
             new_admin = User(

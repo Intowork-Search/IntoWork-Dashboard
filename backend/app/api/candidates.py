@@ -481,20 +481,13 @@ async def upload_cv(
     """Télécharger un CV pour le candidat"""
     
     try:
-        # Vérifier le type de fichier
+        # Vérifier le type de fichier (header check)
         if cv.content_type != "application/pdf":
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Seuls les fichiers PDF sont acceptés"
             )
-        
-        # Vérifier la taille (max 5MB)
-        if cv.size and cv.size > 5 * 1024 * 1024:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Le fichier ne peut pas dépasser 5MB"
-            )
-        
+
         # Récupérer ou créer le profil candidat
         candidate = db.query(Candidate).filter(Candidate.user_id == current_user.id).first()
         if not candidate:
@@ -508,22 +501,42 @@ async def upload_cv(
             db.add(candidate)
             db.commit()
             db.refresh(candidate)
-        
+
         # Lire le contenu du fichier
         cv_content = await cv.read()
-        
+
+        # Vérifier la taille réelle du fichier (max 5MB)
+        file_size = len(cv_content)
+        MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
+        if file_size > MAX_FILE_SIZE:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Le fichier ne peut pas dépasser 5MB (taille actuelle: {file_size / (1024*1024):.2f}MB)"
+            )
+
+        # Vérifier le magic byte du PDF (validation supplémentaire)
+        if not cv_content.startswith(b'%PDF'):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Le fichier ne semble pas être un PDF valide"
+            )
+
         logger.info(f"Début du téléchargement CV pour utilisateur {current_user.id}")
         logger.info(f"Nom du fichier: {cv.filename}")
-        logger.info(f"Taille du fichier: {len(cv_content)} bytes")
-        
+        logger.info(f"Taille du fichier: {file_size} bytes")
+
         # Sauvegarder le fichier sur le disque local
         import os
+        import re
         cv_dir = "uploads/cv"
         os.makedirs(cv_dir, exist_ok=True)
-        
+
+        # Sanitiser le nom de fichier (enlever les caractères dangereux)
+        safe_filename = re.sub(r'[^a-zA-Z0-9_.-]', '_', cv.filename)
+
         # Créer un nom de fichier unique
         import uuid
-        unique_filename = f"{current_user.id}_{uuid.uuid4().hex[:8]}_{cv.filename}"
+        unique_filename = f"{current_user.id}_{uuid.uuid4().hex[:8]}_{safe_filename}"
         cv_path = os.path.join(cv_dir, unique_filename)
         
         # Écrire le fichier sur le disque
