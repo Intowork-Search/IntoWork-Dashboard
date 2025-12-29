@@ -80,3 +80,10 @@ temp/
 
 # Docker
 docker-compose.override.yml
+deployment-secrets.txt
+
+# VS Code History
+.history/
+
+# Temporary Git Directories
+*.git/
