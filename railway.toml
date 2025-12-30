@@ -6,7 +6,7 @@ builder = "dockerfile"
 dockerfile = "Dockerfile.railway"
 
 [deploy]
-startCommand = "bash backend/start.sh"
+# startCommand is defined in Dockerfile.railway CMD
 restartPolicyType = "always"
 restartPolicyMaxRetries = 5
 numReplicas = 1
