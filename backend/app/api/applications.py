@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy.orm import Session, selectinload
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select, func
+from sqlalchemy.orm import selectinload
 from typing import List, Optional
 from app.database import get_db
 from app.models.base import JobApplication, Job, User, Employer, NotificationType, Candidate
@@ -40,16 +42,19 @@ async def get_my_applications(
     limit: int = Query(10, ge=1, le=50),
     status: Optional[str] = Query(None),
     current_user: User = Depends(require_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Récupérer les candidatures du candidat connecté"""
-    
+
     # Vérifier que l'utilisateur est un candidat
     if current_user.role.value != 'candidate':
         raise HTTPException(status_code=403, detail="Seuls les candidats peuvent accéder à leurs candidatures")
-    
+
     # Récupérer le profil candidat
-    candidate = db.query(Candidate).filter(Candidate.user_id == current_user.id).first()
+    result = await db.execute(
+        select(Candidate).filter(Candidate.user_id == current_user.id)
+    )
+    candidate = result.scalar_one_or_none()
     if not candidate:
         return ApplicationsListResponse(
             applications=[],
@@ -58,28 +63,37 @@ async def get_my_applications(
             limit=limit,
             total_pages=0
         )
-    
+
     # Construire la query de base
     from app.models.base import Company
-    query = db.query(JobApplication).filter(
+    stmt = select(JobApplication).filter(
         JobApplication.candidate_id == candidate.id
     ).options(
         selectinload(JobApplication.job).selectinload(Job.company)
     )
-    
+
     # Filtrer par statut si spécifié
     if status:
-        query = query.filter(JobApplication.status == status)
-    
+        stmt = stmt.filter(JobApplication.status == status)
+
     # Ordonner par date de candidature (plus récent en premier)
-    query = query.order_by(JobApplication.applied_at.desc())
-    
+    stmt = stmt.order_by(JobApplication.applied_at.desc())
+
     # Calculer le total
-    total = query.count()
+    count_stmt = select(func.count()).select_from(
+        select(JobApplication).filter(
+            JobApplication.candidate_id == candidate.id,
+            JobApplication.status == status if status else True
+        ).subquery()
+    )
+    total_result = await db.execute(count_stmt)
+    total = total_result.scalar()
     total_pages = (total + limit - 1) // limit
-    
+
     # Appliquer la pagination
-    applications = query.offset((page - 1) * limit).limit(limit).all()
+    stmt = stmt.offset((page - 1) * limit).limit(limit)
+    apps_result = await db.execute(stmt)
+    applications = apps_result.scalars().all()
     
     # Construire les données de réponse avec les informations du job
     applications_data = []
@@ -119,33 +133,42 @@ async def get_my_applications(
 async def create_application(
     application_data: JobApplicationCreate,
     current_user: User = Depends(require_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Postuler à une offre d'emploi"""
-    
+
     # Vérifier que l'utilisateur est un candidat
     if current_user.role.value != 'candidate':
         raise HTTPException(status_code=403, detail="Seuls les candidats peuvent postuler")
-    
+
     # Récupérer le profil candidat
-    candidate = db.query(Candidate).filter(Candidate.user_id == current_user.id).first()
+    result = await db.execute(
+        select(Candidate).filter(Candidate.user_id == current_user.id)
+    )
+    candidate = result.scalar_one_or_none()
     if not candidate:
         raise HTTPException(status_code=404, detail="Profil candidat introuvable")
-    
+
     # Vérifier si le job existe
-    job = db.query(Job).filter(Job.id == application_data.job_id).first()
+    job_result = await db.execute(
+        select(Job).filter(Job.id == application_data.job_id)
+    )
+    job = job_result.scalar_one_or_none()
     if not job:
         raise HTTPException(status_code=404, detail="Offre d'emploi introuvable")
-    
+
     # Vérifier si l'utilisateur a déjà postulé à cette offre
-    existing_application = db.query(JobApplication).filter(
-        JobApplication.job_id == application_data.job_id,
-        JobApplication.candidate_id == candidate.id
-    ).first()
-    
+    existing_result = await db.execute(
+        select(JobApplication).filter(
+            JobApplication.job_id == application_data.job_id,
+            JobApplication.candidate_id == candidate.id
+        )
+    )
+    existing_application = existing_result.scalar_one_or_none()
+
     if existing_application:
         raise HTTPException(status_code=400, detail="Vous avez déjà postulé à cette offre")
-    
+
     # Créer la candidature
     from app.models.base import ApplicationStatus
     application = JobApplication(
@@ -155,15 +178,18 @@ async def create_application(
         cover_letter=application_data.cover_letter,
         applied_at=datetime.utcnow()
     )
-    
+
     db.add(application)
-    db.commit()
-    db.refresh(application)
-    
+    await db.commit()
+    await db.refresh(application)
+
     # Créer une notification pour l'employeur
     try:
         # Récupérer le job avec l'employeur
-        job_with_employer = db.query(Job).options(selectinload(Job.employer)).filter(Job.id == application_data.job_id).first()
+        job_employer_result = await db.execute(
+            select(Job).options(selectinload(Job.employer)).filter(Job.id == application_data.job_id)
+        )
+        job_with_employer = job_employer_result.scalar_one_or_none()
         if job_with_employer and job_with_employer.employer:
             create_notification(
                 db=db,
@@ -177,12 +203,15 @@ async def create_application(
     except Exception as e:
         print(f"Erreur lors de la création de la notification: {e}")
         # Ne pas bloquer si la notification échoue
-    
+
     # Récupérer avec les données du job et de la company
     from app.models.base import Company
-    application_with_job = db.query(JobApplication).options(
-        selectinload(JobApplication.job).selectinload(Job.company)
-    ).filter(JobApplication.id == application.id).first()
+    app_with_job_result = await db.execute(
+        select(JobApplication)
+        .options(selectinload(JobApplication.job).selectinload(Job.company))
+        .filter(JobApplication.id == application.id)
+    )
+    application_with_job = app_with_job_result.scalar_one_or_none()
     
     job_data = {
         'id': application_with_job.job.id,
@@ -210,17 +239,20 @@ async def create_application(
 async def get_application(
     application_id: int,
     current_user: User = Depends(require_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Récupérer une candidature spécifique"""
-    
-    application = db.query(JobApplication).options(
-        selectinload(JobApplication.job)
-    ).filter(
-        JobApplication.id == application_id,
-        JobApplication.candidate_id == current_user.id
-    ).first()
-    
+
+    result = await db.execute(
+        select(JobApplication)
+        .options(selectinload(JobApplication.job))
+        .filter(
+            JobApplication.id == application_id,
+            JobApplication.candidate_id == current_user.id
+        )
+    )
+    application = result.scalar_one_or_none()
+
     if not application:
         raise HTTPException(status_code=404, detail="Candidature introuvable")
     
@@ -250,25 +282,28 @@ async def get_application(
 async def withdraw_application(
     application_id: int,
     current_user: User = Depends(require_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Retirer une candidature"""
-    
-    application = db.query(JobApplication).filter(
-        JobApplication.id == application_id,
-        JobApplication.candidate_id == current_user.id,
-        JobApplication.status == "pending"  # On ne peut retirer que les candidatures en attente
-    ).first()
-    
+
+    result = await db.execute(
+        select(JobApplication).filter(
+            JobApplication.id == application_id,
+            JobApplication.candidate_id == current_user.id,
+            JobApplication.status == "pending"  # On ne peut retirer que les candidatures en attente
+        )
+    )
+    application = result.scalar_one_or_none()
+
     if not application:
         raise HTTPException(
-            status_code=404, 
+            status_code=404,
             detail="Candidature introuvable ou impossible à retirer"
         )
-    
-    db.delete(application)
-    db.commit()
-    
+
+    await db.delete(application)
+    await db.commit()
+
     return {"message": "Candidature retirée avec succès"}
 
 # ===== ENDPOINTS EMPLOYEUR =====
@@ -310,47 +345,81 @@ async def get_employer_applications(
     status: Optional[str] = Query(None),
     job_id: Optional[int] = Query(None),
     current_user: User = Depends(require_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Récupérer toutes les candidatures des offres de l'employeur"""
     from app.models.base import Employer, Candidate, UserRole
-    
+
     if current_user.role != UserRole.EMPLOYER:
         raise HTTPException(status_code=403, detail="Accès réservé aux employeurs")
-    
+
     # Récupérer l'employeur
-    employer = db.query(Employer).filter(Employer.user_id == current_user.id).first()
+    employer_result = await db.execute(
+        select(Employer).filter(Employer.user_id == current_user.id)
+    )
+    employer = employer_result.scalar_one_or_none()
     if not employer:
         raise HTTPException(status_code=404, detail="Employeur introuvable")
-    
+
     # Construire la query - candidatures pour les jobs de cet employeur
-    query = db.query(JobApplication).join(Job).filter(
-        Job.employer_id == employer.id
-    ).options(
-        selectinload(JobApplication.job),
-        selectinload(JobApplication.candidate).selectinload(Candidate.user)
+    stmt = (
+        select(JobApplication)
+        .join(Job)
+        .filter(Job.employer_id == employer.id)
+        .options(
+            selectinload(JobApplication.job),
+            selectinload(JobApplication.candidate).selectinload(Candidate.user)
+        )
     )
-    
+
     # Filtrer par statut si spécifié
     if status:
         from app.models.base import ApplicationStatus
         try:
             status_enum = ApplicationStatus(status)
-            query = query.filter(JobApplication.status == status_enum)
+            stmt = stmt.filter(JobApplication.status == status_enum)
         except ValueError:
             pass
-    
+
     # Filtrer par job_id si spécifié
     if job_id:
-        query = query.filter(JobApplication.job_id == job_id)
-    
+        stmt = stmt.filter(JobApplication.job_id == job_id)
+
     # Ordre anti-chronologique
-    query = query.order_by(JobApplication.applied_at.desc())
-    
-    # Pagination
-    total = query.count()
+    stmt = stmt.order_by(JobApplication.applied_at.desc())
+
+    # Pagination - calculer le total
+    count_stmt = select(func.count()).select_from(
+        select(JobApplication).join(Job).filter(Job.employer_id == employer.id).subquery()
+    )
+    if status:
+        from app.models.base import ApplicationStatus
+        try:
+            status_enum = ApplicationStatus(status)
+            count_stmt = select(func.count()).select_from(
+                select(JobApplication).join(Job).filter(
+                    Job.employer_id == employer.id,
+                    JobApplication.status == status_enum
+                ).subquery()
+            )
+        except ValueError:
+            pass
+    if job_id:
+        count_stmt = select(func.count()).select_from(
+            select(JobApplication).join(Job).filter(
+                Job.employer_id == employer.id,
+                JobApplication.job_id == job_id
+            ).subquery()
+        )
+
+    total_result = await db.execute(count_stmt)
+    total = total_result.scalar()
     total_pages = (total + limit - 1) // limit
-    applications = query.offset((page - 1) * limit).limit(limit).all()
+
+    # Récupérer les applications
+    stmt = stmt.offset((page - 1) * limit).limit(limit)
+    apps_result = await db.execute(stmt)
+    applications = apps_result.scalars().all()
     
     # Formater les résultats
     applications_data = []
@@ -384,39 +453,47 @@ async def update_application_status(
     application_id: int,
     request: UpdateApplicationStatusRequest,
     current_user: User = Depends(require_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Mettre à jour le statut d'une candidature (employeur uniquement)"""
     from app.models.base import Employer, ApplicationStatus, UserRole
-    
+
     if current_user.role != UserRole.EMPLOYER:
         raise HTTPException(status_code=403, detail="Accès réservé aux employeurs")
-    
+
     # Récupérer l'employeur
-    employer = db.query(Employer).filter(Employer.user_id == current_user.id).first()
+    employer_result = await db.execute(
+        select(Employer).filter(Employer.user_id == current_user.id)
+    )
+    employer = employer_result.scalar_one_or_none()
     if not employer:
         raise HTTPException(status_code=404, detail="Employeur introuvable")
-    
+
     # Récupérer la candidature avec le candidat
-    application = db.query(JobApplication).options(
-        selectinload(JobApplication.job),
-        selectinload(JobApplication.candidate)
-    ).filter(JobApplication.id == application_id).first()
-    
+    app_result = await db.execute(
+        select(JobApplication)
+        .options(
+            selectinload(JobApplication.job),
+            selectinload(JobApplication.candidate)
+        )
+        .filter(JobApplication.id == application_id)
+    )
+    application = app_result.scalar_one_or_none()
+
     if not application:
         raise HTTPException(status_code=404, detail="Candidature introuvable")
-    
+
     # Vérifier que le job appartient à cet employeur
     if application.job.employer_id != employer.id:
         raise HTTPException(status_code=403, detail="Vous ne pouvez pas modifier cette candidature")
-    
+
     # Valider et mettre à jour le statut
     try:
         old_status = application.status
         new_status = ApplicationStatus(request.status)
         application.status = new_status
-        db.commit()
-        db.refresh(application)
+        await db.commit()
+        await db.refresh(application)
         
         # Créer une notification pour le candidat si le statut a changé
         if old_status != new_status:
@@ -458,36 +535,42 @@ async def update_application_notes(
     application_id: int,
     request: UpdateApplicationNotesRequest,
     current_user: User = Depends(require_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Ajouter ou mettre à jour les notes d'une candidature (employeur uniquement)"""
     from app.models.base import Employer, UserRole
-    
+
     if current_user.role != UserRole.EMPLOYER:
         raise HTTPException(status_code=403, detail="Accès réservé aux employeurs")
-    
+
     # Récupérer l'employeur
-    employer = db.query(Employer).filter(Employer.user_id == current_user.id).first()
+    employer_result = await db.execute(
+        select(Employer).filter(Employer.user_id == current_user.id)
+    )
+    employer = employer_result.scalar_one_or_none()
     if not employer:
         raise HTTPException(status_code=404, detail="Employeur introuvable")
-    
+
     # Récupérer la candidature
-    application = db.query(JobApplication).options(
-        selectinload(JobApplication.job)
-    ).filter(JobApplication.id == application_id).first()
-    
+    app_result = await db.execute(
+        select(JobApplication)
+        .options(selectinload(JobApplication.job))
+        .filter(JobApplication.id == application_id)
+    )
+    application = app_result.scalar_one_or_none()
+
     if not application:
         raise HTTPException(status_code=404, detail="Candidature introuvable")
-    
+
     # Vérifier que le job appartient à cet employeur
     if application.job.employer_id != employer.id:
         raise HTTPException(status_code=403, detail="Vous ne pouvez pas modifier cette candidature")
-    
+
     # Mettre à jour les notes
     application.notes = request.notes
-    db.commit()
-    db.refresh(application)
-    
+    await db.commit()
+    await db.refresh(application)
+
     return {
         "message": "Notes mises à jour avec succès",
         "application_id": application.id,
