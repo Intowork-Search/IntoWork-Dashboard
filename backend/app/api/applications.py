@@ -191,7 +191,7 @@ async def create_application(
         )
         job_with_employer = job_employer_result.scalar_one_or_none()
         if job_with_employer and job_with_employer.employer:
-            create_notification(
+            await create_notification(
                 db=db,
                 user_id=job_with_employer.employer.user_id,
                 type=NotificationType.NEW_APPLICATION,
@@ -508,8 +508,8 @@ async def update_application_status(
                 
                 title = status_messages.get(new_status, "📬 Mise à jour de votre candidature")
                 message = f"Votre candidature pour le poste de {application.job.title} a été mise à jour: {new_status.value}"
-                
-                create_notification(
+
+                await create_notification(
                     db=db,
                     user_id=application.candidate.user_id,
                     type=NotificationType.STATUS_CHANGE,

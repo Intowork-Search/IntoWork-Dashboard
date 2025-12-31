@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from sqlalchemy import desc
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import desc, select, func, update, delete as sql_delete
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
@@ -42,26 +42,38 @@ async def get_notifications(
     offset: int = 0,
     unread_only: bool = False,
     current_user: User = Depends(require_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """
     Récupérer les notifications de l'utilisateur connecté
     """
-    query = db.query(Notification).filter(Notification.user_id == current_user.id)
-    
+    # Construire la requête de base
+    query = select(Notification).filter(Notification.user_id == current_user.id)
+
     if unread_only:
         query = query.filter(Notification.is_read == False)
-    
-    # Compter le total et les non lues
-    total = query.count()
-    unread_count = db.query(Notification).filter(
-        Notification.user_id == current_user.id,
-        Notification.is_read == False
-    ).count()
-    
+
+    # Compter le total
+    total_result = await db.execute(
+        select(func.count()).select_from(Notification).filter(Notification.user_id == current_user.id)
+    )
+    total = total_result.scalar()
+
+    # Compter les non lues
+    unread_result = await db.execute(
+        select(func.count()).select_from(Notification).filter(
+            Notification.user_id == current_user.id,
+            Notification.is_read == False
+        )
+    )
+    unread_count = unread_result.scalar()
+
     # Récupérer les notifications paginées
-    notifications = query.order_by(desc(Notification.created_at)).offset(offset).limit(limit).all()
-    
+    notifications_result = await db.execute(
+        query.order_by(desc(Notification.created_at)).offset(offset).limit(limit)
+    )
+    notifications = notifications_result.scalars().all()
+
     return NotificationListResponse(
         notifications=[
             NotificationResponse(
@@ -83,86 +95,96 @@ async def get_notifications(
 @router.get("/unread-count")
 async def get_unread_count(
     current_user: User = Depends(require_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """
     Récupérer le nombre de notifications non lues
     """
-    count = db.query(Notification).filter(
-        Notification.user_id == current_user.id,
-        Notification.is_read == False
-    ).count()
-    
+    result = await db.execute(
+        select(func.count()).select_from(Notification).filter(
+            Notification.user_id == current_user.id,
+            Notification.is_read == False
+        )
+    )
+    count = result.scalar()
+
     return {"unread_count": count}
 
 @router.put("/{notification_id}/read")
 async def mark_notification_as_read(
     notification_id: int,
     current_user: User = Depends(require_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """
     Marquer une notification comme lue
     """
-    notification = db.query(Notification).filter(
-        Notification.id == notification_id,
-        Notification.user_id == current_user.id
-    ).first()
-    
+    result = await db.execute(
+        select(Notification).filter(
+            Notification.id == notification_id,
+            Notification.user_id == current_user.id
+        )
+    )
+    notification = result.scalar_one_or_none()
+
     if not notification:
         raise HTTPException(status_code=404, detail="Notification introuvable")
-    
+
     notification.is_read = True
     notification.read_at = datetime.now()
-    db.commit()
-    
+    await db.commit()
+
     return {"message": "Notification marquée comme lue"}
 
 @router.put("/mark-all-read")
 async def mark_all_as_read(
     current_user: User = Depends(require_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """
     Marquer toutes les notifications comme lues
     """
-    db.query(Notification).filter(
-        Notification.user_id == current_user.id,
-        Notification.is_read == False
-    ).update({
-        "is_read": True,
-        "read_at": datetime.now()
-    })
-    db.commit()
-    
+    await db.execute(
+        update(Notification)
+        .filter(
+            Notification.user_id == current_user.id,
+            Notification.is_read == False
+        )
+        .values(is_read=True, read_at=datetime.now())
+    )
+    await db.commit()
+
     return {"message": "Toutes les notifications marquées comme lues"}
 
 @router.delete("/{notification_id}")
 async def delete_notification(
     notification_id: int,
     current_user: User = Depends(require_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """
     Supprimer une notification
     """
-    notification = db.query(Notification).filter(
-        Notification.id == notification_id,
-        Notification.user_id == current_user.id
-    ).first()
-    
+    result = await db.execute(
+        select(Notification).filter(
+            Notification.id == notification_id,
+            Notification.user_id == current_user.id
+        )
+    )
+    notification = result.scalar_one_or_none()
+
     if not notification:
         raise HTTPException(status_code=404, detail="Notification introuvable")
-    
-    db.delete(notification)
-    db.commit()
-    
+
+    await db.delete(notification)
+    await db.commit()
+
     return {"message": "Notification supprimée"}
 
 # ==================== Fonctions utilitaires ====================
 
-def create_notification(
-    db: Session,
+async def create_notification(
+    db: AsyncSession,
     user_id: int,
     type: NotificationType,
     title: str,
@@ -183,6 +205,7 @@ def create_notification(
         is_read=False
     )
     db.add(notification)
-    db.commit()
+    await db.commit()
+    await db.refresh(notification)
     logger.info(f"Notification créée pour user_id={user_id}, type={type.value}")
     return notification
