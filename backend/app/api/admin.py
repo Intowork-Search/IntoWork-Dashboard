@@ -3,8 +3,9 @@ Routes Admin pour le back-office
 Accessible uniquement par l'admin (software@hcexecutive.net)
 """
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from sqlalchemy import func, case
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select, func, case
+from sqlalchemy.orm import selectinload
 from app.database import get_db
 from app.models.base import User, UserRole, Candidate, Employer, Company, Job, JobApplication, Notification
 from app.auth import require_admin
@@ -86,37 +87,55 @@ class UserActivationUpdate(BaseModel):
 @router.get("/stats", response_model=AdminStats)
 async def get_admin_statistics(
     current_user: User = Depends(require_admin),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """
     Récupérer les statistiques globales de la plateforme
     """
     # Compter les utilisateurs
-    total_users = db.query(User).count()
-    total_candidates = db.query(User).filter(User.role == UserRole.CANDIDATE).count()
-    total_employers = db.query(User).filter(User.role == UserRole.EMPLOYER).count()
-    active_users = db.query(User).filter(User.is_active == True).count()
-    inactive_users = db.query(User).filter(User.is_active == False).count()
-    
+    result = await db.execute(select(func.count()).select_from(User))
+    total_users = result.scalar()
+
+    result = await db.execute(select(func.count()).select_from(User).filter(User.role == UserRole.CANDIDATE))
+    total_candidates = result.scalar()
+
+    result = await db.execute(select(func.count()).select_from(User).filter(User.role == UserRole.EMPLOYER))
+    total_employers = result.scalar()
+
+    result = await db.execute(select(func.count()).select_from(User).filter(User.is_active == True))
+    active_users = result.scalar()
+
+    result = await db.execute(select(func.count()).select_from(User).filter(User.is_active == False))
+    inactive_users = result.scalar()
+
     # Compter les autres entités
-    total_companies = db.query(Company).count()
-    total_jobs = db.query(Job).count()
-    total_applications = db.query(JobApplication).count()
-    total_notifications = db.query(Notification).count()
-    
+    result = await db.execute(select(func.count()).select_from(Company))
+    total_companies = result.scalar()
+
+    result = await db.execute(select(func.count()).select_from(Job))
+    total_jobs = result.scalar()
+
+    result = await db.execute(select(func.count()).select_from(JobApplication))
+    total_applications = result.scalar()
+
+    result = await db.execute(select(func.count()).select_from(Notification))
+    total_notifications = result.scalar()
+
     # Jobs par statut
-    jobs_by_status_query = db.query(
-        Job.status,
-        func.count(Job.id).label('count')
-    ).group_by(Job.status).all()
-    
+    result = await db.execute(
+        select(Job.status, func.count(Job.id).label('count'))
+        .group_by(Job.status)
+    )
+    jobs_by_status_query = result.all()
+
     jobs_by_status = dict(jobs_by_status_query)
-    
+
     # Inscriptions récentes (7 derniers jours)
     from datetime import timezone
     seven_days_ago = datetime.now(timezone.utc) - timedelta(days=7)
-    recent_signups = db.query(User).filter(User.created_at >= seven_days_ago).count()
-    
+    result = await db.execute(select(func.count()).select_from(User).filter(User.created_at >= seven_days_ago))
+    recent_signups = result.scalar()
+
     return AdminStats(
         total_users=total_users,
         total_candidates=total_candidates,
@@ -140,13 +159,13 @@ async def get_all_users(
     is_active: Optional[bool] = None,
     search: Optional[str] = None,
     current_user: User = Depends(require_admin),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """
     Récupérer la liste de tous les utilisateurs avec filtres
     """
-    query = db.query(User)
-    
+    query = select(User)
+
     # Filtres
     if role:
         try:
@@ -154,10 +173,10 @@ async def get_all_users(
             query = query.filter(User.role == role_enum)
         except ValueError:
             raise HTTPException(status_code=400, detail=f"Invalid role: {role}")
-    
+
     if is_active is not None:
         query = query.filter(User.is_active == is_active)
-    
+
     if search:
         search_pattern = f"%{search}%"
         query = query.filter(
@@ -165,10 +184,12 @@ async def get_all_users(
             (User.first_name.ilike(search_pattern)) |
             (User.last_name.ilike(search_pattern))
         )
-    
+
     # Pagination
-    users = query.order_by(User.created_at.desc()).offset(skip).limit(limit).all()
-    
+    query = query.order_by(User.created_at.desc()).offset(skip).limit(limit)
+    result = await db.execute(query)
+    users = result.scalars().all()
+
     return [
         UserListItem(
             id=user.id,
@@ -188,20 +209,29 @@ async def get_all_employers(
     skip: int = 0,
     limit: int = 50,
     current_user: User = Depends(require_admin),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """
     Récupérer la liste de tous les employeurs avec leurs informations
     """
-    employers = db.query(Employer).join(User).outerjoin(Company).filter(
-        User.role == UserRole.EMPLOYER
-    ).order_by(Employer.created_at.desc()).offset(skip).limit(limit).all()
-    
+    query = (
+        select(Employer)
+        .join(User)
+        .outerjoin(Company)
+        .filter(User.role == UserRole.EMPLOYER)
+        .options(selectinload(Employer.user), selectinload(Employer.company))
+        .order_by(Employer.created_at.desc())
+        .offset(skip)
+        .limit(limit)
+    )
+    result_exec = await db.execute(query)
+    employers = result_exec.scalars().all()
+
     result = []
     for employer in employers:
         user = employer.user
         company = employer.company
-        
+
         result.append(EmployerListItem(
             id=employer.id,
             user_id=user.id,
@@ -214,7 +244,7 @@ async def get_all_employers(
             is_active=user.is_active,
             created_at=employer.created_at
         ))
-    
+
     return result
 
 
@@ -224,27 +254,42 @@ async def get_all_jobs(
     limit: int = 50,
     status: Optional[str] = None,
     current_user: User = Depends(require_admin),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """
     Récupérer toutes les offres d'emploi (vue admin)
     """
-    query = db.query(Job).join(Company).join(Employer).join(User)
-    
+    query = (
+        select(Job)
+        .join(Company)
+        .join(Employer)
+        .join(User)
+        .options(selectinload(Job.company))
+    )
+
     if status:
         query = query.filter(Job.status == status)
-    
-    jobs = query.order_by(Job.created_at.desc()).offset(skip).limit(limit).all()
-    
+
+    query = query.order_by(Job.created_at.desc()).offset(skip).limit(limit)
+    result_exec = await db.execute(query)
+    jobs = result_exec.scalars().all()
+
     result = []
     for job in jobs:
         company = job.company
-        employer = db.query(Employer).filter(Employer.id == job.employer_id).first()
+
+        # Récupérer l'employeur
+        employer_query = select(Employer).filter(Employer.id == job.employer_id).options(selectinload(Employer.user))
+        employer_result = await db.execute(employer_query)
+        employer = employer_result.scalar_one_or_none()
         user = employer.user if employer else None
-        
+
         # Compter les candidatures réelles pour cette offre
-        real_applications_count = db.query(JobApplication).filter(JobApplication.job_id == job.id).count()
-        
+        count_result = await db.execute(
+            select(func.count()).select_from(JobApplication).filter(JobApplication.job_id == job.id)
+        )
+        real_applications_count = count_result.scalar()
+
         result.append(JobListItem(
             id=job.id,
             title=job.title,
@@ -255,7 +300,7 @@ async def get_all_jobs(
             applications_count=real_applications_count,
             created_at=job.created_at
         ))
-    
+
     return result
 
 
@@ -264,24 +309,25 @@ async def toggle_user_activation(
     user_id: int,
     update: UserActivationUpdate,
     current_user: User = Depends(require_admin),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """
     Activer ou désactiver un utilisateur
     """
-    user = db.query(User).filter(User.id == user_id).first()
-    
+    result = await db.execute(select(User).filter(User.id == user_id))
+    user = result.scalar_one_or_none()
+
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    
+
     # Empêcher l'admin de se désactiver lui-même
     if user.id == current_user.id:
         raise HTTPException(status_code=400, detail="Cannot deactivate your own account")
-    
+
     user.is_active = update.is_active
-    db.commit()
-    db.refresh(user)
-    
+    await db.commit()
+    await db.refresh(user)
+
     return UserListItem(
         id=user.id,
         email=user.email,
@@ -297,30 +343,31 @@ async def toggle_user_activation(
 async def delete_user(
     user_id: int,
     current_user: User = Depends(require_admin),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """
     Supprimer un utilisateur (DANGER: cascade delete)
     """
-    user = db.query(User).filter(User.id == user_id).first()
-    
+    result = await db.execute(select(User).filter(User.id == user_id))
+    user = result.scalar_one_or_none()
+
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    
+
     # Empêcher l'admin de se supprimer lui-même
     if user.id == current_user.id:
         raise HTTPException(status_code=400, detail="Cannot delete your own account")
-    
-    db.delete(user)
-    db.commit()
-    
+
+    await db.delete(user)
+    await db.commit()
+
     return {"message": f"User {user.email} deleted successfully"}
 
 
 @router.get("/me")
 async def get_admin_info(
     current_user: User = Depends(require_admin),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """
     Récupérer les informations de l'admin connecté
