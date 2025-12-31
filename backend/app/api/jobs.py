@@ -1,7 +1,8 @@
 from pydantic import BaseModel
 from typing import Optional, List
-from sqlalchemy.orm import Session
-from sqlalchemy import desc
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import desc, select, func, join
+from sqlalchemy.orm import selectinload
 from fastapi import status, APIRouter, Depends, HTTPException, Query, Response
 import logging
 from datetime import timezone, datetime, timedelta
@@ -81,7 +82,7 @@ async def get_jobs(
     location_type: Optional[str] = None,
     salary_min: Optional[int] = None,
     current_user: Optional[User] = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """
     Récupérer la liste des offres d'emploi avec filtres et pagination
@@ -90,48 +91,65 @@ async def get_jobs(
     user_applications = set()
     if current_user:
         # Récupérer le profil candidat
-        candidate = db.query(Candidate).filter(Candidate.user_id == current_user.id).first()
-        if candidate:
-            applications = db.query(JobApplication.job_id).filter(
-                JobApplication.candidate_id == candidate.id
-            ).all()
-            user_applications = {app.job_id for app in applications}
-    
-    query = db.query(Job, Company).join(Company, Job.company_id == Company.id)
-    query = query.filter(Job.status == JobStatus.PUBLISHED)
-    
-    # Filtres
-    if search:
-        query = query.filter(
-            Job.title.ilike(f"%{search}%") | 
-            Job.description.ilike(f"%{search}%") |
-            Company.name.ilike(f"%{search}%")
+        candidate_result = await db.execute(
+            select(Candidate).filter(Candidate.user_id == current_user.id)
         )
-    
+        candidate = candidate_result.scalar_one_or_none()
+        if candidate:
+            applications_result = await db.execute(
+                select(JobApplication.job_id).filter(
+                    JobApplication.candidate_id == candidate.id
+                )
+            )
+            applications = applications_result.scalars().all()
+            user_applications = set(applications)
+
+    # Construire la requête avec join
+    stmt = select(Job, Company).join(Company, Job.company_id == Company.id)
+    stmt = stmt.filter(Job.status == JobStatus.PUBLISHED)
+
+    # Filtres - Using parameterized queries to prevent SQL injection
+    if search:
+        # Use SQLAlchemy's parameterized query with bind parameters (prevents SQL injection)
+        search_pattern = f"%{search}%"
+        stmt = stmt.filter(
+            Job.title.ilike(search_pattern) |
+            Job.description.ilike(search_pattern) |
+            Company.name.ilike(search_pattern)
+        )
+
     if location:
-        query = query.filter(Job.location.ilike(f"%{location}%"))
-    
+        # Use SQLAlchemy's parameterized query with bind parameters (prevents SQL injection)
+        location_pattern = f"%{location}%"
+        stmt = stmt.filter(Job.location.ilike(location_pattern))
+
     if job_type:
         try:
             job_type_enum = JobType(job_type)
-            query = query.filter(Job.job_type == job_type_enum)
+            stmt = stmt.filter(Job.job_type == job_type_enum)
         except ValueError:
             pass
-    
+
     if location_type:
         try:
             location_type_enum = JobLocation(location_type)
-            query = query.filter(Job.location_type == location_type_enum)
+            stmt = stmt.filter(Job.location_type == location_type_enum)
         except ValueError:
             pass
-    
+
     if salary_min:
-        query = query.filter(Job.salary_min >= salary_min)
-    
-    # Pagination
-    total = query.count()
+        stmt = stmt.filter(Job.salary_min >= salary_min)
+
+    # Pagination - Count total
+    count_stmt = select(func.count()).select_from(stmt.subquery())
+    total_result = await db.execute(count_stmt)
+    total = total_result.scalar()
+
+    # Get paginated results
     offset = (page - 1) * limit
-    results = query.order_by(desc(Job.posted_at)).offset(offset).limit(limit).all()
+    stmt = stmt.order_by(desc(Job.posted_at)).offset(offset).limit(limit)
+    results_data = await db.execute(stmt)
+    results = results_data.all()
     
     # Construire la réponse
     jobs = []
@@ -172,41 +190,52 @@ async def get_my_jobs(
     search: Optional[str] = None,
     status_filter: Optional[str] = None,
     current_user: User = Depends(require_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """
     Récupérer les offres d'emploi créées par l'employeur connecté
     """
     if current_user.role != UserRole.EMPLOYER:
         raise HTTPException(status_code=403, detail="Seuls les employeurs peuvent accéder à cette ressource")
-    
+
     # Récupérer l'employeur
-    employer = db.query(Employer).filter(Employer.user_id == current_user.id).first()
+    employer_result = await db.execute(
+        select(Employer).filter(Employer.user_id == current_user.id)
+    )
+    employer = employer_result.scalar_one_or_none()
     if not employer:
         raise HTTPException(status_code=404, detail="Profil employeur non trouvé")
-    
+
     # Query de base - uniquement les jobs de cet employeur
-    query = db.query(Job, Company).join(Company, Job.company_id == Company.id)
-    query = query.filter(Job.employer_id == employer.id)
-    
-    # Filtres
+    stmt = select(Job, Company).join(Company, Job.company_id == Company.id)
+    stmt = stmt.filter(Job.employer_id == employer.id)
+
+    # Filtres - Using parameterized queries to prevent SQL injection
     if search:
-        query = query.filter(
-            Job.title.ilike(f"%{search}%") | 
-            Job.description.ilike(f"%{search}%")
+        # Use SQLAlchemy's parameterized query with bind parameters (prevents SQL injection)
+        search_pattern = f"%{search}%"
+        stmt = stmt.filter(
+            Job.title.ilike(search_pattern) |
+            Job.description.ilike(search_pattern)
         )
-    
+
     if status_filter:
         try:
             status_enum = JobStatus(status_filter)
-            query = query.filter(Job.status == status_enum)
+            stmt = stmt.filter(Job.status == status_enum)
         except ValueError:
             pass  # Ignorer les valeurs invalides
-    
-    # Pagination
-    total = query.count()
+
+    # Pagination - Count total
+    count_stmt = select(func.count()).select_from(stmt.subquery())
+    total_result = await db.execute(count_stmt)
+    total = total_result.scalar()
+
+    # Get paginated results
     offset = (page - 1) * limit
-    results = query.order_by(desc(Job.posted_at)).offset(offset).limit(limit).all()
+    stmt = stmt.order_by(desc(Job.posted_at)).offset(offset).limit(limit)
+    results_data = await db.execute(stmt)
+    results = results_data.all()
     
     # Construire la réponse
     jobs = []
@@ -243,41 +272,47 @@ async def get_my_jobs(
 @router.get("/stats/recent")
 async def get_recent_jobs_count(
     days: int = Query(7, ge=1, le=30),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """
     Récupérer le nombre d'offres d'emploi récentes
     """
     cutoff_date = datetime.utcnow() - timedelta(days=days)
-    
-    count = db.query(Job).filter(
-        Job.status == JobStatus.PUBLISHED,
-        Job.posted_at >= cutoff_date
-    ).count()
-    
+
+    count_result = await db.execute(
+        select(func.count()).select_from(Job).filter(
+            Job.status == JobStatus.PUBLISHED,
+            Job.posted_at >= cutoff_date
+        )
+    )
+    count = count_result.scalar()
+
     return {"count": count, "days": days}
 
 @router.post("/create", response_model=JobResponse, status_code=status.HTTP_201_CREATED)
 async def create_job(
     job: JobCreateRequest,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_user)
 ):
     """
     Créer une nouvelle offre d'emploi (employeur authentifié)
     """
     logger.info(f"Tentative de création d'offre par user_id={current_user.id}, role={current_user.role}")
-    
+
     if current_user.role != UserRole.EMPLOYER:
         logger.warning("Refus: utilisateur non employeur")
         raise HTTPException(status_code=403, detail="Seuls les employeurs peuvent créer une offre")
 
-    # Récupérer l'employeur
-    employer = db.query(Employer).filter(Employer.user_id == current_user.id).first()
+    # Récupérer l'employeur avec eager loading de company
+    employer_result = await db.execute(
+        select(Employer).options(selectinload(Employer.company)).filter(Employer.user_id == current_user.id)
+    )
+    employer = employer_result.scalar_one_or_none()
     if not employer:
         logger.error("Employeur introuvable pour user_id=%s", current_user.id)
         raise HTTPException(status_code=404, detail="Employeur introuvable")
-    
+
     company = employer.company
     if not company:
         logger.error("Entreprise introuvable pour employeur_id=%s", employer.id)
@@ -319,11 +354,11 @@ async def create_job(
             applications_count=0
         )
         db.add(job_obj)
-        db.commit()
-        db.refresh(job_obj)
+        await db.commit()
+        await db.refresh(job_obj)
     except Exception as e:
         logger.error(f"Erreur lors de la création de l'offre: {e}")
-        db.rollback()
+        await db.rollback()
         raise HTTPException(status_code=500, detail=f"Erreur lors de la création de l'offre: {str(e)}")
 
     logger.info(f"Offre créée avec succès: id={job_obj.id}")
@@ -353,7 +388,7 @@ async def create_job(
 async def update_job(
     job_id: int,
     job: JobCreateRequest,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_user)
 ):
     """
@@ -364,13 +399,17 @@ async def update_job(
         logger.warning("Refus mise à jour: utilisateur non employeur")
         raise HTTPException(status_code=403, detail="Seuls les employeurs peuvent mettre à jour une offre")
 
-    job_obj = db.query(Job).filter(Job.id == job_id).first()
+    job_result = await db.execute(select(Job).filter(Job.id == job_id))
+    job_obj = job_result.scalar_one_or_none()
     if not job_obj:
         logger.warning(f"Mise à jour: offre id={job_id} introuvable")
         raise HTTPException(status_code=404, detail="Offre introuvable")
 
     # Vérifier que l'employeur est bien le propriétaire de l'offre
-    employer = db.query(Employer).filter(Employer.user_id == current_user.id).first()
+    employer_result = await db.execute(
+        select(Employer).options(selectinload(Employer.company)).filter(Employer.user_id == current_user.id)
+    )
+    employer = employer_result.scalar_one_or_none()
     if not employer or job_obj.employer_id != employer.id:
         logger.warning(f"Mise à jour refusée: user_id={current_user.id} n'est pas propriétaire de l'offre id={job_id}")
         raise HTTPException(status_code=403, detail="Vous n'êtes pas autorisé à modifier cette offre")
@@ -401,11 +440,11 @@ async def update_job(
         job_obj.requirements = job.requirements
         job_obj.responsibilities = job.responsibilities
         job_obj.benefits = job.benefits
-        
-        db.commit()
-        db.refresh(job_obj)
+
+        await db.commit()
+        await db.refresh(job_obj)
         logger.info(f"Offre id={job_id} mise à jour avec succès")
-        
+
         company = employer.company
         posted_at = job_obj.posted_at.isoformat() if job_obj.posted_at else None
         return JobResponse(
@@ -426,7 +465,7 @@ async def update_job(
             applications_count=job_obj.applications_count
         )
     except Exception as e:
-        db.rollback()
+        await db.rollback()
         logger.error(f"Erreur lors de la mise à jour de l'offre id={job_id}: {e}")
         raise HTTPException(status_code=500, detail="Erreur lors de la mise à jour de l'offre")
 
@@ -434,7 +473,7 @@ async def update_job(
 @router.delete("/{job_id}", status_code=204)
 async def delete_job(
     job_id: int,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_user)
 ):
     """
@@ -445,62 +484,74 @@ async def delete_job(
         logger.warning("Refus suppression: utilisateur non employeur")
         raise HTTPException(status_code=403, detail="Seuls les employeurs peuvent supprimer une offre")
 
-    job = db.query(Job).filter(Job.id == job_id).first()
+    job_result = await db.execute(select(Job).filter(Job.id == job_id))
+    job = job_result.scalar_one_or_none()
     if not job:
         logger.warning(f"Suppression: offre id={job_id} introuvable")
         raise HTTPException(status_code=404, detail="Offre introuvable")
 
     # Vérifier que l'employeur est bien le propriétaire de l'offre
-    employer = db.query(Employer).filter(Employer.user_id == current_user.id).first()
+    employer_result = await db.execute(
+        select(Employer).filter(Employer.user_id == current_user.id)
+    )
+    employer = employer_result.scalar_one_or_none()
     if not employer or job.employer_id != employer.id:
         logger.warning(f"Suppression refusée: user_id={current_user.id} n'est pas propriétaire de l'offre id={job_id}")
         raise HTTPException(status_code=403, detail="Vous n'êtes pas autorisé à supprimer cette offre")
 
     try:
-        db.delete(job)
-        db.commit()
+        await db.delete(job)
+        await db.commit()
         logger.info(f"Suppression réussie de l'offre id={job_id}")
         return Response(status_code=204)
     except Exception as e:
-        db.rollback()
+        await db.rollback()
         logger.error(f"Erreur lors de la suppression de l'offre id={job_id}: {e}")
         raise HTTPException(status_code=500, detail="Erreur lors de la suppression de l'offre")
 
 # ⚠️ Cette route DOIT être en DERNIER car elle capture tout
 @router.get("/{job_id}", response_model=JobDetailResponse)
 async def get_job(
-    job_id: int, 
+    job_id: int,
     current_user: Optional[User] = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """
     Récupérer les détails d'une offre d'emploi
     """
-    result = db.query(Job, Company).join(Company, Job.company_id == Company.id).filter(
+    stmt = select(Job, Company).join(Company, Job.company_id == Company.id).filter(
         Job.id == job_id,
         Job.status == JobStatus.PUBLISHED
-    ).first()
-    
+    )
+    result_data = await db.execute(stmt)
+    result = result_data.first()
+
     if not result:
         raise HTTPException(status_code=404, detail="Job not found")
-    
+
     job, company = result
-    
+
     # Vérifier si l'utilisateur a déjà postulé
     has_applied = False
     if current_user:
         # Récupérer le profil candidat
-        candidate = db.query(Candidate).filter(Candidate.user_id == current_user.id).first()
+        candidate_result = await db.execute(
+            select(Candidate).filter(Candidate.user_id == current_user.id)
+        )
+        candidate = candidate_result.scalar_one_or_none()
         if candidate:
-            application = db.query(JobApplication).filter(
-                JobApplication.candidate_id == candidate.id,
-                JobApplication.job_id == job_id
-            ).first()
+            application_result = await db.execute(
+                select(JobApplication).filter(
+                    JobApplication.candidate_id == candidate.id,
+                    JobApplication.job_id == job_id
+                )
+            )
+            application = application_result.scalar_one_or_none()
             has_applied = application is not None
-    
+
     # Incrémenter le compteur de vues
     job.views_count += 1
-    db.commit()
+    await db.commit()
     
     return JobDetailResponse(
         id=job.id,
