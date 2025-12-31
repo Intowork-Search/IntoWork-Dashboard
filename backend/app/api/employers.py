@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from pydantic import BaseModel
 from app.database import get_db
 from app.models.base import User, Employer
@@ -20,17 +21,20 @@ class UpdateEmployerRequest(BaseModel):
 @router.get("/employers/me")
 async def get_my_employer_profile(
     user: User = Depends(require_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Récupérer le profil employeur de l'utilisateur connecté"""
-    employer = db.query(Employer).filter(Employer.user_id == user.id).first()
-    
+    result = await db.execute(
+        select(Employer).filter(Employer.user_id == user.id)
+    )
+    employer = result.scalar_one_or_none()
+
     if not employer:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Employer profile not found"
         )
-    
+
     return {
         "id": employer.id,
         "user_id": employer.user_id,
@@ -48,17 +52,20 @@ async def get_my_employer_profile(
 async def update_my_employer_profile(
     request: UpdateEmployerRequest,
     user: User = Depends(require_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Mettre à jour le profil employeur de l'utilisateur connecté"""
-    employer = db.query(Employer).filter(Employer.user_id == user.id).first()
-    
+    result = await db.execute(
+        select(Employer).filter(Employer.user_id == user.id)
+    )
+    employer = result.scalar_one_or_none()
+
     if not employer:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Employer profile not found"
         )
-    
+
     # Mettre à jour les champs fournis
     if request.company_id is not None:
         employer.company_id = request.company_id
@@ -69,10 +76,10 @@ async def update_my_employer_profile(
     if request.phone is not None:
         employer.phone = request.phone
     # Note: employer_type n'est pas dans le modèle, on peut l'ignorer ou l'ajouter
-    
-    db.commit()
-    db.refresh(employer)
-    
+
+    await db.commit()
+    await db.refresh(employer)
+
     return {
         "message": "Employer profile updated successfully",
         "employer": {

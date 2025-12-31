@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select, func
 from app.database import get_db
 from app.models.base import User, UserRole
 from pydantic import BaseModel
@@ -26,45 +27,59 @@ class UserCreate(UserBase):
     pass
 
 @router.get("/users", response_model=List[UserResponse])
-async def get_users(db: Session = Depends(get_db)):
+async def get_users(db: AsyncSession = Depends(get_db)):
     """Récupérer tous les utilisateurs"""
-    users = db.query(User).all()
+    result = await db.execute(select(User))
+    users = result.scalars().all()
     return users
 
 @router.post("/users", response_model=UserResponse)
-async def create_user(user: UserCreate, db: Session = Depends(get_db)):
+async def create_user(user: UserCreate, db: AsyncSession = Depends(get_db)):
     """Créer un nouvel utilisateur"""
     # Vérifier si l'utilisateur existe déjà
-    existing_user = db.query(User).filter(User.clerk_id == user.clerk_id).first()
+    result = await db.execute(
+        select(User).filter(User.clerk_id == user.clerk_id)
+    )
+    existing_user = result.scalar_one_or_none()
     if existing_user:
         raise HTTPException(status_code=400, detail="User with this Clerk ID already exists")
-    
+
     # Créer le nouvel utilisateur
     db_user = User(**user.model_dump())
     db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
+    await db.commit()
+    await db.refresh(db_user)
     return db_user
 
 @router.get("/users/{user_id}", response_model=UserResponse)
-async def get_user(user_id: int, db: Session = Depends(get_db)):
+async def get_user(user_id: int, db: AsyncSession = Depends(get_db)):
     """Récupérer un utilisateur par ID"""
-    user = db.query(User).filter(User.id == user_id).first()
+    result = await db.execute(
+        select(User).filter(User.id == user_id)
+    )
+    user = result.scalar_one_or_none()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
 @router.get("/db-status")
-async def check_db_connection(db: Session = Depends(get_db)):
+async def check_db_connection(db: AsyncSession = Depends(get_db)):
     """Vérifier la connexion à la base de données"""
     try:
         from sqlalchemy import text
         # Test simple de la connexion avec syntaxe SQLAlchemy 2.0
-        result = db.execute(text("SELECT 1")).scalar()
-        user_count = db.query(User).count()
+        result = await db.execute(text("SELECT 1"))
+        test_value = result.scalar()
+
+        # Count users using func.count()
+        count_result = await db.execute(
+            select(func.count()).select_from(User)
+        )
+        user_count = count_result.scalar()
+
         return {
             "status": "connected",
-            "test_query": result,
+            "test_query": test_value,
             "users_count": user_count,
             "message": "Database connection successful"
         }

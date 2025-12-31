@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select, func
+from sqlalchemy.orm import selectinload
 from pydantic import BaseModel
 from typing import Optional
 import logging
@@ -61,18 +63,18 @@ class CompanyStatsResponse(BaseModel):
 @router.post("", response_model=CompanyResponse, status_code=201)
 async def create_company(
     company_data: CompanyCreateRequest,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_user)
 ):
     """
     Créer une nouvelle entreprise (pour l'onboarding employeur)
     """
     logger.info(f"Création entreprise pour user_id={current_user.id}")
-    
+
     if current_user.role != UserRole.EMPLOYER:
         logger.warning("Accès refusé: utilisateur non employeur")
         raise HTTPException(status_code=403, detail="Accès réservé aux employeurs")
-    
+
     # Créer l'entreprise
     new_company = Company(
         name=company_data.name,
@@ -86,13 +88,13 @@ async def create_company(
         country=company_data.country,
         logo_url=company_data.logo_url
     )
-    
+
     db.add(new_company)
-    db.commit()
-    db.refresh(new_company)
-    
+    await db.commit()
+    await db.refresh(new_company)
+
     logger.info(f"Entreprise créée: id={new_company.id}, name={new_company.name}")
-    
+
     return CompanyResponse(
         id=new_company.id,
         name=new_company.name,
@@ -109,32 +111,35 @@ async def create_company(
 
 @router.get("/my-company", response_model=CompanyResponse)
 async def get_my_company(
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_user)
 ):
     """
     Récupérer les informations de l'entreprise de l'employeur connecté
     """
     logger.info(f"Récupération entreprise pour user_id={current_user.id}, role={current_user.role}")
-    
+
     if current_user.role != UserRole.EMPLOYER:
         logger.warning("Accès refusé: utilisateur non employeur")
         raise HTTPException(status_code=403, detail="Accès réservé aux employeurs")
-    
-    # Récupérer l'employeur
-    employer = db.query(Employer).filter(Employer.user_id == current_user.id).first()
+
+    # Récupérer l'employeur avec eager loading de company
+    result = await db.execute(
+        select(Employer).options(selectinload(Employer.company)).filter(Employer.user_id == current_user.id)
+    )
+    employer = result.scalar_one_or_none()
     if not employer:
         logger.error(f"Employeur introuvable pour user_id={current_user.id}")
         raise HTTPException(status_code=404, detail="Employeur introuvable")
-    
+
     # Récupérer l'entreprise
     company = employer.company
     if not company:
         logger.error(f"Entreprise introuvable pour employer_id={employer.id}")
         raise HTTPException(status_code=404, detail="Entreprise introuvable")
-    
+
     logger.info(f"Entreprise trouvée: id={company.id}, name={company.name}")
-    
+
     return CompanyResponse(
         id=company.id,
         name=company.name,
@@ -152,40 +157,43 @@ async def get_my_company(
 @router.put("/my-company", response_model=CompanyResponse)
 async def update_my_company(
     company_data: CompanyUpdateRequest,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_user)
 ):
     """
     Mettre à jour les informations de l'entreprise de l'employeur connecté
     """
     logger.info(f"Mise à jour entreprise pour user_id={current_user.id}")
-    
+
     if current_user.role != UserRole.EMPLOYER:
         logger.warning("Accès refusé: utilisateur non employeur")
         raise HTTPException(status_code=403, detail="Accès réservé aux employeurs")
-    
-    # Récupérer l'employeur
-    employer = db.query(Employer).filter(Employer.user_id == current_user.id).first()
+
+    # Récupérer l'employeur avec eager loading de company
+    result = await db.execute(
+        select(Employer).options(selectinload(Employer.company)).filter(Employer.user_id == current_user.id)
+    )
+    employer = result.scalar_one_or_none()
     if not employer:
         logger.error(f"Employeur introuvable pour user_id={current_user.id}")
         raise HTTPException(status_code=404, detail="Employeur introuvable")
-    
+
     # Récupérer l'entreprise
     company = employer.company
     if not company:
         logger.error(f"Entreprise introuvable pour employer_id={employer.id}")
         raise HTTPException(status_code=404, detail="Entreprise introuvable")
-    
+
     # Mettre à jour les champs non nuls
     update_data = company_data.dict(exclude_unset=True)
     for field, value in update_data.items():
         setattr(company, field, value)
-    
+
     try:
-        db.commit()
-        db.refresh(company)
+        await db.commit()
+        await db.refresh(company)
         logger.info(f"Entreprise id={company.id} mise à jour avec succès")
-        
+
         return CompanyResponse(
             id=company.id,
             name=company.name,
@@ -200,55 +208,70 @@ async def update_my_company(
             logo_url=company.logo_url
         )
     except Exception as e:
-        db.rollback()
+        await db.rollback()
         logger.error(f"Erreur lors de la mise à jour de l'entreprise: {e}")
         raise HTTPException(status_code=500, detail="Erreur lors de la mise à jour")
 
 @router.get("/my-company/stats", response_model=CompanyStatsResponse)
 async def get_company_stats(
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_user)
 ):
     """
     Récupérer les statistiques de l'entreprise de l'employeur connecté
     """
     logger.info(f"Récupération stats entreprise pour user_id={current_user.id}")
-    
+
     if current_user.role != UserRole.EMPLOYER:
         logger.warning("Accès refusé: utilisateur non employeur")
         raise HTTPException(status_code=403, detail="Accès réservé aux employeurs")
-    
-    # Récupérer l'employeur
-    employer = db.query(Employer).filter(Employer.user_id == current_user.id).first()
+
+    # Récupérer l'employeur avec eager loading de company
+    result = await db.execute(
+        select(Employer).options(selectinload(Employer.company)).filter(Employer.user_id == current_user.id)
+    )
+    employer = result.scalar_one_or_none()
     if not employer:
         logger.error(f"Employeur introuvable pour user_id={current_user.id}")
         raise HTTPException(status_code=404, detail="Employeur introuvable")
-    
+
     company = employer.company
     if not company:
         logger.error(f"Entreprise introuvable pour employer_id={employer.id}")
         raise HTTPException(status_code=404, detail="Entreprise introuvable")
-    
+
     # Calculer les statistiques
     # Offres actives
-    active_jobs = db.query(Job).filter(
-        Job.company_id == company.id,
-        Job.status == JobStatus.PUBLISHED
-    ).count()
-    
+    active_jobs_result = await db.execute(
+        select(func.count()).select_from(Job).filter(
+            Job.company_id == company.id,
+            Job.status == JobStatus.PUBLISHED
+        )
+    )
+    active_jobs = active_jobs_result.scalar()
+
     # Total offres
-    total_jobs = db.query(Job).filter(Job.company_id == company.id).count()
-    
+    total_jobs_result = await db.execute(
+        select(func.count()).select_from(Job).filter(Job.company_id == company.id)
+    )
+    total_jobs = total_jobs_result.scalar()
+
     # Total candidatures reçues
-    total_applications = db.query(JobApplication).join(Job).filter(
-        Job.company_id == company.id
-    ).count()
-    
+    total_applications_result = await db.execute(
+        select(func.count()).select_from(JobApplication).join(Job).filter(
+            Job.company_id == company.id
+        )
+    )
+    total_applications = total_applications_result.scalar()
+
     # Total employeurs de l'entreprise
-    total_employers = db.query(Employer).filter(Employer.company_id == company.id).count()
-    
+    total_employers_result = await db.execute(
+        select(func.count()).select_from(Employer).filter(Employer.company_id == company.id)
+    )
+    total_employers = total_employers_result.scalar()
+
     logger.info(f"Stats: active_jobs={active_jobs}, total_jobs={total_jobs}, applications={total_applications}")
-    
+
     return CompanyStatsResponse(
         active_jobs=active_jobs,
         total_jobs=total_jobs,
