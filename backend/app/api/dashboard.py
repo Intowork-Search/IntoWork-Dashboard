@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select, func
+from sqlalchemy.orm import selectinload
 from app.database import get_db
 from app.models.base import (
     User, Candidate, Experience, Education, Skill,
@@ -38,15 +39,28 @@ class DashboardData(BaseModel):
 @router.get("/dashboard", response_model=DashboardData)
 async def get_dashboard_data(
     current_user: User = Depends(require_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Récupérer les données du dashboard pour l'utilisateur connecté"""
-    
+
     try:
         # Gestion du rôle ADMIN
         if current_user.role == UserRole.ADMIN:
             # Les admins doivent utiliser /api/admin/* endpoints
             # Retourner un dashboard minimal pour éviter l'erreur
+
+            # Count users
+            result = await db.execute(select(func.count()).select_from(User))
+            users_count = result.scalar()
+
+            # Count jobs
+            result = await db.execute(select(func.count()).select_from(Job))
+            jobs_count = result.scalar()
+
+            # Count applications
+            result = await db.execute(select(func.count()).select_from(JobApplication))
+            applications_count = result.scalar()
+
             return {
                 "stats": [
                     {
@@ -58,21 +72,21 @@ async def get_dashboard_data(
                     },
                     {
                         "title": "Utilisateurs",
-                        "value": str(db.query(User).count()),
+                        "value": str(users_count),
                         "change": "Total plateforme",
                         "changeType": "neutral",
                         "color": "blue"
                     },
                     {
                         "title": "Offres",
-                        "value": str(db.query(Job).count()),
+                        "value": str(jobs_count),
                         "change": "Total plateforme",
                         "changeType": "neutral",
                         "color": "green"
                     },
                     {
                         "title": "Candidatures",
-                        "value": str(db.query(JobApplication).count()),
+                        "value": str(applications_count),
                         "change": "Total plateforme",
                         "changeType": "neutral",
                         "color": "purple"
@@ -99,7 +113,8 @@ async def get_dashboard_data(
         
         if current_user.role.value == "employer":
             # Récupérer l'employeur lié à l'utilisateur
-            employer = db.query(Employer).filter(Employer.user_id == current_user.id).first()
+            result = await db.execute(select(Employer).filter(Employer.user_id == current_user.id))
+            employer = result.scalar_one_or_none()
             if not employer:
                 raise HTTPException(status_code=404, detail="Employeur non trouvé")
 
@@ -156,18 +171,29 @@ async def get_dashboard_data(
                 }
 
             # Offres actives
-            active_jobs = db.query(Job).filter(Job.employer_id == employer.id, Job.status == JobStatus.PUBLISHED).all()
+            stmt = select(Job).filter(Job.employer_id == employer.id, Job.status == JobStatus.PUBLISHED)
+            result = await db.execute(stmt)
+            active_jobs = result.scalars().all()
             active_jobs_count = len(active_jobs)
 
             # Candidatures reçues (toutes offres de l'employeur)
-            applications_count = db.query(JobApplication).join(Job).filter(Job.employer_id == employer.id).count()
+            stmt = select(func.count()).select_from(JobApplication).join(Job).filter(Job.employer_id == employer.id)
+            result = await db.execute(stmt)
+            applications_count = result.scalar()
 
             # Entretiens prévus (statut interview)
-            interviews_count = db.query(JobApplication).join(Job).filter(Job.employer_id == employer.id, JobApplication.status == ApplicationStatus.INTERVIEW).count()
+            stmt = select(func.count()).select_from(JobApplication).join(Job).filter(Job.employer_id == employer.id, JobApplication.status == ApplicationStatus.INTERVIEW)
+            result = await db.execute(stmt)
+            interviews_count = result.scalar()
 
             # Taux de réponse (candidatures traitées / total)
-            total_applications = db.query(JobApplication).join(Job).filter(Job.employer_id == employer.id).count()
-            responded_applications = db.query(JobApplication).join(Job).filter(Job.employer_id == employer.id, JobApplication.status.in_([ApplicationStatus.REJECTED, ApplicationStatus.ACCEPTED, ApplicationStatus.INTERVIEW, ApplicationStatus.SHORTLISTED, ApplicationStatus.VIEWED])).count()
+            stmt = select(func.count()).select_from(JobApplication).join(Job).filter(Job.employer_id == employer.id)
+            result = await db.execute(stmt)
+            total_applications = result.scalar()
+
+            stmt = select(func.count()).select_from(JobApplication).join(Job).filter(Job.employer_id == employer.id, JobApplication.status.in_([ApplicationStatus.REJECTED, ApplicationStatus.ACCEPTED, ApplicationStatus.INTERVIEW, ApplicationStatus.SHORTLISTED, ApplicationStatus.VIEWED]))
+            result = await db.execute(stmt)
+            responded_applications = result.scalar()
             response_rate = f"{round((responded_applications / total_applications) * 100) if total_applications else 0}%"
 
             # Statistiques pour employeur
@@ -205,7 +231,9 @@ async def get_dashboard_data(
             # Activités récentes (exemples)
             recent_activities = []
             # Dernière offre publiée
-            last_job = db.query(Job).filter(Job.employer_id == employer.id).order_by(Job.created_at.desc()).first()
+            stmt = select(Job).filter(Job.employer_id == employer.id).order_by(Job.created_at.desc()).limit(1)
+            result = await db.execute(stmt)
+            last_job = result.scalar_one_or_none()
             if last_job:
                 recent_activities.append({
                     "id": 1,
@@ -215,7 +243,9 @@ async def get_dashboard_data(
                     "type": "job_post"
                 })
             # Dernière candidature reçue
-            last_application = db.query(JobApplication).join(Job).filter(Job.employer_id == employer.id).order_by(JobApplication.applied_at.desc()).first()
+            stmt = select(JobApplication).join(Job).filter(Job.employer_id == employer.id).order_by(JobApplication.applied_at.desc()).limit(1).options(selectinload(JobApplication.job))
+            result = await db.execute(stmt)
+            last_application = result.scalar_one_or_none()
             if last_application:
                 recent_activities.append({
                     "id": 2,
@@ -225,7 +255,9 @@ async def get_dashboard_data(
                     "type": "application"
                 })
             # Dernier entretien planifié
-            last_interview = db.query(JobApplication).join(Job).filter(Job.employer_id == employer.id, JobApplication.status == ApplicationStatus.INTERVIEW).order_by(JobApplication.updated_at.desc()).first()
+            stmt = select(JobApplication).join(Job).filter(Job.employer_id == employer.id, JobApplication.status == ApplicationStatus.INTERVIEW).order_by(JobApplication.updated_at.desc()).limit(1).options(selectinload(JobApplication.job))
+            result = await db.execute(stmt)
+            last_interview = result.scalar_one_or_none()
             if last_interview:
                 recent_activities.append({
                     "id": 3,
@@ -251,22 +283,34 @@ async def get_dashboard_data(
         
         # Logique pour CANDIDATE
         else:
-            # Récupérer le candidat lié à l'utilisateur
-            candidate = db.query(Candidate).filter(Candidate.user_id == current_user.id).first()
+            # Récupérer le candidat lié à l'utilisateur avec relations
+            stmt = select(Candidate).filter(Candidate.user_id == current_user.id).options(
+                selectinload(Candidate.experiences),
+                selectinload(Candidate.educations),
+                selectinload(Candidate.skills)
+            )
+            result = await db.execute(stmt)
+            candidate = result.scalar_one_or_none()
             if not candidate:
                 raise HTTPException(status_code=404, detail="Candidat non trouvé")
 
             # Candidatures envoyées
-            applications_count = db.query(JobApplication).filter(JobApplication.candidate_id == candidate.id).count()
+            stmt = select(func.count()).select_from(JobApplication).filter(JobApplication.candidate_id == candidate.id)
+            result = await db.execute(stmt)
+            applications_count = result.scalar()
 
             # Offres disponibles (publiées)
-            available_jobs_count = db.query(Job).filter(Job.status == JobStatus.PUBLISHED).count()
+            stmt = select(func.count()).select_from(Job).filter(Job.status == JobStatus.PUBLISHED)
+            result = await db.execute(stmt)
+            available_jobs_count = result.scalar()
 
             # Entretiens prévus
-            interviews_count = db.query(JobApplication).filter(
+            stmt = select(func.count()).select_from(JobApplication).filter(
                 JobApplication.candidate_id == candidate.id,
                 JobApplication.status == ApplicationStatus.INTERVIEW
-            ).count()
+            )
+            result = await db.execute(stmt)
+            interviews_count = result.scalar()
 
             # Calcul du pourcentage de complétion du profil
             fields = [
@@ -330,12 +374,14 @@ async def get_dashboard_data(
 
             # Activités récentes pour candidat
             recent_activities = []
-            
+
             # Dernière candidature envoyée
-            last_application = db.query(JobApplication).filter(
+            stmt = select(JobApplication).filter(
                 JobApplication.candidate_id == candidate.id
-            ).order_by(JobApplication.applied_at.desc()).first()
-            
+            ).order_by(JobApplication.applied_at.desc()).limit(1).options(selectinload(JobApplication.job))
+            result = await db.execute(stmt)
+            last_application = result.scalar_one_or_none()
+
             if last_application:
                 recent_activities.append({
                     "id": 1,
@@ -403,12 +449,18 @@ def _format_time_ago(dt: datetime) -> str:
 @router.get("/dashboard/activities", response_model=List[RecentActivity])
 async def get_recent_activities(
     current_user: User = Depends(require_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Récupérer les activités récentes de l'utilisateur"""
-    
+
     try:
-        candidate = db.query(Candidate).filter(Candidate.user_id == current_user.id).first()
+        stmt = select(Candidate).filter(Candidate.user_id == current_user.id).options(
+            selectinload(Candidate.experiences),
+            selectinload(Candidate.educations),
+            selectinload(Candidate.skills)
+        )
+        result = await db.execute(stmt)
+        candidate = result.scalar_one_or_none()
         
         activities = []
         
