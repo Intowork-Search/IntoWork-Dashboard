@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select, delete as sql_delete
+from sqlalchemy.orm import selectinload
 from app.database import get_db
 from app.models.base import User, Candidate, Experience, Education, Skill, SkillCategory, CandidateCV
 from app.auth import get_current_user, require_user
@@ -113,20 +115,29 @@ class CandidateProfileResponse(CandidateProfileBase):
 @router.get("/profile", response_model=CandidateProfileResponse)
 async def get_candidate_profile(
     current_user: User = Depends(require_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Récupérer le profil complet du candidat connecté"""
-    
+
     # Vérifier que l'utilisateur est un candidat
     if current_user.role.value != 'candidate':
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Seuls les candidats peuvent accéder à cette ressource"
         )
-    
-    # Récupérer ou créer le profil candidat
-    candidate = db.query(Candidate).filter(Candidate.user_id == current_user.id).first()
-    
+
+    # Récupérer ou créer le profil candidat avec eager loading
+    result = await db.execute(
+        select(Candidate)
+        .options(
+            selectinload(Candidate.experiences),
+            selectinload(Candidate.educations),
+            selectinload(Candidate.skills)
+        )
+        .filter(Candidate.user_id == current_user.id)
+    )
+    candidate = result.scalar_one_or_none()
+
     if not candidate:
         # Créer un profil candidat vide
         candidate = Candidate(
@@ -137,8 +148,8 @@ async def get_candidate_profile(
             summary=None
         )
         db.add(candidate)
-        db.commit()
-        db.refresh(candidate)
+        await db.commit()
+        await db.refresh(candidate)
     
     logger.info(f"Profile retrieved for candidate {candidate.id}")
     logger.info(f"🔍 CV Info - filename: {candidate.cv_filename}, url: {candidate.cv_url}, uploaded_at: {candidate.cv_uploaded_at}")
@@ -170,32 +181,41 @@ async def get_candidate_profile(
 async def update_candidate_profile(
     profile_data: CandidateProfileUpdate,
     current_user: User = Depends(require_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Mettre à jour le profil du candidat connecté"""
-    
+
     if current_user.role.value != 'candidate':
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Seuls les candidats peuvent modifier leur profil"
         )
-    
-    # Récupérer le profil candidat
-    candidate = db.query(Candidate).filter(Candidate.user_id == current_user.id).first()
-    
+
+    # Récupérer le profil candidat avec eager loading
+    result = await db.execute(
+        select(Candidate)
+        .options(
+            selectinload(Candidate.experiences),
+            selectinload(Candidate.educations),
+            selectinload(Candidate.skills)
+        )
+        .filter(Candidate.user_id == current_user.id)
+    )
+    candidate = result.scalar_one_or_none()
+
     if not candidate:
         # Créer le profil s'il n'existe pas
         candidate = Candidate(user_id=current_user.id)
         db.add(candidate)
-        db.flush()
-    
+        await db.flush()
+
     # Mettre à jour les champs
     for field, value in profile_data.model_dump(exclude_unset=True).items():
         if hasattr(candidate, field):
             setattr(candidate, field, value)
-    
-    db.commit()
-    db.refresh(candidate)
+
+    await db.commit()
+    await db.refresh(candidate)
     
     logger.info(f"Profile updated for candidate {candidate.id}")
     
@@ -228,32 +248,35 @@ async def update_candidate_profile(
 async def create_experience(
     experience_data: ExperienceCreate,
     current_user: User = Depends(require_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Ajouter une nouvelle expérience"""
-    
+
     if current_user.role.value != 'candidate':
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Seuls les candidats peuvent ajouter des expériences"
         )
-    
-    candidate = db.query(Candidate).filter(Candidate.user_id == current_user.id).first()
+
+    result = await db.execute(
+        select(Candidate).filter(Candidate.user_id == current_user.id)
+    )
+    candidate = result.scalar_one_or_none()
     if not candidate:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Profil candidat non trouvé"
         )
-    
+
     experience = Experience(
         candidate_id=candidate.id,
         **experience_data.model_dump()
     )
-    
+
     db.add(experience)
-    db.commit()
-    db.refresh(experience)
-    
+    await db.commit()
+    await db.refresh(experience)
+
     return experience
 
 @router.put("/profile/experiences/{experience_id}", response_model=ExperienceResponse)
@@ -261,59 +284,71 @@ async def update_experience(
     experience_id: int,
     experience_data: ExperienceUpdate,
     current_user: User = Depends(require_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Mettre à jour une expérience"""
-    
+
     if current_user.role.value != 'candidate':
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
-    
-    candidate = db.query(Candidate).filter(Candidate.user_id == current_user.id).first()
+
+    candidate_result = await db.execute(
+        select(Candidate).filter(Candidate.user_id == current_user.id)
+    )
+    candidate = candidate_result.scalar_one_or_none()
     if not candidate:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    
-    experience = db.query(Experience).filter(
-        Experience.id == experience_id,
-        Experience.candidate_id == candidate.id
-    ).first()
-    
+
+    experience_result = await db.execute(
+        select(Experience).filter(
+            Experience.id == experience_id,
+            Experience.candidate_id == candidate.id
+        )
+    )
+    experience = experience_result.scalar_one_or_none()
+
     if not experience:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    
+
     for field, value in experience_data.model_dump(exclude_unset=True).items():
         setattr(experience, field, value)
-    
-    db.commit()
-    db.refresh(experience)
-    
+
+    await db.commit()
+    await db.refresh(experience)
+
     return experience
 
 @router.delete("/profile/experiences/{experience_id}")
 async def delete_experience(
     experience_id: int,
     current_user: User = Depends(require_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Supprimer une expérience"""
-    
+
     if current_user.role.value != 'candidate':
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
-    
-    candidate = db.query(Candidate).filter(Candidate.user_id == current_user.id).first()
+
+    candidate_result = await db.execute(
+        select(Candidate).filter(Candidate.user_id == current_user.id)
+    )
+    candidate = candidate_result.scalar_one_or_none()
     if not candidate:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    
-    experience = db.query(Experience).filter(
-        Experience.id == experience_id,
-        Experience.candidate_id == candidate.id
-    ).first()
-    
+
+    experience_result = await db.execute(
+        select(Experience).filter(
+            Experience.id == experience_id,
+            Experience.candidate_id == candidate.id
+        )
+    )
+    experience = experience_result.scalar_one_or_none()
+
     if not experience:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    
-    db.delete(experience)
-    db.commit()
-    
+
+    await db.delete(experience)
+    await db.commit()
+
     return {"message": "Expérience supprimée avec succès"}
 
 # Endpoints pour Education
@@ -322,32 +357,35 @@ async def delete_experience(
 async def create_education(
     education_data: EducationCreate,
     current_user: User = Depends(require_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Ajouter une nouvelle formation"""
-    
+
     if current_user.role.value != 'candidate':
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Seuls les candidats peuvent ajouter des formations"
         )
-    
-    candidate = db.query(Candidate).filter(Candidate.user_id == current_user.id).first()
+
+    result = await db.execute(
+        select(Candidate).filter(Candidate.user_id == current_user.id)
+    )
+    candidate = result.scalar_one_or_none()
     if not candidate:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Profil candidat non trouvé"
         )
-    
+
     education = Education(
         candidate_id=candidate.id,
         **education_data.model_dump()
     )
-    
+
     db.add(education)
-    db.commit()
-    db.refresh(education)
-    
+    await db.commit()
+    await db.refresh(education)
+
     return education
 
 @router.put("/profile/education/{education_id}", response_model=EducationResponse)
@@ -355,59 +393,71 @@ async def update_education(
     education_id: int,
     education_data: EducationUpdate,
     current_user: User = Depends(require_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Mettre à jour une formation"""
-    
+
     if current_user.role.value != 'candidate':
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
-    
-    candidate = db.query(Candidate).filter(Candidate.user_id == current_user.id).first()
+
+    candidate_result = await db.execute(
+        select(Candidate).filter(Candidate.user_id == current_user.id)
+    )
+    candidate = candidate_result.scalar_one_or_none()
     if not candidate:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    
-    education = db.query(Education).filter(
-        Education.id == education_id,
-        Education.candidate_id == candidate.id
-    ).first()
-    
+
+    education_result = await db.execute(
+        select(Education).filter(
+            Education.id == education_id,
+            Education.candidate_id == candidate.id
+        )
+    )
+    education = education_result.scalar_one_or_none()
+
     if not education:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    
+
     for field, value in education_data.model_dump(exclude_unset=True).items():
         setattr(education, field, value)
-    
-    db.commit()
-    db.refresh(education)
-    
+
+    await db.commit()
+    await db.refresh(education)
+
     return education
 
 @router.delete("/profile/education/{education_id}")
 async def delete_education(
     education_id: int,
     current_user: User = Depends(require_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Supprimer une formation"""
-    
+
     if current_user.role.value != 'candidate':
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
-    
-    candidate = db.query(Candidate).filter(Candidate.user_id == current_user.id).first()
+
+    candidate_result = await db.execute(
+        select(Candidate).filter(Candidate.user_id == current_user.id)
+    )
+    candidate = candidate_result.scalar_one_or_none()
     if not candidate:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    
-    education = db.query(Education).filter(
-        Education.id == education_id,
-        Education.candidate_id == candidate.id
-    ).first()
-    
+
+    education_result = await db.execute(
+        select(Education).filter(
+            Education.id == education_id,
+            Education.candidate_id == candidate.id
+        )
+    )
+    education = education_result.scalar_one_or_none()
+
     if not education:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    
-    db.delete(education)
-    db.commit()
-    
+
+    await db.delete(education)
+    await db.commit()
+
     return {"message": "Formation supprimée avec succès"}
 
 # Endpoints pour Skills
@@ -416,37 +466,40 @@ async def delete_education(
 async def create_skill(
     skill_data: SkillCreate,
     current_user: User = Depends(require_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Ajouter une nouvelle compétence"""
-    
+
     if current_user.role.value != 'candidate':
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
-    
-    candidate = db.query(Candidate).filter(Candidate.user_id == current_user.id).first()
+
+    result = await db.execute(
+        select(Candidate).filter(Candidate.user_id == current_user.id)
+    )
+    candidate = result.scalar_one_or_none()
     if not candidate:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    
+
     skill = Skill(
         candidate_id=candidate.id,
         **skill_data.model_dump()
     )
-    
+
     db.add(skill)
-    db.commit()
-    db.refresh(skill)
-    
+    await db.commit()
+    await db.refresh(skill)
+
     return skill
 
-@router.put("/profile/skills/{skill_id}", response_model=SkillResponse)  
+@router.put("/profile/skills/{skill_id}", response_model=SkillResponse)
 async def update_skill(
     skill_id: int,
     skill_data: SkillUpdate,
     current_user: User = Depends(require_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Mettre à jour une compétence"""
-    
+
     if current_user.role.value != 'candidate':
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
     
@@ -528,16 +581,41 @@ async def upload_cv(
         # Sauvegarder le fichier sur le disque local
         import os
         import re
-        cv_dir = "uploads/cv"
+        import uuid
+        from pathlib import Path
+
+        # Security: Define upload directory with absolute path to prevent path traversal
+        cv_dir = os.path.abspath("uploads/cv")
         os.makedirs(cv_dir, exist_ok=True)
 
-        # Sanitiser le nom de fichier (enlever les caractères dangereux)
-        safe_filename = re.sub(r'[^a-zA-Z0-9_.-]', '_', cv.filename)
+        # Security: Sanitize filename - remove path separators and dangerous characters
+        # Extract just the filename without any directory components
+        original_filename = os.path.basename(cv.filename)
 
-        # Créer un nom de fichier unique
-        import uuid
-        unique_filename = f"{current_user.id}_{uuid.uuid4().hex[:8]}_{safe_filename}"
+        # Remove any remaining path traversal attempts and special characters
+        safe_filename = re.sub(r'[^a-zA-Z0-9_.-]', '_', original_filename)
+
+        # Security: Ensure filename doesn't start with dot (hidden file)
+        if safe_filename.startswith('.'):
+            safe_filename = 'file' + safe_filename
+
+        # Security: Limit filename length to prevent filesystem issues
+        name_part, ext = os.path.splitext(safe_filename)
+        if len(name_part) > 100:
+            name_part = name_part[:100]
+        safe_filename = name_part + ext
+
+        # Security: Create UUID-based filename to prevent filename-based attacks
+        unique_filename = f"{current_user.id}_{uuid.uuid4().hex}_{safe_filename}"
         cv_path = os.path.join(cv_dir, unique_filename)
+
+        # Security: Validate the final path is within the upload directory (prevent path traversal)
+        cv_path_resolved = os.path.abspath(cv_path)
+        if not cv_path_resolved.startswith(cv_dir):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid file path detected"
+            )
         
         # Écrire le fichier sur le disque
         with open(cv_path, "wb") as f:
