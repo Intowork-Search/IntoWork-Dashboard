@@ -502,22 +502,29 @@ async def update_skill(
 
     if current_user.role.value != 'candidate':
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
-    
-    candidate = db.query(Candidate).filter(Candidate.user_id == current_user.id).first()
-    skill = db.query(Skill).filter(
-        Skill.id == skill_id,
-        Skill.candidate_id == candidate.id
-    ).first()
-    
+
+    candidate_result = await db.execute(
+        select(Candidate).filter(Candidate.user_id == current_user.id)
+    )
+    candidate = candidate_result.scalar_one_or_none()
+
+    skill_result = await db.execute(
+        select(Skill).filter(
+            Skill.id == skill_id,
+            Skill.candidate_id == candidate.id
+        )
+    )
+    skill = skill_result.scalar_one_or_none()
+
     if not skill:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    
+
     for field, value in skill_data.model_dump(exclude_unset=True).items():
         setattr(skill, field, value)
-    
-    db.commit()
-    db.refresh(skill)
-    
+
+    await db.commit()
+    await db.refresh(skill)
+
     return skill
 
 # Import pour le téléchargement de fichiers
@@ -529,10 +536,10 @@ from sqlalchemy import func
 async def upload_cv(
     cv: UploadFile = File(...),
     current_user: User = Depends(require_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Télécharger un CV pour le candidat"""
-    
+
     try:
         # Vérifier le type de fichier (header check)
         if cv.content_type != "application/pdf":
@@ -542,7 +549,10 @@ async def upload_cv(
             )
 
         # Récupérer ou créer le profil candidat
-        candidate = db.query(Candidate).filter(Candidate.user_id == current_user.id).first()
+        result = await db.execute(
+            select(Candidate).filter(Candidate.user_id == current_user.id)
+        )
+        candidate = result.scalar_one_or_none()
         if not candidate:
             candidate = Candidate(
                 user_id=current_user.id,
@@ -552,8 +562,8 @@ async def upload_cv(
                 summary=None
             )
             db.add(candidate)
-            db.commit()
-            db.refresh(candidate)
+            await db.commit()
+            await db.refresh(candidate)
 
         # Lire le contenu du fichier
         cv_content = await cv.read()
@@ -629,22 +639,22 @@ async def upload_cv(
             file_size=len(cv_content),
             is_active=True  # Le nouveau CV devient actif
         )
-        
+
         # Désactiver les anciens CV (optionnel - garde tous actifs pour l'instant)
-        # db.query(CandidateCV).filter(CandidateCV.candidate_id == candidate.id).update({"is_active": False})
-        
+        # await db.execute(update(CandidateCV).filter(CandidateCV.candidate_id == candidate.id).values(is_active=False))
+
         db.add(new_cv)
-        
+
         # Aussi mettre à jour les champs legacy dans candidate pour compatibilité
         candidate.cv_filename = cv.filename
         candidate.cv_uploaded_at = func.now()
         candidate.cv_url = cv_path
-        
+
         logger.info(f"Nouveau CV ajouté - filename: {cv.filename}")
         logger.info(f"CV sauvegardé sur disque: {cv_path} ({len(cv_content)} bytes)")
-        
-        db.commit()
-        db.refresh(new_cv)
+
+        await db.commit()
+        await db.refresh(new_cv)
         
         logger.info(f"Après commit - cv_filename: {candidate.cv_filename}")
         logger.info(f"Après commit - cv_uploaded_at: {candidate.cv_uploaded_at}")
@@ -672,52 +682,55 @@ async def upload_cv(
 @router.get("/cv/download")
 async def download_cv(
     current_user: User = Depends(require_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Télécharger le CV du candidat connecté"""
-    
+
     logger.info(f"🔍 Tentative de téléchargement CV pour utilisateur {current_user.id}")
-    
+
     # Récupérer le candidat
-    candidate = db.query(Candidate).filter(Candidate.user_id == current_user.id).first()
-    
+    result = await db.execute(
+        select(Candidate).filter(Candidate.user_id == current_user.id)
+    )
+    candidate = result.scalar_one_or_none()
+
     logger.info(f"📊 Candidat trouvé: {candidate is not None}")
     if candidate:
         logger.info(f"📊 CV filename: {candidate.cv_filename}")
         logger.info(f"📊 CV URL: {candidate.cv_url}")
         logger.info(f"📊 CV uploaded_at: {candidate.cv_uploaded_at}")
-    
+
     if not candidate:
         logger.warning("❌ Aucun candidat trouvé")
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Profil candidat non trouvé"
         )
-    
+
     if not candidate.cv_filename:
         logger.warning("❌ Aucun nom de fichier CV")
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Aucun CV téléchargé"
         )
-    
+
     if not candidate.cv_url:
         logger.warning("❌ Aucun chemin de fichier CV")
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Chemin du fichier CV introuvable"
         )
-    
+
     import os
     from fastapi.responses import FileResponse
-    
+
     # Vérifier que le fichier existe
     if not os.path.exists(candidate.cv_url):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Fichier CV introuvable"
         )
-    
+
     return FileResponse(
         path=candidate.cv_url,
         media_type="application/pdf",
@@ -730,23 +743,29 @@ async def download_cv(
 @router.get("/cvs", response_model=List[CVResponse])
 async def list_cvs(
     current_user: User = Depends(require_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Lister tous les CV du candidat connecté"""
-    
+
     # Récupérer le candidat
-    candidate = db.query(Candidate).filter(Candidate.user_id == current_user.id).first()
-    
+    result = await db.execute(
+        select(Candidate).filter(Candidate.user_id == current_user.id)
+    )
+    candidate = result.scalar_one_or_none()
+
     if not candidate:
         return []
-    
+
     # Récupérer tous les CV du candidat
-    cvs = db.query(CandidateCV).filter(
-        CandidateCV.candidate_id == candidate.id
-    ).order_by(CandidateCV.created_at.desc()).all()
-    
+    cvs_result = await db.execute(
+        select(CandidateCV)
+        .filter(CandidateCV.candidate_id == candidate.id)
+        .order_by(CandidateCV.created_at.desc())
+    )
+    cvs = cvs_result.scalars().all()
+
     logger.info(f"📋 {len(cvs)} CV(s) trouvé(s) pour le candidat {candidate.id}")
-    
+
     return cvs
 
 
@@ -754,31 +773,37 @@ async def list_cvs(
 async def download_specific_cv(
     cv_id: int,
     current_user: User = Depends(require_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Télécharger un CV spécifique par son ID"""
-    
+
     # Récupérer le candidat
-    candidate = db.query(Candidate).filter(Candidate.user_id == current_user.id).first()
-    
+    result = await db.execute(
+        select(Candidate).filter(Candidate.user_id == current_user.id)
+    )
+    candidate = result.scalar_one_or_none()
+
     if not candidate:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Profil candidat non trouvé"
         )
-    
+
     # Récupérer le CV spécifique
-    cv = db.query(CandidateCV).filter(
-        CandidateCV.id == cv_id,
-        CandidateCV.candidate_id == candidate.id
-    ).first()
-    
+    cv_result = await db.execute(
+        select(CandidateCV).filter(
+            CandidateCV.id == cv_id,
+            CandidateCV.candidate_id == candidate.id
+        )
+    )
+    cv = cv_result.scalar_one_or_none()
+
     if not cv:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="CV non trouvé"
         )
-    
+
     # Vérifier que le fichier existe
     import os
     if not os.path.exists(cv.file_path):
@@ -786,9 +811,9 @@ async def download_specific_cv(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Fichier CV introuvable sur le serveur"
         )
-    
+
     from fastapi.responses import FileResponse
-    
+
     return FileResponse(
         path=cv.file_path,
         media_type="application/pdf",
@@ -802,31 +827,37 @@ async def download_specific_cv(
 async def delete_cv(
     cv_id: int,
     current_user: User = Depends(require_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Supprimer un CV spécifique"""
-    
+
     # Récupérer le candidat
-    candidate = db.query(Candidate).filter(Candidate.user_id == current_user.id).first()
-    
+    result = await db.execute(
+        select(Candidate).filter(Candidate.user_id == current_user.id)
+    )
+    candidate = result.scalar_one_or_none()
+
     if not candidate:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Profil candidat non trouvé"
         )
-    
+
     # Récupérer le CV spécifique
-    cv = db.query(CandidateCV).filter(
-        CandidateCV.id == cv_id,
-        CandidateCV.candidate_id == candidate.id
-    ).first()
-    
+    cv_result = await db.execute(
+        select(CandidateCV).filter(
+            CandidateCV.id == cv_id,
+            CandidateCV.candidate_id == candidate.id
+        )
+    )
+    cv = cv_result.scalar_one_or_none()
+
     if not cv:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="CV non trouvé"
         )
-    
+
     # Supprimer le fichier du disque
     import os
     try:
@@ -835,13 +866,13 @@ async def delete_cv(
             logger.info(f"🗑️ Fichier supprimé: {cv.file_path}")
     except Exception as e:
         logger.warning(f"⚠️ Erreur suppression fichier: {e}")
-    
+
     # Supprimer l'enregistrement de la base de données
-    db.delete(cv)
-    db.commit()
-    
+    await db.delete(cv)
+    await db.commit()
+
     logger.info(f"✅ CV supprimé: {cv.filename}")
-    
+
     return {"message": "CV supprimé avec succès"}
 
 
@@ -849,32 +880,35 @@ async def delete_cv(
 async def get_candidate_cv(
     candidate_id: int,
     current_user: User = Depends(require_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Récupérer le CV d'un candidat spécifique (pour les employeurs)"""
-    
+
     # Pour l'instant, seuls les propriétaires peuvent voir leur CV
-    candidate = db.query(Candidate).filter(
-        Candidate.id == candidate_id,
-        Candidate.user_id == current_user.id
-    ).first()
-    
+    result = await db.execute(
+        select(Candidate).filter(
+            Candidate.id == candidate_id,
+            Candidate.user_id == current_user.id
+        )
+    )
+    candidate = result.scalar_one_or_none()
+
     if not candidate or not candidate.cv_filename or not candidate.cv_url:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="CV non trouvé"
         )
-    
+
     import os
     from fastapi.responses import FileResponse
-    
+
     # Vérifier que le fichier existe
     if not os.path.exists(candidate.cv_url):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Fichier CV introuvable"
         )
-    
+
     return FileResponse(
         path=candidate.cv_url,
         media_type="application/pdf",
