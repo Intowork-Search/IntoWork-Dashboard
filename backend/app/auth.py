@@ -1,7 +1,8 @@
 import os
 from fastapi import HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from app.database import get_db
 from app.models.base import User, UserRole
 from typing import Optional
@@ -24,17 +25,51 @@ security = HTTPBearer(auto_error=False)
 
 class PasswordHasher:
     """Gestion des mots de passe avec bcrypt"""
-    
+
     @staticmethod
     def hash_password(password: str) -> str:
         """Hash un mot de passe"""
         salt = bcrypt.gensalt()
         return bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
-    
+
     @staticmethod
     def verify_password(password: str, hashed: str) -> bool:
         """Vérifie un mot de passe"""
         return bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))
+
+    @staticmethod
+    def validate_password_strength(password: str) -> tuple[bool, str]:
+        """
+        Security: Validate password strength with comprehensive requirements
+
+        Requirements:
+        - Minimum 12 characters
+        - At least 1 uppercase letter (A-Z)
+        - At least 1 lowercase letter (a-z)
+        - At least 1 digit (0-9)
+        - At least 1 special character (!@#$%^&*()_+-=[]{}|;:,.<>?)
+
+        Returns:
+            tuple[bool, str]: (is_valid, error_message)
+        """
+        if len(password) < 12:
+            return False, "Password must be at least 12 characters long"
+
+        if not any(c.isupper() for c in password):
+            return False, "Password must contain at least one uppercase letter (A-Z)"
+
+        if not any(c.islower() for c in password):
+            return False, "Password must contain at least one lowercase letter (a-z)"
+
+        if not any(c.isdigit() for c in password):
+            return False, "Password must contain at least one digit (0-9)"
+
+        # Check for special characters
+        special_chars = set("!@#$%^&*()_+-=[]{}|;:,.<>?")
+        if not any(c in special_chars for c in password):
+            return False, "Password must contain at least one special character (!@#$%^&*()_+-=[]{}|;:,.<>?)"
+
+        return True, ""
 
 
 class Auth:
@@ -68,42 +103,45 @@ class Auth:
             raise HTTPException(status_code=401, detail=f"Invalid token: {str(e)}")
 
 
-def get_current_user(
+async def get_current_user(
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ) -> Optional[User]:
     """
     Dépendance pour récupérer l'utilisateur actuel depuis le token NextAuth JWT
     """
     if not credentials:
         return None
-    
+
     try:
         # Vérifier le token NextAuth
         payload = Auth.verify_token(credentials.credentials)
         user_id = payload.get("sub")
-        
+
         if not user_id:
             raise HTTPException(status_code=401, detail="Invalid token payload")
-        
-        # Récupérer l'utilisateur depuis la DB
-        user = db.query(User).filter(User.id == int(user_id)).first()
-        
+
+        # Récupérer l'utilisateur depuis la DB (ASYNC)
+        result = await db.execute(
+            select(User).filter(User.id == int(user_id))
+        )
+        user = result.scalar_one_or_none()
+
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
-        
+
         if not user.is_active:
             raise HTTPException(status_code=403, detail="User account is inactive")
-        
+
         return user
-        
+
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(status_code=401, detail=f"Authentication failed: {str(e)}")
 
 
-def require_user(
+async def require_user(
     current_user: User = Depends(get_current_user)
 ) -> User:
     """
@@ -119,10 +157,10 @@ def require_role(*allowed_roles: UserRole):
     Décorateur pour exiger des rôles spécifiques
     Usage: @require_role(UserRole.EMPLOYER, UserRole.ADMIN)
     """
-    def role_dependency(current_user: User = Depends(require_user)) -> User:
+    async def role_dependency(current_user: User = Depends(require_user)) -> User:
         if current_user.role not in allowed_roles:
             raise HTTPException(
-                status_code=403, 
+                status_code=403,
                 detail=f"Access denied. Required roles: {', '.join(role.value for role in allowed_roles)}"
             )
         return current_user
