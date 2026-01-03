@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, Depends, HTTPException, status, Request
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from pydantic import BaseModel, EmailStr
 from app.database import get_db
 from app.models.base import User, UserRole, Candidate, Employer, PasswordResetToken
@@ -9,9 +10,14 @@ from typing import Optional
 from datetime import datetime, timedelta, timezone
 import secrets
 import logging
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
+
+# Security: Rate limiter to prevent brute force attacks
+limiter = Limiter(key_func=get_remote_address)
 
 
 # Schemas
@@ -35,45 +41,59 @@ class AuthResponse(BaseModel):
 
 
 @router.post("/signup", response_model=AuthResponse, status_code=status.HTTP_201_CREATED)
-async def signup(request: SignUpRequest, db: Session = Depends(get_db)):
+@limiter.limit("3/hour")  # Security: Limit signup to 3 attempts per hour per IP to prevent abuse
+async def signup(request: Request, signup_data: SignUpRequest, db: AsyncSession = Depends(get_db)):
     """
     Inscription d'un nouvel utilisateur
+
+    Rate limit: 3 requests per hour per IP address
     """
-    # Vérifier si l'email existe déjà
-    existing_user = db.query(User).filter(User.email == request.email).first()
+    # Vérifier si l'email existe déjà (ASYNC)
+    result = await db.execute(
+        select(User).filter(User.email == signup_data.email)
+    )
+    existing_user = result.scalar_one_or_none()
     if existing_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Email already registered"
         )
-    
+
+    # Security: Validate password strength before creating account
+    is_valid, error_message = PasswordHasher.validate_password_strength(signup_data.password)
+    if not is_valid:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=error_message
+        )
+
     # Valider le rôle
     try:
-        user_role = UserRole(request.role)
+        user_role = UserRole(signup_data.role)
     except ValueError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid role. Must be 'candidate' or 'employer'"
         )
-    
+
     # Hasher le mot de passe
-    password_hash = PasswordHasher.hash_password(request.password)
-    
+    password_hash = PasswordHasher.hash_password(signup_data.password)
+
     # Créer l'utilisateur
     new_user = User(
-        email=request.email,
+        email=signup_data.email,
         password_hash=password_hash,
-        first_name=request.first_name,
-        last_name=request.last_name,
-        name=f"{request.first_name} {request.last_name}",
+        first_name=signup_data.first_name,
+        last_name=signup_data.last_name,
+        name=f"{signup_data.first_name} {signup_data.last_name}",
         role=user_role,
         is_active=True
     )
-    
+
     db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-    
+    await db.commit()
+    await db.refresh(new_user)
+
     # Créer le profil associé (Candidate ou Employer)
     if user_role == UserRole.CANDIDATE:
         candidate = Candidate(user_id=new_user.id)
@@ -81,8 +101,8 @@ async def signup(request: SignUpRequest, db: Session = Depends(get_db)):
     elif user_role == UserRole.EMPLOYER:
         employer = Employer(user_id=new_user.id)
         db.add(employer)
-    
-    db.commit()
+
+    await db.commit()
     
     # Générer le token JWT
     access_token = Auth.create_access_token(
@@ -105,26 +125,32 @@ async def signup(request: SignUpRequest, db: Session = Depends(get_db)):
 
 
 @router.post("/signin", response_model=AuthResponse)
-async def signin(request: SignInRequest, db: Session = Depends(get_db)):
+@limiter.limit("5/15minutes")  # Security: Limit login to 5 attempts per 15 minutes per IP to prevent brute force
+async def signin(request: Request, signin_data: SignInRequest, db: AsyncSession = Depends(get_db)):
     """
     Connexion d'un utilisateur existant
+
+    Rate limit: 5 requests per 15 minutes per IP address
     """
-    # Chercher l'utilisateur
-    user = db.query(User).filter(User.email == request.email).first()
-    
+    # Chercher l'utilisateur (ASYNC)
+    result = await db.execute(
+        select(User).filter(User.email == signin_data.email)
+    )
+    user = result.scalar_one_or_none()
+
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password"
         )
-    
+
     # Vérifier le mot de passe
-    if not user.password_hash or not PasswordHasher.verify_password(request.password, user.password_hash):
+    if not user.password_hash or not PasswordHasher.verify_password(signin_data.password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password"
         )
-    
+
     # Vérifier que le compte est actif
     if not user.is_active:
         raise HTTPException(
@@ -185,7 +211,7 @@ class ChangeEmailRequest(BaseModel):
 async def change_password(
     request: ChangePasswordRequest,
     user: User = Depends(require_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """
     Changer le mot de passe de l'utilisateur connecté
@@ -197,18 +223,19 @@ async def change_password(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Current password is incorrect"
         )
-    
-    # Valider le nouveau mot de passe (minimum 8 caractères)
-    if len(request.new_password) < 8:
+
+    # Security: Validate new password strength
+    is_valid, error_message = PasswordHasher.validate_password_strength(request.new_password)
+    if not is_valid:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="New password must be at least 8 characters long"
+            detail=error_message
         )
-    
+
     # Hasher et sauvegarder le nouveau mot de passe
     user.password_hash = hasher.hash_password(request.new_password)
-    db.commit()
-    
+    await db.commit()
+
     return {"message": "Password changed successfully"}
 
 
@@ -216,7 +243,7 @@ async def change_password(
 async def change_email(
     request: ChangeEmailRequest,
     user: User = Depends(require_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """
     Changer l'adresse email de l'utilisateur connecté
@@ -228,30 +255,33 @@ async def change_email(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Password is incorrect"
         )
-    
-    # Vérifier si le nouvel email existe déjà
-    existing_user = db.query(User).filter(
-        User.email == request.new_email,
-        User.id != user.id
-    ).first()
-    
+
+    # Vérifier si le nouvel email existe déjà (ASYNC)
+    result = await db.execute(
+        select(User).filter(
+            User.email == request.new_email,
+            User.id != user.id
+        )
+    )
+    existing_user = result.scalar_one_or_none()
+
     if existing_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Email already in use"
         )
-    
+
     # Mettre à jour l'email
     user.email = request.new_email
-    db.commit()
-    
+    await db.commit()
+
     return {"message": "Email changed successfully", "new_email": request.new_email}
 
 
 @router.delete("/delete-account")
 async def delete_account(
     user: User = Depends(require_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """
     Supprimer le compte de l'utilisateur connecté
@@ -260,29 +290,39 @@ async def delete_account(
         # Si c'est un candidat, supprimer les candidatures d'abord
         if user.role == UserRole.CANDIDATE and user.candidate:
             from app.models.base import JobApplication
-            # Supprimer toutes les candidatures
-            db.query(JobApplication).filter(
-                JobApplication.candidate_id == user.candidate.id
-            ).delete()
+            from sqlalchemy import delete as sql_delete
+            # Supprimer toutes les candidatures (ASYNC)
+            await db.execute(
+                sql_delete(JobApplication).filter(
+                    JobApplication.candidate_id == user.candidate.id
+                )
+            )
 
         # Si c'est un employeur, supprimer les offres d'emploi et candidatures associées
         if user.role == UserRole.EMPLOYER and user.employer:
             from app.models.base import Job, JobApplication
-            # Récupérer tous les jobs de l'employeur
-            employer_jobs = db.query(Job).filter(Job.employer_id == user.employer.id).all()
+            from sqlalchemy import delete as sql_delete
+            # Récupérer tous les jobs de l'employeur (ASYNC)
+            result = await db.execute(
+                select(Job).filter(Job.employer_id == user.employer.id)
+            )
+            employer_jobs = result.scalars().all()
+
             for job in employer_jobs:
                 # Supprimer les candidatures pour chaque job
-                db.query(JobApplication).filter(JobApplication.job_id == job.id).delete()
+                await db.execute(
+                    sql_delete(JobApplication).filter(JobApplication.job_id == job.id)
+                )
                 # Supprimer le job
-                db.delete(job)
+                await db.delete(job)
 
         # Maintenant supprimer l'utilisateur (cascade supprimera candidate/employer et autres relations)
-        db.delete(user)
-        db.commit()
+        await db.delete(user)
+        await db.commit()
 
         return {"message": "Account deleted successfully"}
     except Exception as e:
-        db.rollback()
+        await db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error deleting account: {str(e)}"
@@ -300,26 +340,36 @@ class ResetPasswordRequest(BaseModel):
 
 
 @router.post("/forgot-password")
+@limiter.limit("3/hour")  # Security: Limit password reset requests to 3 per hour per IP to prevent abuse
 async def forgot_password(
-    request: ForgotPasswordRequest,
-    db: Session = Depends(get_db)
+    request: Request,
+    forgot_data: ForgotPasswordRequest,
+    db: AsyncSession = Depends(get_db)
 ):
     """
     Demander une réinitialisation de mot de passe
 
     Envoie un email avec un lien de réinitialisation sécurisé.
     Pour des raisons de sécurité, retourne toujours un succès même si l'email n'existe pas.
+
+    Rate limit: 3 requests per hour per IP address
     """
     try:
-        # Chercher l'utilisateur
-        user = db.query(User).filter(User.email == request.email).first()
+        # Chercher l'utilisateur (ASYNC)
+        result = await db.execute(
+            select(User).filter(User.email == forgot_data.email)
+        )
+        user = result.scalar_one_or_none()
 
         if user:
-            # Invalider tous les tokens existants non utilisés de cet utilisateur
-            db.query(PasswordResetToken).filter(
-                PasswordResetToken.user_id == user.id,
-                PasswordResetToken.used_at.is_(None)
-            ).update({"used_at": datetime.now(timezone.utc)})
+            from sqlalchemy import update
+            # Invalider tous les tokens existants non utilisés de cet utilisateur (ASYNC)
+            await db.execute(
+                update(PasswordResetToken).filter(
+                    PasswordResetToken.user_id == user.id,
+                    PasswordResetToken.used_at.is_(None)
+                ).values(used_at=datetime.now(timezone.utc))
+            )
 
             # Générer un token sécurisé
             token = secrets.token_urlsafe(32)
@@ -332,7 +382,7 @@ async def forgot_password(
             )
 
             db.add(reset_token)
-            db.commit()
+            await db.commit()
 
             # Envoyer l'email
             email_sent = email_service.send_password_reset_email(
@@ -352,7 +402,7 @@ async def forgot_password(
 
     except Exception as e:
         logger.error(f"Error in forgot_password: {str(e)}")
-        db.rollback()
+        await db.rollback()
         # Retourner un succès même en cas d'erreur (sécurité)
         return {
             "message": "If this email exists in our system, you will receive password reset instructions shortly."
@@ -360,17 +410,24 @@ async def forgot_password(
 
 
 @router.post("/reset-password")
+@limiter.limit("5/15minutes")  # Security: Limit password reset attempts to 5 per 15 minutes per IP
 async def reset_password(
-    request: ResetPasswordRequest,
-    db: Session = Depends(get_db)
+    request: Request,
+    reset_data: ResetPasswordRequest,
+    db: AsyncSession = Depends(get_db)
 ):
     """
     Réinitialiser le mot de passe avec un token valide
+
+    Rate limit: 5 requests per 15 minutes per IP address
     """
-    # Chercher le token
-    reset_token = db.query(PasswordResetToken).filter(
-        PasswordResetToken.token == request.token
-    ).first()
+    # Chercher le token (ASYNC)
+    result = await db.execute(
+        select(PasswordResetToken).filter(
+            PasswordResetToken.token == reset_data.token
+        )
+    )
+    reset_token = result.scalar_one_or_none()
 
     if not reset_token:
         raise HTTPException(
@@ -392,15 +449,19 @@ async def reset_password(
             detail="This reset token has expired. Please request a new one."
         )
 
-    # Valider le nouveau mot de passe
-    if len(request.new_password) < 8:
+    # Security: Validate new password strength
+    is_valid, error_message = PasswordHasher.validate_password_strength(reset_data.new_password)
+    if not is_valid:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Password must be at least 8 characters long"
+            detail=error_message
         )
 
-    # Récupérer l'utilisateur
-    user = db.query(User).filter(User.id == reset_token.user_id).first()
+    # Récupérer l'utilisateur (ASYNC)
+    user_result = await db.execute(
+        select(User).filter(User.id == reset_token.user_id)
+    )
+    user = user_result.scalar_one_or_none()
 
     if not user:
         raise HTTPException(
@@ -409,19 +470,22 @@ async def reset_password(
         )
 
     # Hasher et mettre à jour le mot de passe
-    user.password_hash = PasswordHasher.hash_password(request.new_password)
+    user.password_hash = PasswordHasher.hash_password(reset_data.new_password)
 
     # Marquer le token comme utilisé
     reset_token.used_at = datetime.now(timezone.utc)
 
-    # Invalider tous les autres tokens de cet utilisateur
-    db.query(PasswordResetToken).filter(
-        PasswordResetToken.user_id == user.id,
-        PasswordResetToken.id != reset_token.id,
-        PasswordResetToken.used_at.is_(None)
-    ).update({"used_at": datetime.now(timezone.utc)})
+    # Invalider tous les autres tokens de cet utilisateur (ASYNC)
+    from sqlalchemy import update
+    await db.execute(
+        update(PasswordResetToken).filter(
+            PasswordResetToken.user_id == user.id,
+            PasswordResetToken.id != reset_token.id,
+            PasswordResetToken.used_at.is_(None)
+        ).values(used_at=datetime.now(timezone.utc))
+    )
 
-    db.commit()
+    await db.commit()
 
     logger.info(f"Password successfully reset for user {user.email}")
 
