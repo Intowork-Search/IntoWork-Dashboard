@@ -155,7 +155,7 @@ export default function Dashboard() {
       const formData = new FormData();
       formData.append('cv', file);
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/candidates/cv`, {
+      const response = await fetch(`https://intowork-dashboard-production.up.railway.app/api/candidates/cv`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -190,19 +190,12 @@ export default function Dashboard() {
     fileInputRef.current?.click();
   };
 
-  // Rediriger les admins vers leur dashboard
-  useEffect(() => {
-    if (user && userRole === 'admin') {
-      router.push('/dashboard/admin');
-    }
-  }, [user, userRole, router]);
-
   // Charger les données du dashboard au montage
   useEffect(() => {
-    if (user && userRole !== 'admin') {
+    if (user) {
       loadDashboardData();
     }
-  }, [user, userRole]);
+  }, [user]);
 
   // Actualiser les données lors du retour sur la page
   useEffect(() => {

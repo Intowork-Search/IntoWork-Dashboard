@@ -103,12 +103,10 @@ export default function DashboardLayout({
                 )}
               </div>
               
-              {/* Notifications - Cachées pour les admins */}
-              {user?.role !== 'admin' && (
-                <div className="flex items-center space-x-4">
-                  <NotificationPanel />
-                </div>
-              )}
+              {/* Notifications */}
+              <div className="flex items-center space-x-4">
+                <NotificationPanel />
+              </div>
             </div>
           </div>
         </header>
