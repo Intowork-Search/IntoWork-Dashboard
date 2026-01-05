@@ -48,13 +48,8 @@ export default function ForgotPasswordPage() {
       <div className="flex min-h-screen overflow-hidden">
         {/* Left Panel - Branding & Features (Identical to signin/signup) */}
         <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden flex-col justify-between p-12">
-          {/* Background gradient and decorative elements */}
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/80 via-primary to-secondary/60"></div>
-
-          {/* Decorative blurred shapes - identical animations */}
-          <div className="absolute top-0 -left-40 w-80 h-80 bg-accent/30 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-blob"></div>
-          <div className="absolute top-40 -right-40 w-80 h-80 bg-primary/30 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-blob animation-delay-2000"></div>
-          <div className="absolute -bottom-20 left-20 w-80 h-80 bg-secondary/20 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-blob animation-delay-4000"></div>
+          {/* Background solid color */}
+          <div className="absolute inset-0 bg-primary"></div>
 
           {/* Content */}
           <div className="relative z-10">
@@ -128,7 +123,7 @@ export default function ForgotPasswordPage() {
         </div>
 
         {/* Right Panel - Password Reset Form */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-8 bg-gradient-to-br from-base-100 via-base-100 to-base-200 relative overflow-hidden">
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-8 bg-base-100 relative overflow-hidden">
           {/* Subtle background pattern */}
           <div className="absolute inset-0 opacity-40">
             <div className="absolute inset-0 bg-[linear-gradient(to_right,transparent_1px,rgba(0,0,0,0.02)_1px)] bg-[length:4rem_4rem]"></div>
@@ -137,7 +132,7 @@ export default function ForgotPasswordPage() {
           <div className="w-full max-w-md relative z-10">
             {/* Mobile Logo */}
             <div className="lg:hidden flex items-center gap-3 mb-10 animate-fade-in">
-              <div className="w-12 h-12 bg-gradient-to-br from-primary/80 to-primary rounded-xl flex items-center justify-center shadow-lg">
+              <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center shadow-lg">
                 <SparklesIcon className="w-6 h-6 text-white" />
               </div>
               <div>
@@ -151,7 +146,7 @@ export default function ForgotPasswordPage() {
                 {/* Form Header */}
                 <div className="mb-10 animate-fade-in animation-delay-100">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-gradient-to-br from-primary/20 to-primary/10 rounded-lg flex items-center justify-center">
+                    <div className="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center">
                       <KeyIcon className="w-6 h-6 text-primary" />
                     </div>
                     <h2 className="text-4xl font-bold text-base-content">
@@ -197,10 +192,8 @@ export default function ForgotPasswordPage() {
                       <button
                         type="submit"
                         disabled={loading}
-                        className="w-full h-12 mt-2 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary/85 text-white font-semibold rounded-xl transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 group shadow-lg hover:shadow-xl relative overflow-hidden"
+                        className="w-full h-12 mt-2 bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 group shadow-lg hover:shadow-xl relative overflow-hidden"
                       >
-                        {/* Shine effect */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 group-hover:translate-x-full transition-transform duration-1000"></div>
 
                         {loading ? (
                           <>
@@ -258,11 +251,11 @@ export default function ForgotPasswordPage() {
                     <div className="flex justify-center mb-8 animate-fade-in animation-delay-300">
                       <div className="relative w-24 h-24">
                         {/* Background glow */}
-                        <div className="absolute inset-0 bg-gradient-to-br from-success/30 to-success/10 rounded-full blur-xl opacity-80"></div>
+                        <div className="absolute inset-0 bg-success rounded-full blur-xl opacity-80"></div>
 
                         {/* Icon container */}
-                        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-success/20 to-success/5 rounded-full border border-success/30">
-                          <div className="w-16 h-16 bg-gradient-to-br from-success to-success/80 rounded-full flex items-center justify-center shadow-lg">
+                        <div className="absolute inset-0 flex items-center justify-center bg-success rounded-full border border-success/30">
+                          <div className="w-16 h-16 bg-success rounded-full flex items-center justify-center shadow-lg">
                             <CheckCircleIcon className="w-10 h-10 text-white" />
                           </div>
                         </div>

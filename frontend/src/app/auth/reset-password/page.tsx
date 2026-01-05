@@ -18,49 +18,10 @@ import {
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import axios from 'axios';
+import PasswordStrengthIndicator from '@/components/PasswordStrengthIndicator';
+import { validatePassword } from '@/lib/passwordValidation';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api';
-
-// Composant pour la force du mot de passe
-function PasswordStrengthIndicator({ password }: { password: string }) {
-  const getStrength = () => {
-    if (password.length === 0) return { label: '', strength: 0, color: '' };
-    if (password.length < 8) return { label: 'Trop court', strength: 1, color: 'bg-error' };
-
-    let strength = 1;
-    if (password.length >= 12) strength++;
-    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
-    if (/\d/.test(password)) strength++;
-    if (/[^a-zA-Z0-9]/.test(password)) strength++;
-
-    if (strength <= 2) return { label: 'Faible', strength: 2, color: 'bg-warning' };
-    if (strength <= 4) return { label: 'Moyen', strength: 3, color: 'bg-info' };
-    return { label: 'Fort', strength: 4, color: 'bg-success' };
-  };
-
-  const { label, strength, color } = getStrength();
-
-  if (password.length === 0) return null;
-
-  return (
-    <div className="mt-2">
-      <div className="flex items-center justify-between mb-1">
-        <span className="text-xs text-base-content/60">Force du mot de passe</span>
-        <span className="text-xs font-medium text-base-content">{label}</span>
-      </div>
-      <div className="flex gap-1">
-        {[1, 2, 3, 4].map((level) => (
-          <div
-            key={level}
-            className={`h-1 flex-1 rounded-full transition-all ${
-              level <= strength ? color : 'bg-base-300'
-            }`}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
 
 function ResetPasswordContent() {
   const router = useRouter();
@@ -81,9 +42,11 @@ function ResetPasswordContent() {
     }
   }, [token, router]);
 
-  const validatePassword = (): boolean => {
-    if (newPassword.length < 8) {
-      toast.error('Le mot de passe doit contenir au moins 8 caractères');
+  const validatePasswordInput = (): boolean => {
+    // Valider avec les nouvelles exigences de sécurité
+    const passwordValidation = validatePassword(newPassword);
+    if (!passwordValidation.isValid) {
+      toast.error(passwordValidation.errors[0]);
       return false;
     }
 
@@ -98,7 +61,7 @@ function ResetPasswordContent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validatePassword()) return;
+    if (!validatePasswordInput()) return;
     if (!token) return;
 
     setLoading(true);
@@ -144,13 +107,8 @@ function ResetPasswordContent() {
       <div className="flex min-h-screen overflow-hidden">
         {/* Left Panel - Branding & Features (Identical to forgot-password) */}
         <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden flex-col justify-between p-12">
-          {/* Background gradient and decorative elements */}
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/80 via-primary to-secondary/60"></div>
-
-          {/* Decorative blurred shapes */}
-          <div className="absolute top-0 -left-40 w-80 h-80 bg-accent/30 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-blob"></div>
-          <div className="absolute top-40 -right-40 w-80 h-80 bg-primary/30 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-blob animation-delay-2000"></div>
-          <div className="absolute -bottom-20 left-20 w-80 h-80 bg-secondary/20 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-blob animation-delay-4000"></div>
+          {/* Background solid color */}
+          <div className="absolute inset-0 bg-primary"></div>
 
           {/* Content */}
           <div className="relative z-10">
@@ -224,7 +182,7 @@ function ResetPasswordContent() {
         </div>
 
         {/* Right Panel - Reset Password Form */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-8 bg-gradient-to-br from-base-100 via-base-100 to-base-200 relative overflow-hidden">
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-8 bg-base-100 relative overflow-hidden">
           {/* Subtle background pattern */}
           <div className="absolute inset-0 opacity-40">
             <div className="absolute inset-0 bg-[linear-gradient(to_right,transparent_1px,rgba(0,0,0,0.02)_1px)] bg-[length:4rem_4rem]"></div>
@@ -233,7 +191,7 @@ function ResetPasswordContent() {
           <div className="w-full max-w-md relative z-10">
             {/* Mobile Logo */}
             <div className="lg:hidden flex items-center gap-3 mb-10 animate-fade-in">
-              <div className="w-12 h-12 bg-gradient-to-br from-primary/80 to-primary rounded-xl flex items-center justify-center shadow-lg">
+              <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center shadow-lg">
                 <SparklesIcon className="w-6 h-6 text-white" />
               </div>
               <div>
@@ -247,7 +205,7 @@ function ResetPasswordContent() {
                 {/* Form Header */}
                 <div className="mb-10 animate-fade-in animation-delay-100">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-gradient-to-br from-primary/20 to-primary/10 rounded-lg flex items-center justify-center">
+                    <div className="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center">
                       <LockClosedIcon className="w-6 h-6 text-primary" />
                     </div>
                     <h2 className="text-4xl font-bold text-base-content">
@@ -280,7 +238,7 @@ function ResetPasswordContent() {
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
                             className="w-full px-4 py-3 pl-12 pr-12 bg-base-100 border border-base-300 rounded-xl text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300"
-                            placeholder="Minimum 8 caractères"
+                            placeholder="Minimum 12 caractères"
                           />
                           <LockClosedIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-base-content/40" />
                           <button
@@ -295,6 +253,7 @@ function ResetPasswordContent() {
                             )}
                           </button>
                         </div>
+                        {/* Password strength indicator with full requirements */}
                         <PasswordStrengthIndicator password={newPassword} />
                       </div>
 
@@ -337,27 +296,12 @@ function ResetPasswordContent() {
                         )}
                       </div>
 
-                      {/* Password requirements */}
-                      <div className="bg-base-100 rounded-lg p-4 border border-base-300/50">
-                        <p className="text-sm font-semibold text-base-content/70 mb-2">
-                          Exigences du mot de passe :
-                        </p>
-                        <ul className="text-xs text-base-content/60 space-y-1 list-disc list-inside">
-                          <li>Au moins 8 caractères</li>
-                          <li>Recommandé : Lettres majuscules et minuscules</li>
-                          <li>Recommandé : Au moins un chiffre</li>
-                          <li>Recommandé : Au moins un caractère spécial</li>
-                        </ul>
-                      </div>
-
                       {/* Submit button */}
                       <button
                         type="submit"
                         disabled={loading || !newPassword || !confirmPassword}
-                        className="w-full h-12 mt-2 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary/85 text-white font-semibold rounded-xl transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 group shadow-lg hover:shadow-xl relative overflow-hidden"
+                        className="w-full h-12 mt-2 bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 group shadow-lg hover:shadow-xl relative overflow-hidden"
                       >
-                        {/* Shine effect */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 group-hover:translate-x-full transition-transform duration-1000"></div>
 
                         {loading ? (
                           <>
@@ -404,9 +348,9 @@ function ResetPasswordContent() {
                     {/* Success Icon */}
                     <div className="flex justify-center mb-8 animate-fade-in animation-delay-300">
                       <div className="relative w-24 h-24">
-                        <div className="absolute inset-0 bg-gradient-to-br from-success/30 to-success/10 rounded-full blur-xl opacity-80"></div>
-                        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-success/20 to-success/5 rounded-full border border-success/30">
-                          <div className="w-16 h-16 bg-gradient-to-br from-success to-success/80 rounded-full flex items-center justify-center shadow-lg">
+                        <div className="absolute inset-0 bg-success rounded-full blur-xl opacity-80"></div>
+                        <div className="absolute inset-0 flex items-center justify-center bg-success rounded-full border border-success/30">
+                          <div className="w-16 h-16 bg-success rounded-full flex items-center justify-center shadow-lg">
                             <CheckCircleIcon className="w-10 h-10 text-white" />
                           </div>
                         </div>
