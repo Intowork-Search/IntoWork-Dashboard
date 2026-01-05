@@ -204,50 +204,20 @@ export default function Dashboard() {
     }
   }, [user, userRole]);
 
-  // Actualiser les données lors du retour sur la page
-  useEffect(() => {
-    if (!user) return;
-
-    // Actualiser lors du focus de la fenêtre
-    const handleFocus = () => {
-      loadDashboardData();
-    };
-
-    // Actualiser lors du changement de visibilité
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        loadDashboardData();
-      }
-    };
-
-    // Détecter la navigation (when coming back from profile page)
-    const handleBeforeUnload = () => {
-      // Sauvegarder un timestamp pour détecter le retour
-      sessionStorage.setItem('dashboardLastLeft', Date.now().toString());
-    };
-
-    // Vérifier si on revient d'une autre page
-    const checkReturnFromOtherPage = () => {
-      const lastLeft = sessionStorage.getItem('dashboardLastLeft');
-      if (lastLeft && Date.now() - parseInt(lastLeft) > 1000) { // Plus d'1 seconde
-        loadDashboardData();
-        sessionStorage.removeItem('dashboardLastLeft');
-      }
-    };
-
-    window.addEventListener('focus', handleFocus);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    
-    // Vérifier immédiatement si on revient d'une autre page
-    checkReturnFromOtherPage();
-    
-    return () => {
-      window.removeEventListener('focus', handleFocus);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, [user]);
+  // ⚠️ CORRECTIF PERFORMANCE: Event listeners manuels supprimés
+  // Les listeners window.focus et visibilitychange causaient un polling excessif
+  // en combinaison avec React Query qui gère déjà le refetch intelligent.
+  //
+  // Si vous souhaitez réactualiser manuellement les données, utilisez le bouton
+  // "Actualiser" dans l'interface (ligne 373).
+  //
+  // React Query gère automatiquement:
+  // - Le caching intelligent (staleTime: 5 minutes)
+  // - Le refetch contrôlé sur window focus (si configuré)
+  // - La déduplication des requêtes
+  //
+  // Pour restaurer le rafraîchissement automatique de manière optimisée,
+  // migrez vers des hooks React Query personnalisés (voir useDashboard.ts)
 
   // Fonctions utilitaires pour les classes CSS
   const getStatBgColor = (color: string) => {

@@ -208,7 +208,7 @@ export default function AdminDashboard() {
         {/* Users Tab */}
         {activeTab === 'users' && (
           <div className="bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200">
-            <div className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
+            <div className="p-6 bg-blue-50 border-b border-gray-200">
               <h2 className="text-xl font-bold text-gray-900 mb-4">🔍 Rechercher des utilisateurs</h2>
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex-1">
@@ -319,7 +319,7 @@ export default function AdminDashboard() {
         {/* Employers Tab */}
         {activeTab === 'employers' && (
           <div className="bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200">
-            <div className="p-6 bg-gradient-to-r from-purple-50 to-pink-50 border-b border-gray-200">
+            <div className="p-6 bg-purple-50 border-b border-gray-200">
               <h2 className="text-xl font-bold text-gray-900 mb-2">💼 Liste des Employeurs</h2>
               <p className="text-sm text-gray-600">Tous les employeurs inscrits sur la plateforme</p>
             </div>
@@ -371,7 +371,7 @@ export default function AdminDashboard() {
         {/* Jobs Tab */}
         {activeTab === 'jobs' && (
           <div className="bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200">
-            <div className="p-6 bg-gradient-to-r from-green-50 to-teal-50 border-b border-gray-200">
+            <div className="p-6 bg-green-50 border-b border-gray-200">
               <h2 className="text-xl font-bold text-gray-900 mb-2">📝 Offres d'emploi</h2>
               <p className="text-sm text-gray-600">Toutes les offres publiées sur la plateforme</p>
             </div>
@@ -456,13 +456,13 @@ export default function AdminDashboard() {
                   role="document"
                 >
                 {/* Header */}
-                <div className="bg-gradient-to-r from-green-500 to-teal-600 px-6 py-4">
+                <div className="bg-green-500 px-6 py-4">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <h3 id="modal-title" className="text-2xl font-bold text-white">
                         {selectedJob.title}
                       </h3>
-                      <p className="mt-1 text-green-100">
+                      <p className="mt-1 text-green-50">
                         {selectedJob.company_name} • {selectedJob.location || 'Lieu non spécifié'}
                       </p>
                     </div>
@@ -547,12 +547,12 @@ interface StatsCardProps {
 
 function StatsCard({ title, value, icon, color }: StatsCardProps) {
   const colorClasses = {
-    blue: 'bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-blue-200',
-    green: 'bg-gradient-to-br from-green-500 to-green-600 text-white shadow-green-200',
-    purple: 'bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-purple-200',
-    indigo: 'bg-gradient-to-br from-indigo-500 to-indigo-600 text-white shadow-indigo-200',
-    yellow: 'bg-gradient-to-br from-yellow-500 to-yellow-600 text-white shadow-yellow-200',
-    pink: 'bg-gradient-to-br from-pink-500 to-pink-600 text-white shadow-pink-200',
+    blue: 'bg-blue-600 text-white shadow-blue-200',
+    green: 'bg-green-600 text-white shadow-green-200',
+    purple: 'bg-purple-600 text-white shadow-purple-200',
+    indigo: 'bg-indigo-600 text-white shadow-indigo-200',
+    yellow: 'bg-yellow-600 text-white shadow-yellow-200',
+    pink: 'bg-pink-600 text-white shadow-pink-200',
   };
 
   return (

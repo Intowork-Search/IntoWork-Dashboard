@@ -42,23 +42,25 @@ export default function JobPostsPage(): React.JSX.Element {
     fetchJobs();
   }, []);
 
-  // Polling automatique toutes les 30 secondes pour synchroniser les stats en temps réel
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      // Recharger silencieusement les jobs sans afficher le loader
-      try {
-        const token = await getToken();
-        if (!token) return;
-        
-        const response = await jobsAPI.getMyJobs(token);
-        setJobs(response.jobs || []);
-      } catch (err) {
-        console.error('Erreur lors du rafraîchissement automatique:', err);
-      }
-    }, 30000); // 30 secondes
-
-    return () => clearInterval(interval);
-  }, []);
+  // ⚠️ CORRECTIF PERFORMANCE: Polling désactivé (causait polling excessif)
+  // Les statistiques se mettent à jour après chaque création/modification/suppression
+  // Pour rafraîchir manuellement, rechargez la page (F5)
+  // useEffect(() => {
+  //   const interval = setInterval(async () => {
+  //     // Recharger silencieusement les jobs sans afficher le loader
+  //     try {
+  //       const token = await getToken();
+  //       if (!token) return;
+  //
+  //       const response = await jobsAPI.getMyJobs(token);
+  //       setJobs(response.jobs || []);
+  //     } catch (err) {
+  //       console.error('Erreur lors du rafraîchissement automatique:', err);
+  //     }
+  //   }, 30000); // 30 secondes
+  //
+  //   return () => clearInterval(interval);
+  // }, []);
 
   const fetchJobs = async () => {
     try {

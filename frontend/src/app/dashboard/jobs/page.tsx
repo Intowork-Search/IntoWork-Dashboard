@@ -1,13 +1,21 @@
 'use client';
 
-// Cache buster: 2025-12-18-15h00
+/**
+ * Page de recherche d'offres d'emploi
+ *
+ * Migrée vers React Query (Phase 2.3)
+ * - Utilise useJobs() pour les candidats (toutes les offres)
+ * - Utilise useMyJobs() pour les employeurs (leurs offres uniquement)
+ * - Utilise useApplyToJob() pour les candidatures
+ * - Cache automatique, optimistic updates, retry
+ */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
-import { jobsAPI, Job, JobFilters, applicationsAPI } from '@/lib/api';
-import { useAuth, useUser } from '@/hooks/useNextAuth';
-import toast from 'react-hot-toast';
-import { 
+import { JobFilters } from '@/lib/api';
+import { useUser } from '@/hooks/useNextAuth';
+import { useJobs, useMyJobs, useApplyToJob } from '@/hooks';
+import {
   MagnifyingGlassIcon,
   MapPinIcon,
   CurrencyEuroIcon,
@@ -21,91 +29,46 @@ import {
 import { StarIcon } from '@heroicons/react/24/solid';
 
 export default function JobsPage() {
-  const { getToken } = useAuth();
   const { user, isLoaded } = useUser();
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<JobFilters>({
     page: 1,
     limit: 12
   });
-  const [totalJobs, setTotalJobs] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
-  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
   const [showApplicationModal, setShowApplicationModal] = useState(false);
   const [coverLetter, setCoverLetter] = useState('');
-  const [applying, setApplying] = useState(false);
 
-  // Vérifier si l'utilisateur est un employeur
+  // Déterminer le rôle
   const isEmployer = user?.role === 'employer';
+
+  // Récupérer les jobs selon le rôle (avec React Query)
+  const {
+    data: jobsData,
+    isLoading,
+    isError,
+    error,
+    refetch
+  } = isEmployer
+    ? useMyJobs(filters, { enabled: isLoaded && !!user })
+    : useJobs(filters, { enabled: isLoaded });
+
+  // Mutation pour postuler
+  const applyToJob = useApplyToJob();
+
+  // Extraire les données
+  const jobs = jobsData?.jobs || [];
+  const totalJobs = jobsData?.total || 0;
+  const totalPages = jobsData?.total_pages || 0;
+  const selectedJob = jobs.find(job => job.id === selectedJobId);
 
   console.log('🔍 Debug Jobs Page:', {
     user,
     role: user?.role,
     isEmployer,
-    isLoaded
+    isLoaded,
+    jobsCount: jobs.length,
+    totalJobs
   });
-
-  // Charger les offres d'emploi
-  const loadJobs = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      console.log('📦 Loading jobs for:', isEmployer ? 'EMPLOYER (my jobs only)' : 'CANDIDATE (all jobs)');
-      
-      // Si c'est un employeur, charger uniquement ses offres
-      if (isEmployer) {
-        const token = await getToken();
-        if (!token) {
-          setError('Session expirée. Veuillez vous reconnecter.');
-          return;
-        }
-        console.log('🔑 Using getMyJobs with token');
-        const response = await jobsAPI.getMyJobs(token, filters);
-        setJobs(response.jobs);
-        setTotalJobs(response.total);
-        setTotalPages(response.total_pages);
-        console.log('✅ Loaded employer jobs:', response.jobs.length);
-      } else {
-        // Si c'est un candidat, charger toutes les offres publiques
-        console.log('📋 Using getJobs (public)');
-        const response = await jobsAPI.getJobs(filters);
-        setJobs(response.jobs);
-        setTotalJobs(response.total);
-        setTotalPages(response.total_pages);
-        console.log('✅ Loaded public jobs:', response.jobs.length);
-      }
-    } catch (err) {
-      setError('Erreur lors du chargement des offres d\'emploi');
-      console.error('❌ Erreur:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    // Attendre que le user soit chargé avant de charger les jobs
-    if (isLoaded && user) {
-      loadJobs();
-    }
-  }, [filters, isEmployer, user, isLoaded]);
-
-  // Polling désactivé pour meilleures performances
-  // Réactiver en production si nécessaire avec un intervalle plus long (5 min)
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     jobsAPI.getJobs(filters).then(response => {
-  //       setJobs(response.jobs);
-  //       setTotalJobs(response.total);
-  //       setTotalPages(response.total_pages);
-  //     }).catch(err => {
-  //       console.error('Erreur lors du rafraîchissement automatique:', err);
-  //     });
-  //   }, 300000); // 5 minutes
-  //   return () => clearInterval(interval);
-  // }, [filters]);
 
   // Gérer les filtres
   const handleSearch = (searchTerm: string) => {
@@ -124,6 +87,32 @@ export default function JobsPage() {
     setFilters({ ...filters, location_type: locationType, page: 1 });
   };
 
+  // Ouvrir le modal de candidature
+  const handleApply = (jobId: number) => {
+    setSelectedJobId(jobId);
+    setCoverLetter('');
+    setShowApplicationModal(true);
+  };
+
+  // Soumettre la candidature (avec React Query mutation)
+  const handleSubmitApplication = () => {
+    if (!selectedJobId) return;
+
+    applyToJob.mutate(
+      {
+        job_id: selectedJobId,
+        cover_letter: coverLetter || undefined
+      },
+      {
+        onSuccess: () => {
+          setShowApplicationModal(false);
+          setSelectedJobId(null);
+          setCoverLetter('');
+        }
+      }
+    );
+  };
+
   // Formater le salaire
   const formatSalary = (min?: number, max?: number, currency: string = 'EUR') => {
     if (!min && !max) return 'Salaire non précisé';
@@ -136,10 +125,10 @@ export default function JobsPage() {
   const formatDate = (dateString?: string) => {
     if (!dateString) return 'Date non précisée';
     const date = new Date(dateString);
-    return date.toLocaleDateString('fr-FR', { 
-      day: 'numeric', 
-      month: 'long', 
-      year: 'numeric' 
+    return date.toLocaleDateString('fr-FR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
     });
   };
 
@@ -149,60 +138,6 @@ export default function JobsPage() {
       case 'remote': return <ComputerDesktopIcon className="w-4 h-4" />;
       case 'hybrid': return <BriefcaseIcon className="w-4 h-4" />;
       default: return <HomeIcon className="w-4 h-4" />;
-    }
-  };
-
-  // Ouvrir le modal de candidature
-  const handleApply = (job: Job) => {
-    setSelectedJob(job);
-    setCoverLetter('');
-    setShowApplicationModal(true);
-  };
-
-  // Soumettre la candidature
-  const handleSubmitApplication = async () => {
-    if (!selectedJob) return;
-
-    try {
-      setApplying(true);
-      const token = await getToken();
-      if (!token) {
-        alert('Vous devez être connecté pour postuler');
-        return;
-      }
-
-      await applicationsAPI.applyToJob(token, {
-        job_id: selectedJob.id,
-        cover_letter: coverLetter || undefined
-      });
-
-      toast.success('✅ Candidature envoyée avec succès !');
-      setShowApplicationModal(false);
-      setSelectedJob(null);
-      setCoverLetter('');
-      
-      // Recharger automatiquement les jobs pour mettre à jour le bouton
-      loadJobs();
-    } catch (error: any) {
-      console.error('Erreur lors de la candidature:', error);
-      
-      // Gérer les différents types d'erreurs
-      if (error.response?.status === 400) {
-        const errorMessage = error.response?.data?.detail || 'Erreur lors de l\'envoi';
-        if (errorMessage.includes('déjà postulé')) {
-          toast.error('❌ Vous avez déjà postulé à cette offre');
-        } else {
-          toast.error(`❌ ${errorMessage}`);
-        }
-      } else if (error.response?.status === 403) {
-        toast.error('❌ Vous n\'avez pas les permissions nécessaires');
-      } else if (error.response?.status === 404) {
-        toast.error('❌ Offre d\'emploi introuvable');
-      } else {
-        toast.error('❌ Erreur lors de l\'envoi de la candidature');
-      }
-    } finally {
-      setApplying(false);
     }
   };
 
@@ -228,14 +163,17 @@ export default function JobsPage() {
     }
   };
 
-  if (error) {
+  // Affichage de l'erreur
+  if (isError) {
     return (
       <DashboardLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
-            <div className="text-red-600 text-lg mb-4">⚠️ {error}</div>
-            <button 
-              onClick={loadJobs}
+            <div className="text-red-600 text-lg mb-4">
+              ⚠️ {error instanceof Error ? error.message : 'Erreur lors du chargement des offres'}
+            </div>
+            <button
+              onClick={() => refetch()}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
               Réessayer
@@ -273,13 +211,13 @@ export default function JobsPage() {
                   {isEmployer ? '✅ Mode EMPLOYEUR (mes offres)' : '📋 Mode CANDIDAT (toutes offres)'}
                 </div>
               </div>
-              {/* Badge En direct */}
+              {/* Badge React Query */}
               <div className="flex items-center space-x-2 px-4 py-2 bg-green-50 border border-green-200 rounded-lg">
                 <div className="relative flex h-3 w-3">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
                 </div>
-                <span className="text-sm font-medium text-green-700">Mises à jour en direct</span>
+                <span className="text-sm font-medium text-green-700">React Query Active</span>
               </div>
             </div>
           </div>
@@ -339,7 +277,7 @@ export default function JobsPage() {
         </div>
 
         {/* Résultats */}
-        {loading ? (
+        {isLoading ? (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
             <p className="text-gray-500 mt-4">Chargement des offres d'emploi...</p>
@@ -351,7 +289,7 @@ export default function JobsPage() {
             <p className="text-gray-600 mb-6">
               Aucune offre d'emploi ne correspond à vos critères actuels.
             </p>
-            <button 
+            <button
               onClick={() => setFilters({ page: 1, limit: 12 })}
               className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
@@ -361,8 +299,8 @@ export default function JobsPage() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {jobs.map((job) => (
-              <div 
-                key={job.id} 
+              <div
+                key={job.id}
                 className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow p-6 relative"
               >
                 {/* Badge Featured */}
@@ -379,8 +317,8 @@ export default function JobsPage() {
                 <div className="flex items-start space-x-4 mb-4">
                   <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
                     {job.company_logo_url ? (
-                      <img 
-                        src={job.company_logo_url} 
+                      <img
+                        src={job.company_logo_url}
                         alt={job.company_name}
                         className="w-8 h-8 object-contain"
                       />
@@ -405,7 +343,7 @@ export default function JobsPage() {
                     <MapPinIcon className="w-4 h-4" />
                     <span>{job.location || 'Localisation non précisée'}</span>
                   </div>
-                  
+
                   <div className="flex items-center space-x-2 text-sm text-gray-600">
                     {getLocationTypeIcon(job.location_type)}
                     <span>{getLocationTypeLabel(job.location_type)}</span>
@@ -438,23 +376,25 @@ export default function JobsPage() {
                 </div>
 
                 {/* Bouton d'action */}
-                <div className="mt-4">
-                  {job.has_applied ? (
-                    <button 
-                      disabled
-                      className="w-full bg-gray-400 text-white font-medium py-2 px-4 rounded-lg cursor-not-allowed"
-                    >
-                      Déjà postulé ✓
-                    </button>
-                  ) : (
-                    <button 
-                      onClick={() => handleApply(job)}
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
-                    >
-                      Postuler
-                    </button>
-                  )}
-                </div>
+                {!isEmployer && (
+                  <div className="mt-4">
+                    {job.has_applied ? (
+                      <button
+                        disabled
+                        className="w-full bg-gray-400 text-white font-medium py-2 px-4 rounded-lg cursor-not-allowed"
+                      >
+                        Déjà postulé ✓
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleApply(job.id)}
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                      >
+                        Postuler maintenant
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -462,7 +402,7 @@ export default function JobsPage() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-center space-x-2 mt-8">
+          <div className="flex justify-center items-center space-x-4 mt-8">
             <button
               onClick={() => setFilters({ ...filters, page: Math.max(1, (filters.page || 1) - 1) })}
               disabled={filters.page === 1}
@@ -470,11 +410,11 @@ export default function JobsPage() {
             >
               Précédent
             </button>
-            
-            <span className="px-4 py-2 text-sm text-gray-600">
-              Page {filters.page} sur {totalPages}
+
+            <span className="text-gray-700">
+              Page {filters.page || 1} sur {totalPages}
             </span>
-            
+
             <button
               onClick={() => setFilters({ ...filters, page: Math.min(totalPages, (filters.page || 1) + 1) })}
               disabled={filters.page === totalPages}
@@ -488,73 +428,47 @@ export default function JobsPage() {
 
       {/* Modal de candidature */}
       {showApplicationModal && selectedJob && (
-        <div className="fixed inset-0 bg-white/40 backdrop-blur-md flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            {/* Header */}
-            <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
-              <h3 className="text-xl font-bold text-gray-900">Postuler à cette offre</h3>
-              <button
-                onClick={() => setShowApplicationModal(false)}
-                className="text-gray-400 hover:text-gray-600"
-                aria-label="Fermer"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
+            <div className="p-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                Postuler pour : {selectedJob.title}
+              </h2>
+              <p className="text-gray-600 mb-6">
+                {selectedJob.company_name}
+              </p>
 
-            {/* Contenu */}
-            <div className="p-6 space-y-6">
-              {/* Détails de l'offre */}
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h4 className="font-semibold text-gray-900 text-lg mb-2">{selectedJob.title}</h4>
-                <p className="text-gray-600 mb-1">{selectedJob.company_name}</p>
-                <p className="text-gray-600">{selectedJob.location}</p>
-                {selectedJob.salary_min && (
-                  <p className="text-blue-600 font-medium mt-2">
-                    {formatSalary(selectedJob.salary_min, selectedJob.salary_max)}
-                  </p>
-                )}
-              </div>
-
-              {/* Lettre de motivation */}
-              <div>
-                <label htmlFor="coverLetter" className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Lettre de motivation (optionnel)
                 </label>
                 <textarea
-                  id="coverLetter"
                   value={coverLetter}
                   onChange={(e) => setCoverLetter(e.target.value)}
                   rows={8}
-                  placeholder="Expliquez pourquoi vous êtes intéressé par ce poste..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                  placeholder="Expliquez pourquoi vous êtes le candidat idéal pour ce poste..."
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                 />
               </div>
 
-              {/* Informations */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-sm text-blue-800">
-                  💡 <strong>Astuce :</strong> Une lettre de motivation personnalisée augmente vos chances d'être sélectionné !
-                </p>
-              </div>
-
-              {/* Boutons */}
-              <div className="flex gap-3">
+              <div className="flex space-x-4">
                 <button
-                  onClick={() => setShowApplicationModal(false)}
-                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
-                  disabled={applying}
+                  onClick={() => {
+                    setShowApplicationModal(false);
+                    setSelectedJobId(null);
+                    setCoverLetter('');
+                  }}
+                  disabled={applyToJob.isPending}
+                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
                 >
                   Annuler
                 </button>
                 <button
                   onClick={handleSubmitApplication}
-                  disabled={applying}
-                  className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={applyToJob.isPending}
+                  className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50"
                 >
-                  {applying ? 'Envoi en cours...' : 'Envoyer ma candidature'}
+                  {applyToJob.isPending ? 'Envoi en cours...' : 'Envoyer ma candidature'}
                 </button>
               </div>
             </div>

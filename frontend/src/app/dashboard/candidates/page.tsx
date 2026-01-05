@@ -56,17 +56,19 @@ export default function CandidatesPage(): React.JSX.Element {
     fetchApplications();
   }, [page, statusFilter]);
 
-  // Polling automatique toutes les 30 secondes
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Ne pas faire de polling si une mise à jour est en cours
-      if (!updatingStatus && !updatingNotes) {
-        fetchApplications(true);
-      }
-    }, 30000);
-
-    return () => clearInterval(interval);
-  }, [page, statusFilter, updatingStatus, updatingNotes]);
+  // ⚠️ CORRECTIF PERFORMANCE: Polling désactivé (causait polling excessif)
+  // Les données se rafraîchissent automatiquement après chaque modification (status, notes)
+  // Pour rafraîchir manuellement, changez de page ou utilisez les filtres
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     // Ne pas faire de polling si une mise à jour est en cours
+  //     if (!updatingStatus && !updatingNotes) {
+  //       fetchApplications(true);
+  //     }
+  //   }, 30000);
+  //
+  //   return () => clearInterval(interval);
+  // }, [page, statusFilter, updatingStatus, updatingNotes]);
 
   const fetchApplications = async (silent = false) => {
     try {
@@ -299,15 +301,9 @@ export default function CandidatesPage(): React.JSX.Element {
               </select>
             </div>
 
-            {/* Badge En direct */}
+            {/* Espace vide pour équilibrer la grille */}
             <div className="flex items-center justify-end">
-              <div className="flex items-center space-x-2 px-4 py-2 bg-green-50 border border-green-200 rounded-lg">
-                <div className="relative flex h-3 w-3">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-                </div>
-                <span className="text-sm font-medium text-green-700">Mise à jour auto</span>
-              </div>
+              {/* Badge "Mise à jour auto" supprimé suite au correctif de performance */}
             </div>
           </div>
         </div>

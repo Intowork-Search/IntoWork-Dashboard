@@ -98,7 +98,7 @@ export default function CompanyPage(): React.JSX.Element {
         <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div className="flex items-center gap-6">
-              <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
                 {company?.logo_url ? (
                   <img src={company.logo_url} alt={company.name} className="w-full h-full object-cover rounded-2xl" />
                 ) : (
@@ -117,7 +117,7 @@ export default function CompanyPage(): React.JSX.Element {
               className={`px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center gap-2 ${
                 isEditing
                   ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  : 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 shadow-lg'
+                  : 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg'
               }`}
             >
               {isEditing ? (
@@ -142,7 +142,7 @@ export default function CompanyPage(): React.JSX.Element {
         {/* Statistiques */}
         {stats && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg p-6 text-white">
+            <div className="bg-blue-600 rounded-2xl shadow-lg p-6 text-white">
               <div className="flex items-center justify-between mb-2">
                 <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -154,7 +154,7 @@ export default function CompanyPage(): React.JSX.Element {
               <p className="text-blue-100">Offres actives</p>
             </div>
 
-            <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl shadow-lg p-6 text-white">
+            <div className="bg-indigo-600 rounded-2xl shadow-lg p-6 text-white">
               <div className="flex items-center justify-between mb-2">
                 <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -166,7 +166,7 @@ export default function CompanyPage(): React.JSX.Element {
               <p className="text-indigo-100">Total d'offres</p>
             </div>
 
-            <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-lg p-6 text-white">
+            <div className="bg-purple-600 rounded-2xl shadow-lg p-6 text-white">
               <div className="flex items-center justify-between mb-2">
                 <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -178,7 +178,7 @@ export default function CompanyPage(): React.JSX.Element {
               <p className="text-purple-100">Recruteurs</p>
             </div>
 
-            <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl shadow-lg p-6 text-white">
+            <div className="bg-green-600 rounded-2xl shadow-lg p-6 text-white">
               <div className="flex items-center justify-between mb-2">
                 <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -434,7 +434,7 @@ export default function CompanyPage(): React.JSX.Element {
             <button
               onClick={handleSave}
               disabled={saving || !formData.name}
-              className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all disabled:opacity-50 shadow-lg flex items-center gap-2"
+              className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all disabled:opacity-50 shadow-lg flex items-center gap-2"
             >
               {saving ? (
                 <>
