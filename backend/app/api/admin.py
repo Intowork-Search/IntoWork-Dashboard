@@ -12,7 +12,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime, timedelta
 
-router = APIRouter(tags=["admin"])
+router = APIRouter(prefix="/admin", tags=["admin"])
 
 
 # ==================== MODELS ====================
@@ -242,9 +242,6 @@ async def get_all_jobs(
         employer = db.query(Employer).filter(Employer.id == job.employer_id).first()
         user = employer.user if employer else None
         
-        # Compter les candidatures réelles pour cette offre
-        real_applications_count = db.query(JobApplication).filter(JobApplication.job_id == job.id).count()
-        
         result.append(JobListItem(
             id=job.id,
             title=job.title,
@@ -252,7 +249,7 @@ async def get_all_jobs(
             employer_email=user.email if user else "N/A",
             status=job.status,
             location=job.location,
-            applications_count=real_applications_count,
+            applications_count=job.applications_count or 0,
             created_at=job.created_at
         ))
     
