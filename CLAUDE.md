@@ -19,13 +19,14 @@ INTOWORK Search is a B2B2C recruitment platform with AI-powered job matching. Th
 ### Stack Overview
 
 **Backend** (`/backend`):
-- FastAPI 0.104+ with async/await support
-- SQLAlchemy 2.0+ ORM with declarative models
+- FastAPI 0.104+ with **full async/await support** (AsyncSession, async routes)
+- SQLAlchemy 2.0+ ORM with **async engine** and declarative models
 - PostgreSQL 15 (development: port 5433)
 - Alembic for database migrations
 - NextAuth v5 with JWT authentication (HS256)
 - bcrypt for password hashing
 - Resend for email delivery (password reset)
+- SlowAPI for rate limiting
 
 **Frontend** (`/frontend`):
 - Next.js 16 (App Router with React Server Components)
@@ -33,6 +34,7 @@ INTOWORK Search is a B2B2C recruitment platform with AI-powered job matching. Th
 - Tailwind CSS 4 with PostCSS
 - DaisyUI 5.5+ for component library
 - NextAuth v5 for authentication with JWT strategy
+- **TanStack React Query v5** for server state management and caching
 - Axios for API communication
 - React Hot Toast for notifications
 
@@ -303,30 +305,98 @@ NODE_ENV=development
 
 ## Key Development Patterns
 
+### Async/Await Backend (SQLAlchemy 2.0)
+
+**IMPORTANT**: All backend routes and database operations use async/await. See `backend/ASYNC_PATTERN_REFERENCE.md` for migration guide.
+
+**Key Patterns**:
+```python
+# Database dependency
+async def get_db() -> AsyncGenerator[AsyncSession, None]
+
+# Query pattern
+result = await db.execute(select(Model).filter(Model.field == value))
+obj = result.scalar_one_or_none()  # or .scalars().all()
+
+# Count pattern
+result = await db.execute(select(func.count()).select_from(Model))
+count = result.scalar()
+
+# Update pattern
+await db.execute(update(Model).where(Model.id == id).values(field=value))
+await db.commit()
+
+# Eager loading relationships
+result = await db.execute(
+    select(Model).options(selectinload(Model.relationship))
+)
+```
+
+**Reference Documents**:
+- `backend/ASYNC_PATTERN_REFERENCE.md` - Complete async patterns guide
+- `backend/ASYNC_MIGRATION_PATTERNS.md` - Migration examples for all API routes
+
+### React Query for Data Fetching (Frontend)
+
+**IMPORTANT**: All data fetching uses React Query for caching, revalidation, and optimistic updates.
+
+**Setup Files**:
+- `frontend/src/lib/queryClient.ts` - QueryClient configuration
+- `frontend/src/lib/queryKeys.ts` - Centralized cache keys
+- `frontend/src/components/QueryProvider.tsx` - Provider wrapper
+- `frontend/src/hooks/*` - Custom hooks per resource (useJobs, useApplications, etc.)
+
+**Key Patterns**:
+```typescript
+// Using custom hooks
+const { data: jobs, isLoading } = useJobs(filters);
+const { data: applications } = useApplications(candidateId);
+
+// Mutations with automatic cache invalidation
+const createJobMutation = useCreateJob();
+await createJobMutation.mutateAsync(jobData);
+// Cache automatically invalidated via onSuccess callback
+
+// Query keys
+import { queryKeys } from '@/lib/queryKeys';
+queryClient.invalidateQueries({ queryKey: queryKeys.jobs.all });
+```
+
+**Reference Documents**:
+- `frontend/REACT_QUERY_SETUP.md` - Setup and configuration guide
+- `frontend/REACT_QUERY_HOOKS.md` - Hook usage patterns
+
 ### Adding a New API Endpoint
 
 1. **Backend**:
-   - Add route handler in appropriate file under `backend/app/api/`
+   - Add **async** route handler in appropriate file under `backend/app/api/`
    - Use `require_user` dependency for basic authentication
    - Use `require_role(UserRole.X)` for role-based access control
    - Use `require_candidate`, `require_employer`, or `require_admin` shortcuts
    - Define Pydantic models for request/response validation
-   - Add database operations using SQLAlchemy ORM
+   - Use **async/await** for all database operations (see async patterns above)
 
 2. **Frontend**:
    - Add TypeScript interface in `frontend/src/lib/api.ts`
    - Add API function to appropriate module (e.g., `candidatesAPI`)
-   - Get session with NextAuth: `const session = await auth()`
-   - Use `createAuthenticatedClient(session.accessToken)` for protected endpoints
+   - Create custom React Query hook in `frontend/src/hooks/`
+   - Use query keys from `frontend/src/lib/queryKeys.ts`
+   - Implement cache invalidation in mutation callbacks
    - Handle errors with try/catch and toast notifications (react-hot-toast)
 
 ### Database Schema Changes
 
 1. Modify models in `backend/app/models/base.py`
 2. Create migration: `alembic revision --autogenerate -m "description"`
-3. Review generated migration in `backend/alembic/versions/`
+3. **IMPORTANT**: Review generated migration in `backend/alembic/versions/`
+   - Verify async compatibility (use `await op.run_async()` if needed)
+   - Check for missing indexes (see `PostgreSQL_Database_Analysis.md` for optimization guide)
+   - Ensure proper constraints and foreign keys
 4. Apply migration: `alembic upgrade head`
 5. Update TypeScript interfaces in `frontend/src/lib/api.ts`
+6. Update React Query hooks if response shape changed
+
+**Performance Note**: Recent database analysis identified 15 critical missing indexes. See `PostgreSQL_Database_Analysis.md` for optimization opportunities. A production-ready migration is available at `backend/alembic/versions/h8c2d6e5f4g3_critical_indexes_and_constraints.py`.
 
 ### Role-Based Access Control
 
@@ -367,6 +437,42 @@ Password reset uses email-based token flow:
 
 **Note**: Email service gracefully degrades if Resend API key not configured (logs warning but doesn't crash)
 
+### Password Validation and Security
+
+The platform implements comprehensive password validation:
+
+**Frontend Components**:
+
+- `frontend/src/lib/passwordValidation.ts` - Validation logic and strength calculation
+- `frontend/src/components/PasswordStrengthIndicator.tsx` - Visual strength indicator
+
+**Password Requirements**:
+
+
+- Minimum 8 characters
+- At least one uppercase letter
+- At least one lowercase letter
+- At least one number
+- At least one special character
+- Visual strength indicator (weak/medium/strong/very strong)
+
+**Implementation Pattern**:
+
+```typescript
+import { validatePassword, getPasswordStrength } from '@/lib/passwordValidation';
+
+const validation = validatePassword(password);
+const strength = getPasswordStrength(password);
+// validation: { isValid: boolean, errors: string[] }
+// strength: { score: 0-4, label: string, color: string }
+```
+
+Used in:
+
+- Sign up page (`/auth/signup`)
+- Password reset page (`/auth/reset-password`)
+- Change password modal (dashboard settings)
+
 ## Deployment
 
 **Backend**: Railway (PostgreSQL + FastAPI)
@@ -383,6 +489,7 @@ Password reset uses email-based token flow:
 - Automatic deployments on git push
 
 **Deployment Utilities** (`/scripts`):
+
 - `deploy-all.sh` - Deploy both backend and frontend
 - `deploy-railway.sh` - Deploy backend to Railway
 - `deploy-vercel.sh` - Deploy frontend to Vercel
@@ -411,10 +518,12 @@ See `docs/README.md` for complete documentation index.
 ## Git Repository Setup
 
 This project uses a **dual-repository setup** for redundancy:
+
 - **Primary**: GitLab (origin)
 - **Mirror**: GitHub (old-origin)
 
 All git operations are automated via scripts in `/scripts`:
+
 - Push to both repos: `make push` or `./scripts/push-all.sh`
 - Commit and push: `make commit MSG="message"`
 - Check status: `make status-all`
@@ -436,3 +545,6 @@ All git operations are automated via scripts in `/scripts`:
 13. **Session Strategy**: NextAuth uses JWT strategy (not database sessions) for performance
 14. **Legacy Fields**: `clerk_id` field in User model is nullable and kept for migration compatibility
 15. **Dual Repos**: Always push to both GitHub and GitLab using `make push` to keep them in sync
+16. **Async/Await**: ALL backend routes and database operations use async/await - never use synchronous SQLAlchemy patterns
+17. **React Query Cache**: Frontend data is cached - use `queryClient.invalidateQueries()` after mutations to ensure UI updates
+18. **Database Performance**: Check `PostgreSQL_Database_Analysis.md` before writing queries that scan large tables
