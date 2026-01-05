@@ -28,13 +28,15 @@ export const queryClient = new QueryClient({
       // Nombre de retry automatiques en cas d'échec
       retry: 2,
 
-      // Rafraîchir automatiquement quand la fenêtre reprend le focus
-      refetchOnWindowFocus: true,
+      // ⚠️ CORRECTIF PERFORMANCE: Désactivé pour éviter le polling excessif
+      // Avec plusieurs onglets ouverts, cela causait des centaines de requêtes
+      refetchOnWindowFocus: false,
 
       // Rafraîchir automatiquement lors d'une reconnexion réseau
       refetchOnReconnect: true,
 
-      // Ne pas refetch automatiquement au mount si données fraîches
+      // ⚠️ CORRECTIF PERFORMANCE: true = refetch seulement si données stale (périmées)
+      // Évite les refetch inutiles quand les données sont fraîches (< 5 min)
       refetchOnMount: true,
     },
     mutations: {

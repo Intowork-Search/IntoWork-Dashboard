@@ -53,8 +53,10 @@ export function useNotifications(
       return await notificationsAPI.getNotifications(token, limit, offset, unreadOnly);
     },
     enabled: isSignedIn && (options.enabled !== false),
-    staleTime: 1000 * 30, // 30 secondes (fréquent pour les notifications)
-    refetchInterval: options.refetchInterval ?? 1000 * 60, // 1 minute par défaut
+    staleTime: 1000 * 60 * 2, // 2 minutes (notifications)
+    // ⚠️ CORRECTIF PERFORMANCE: Polling désactivé par défaut pour éviter surcharge
+    // Pour activer le polling: passez refetchInterval en option
+    refetchInterval: options.refetchInterval ?? false,
   });
 }
 
@@ -81,8 +83,9 @@ export function useUnreadNotificationsCount(
       return await notificationsAPI.getUnreadCount(token);
     },
     enabled: isSignedIn && (options.enabled !== false),
-    staleTime: 1000 * 30, // 30 secondes
-    refetchInterval: options.refetchInterval ?? 1000 * 60, // Polling 1 minute
+    staleTime: 1000 * 60 * 2, // 2 minutes
+    // ⚠️ CORRECTIF PERFORMANCE: Polling désactivé par défaut
+    refetchInterval: options.refetchInterval ?? false,
   });
 }
 
