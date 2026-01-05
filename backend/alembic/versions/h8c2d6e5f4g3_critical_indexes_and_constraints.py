@@ -36,11 +36,14 @@ def upgrade() -> None:
     # First, identify and handle any existing duplicates (if this is a migration on existing DB)
     # This constraint allows one active application per candidate per job
     # Users can reapply after rejection (status='rejected' doesn't count)
-    op.create_unique_constraint(
+    # Note: Using partial unique index instead of unique constraint to support postgresql_where
+    op.create_index(
         'unique_candidate_job_application',
         'job_applications',
         ['candidate_id', 'job_id'],
-        postgresql_where=sa.text("status != 'rejected'")
+        unique=True,
+        postgresql_where=sa.text("status != 'rejected'"),
+        if_not_exists=True
     )
 
     # 1.2: Prevent duplicate OAuth provider accounts per user
@@ -64,12 +67,12 @@ def upgrade() -> None:
     # ============================================================
 
     # 2.1: Job listing queries (status + location_type + job_type filters)
-    # Supports WHERE status = 'published' AND location_type = $1
+    # Supports WHERE status = 'PUBLISHED' AND location_type = $1
     op.create_index(
         'idx_jobs_status_location_type',
         'jobs',
         [sa.column('status'), sa.column('location_type')],
-        postgresql_where=sa.text("status = 'published'"),
+        postgresql_where=sa.text("status = 'PUBLISHED'"),
         if_not_exists=True
     )
 
@@ -78,7 +81,7 @@ def upgrade() -> None:
         'idx_jobs_status_job_type',
         'jobs',
         [sa.column('status'), sa.column('job_type')],
-        postgresql_where=sa.text("status = 'published'"),
+        postgresql_where=sa.text("status = 'PUBLISHED'"),
         if_not_exists=True
     )
 
@@ -95,7 +98,7 @@ def upgrade() -> None:
         'idx_jobs_company_id_status',
         'jobs',
         [sa.column('company_id'), sa.column('status')],
-        postgresql_where=sa.text("status = 'published'"),
+        postgresql_where=sa.text("status = 'PUBLISHED'"),
         if_not_exists=True
     )
 
@@ -164,11 +167,11 @@ def upgrade() -> None:
     # ============================================================
 
     # 5.1: Session expiration cleanup
+    # Note: Removed postgresql_where because NOW() is not IMMUTABLE
     op.create_index(
         'idx_sessions_expires',
         'sessions',
         [sa.column('expires')],
-        postgresql_where=sa.text("expires < NOW()"),
         if_not_exists=True
     )
 
@@ -225,4 +228,5 @@ def downgrade() -> None:
     # Remove unique constraints
     op.drop_constraint('unique_identifier_active_token', 'verification_tokens', type_='unique')
     op.drop_constraint('unique_user_provider_account', 'accounts', type_='unique')
-    op.drop_constraint('unique_candidate_job_application', 'job_applications', type_='unique')
+    # Remove unique index (not constraint) for job applications
+    op.drop_index('unique_candidate_job_application', table_name='job_applications', if_exists=True)

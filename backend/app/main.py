@@ -16,15 +16,25 @@ from app.api.admin import router as admin_router
 from dotenv import load_dotenv
 import os
 from pathlib import Path
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 # Charger les variables d'environnement depuis le fichier .env
 load_dotenv()
+
+# Security: Initialize rate limiter to prevent brute force and abuse
+limiter = Limiter(key_func=get_remote_address)
 
 app = FastAPI(
     title="INTOWORK Search - Backend",
     description="Plateforme de recrutement B2B2C - API Backend",
     version="1.0.0"
 )
+
+# Security: Add rate limiter state and exception handler
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 
 # Security Headers Middleware

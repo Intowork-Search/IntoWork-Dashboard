@@ -1,67 +1,62 @@
-# Multi-stage Dockerfile for Next.js Frontend
-# Stage 1: Dependencies
-FROM node:20-alpine AS deps
-RUN apk add --no-cache libc6-compat
+# Multi-stage Dockerfile for FastAPI Backend (Railway Deployment)
+# Optimized for Python 3.11+ with PostgreSQL and Alembic migrations
+
+# Stage 1: Base image with Python dependencies
+FROM python:3.11-slim AS base
+
+# Prevent Python from writing pyc files and buffering stdout/stderr
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Install system dependencies required for PostgreSQL and Python packages
+RUN apt-get update && apt-get install -y \
+    gcc \
+    postgresql-client \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
-# Copy package files
-COPY package.json package-lock.json* ./
-RUN npm ci
+# Stage 2: Dependencies installation
+FROM base AS dependencies
 
-# Stage 2: Builder
-FROM node:20-alpine AS builder
-WORKDIR /app
+# Copy requirements file
+COPY backend/requirements.txt .
 
-# Copy dependencies from deps stage
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Build arguments for environment variables
-ARG NEXT_PUBLIC_API_URL
-ARG NEXTAUTH_URL
-ARG NEXTAUTH_SECRET
-ARG AUTH_SECRET
-ARG NODE_ENV=production
+# Stage 3: Production image
+FROM base AS production
 
-# Set environment variables for build
-ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
-ENV NEXTAUTH_URL=$NEXTAUTH_URL
-ENV NEXTAUTH_SECRET=$NEXTAUTH_SECRET
-ENV AUTH_SECRET=$AUTH_SECRET
-ENV NODE_ENV=$NODE_ENV
-ENV NEXT_TELEMETRY_DISABLED=1
+# Create non-root user for security
+RUN useradd -m -u 1000 appuser && \
+    mkdir -p /app/backend/uploads/cv && \
+    chown -R appuser:appuser /app
 
-# Build the application
-RUN npm run build
+# Copy Python dependencies from dependencies stage
+COPY --from=dependencies /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=dependencies /usr/local/bin /usr/local/bin
 
-# Stage 3: Runner
-FROM node:20-alpine AS runner
-WORKDIR /app
+# Copy application code
+COPY --chown=appuser:appuser backend/ /app/backend/
 
-ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
+WORKDIR /app/backend
 
-# Create non-root user
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+# Set correct permissions for startup script
+RUN chmod +x /app/backend/start.sh
 
-# Copy necessary files from builder
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
+# Switch to non-root user
+USER appuser
 
-# Set correct permissions
-RUN chown -R nextjs:nodejs /app
-
-USER nextjs
-
-EXPOSE 3000
-
-ENV PORT=3000
-ENV HOSTNAME="0.0.0.0"
+# Expose the port (Railway will provide PORT env variable)
+EXPOSE 8000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:${PORT:-8000}/health')" || exit 1
 
-CMD ["node", "server.js"]
+# Use the startup script which handles migrations and server start
+CMD ["bash", "/app/backend/start.sh"]

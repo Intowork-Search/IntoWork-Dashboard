@@ -3,7 +3,6 @@
 
 [build]
 builder = "dockerfile"
-dockerfile = "Dockerfile.railway"
 
 [deploy]
 # startCommand is defined in Dockerfile.railway CMD
