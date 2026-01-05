@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { XMarkIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
+import PasswordStrengthIndicator from '@/components/PasswordStrengthIndicator';
+import { validatePassword } from '@/lib/passwordValidation';
 
 interface ChangePasswordModalProps {
   isOpen: boolean;
@@ -25,13 +27,15 @@ export default function ChangePasswordModal({ isOpen, onClose, onSubmit }: Chang
     e.preventDefault();
     setError('');
 
-    if (newPassword !== confirmPassword) {
-      setError('Les mots de passe ne correspondent pas');
+    // Valider avec les nouvelles exigences de sécurité
+    const passwordValidation = validatePassword(newPassword);
+    if (!passwordValidation.isValid) {
+      setError(passwordValidation.errors[0]);
       return;
     }
 
-    if (newPassword.length < 8) {
-      setError('Le nouveau mot de passe doit contenir au moins 8 caractères');
+    if (newPassword !== confirmPassword) {
+      setError('Les mots de passe ne correspondent pas');
       return;
     }
 
@@ -107,9 +111,9 @@ export default function ChangePasswordModal({ isOpen, onClose, onSubmit }: Chang
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 required
-                minLength={8}
+                minLength={12}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 pr-12"
-                placeholder="••••••••"
+                placeholder="••••••••••••"
               />
               <button
                 type="button"
@@ -119,7 +123,8 @@ export default function ChangePasswordModal({ isOpen, onClose, onSubmit }: Chang
                 {showNew ? <EyeSlashIcon className="w-5 h-5" /> : <EyeIcon className="w-5 h-5" />}
               </button>
             </div>
-            <p className="text-xs text-gray-500 mt-1">Au moins 8 caractères</p>
+            {/* Password strength indicator with requirements */}
+            <PasswordStrengthIndicator password={newPassword} />
           </div>
 
           {/* Confirmer nouveau mot de passe */}

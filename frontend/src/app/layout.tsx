@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import SessionProvider from '@/components/SessionProvider';
+import QueryProvider from '@/components/QueryProvider';
 import ToastProvider from '@/components/ToastProvider';
 import "./globals.css";
 
@@ -25,10 +26,12 @@ export default function RootLayout({
       <body
         className={`${inter.variable} font-sans antialiased bg-gray-50`}
       >
-        <SessionProvider>
-          {children}
-          <ToastProvider />
-        </SessionProvider>
+        <QueryProvider>
+          <SessionProvider>
+            {children}
+            <ToastProvider />
+          </SessionProvider>
+        </QueryProvider>
       </body>
     </html>
   );

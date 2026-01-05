@@ -83,7 +83,7 @@ export default function DashboardLayout({
               <Bars3Icon className="w-6 h-6" />
             </button>
             <div className="flex items-center space-x-2">
-              <div className="w-6 h-6 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+              <div className="w-6 h-6 bg-blue-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-xs">IW</span>
               </div>
               <span className="font-bold text-gray-900">INTOWORK</span>

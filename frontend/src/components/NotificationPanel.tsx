@@ -31,15 +31,17 @@ export default function NotificationPanel() {
     }
   };
 
-  // Polling pour les nouvelles notifications (toutes les 30s)
+  // ⚠️ CORRECTIF PERFORMANCE: Polling désactivé (causait polling excessif)
+  // Charger les notifications au montage uniquement
   useEffect(() => {
     loadNotifications();
-    
-    const interval = setInterval(() => {
-      loadNotifications();
-    }, 30000);
 
-    return () => clearInterval(interval);
+    // Polling désactivé - utilisez le bouton pour rafraîchir manuellement
+    // Pour restaurer le polling automatique, migrez vers useNotifications hook
+    // const interval = setInterval(() => {
+    //   loadNotifications();
+    // }, 30000);
+    // return () => clearInterval(interval);
   }, []);
 
   // Fermer le panel si on clique à l'extérieur
