@@ -35,9 +35,10 @@ export const queryClient = new QueryClient({
       // Rafraîchir automatiquement lors d'une reconnexion réseau
       refetchOnReconnect: true,
 
-      // ⚠️ CORRECTIF PERFORMANCE: true = refetch seulement si données stale (périmées)
-      // Évite les refetch inutiles quand les données sont fraîches (< 5 min)
-      refetchOnMount: true,
+      // ⚠️ CORRECTIF PERFORMANCE: false = pas de refetch automatique au montage
+      // Évite les refetch inutiles à chaque navigation entre pages
+      // Les données restent en cache pendant staleTime (5 minutes)
+      refetchOnMount: false,
     },
     mutations: {
       // Mutations: 1 seul retry par défaut

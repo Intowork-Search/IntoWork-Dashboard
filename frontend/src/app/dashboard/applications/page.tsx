@@ -1,11 +1,18 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '@/hooks/useNextAuth';
+/**
+ * Page des candidatures (Candidat)
+ * 
+ * Migrée vers React Query pour meilleures performances
+ * - Cache automatique (5 min)
+ * - Pas de rechargements excessifs
+ * - Retry automatique en cas d'erreur
+ */
+
+import React, { useState } from 'react';
 import Link from 'next/link';
-import toast from 'react-hot-toast';
 import DashboardLayout from '@/components/DashboardLayout';
-import { applicationsAPI, JobApplication } from '@/lib/api';
+import { useMyApplications, useWithdrawApplication } from '@/hooks';
 import {
   CalendarDaysIcon,
   MapPinIcon,
@@ -20,50 +27,26 @@ import {
 } from '@heroicons/react/24/outline';
 
 export default function ApplicationsPage() {
-  const { getToken } = useAuth();
-  const [applications, setApplications] = useState<JobApplication[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
-  const [totalApplications, setTotalApplications] = useState(0);
-  const [withdrawing, setWithdrawing] = useState(false);
+  const limit = 12;
 
-  // Charger les candidatures
-  const loadApplications = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const token = await getToken();
-      if (!token) {
-        throw new Error('Token non disponible');
-      }
-      
-      const response = await applicationsAPI.getMyApplications(token, currentPage, 12);
-      setApplications(response.applications);
-      setTotalPages(response.total_pages);
-      setTotalApplications(response.total);
-    } catch (err) {
-      setError('Erreur lors du chargement de vos candidatures');
-      console.error('Erreur:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Utiliser React Query hook
+  const {
+    data,
+    isLoading: loading,
+    isError,
+    error: queryError,
+    refetch
+  } = useMyApplications(currentPage, limit);
 
-  useEffect(() => {
-    loadApplications();
-  }, [currentPage]);
+  // Mutation pour retirer une candidature
+  const withdrawMutation = useWithdrawApplication();
 
-  // Polling désactivé pour meilleures performances
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     if (!withdrawing && !loading) {
-  //       loadApplications();
-  //     }
-  //   }, 300000); // 5 minutes si réactivé
-  //   return () => clearInterval(interval);
-  // }, [currentPage, withdrawing, loading]);
+  // Extraire les données
+  const applications = data?.applications || [];
+  const totalPages = data?.total_pages || 0;
+  const totalApplications = data?.total || 0;
+  const error = isError ? (queryError as any)?.message || 'Erreur lors du chargement' : null;
 
   // Retirer une candidature
   const handleWithdrawApplication = async (applicationId: number) => {
@@ -71,21 +54,12 @@ export default function ApplicationsPage() {
       return;
     }
 
-    try {
-      setWithdrawing(true);
-      const token = await getToken();
-      if (!token) return;
-
-      await applicationsAPI.withdrawApplication(token, applicationId);
-      toast.success('✅ Candidature retirée avec succès');
-      // Recharger la liste
-      loadApplications();
-    } catch (error) {
-      console.error('Erreur lors du retrait de la candidature:', error);
-      toast.error('❌ Erreur lors du retrait de la candidature');
-    } finally {
-      setWithdrawing(false);
-    }
+    withdrawMutation.mutate(applicationId, {
+      onSuccess: () => {
+        // React Query va automatiquement refetch
+        refetch();
+      }
+    });
   };
 
   // Icône et couleur selon le statut
@@ -176,7 +150,7 @@ export default function ApplicationsPage() {
           <div className="text-center">
             <div className="text-red-600 text-lg mb-4">⚠️ {error}</div>
             <button 
-              onClick={loadApplications}
+              onClick={() => refetch()}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
               Réessayer
@@ -357,11 +331,11 @@ export default function ApplicationsPage() {
                       {(application.status === 'applied' || application.status === 'pending') && (
                         <button
                           onClick={() => handleWithdrawApplication(application.id)}
-                          disabled={withdrawing}
+                          disabled={withdrawMutation.isPending}
                           className="flex items-center gap-1 px-3 py-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                           title="Retirer la candidature"
                         >
-                          {withdrawing ? (
+                          {withdrawMutation.isPending ? (
                             <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-red-600"></div>
                           ) : (
                             <TrashIcon className="w-5 h-5" />
@@ -386,14 +360,14 @@ export default function ApplicationsPage() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                disabled={currentPage === 1}
+                disabled={currentPage === 1 || loading || withdrawMutation.isPending}
                 className="px-3 py-2 text-sm bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Précédent
               </button>
               <button
                 onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                disabled={currentPage === totalPages}
+                disabled={currentPage === totalPages || loading || withdrawMutation.isPending}
                 className="px-3 py-2 text-sm bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Suivant

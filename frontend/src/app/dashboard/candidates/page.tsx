@@ -1,9 +1,21 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { useAuth } from '@/hooks/useNextAuth';
-import toast from 'react-hot-toast';
+/**
+ * Page des candidatures reçues (Employeur)
+ * 
+ * Migrée vers React Query pour meilleures performances
+ * - Cache automatique (2 min)
+ * - Pas de rechargements excessifs
+ * - Optimistic updates pour status/notes
+ */
+
+import React, { useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
+import { 
+  useEmployerApplications,
+  useUpdateApplicationStatus,
+  useUpdateApplicationNotes
+} from '@/hooks';
 import { 
   UserGroupIcon, 
   EnvelopeIcon, 
@@ -39,153 +51,65 @@ interface ApplicationsResponse {
 }
 
 export default function CandidatesPage(): React.JSX.Element {
-  const { getToken } = useAuth();
-  const [applications, setApplications] = useState<CandidateApplication[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
-  const [total, setTotal] = useState(0);
+  const limit = 20;
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState('');
   const [viewingApplication, setViewingApplication] = useState<CandidateApplication | null>(null);
-  const [updatingStatus, setUpdatingStatus] = useState(false);
-  const [updatingNotes, setUpdatingNotes] = useState(false);
 
-  useEffect(() => {
-    fetchApplications();
-  }, [page, statusFilter]);
+  // Utiliser React Query hooks
+  const {
+    data,
+    isLoading: loading,
+    isError,
+    error: queryError,
+    refetch
+  } = useEmployerApplications(page, limit, statusFilter || undefined);
 
-  // ⚠️ CORRECTIF PERFORMANCE: Polling désactivé (causait polling excessif)
-  // Les données se rafraîchissent automatiquement après chaque modification (status, notes)
-  // Pour rafraîchir manuellement, changez de page ou utilisez les filtres
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     // Ne pas faire de polling si une mise à jour est en cours
-  //     if (!updatingStatus && !updatingNotes) {
-  //       fetchApplications(true);
-  //     }
-  //   }, 30000);
-  //
-  //   return () => clearInterval(interval);
-  // }, [page, statusFilter, updatingStatus, updatingNotes]);
+  // Mutations
+  const updateStatusMutation = useUpdateApplicationStatus();
+  const updateNotesMutation = useUpdateApplicationNotes();
 
-  const fetchApplications = async (silent = false) => {
-    try {
-      if (!silent) setLoading(true);
-      setError(null);
-      
-      const token = await getToken();
-      if (!token) {
-        setError('Authentification requise');
-        return;
-      }
+  // Extraire les données
+  const applications = data?.applications || [];
+  const totalPages = data?.total_pages || 0;
+  const total = data?.total || 0;
+  const error = isError ? 'Erreur lors du chargement' : null;
 
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: '20'
-      });
-      
-      if (statusFilter) params.append('status', statusFilter);
+  // États de chargement pour les mutations
+  const updatingStatus = updateStatusMutation.isPending;
+  const updatingNotes = updateNotesMutation.isPending;
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api';
-      const response = await fetch(`${apiUrl}/applications/employer/applications?${params}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`Erreur ${response.status}`);
-      }
-
-      const data: ApplicationsResponse = await response.json();
-      setApplications(data.applications);
-      setTotal(data.total);
-      setTotalPages(data.total_pages);
-    } catch (err: any) {
-      console.error('Erreur:', err);
-      if (!silent) setError('Erreur lors du chargement des candidatures');
-    } finally {
-      if (!silent) setLoading(false);
-    }
-  };
-
-  // Changer le statut d'une candidature
+  // Changer le statut d'une candidature (avec React Query)
   const handleStatusChange = async (applicationId: number, newStatus: string) => {
-    try {
-      setUpdatingStatus(true);
-      const token = await getToken();
-      if (!token) return;
-
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api';
-      const response = await fetch(`${apiUrl}/applications/employer/applications/${applicationId}/status`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ status: newStatus })
-      });
-
-      if (!response.ok) {
-        throw new Error('Erreur lors de la mise à jour du statut');
+    updateStatusMutation.mutate(
+      { applicationId, status: newStatus },
+      {
+        onSuccess: () => {
+          // Si la modal est ouverte, mettre à jour l'application affichée
+          if (viewingApplication && viewingApplication.id === applicationId) {
+            setViewingApplication({ ...viewingApplication, status: newStatus });
+          }
+          refetch(); // Rafraîchir la liste
+        }
       }
-
-      // Rafraîchir la liste
-      await fetchApplications(true);
-      
-      toast.success('✅ Statut mis à jour avec succès');
-      
-      // Si la modal est ouverte, mettre à jour l'application affichée
-      if (viewingApplication && viewingApplication.id === applicationId) {
-        setViewingApplication({ ...viewingApplication, status: newStatus });
-      }
-    } catch (error) {
-      console.error('Erreur:', error);
-      toast.error('❌ Erreur lors de la mise à jour du statut');
-    } finally {
-      setUpdatingStatus(false);
-    }
+    );
   };
 
-  // Mettre à jour les notes
+  // Mettre à jour les notes (avec React Query)
   const handleNotesUpdate = async (applicationId: number, notes: string) => {
-    try {
-      setUpdatingNotes(true);
-      const token = await getToken();
-      if (!token) return;
-
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api';
-      const response = await fetch(`${apiUrl}/applications/employer/applications/${applicationId}/notes`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ notes })
-      });
-
-      if (!response.ok) {
-        throw new Error('Erreur lors de la mise à jour des notes');
+    updateNotesMutation.mutate(
+      { applicationId, notes },
+      {
+        onSuccess: () => {
+          // Si la modal est ouverte, mettre à jour l'application affichée
+          if (viewingApplication && viewingApplication.id === applicationId) {
+            setViewingApplication({ ...viewingApplication, notes });
+          }
+          refetch(); // Rafraîchir la liste
+        }
       }
-
-      // Rafraîchir la liste
-      await fetchApplications(true);
-      
-      toast.success('✅ Notes sauvegardées avec succès');
-      
-      // Si la modal est ouverte, mettre à jour l'application affichée
-      if (viewingApplication && viewingApplication.id === applicationId) {
-        setViewingApplication({ ...viewingApplication, notes });
-      }
-    } catch (error) {
-      console.error('Erreur:', error);
-      toast.error('❌ Erreur lors de la mise à jour des notes');
-    } finally {
-      setUpdatingNotes(false);
-    }
+    );
   };
 
   const getStatusBadge = (status: string) => {
@@ -221,7 +145,7 @@ export default function CandidatesPage(): React.JSX.Element {
     });
   };
 
-  const filteredApplications = applications.filter(app =>
+  const filteredApplications = applications.filter((app: CandidateApplication) =>
     app.candidate_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     app.candidate_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
     app.job_title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -249,19 +173,19 @@ export default function CandidatesPage(): React.JSX.Element {
           <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
             <p className="text-sm text-gray-600">En attente</p>
             <p className="text-2xl font-bold text-yellow-600">
-              {applications.filter(a => a.status === 'applied' || a.status === 'pending').length}
+              {applications.filter((a: CandidateApplication) => a.status === 'applied' || a.status === 'pending').length}
             </p>
           </div>
           <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
             <p className="text-sm text-gray-600">Entretiens</p>
             <p className="text-2xl font-bold text-indigo-600">
-              {applications.filter(a => a.status === 'interview').length}
+              {applications.filter((a: CandidateApplication) => a.status === 'interview').length}
             </p>
           </div>
           <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
             <p className="text-sm text-gray-600">Acceptés</p>
             <p className="text-2xl font-bold text-green-600">
-              {applications.filter(a => a.status === 'accepted').length}
+              {applications.filter((a: CandidateApplication) => a.status === 'accepted').length}
             </p>
           </div>
         </div>
@@ -347,13 +271,13 @@ export default function CandidatesPage(): React.JSX.Element {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredApplications.map((application) => (
+                  {filteredApplications.map((application: CandidateApplication) => (
                     <tr key={application.id} className="hover:bg-gray-50 transition">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
                             <span className="text-blue-600 font-medium text-sm">
-                              {application.candidate_name.split(' ').map(n => n[0]).join('')}
+                              {application.candidate_name.split(' ').map((n: string) => n[0]).join('')}
                             </span>
                           </div>
                           <div className="ml-4">

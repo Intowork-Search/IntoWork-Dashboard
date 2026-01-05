@@ -19,6 +19,7 @@ export {
   useMyApplications,
   useApplication,
   useApplicationsCount,
+  useEmployerApplications,
   useApplyToJob,
   useWithdrawApplication,
   useUpdateApplicationStatus,

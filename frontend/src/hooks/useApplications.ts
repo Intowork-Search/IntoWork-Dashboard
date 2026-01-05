@@ -113,6 +113,62 @@ export function useApplicationsCount(
   });
 }
 
+/**
+ * useEmployerApplications - Récupérer les candidatures reçues (employeur)
+ *
+ * @param page - Numéro de page
+ * @param limit - Nombre de résultats par page
+ * @param status - Filtre par statut (optionnel)
+ * @param options - Options React Query
+ *
+ * @example
+ * const { data, isLoading } = useEmployerApplications(1, 20, 'applied');
+ * const applications = data?.applications || [];
+ */
+export function useEmployerApplications(
+  page: number = 1,
+  limit: number = 20,
+  status?: string,
+  options: {
+    enabled?: boolean;
+    refetchInterval?: number;
+  } = {}
+) {
+  const { getToken, isSignedIn } = useAuth();
+
+  return useQuery({
+    queryKey: queryKeys.applications.employerApplications({ page, limit, status }),
+    queryFn: async () => {
+      const token = await getToken();
+      if (!token) throw new Error('Non authentifié');
+
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api';
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString()
+      });
+      
+      if (status) params.append('status', status);
+
+      const response = await fetch(`${apiUrl}/applications/employer/applications?${params}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur ${response.status}`);
+      }
+
+      return await response.json();
+    },
+    enabled: isSignedIn && (options.enabled !== false),
+    staleTime: 1000 * 60 * 2, // 2 minutes
+    refetchInterval: options.refetchInterval,
+  });
+}
+
 // ============================================================
 // MUTATIONS (Écriture)
 // ============================================================
@@ -254,7 +310,7 @@ export function useUpdateApplicationStatus() {
       if (previousApplication) {
         queryClient.setQueryData<JobApplication>(queryKey, {
           ...previousApplication,
-          status: status as any,
+          status: status as JobApplication['status'],
         });
       }
 

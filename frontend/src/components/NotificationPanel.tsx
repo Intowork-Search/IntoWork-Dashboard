@@ -1,8 +1,23 @@
 'use client';
 
+/**
+ * NotificationPanel - Panneau de notifications
+ * 
+ * Migrée vers React Query pour meilleures performances
+ * - Cache automatique (2 min)
+ * - Pas de polling excessif
+ * - Mutations optimistes
+ */
+
 import React, { useState, useEffect, useRef } from 'react';
-import { useAuth } from '@/hooks/useNextAuth';
-import { notificationsAPI, Notification } from '@/lib/api';
+import {
+  useNotifications,
+  useUnreadNotificationsCount,
+  useMarkNotificationAsRead,
+  useMarkAllNotificationsAsRead,
+  useDeleteNotification
+} from '@/hooks';
+import { type Notification } from '@/lib/api';
 import { BellIcon, XMarkIcon, CheckIcon } from '@heroicons/react/24/outline';
 import { BellIcon as BellIconSolid } from '@heroicons/react/24/solid';
 import Link from 'next/link';
@@ -10,39 +25,18 @@ import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 export default function NotificationPanel() {
-  const { getToken } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [loading, setLoading] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
 
-  // Charger les notifications
-  const loadNotifications = async () => {
-    try {
-      const token = await getToken();
-      if (!token) return;
+  // Utiliser React Query hooks
+  const { data: notificationsData } = useNotifications(10, 0);
+  const { data: unreadCount = 0 } = useUnreadNotificationsCount();
+  const markAsReadMutation = useMarkNotificationAsRead();
+  const markAllAsReadMutation = useMarkAllNotificationsAsRead();
+  const deleteNotificationMutation = useDeleteNotification();
 
-      const response = await notificationsAPI.getNotifications(token, 10, 0);
-      setNotifications(response.notifications);
-      setUnreadCount(response.unread_count);
-    } catch (error) {
-      console.error('Erreur lors du chargement des notifications:', error);
-    }
-  };
-
-  // ⚠️ CORRECTIF PERFORMANCE: Polling désactivé (causait polling excessif)
-  // Charger les notifications au montage uniquement
-  useEffect(() => {
-    loadNotifications();
-
-    // Polling désactivé - utilisez le bouton pour rafraîchir manuellement
-    // Pour restaurer le polling automatique, migrez vers useNotifications hook
-    // const interval = setInterval(() => {
-    //   loadNotifications();
-    // }, 30000);
-    // return () => clearInterval(interval);
-  }, []);
+  // Extraire les données
+  const notifications = notificationsData?.notifications || [];
 
   // Fermer le panel si on clique à l'extérieur
   useEffect(() => {
@@ -66,31 +60,12 @@ export default function NotificationPanel() {
     event.preventDefault();
     event.stopPropagation();
     
-    try {
-      const token = await getToken();
-      if (!token) return;
-
-      await notificationsAPI.markAsRead(token, notificationId);
-      await loadNotifications();
-    } catch (error) {
-      console.error('Erreur lors du marquage comme lu:', error);
-    }
+    markAsReadMutation.mutate(notificationId);
   };
 
   // Marquer toutes comme lues
   const handleMarkAllAsRead = async () => {
-    try {
-      setLoading(true);
-      const token = await getToken();
-      if (!token) return;
-
-      await notificationsAPI.markAllAsRead(token);
-      await loadNotifications();
-    } catch (error) {
-      console.error('Erreur lors du marquage de toutes:', error);
-    } finally {
-      setLoading(false);
-    }
+    markAllAsReadMutation.mutate();
   };
 
   // Supprimer une notification
@@ -98,15 +73,7 @@ export default function NotificationPanel() {
     event.preventDefault();
     event.stopPropagation();
     
-    try {
-      const token = await getToken();
-      if (!token) return;
-
-      await notificationsAPI.deleteNotification(token, notificationId);
-      await loadNotifications();
-    } catch (error) {
-      console.error('Erreur lors de la suppression:', error);
-    }
+    deleteNotificationMutation.mutate(notificationId);
   };
 
   // Icône selon le type
@@ -159,7 +126,7 @@ export default function NotificationPanel() {
 
       {/* Panel des notifications */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 max-h-[32rem] overflow-hidden flex flex-col">
+        <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 max-h-128 overflow-hidden flex flex-col">
           {/* Header */}
           <div className="p-3 sm:p-4 border-b border-gray-200">
             <div className="flex items-center justify-between mb-2">
@@ -176,7 +143,7 @@ export default function NotificationPanel() {
             {unreadCount > 0 && (
               <button
                 onClick={handleMarkAllAsRead}
-                disabled={loading}
+                disabled={markAllAsReadMutation.isPending}
                 className="text-xs sm:text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1 disabled:opacity-50"
               >
                 <CheckIcon className="w-4 h-4" />
@@ -205,7 +172,7 @@ export default function NotificationPanel() {
                       setIsOpen(false);
                     }}
                     className={`block p-3 sm:p-4 hover:bg-gray-50 transition-colors ${
-                      !notification.is_read ? 'bg-blue-50' : ''
+                      notification.is_read ? '' : 'bg-blue-50'
                     }`}
                   >
                     <div className="flex items-start gap-2 sm:gap-3">
