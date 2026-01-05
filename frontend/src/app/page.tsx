@@ -25,7 +25,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-blue-50">
       {/* Header */}
       <header className="px-6 py-4">
         <nav className="flex justify-between items-center max-w-7xl mx-auto">

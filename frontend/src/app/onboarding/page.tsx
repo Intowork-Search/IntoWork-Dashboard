@@ -40,10 +40,10 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center px-4 py-8">
+    <div className="min-h-screen bg-blue-50 flex items-center justify-center px-4 py-8">
       <div className="max-w-3xl w-full bg-white rounded-2xl shadow-2xl overflow-hidden">
-        {/* Header avec gradient */}
-        <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-8 text-white text-center">
+        {/* Header solid color */}
+        <div className="bg-blue-600 p-8 text-white text-center">
           <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-2xl">✨</span>
           </div>
@@ -67,10 +67,10 @@ export default function OnboardingPage() {
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div 
+              <div
                 className={`group p-8 border-2 rounded-2xl cursor-pointer transition-all duration-300 hover:shadow-xl ${
-                  role === 'candidate' 
-                    ? 'border-blue-500 bg-gradient-to-br from-blue-50 to-indigo-50 shadow-lg transform scale-105' 
+                  role === 'candidate'
+                    ? 'border-blue-500 bg-blue-50 shadow-lg transform scale-105'
                     : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50/50'
                 }`}
                 onClick={() => {
@@ -256,7 +256,7 @@ export default function OnboardingPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-blue-400 disabled:to-indigo-400 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
+            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
           >
             {loading ? (
               <div className="flex items-center justify-center">
