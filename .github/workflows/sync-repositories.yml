@@ -22,14 +22,46 @@ jobs:
         env:
           GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
         run: |
+          # Check if GITLAB_TOKEN is set
+          if [ -z "$GITLAB_TOKEN" ]; then
+            echo "⚠️ GITLAB_TOKEN secret is not configured"
+            echo "To enable GitLab sync, add a Personal Access Token to GitHub Secrets"
+            echo "See: https://github.com/Intowork-Search/IntoWork-Dashboard/settings/secrets/actions"
+            exit 0
+          fi
+
+          # Configure git for the sync
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "GitHub Actions Bot"
+
+          # Add GitLab remote with token authentication
           git remote add gitlab https://oauth2:${GITLAB_TOKEN}@gitlab.com/badalot/intowork-dashboard.git || true
-          git push gitlab ${GITHUB_REF#refs/heads/} --force-with-lease
+
+          # Push to GitLab
+          if git push gitlab ${GITHUB_REF#refs/heads/} --force-with-lease; then
+            echo "✅ Successfully pushed to GitLab"
+          else
+            echo "⚠️ Failed to push to GitLab - check token permissions"
+            echo "Token needs: write_repository, api scopes"
+            exit 1
+          fi
 
       - name: Sync tags
         env:
           GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
         run: |
-          git push gitlab --tags --force-with-lease
+          # Skip if token not configured
+          if [ -z "$GITLAB_TOKEN" ]; then
+            echo "⚠️ Skipping tag sync - GITLAB_TOKEN not configured"
+            exit 0
+          fi
+
+          if git push gitlab --tags --force-with-lease; then
+            echo "✅ Successfully synced tags to GitLab"
+          else
+            echo "⚠️ Failed to sync tags to GitLab"
+            exit 1
+          fi
 
       - name: Notify on failure
         if: failure()
