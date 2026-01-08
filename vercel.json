@@ -6,6 +6,7 @@
   "installCommand": "cd frontend && npm install",
   "framework": "nextjs",
   "regions": ["iad1"],
+  "domains": ["intowork.co", "www.intowork.co"],
   "env": {
     "NEXTAUTH_URL": {
       "description": "The URL of your Vercel deployment (e.g., https://your-app.vercel.app)",
