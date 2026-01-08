@@ -195,6 +195,14 @@ make dev
 ```bash
 cd backend
 
+# Virtual environment setup (first time only)
+python3 -m venv venv
+source venv/bin/activate  # Linux/Mac
+# OR venv\Scripts\activate  # Windows
+
+# Install dependencies
+pip install -r requirements.txt
+
 # Start development server (port 8001)
 uvicorn app.main:app --reload --port 8001
 
@@ -205,15 +213,27 @@ docker run --name postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=intowork
 alembic upgrade head                    # Apply all migrations
 alembic revision --autogenerate -m "Description"  # Create new migration
 alembic downgrade -1                    # Rollback one migration
+alembic current                         # Show current migration
+alembic history                         # Show migration history
 
-# Test API connectivity
-python test_api.py
+# Testing
+python test_api.py                      # Test API connectivity
+python test_complete_backend.py         # Comprehensive backend tests
+pytest                                  # Run test suite (if configured)
+
+# Database utilities
+python create_test_data.py              # Create test data
+python check_user.py                    # Check user exists
+python reset_user_password.py           # Reset user password
 ```
 
 ### Frontend Commands
 
 ```bash
 cd frontend
+
+# Install dependencies
+npm install
 
 # Start development server (port 3000)
 npm run dev
@@ -254,10 +274,50 @@ cd backend
 python test_api.py              # Basic API connectivity test
 python test_password_reset.py   # Test password reset flow
 python test_auth_jobs.py        # Test authentication and job endpoints
+python test_complete_backend.py # Comprehensive backend tests
+python test_security_fixes.py   # Security validation tests
+python test_query_performance.py # Database query performance tests
 
 # Test deployment readiness
 ./test-railway-deployment.sh    # Test Railway deployment configuration
 ./test-pre-push.sh              # Pre-push verification checks
+
+# Local integration tests (from project root)
+./start-test-local.sh           # Start local test environment
+./test-complet.sh               # Run comprehensive integration tests
+./stop-test-local.sh            # Stop test environment
+```
+
+### Development Utilities
+
+**Backend Utilities** (`backend/`):
+```bash
+# Create test data for development
+python create_test_data.py
+
+# Check if user exists
+python check_user.py
+
+# Reset user password
+python reset_user_password.py
+
+# Check jobs in database
+python check_jobs.py
+
+# Apply rate limits to routes
+python apply_rate_limits.py
+```
+
+**Scripts** (`/scripts`):
+```bash
+# Generate secure secrets for .env
+./scripts/generate-secrets.sh
+
+# Verify deployment configuration
+./scripts/verify-deployment.sh
+
+# Setup GitHub SSH authentication
+./scripts/setup-github-ssh.sh
 ```
 
 ## Environment Configuration
@@ -396,16 +456,65 @@ queryClient.invalidateQueries({ queryKey: queryKeys.jobs.all });
 5. Update TypeScript interfaces in `frontend/src/lib/api.ts`
 6. Update React Query hooks if response shape changed
 
-**Performance Note**: Recent database analysis identified 15 critical missing indexes. See `PostgreSQL_Database_Analysis.md` for optimization opportunities. A production-ready migration is available at `backend/alembic/versions/h8c2d6e5f4g3_critical_indexes_and_constraints.py`.
+**Performance Note**: Recent database analysis identified 15 critical missing indexes. See `PostgreSQL_Database_Analysis.md` for optimization guide and `DATABASE_IMPLEMENTATION_GUIDE.md` for implementation patterns.
+
+**Database Optimization Resources**:
+- `PostgreSQL_Database_Analysis.md` - Complete performance analysis
+- `DATABASE_IMPLEMENTATION_GUIDE.md` - Implementation patterns and best practices
+- `PERFORMANCE_METRICS_REFERENCE.md` - Query performance benchmarks
+- `backend/alembic/versions/h8c2d6e5f4g3_critical_indexes_and_constraints.py` - Production-ready index migration
+- `backend/alembic/versions/i9d3e6f5h4j5_fulltext_search_and_advanced_indexes.py` - Full-text search indexes
+
+### Authentication Dependencies (Backend)
+
+The backend uses FastAPI dependency injection with **Annotated types** for authentication:
+
+**Key Dependencies** (from `backend/app/auth.py`):
+```python
+from typing import Annotated
+from fastapi import Depends
+from app.auth import require_user, require_role, require_candidate, require_employer, require_admin
+
+# Get any authenticated user
+@router.get("/endpoint")
+async def endpoint(user: Annotated[User, Depends(require_user)]):
+    pass
+
+# Require specific role
+@router.get("/endpoint")
+async def endpoint(user: Annotated[User, Depends(require_role(UserRole.ADMIN))]):
+    pass
+
+# Shortcuts for common roles
+@router.get("/endpoint")
+async def endpoint(candidate: Annotated[Candidate, Depends(require_candidate)]):
+    # Returns the Candidate profile, not just User
+    pass
+```
+
+**Available Dependencies**:
+- `require_user` - Any authenticated user (returns User)
+- `require_role(UserRole)` - Specific role required (returns User)
+- `require_candidate` - Candidate only (returns Candidate profile)
+- `require_employer` - Employer only (returns Employer profile)
+- `require_admin` - Admin only (returns User)
+- `require_employer_or_admin` - Either employer or admin (returns User)
+
+**Database Dependency**:
+```python
+from app.database import get_db
+
+async def endpoint(db: Annotated[AsyncSession, Depends(get_db)]):
+    # db is an AsyncSession for database operations
+    pass
+```
 
 ### Role-Based Access Control
 
 - Check user role via `user.role` enum: `UserRole.CANDIDATE`, `UserRole.EMPLOYER`, `UserRole.ADMIN`
 - Frontend: Use `await auth()` from NextAuth to get session with user role
 - Frontend: Access user info via `session.user.role`, `session.user.email`, etc.
-- Backend: Use `require_user` to get authenticated user (any role)
-- Backend: Use `require_role(UserRole.X)` to enforce specific roles
-- Backend shortcuts: `require_candidate`, `require_employer`, `require_admin`, `require_employer_or_admin`
+- Backend: Use dependencies above for role enforcement
 - Candidate routes: `/dashboard/candidates/*`, `/api/candidates/*`
 - Employer routes: `/dashboard/job-posts/*`, `/dashboard/company/*`, `/api/jobs/*`, `/api/companies/*`, `/api/employers/*`
 - Admin routes: `/dashboard/admin/*`, `/api/admin/*`
@@ -472,6 +581,41 @@ Used in:
 - Sign up page (`/auth/signup`)
 - Password reset page (`/auth/reset-password`)
 - Change password modal (dashboard settings)
+
+### Performance Optimization and Caching
+
+The backend includes optional performance optimization features:
+
+**Available Infrastructure** (in `backend/app/`):
+- `cache.py` - Redis-based caching utilities
+- `rate_limiter.py` - SlowAPI rate limiting configuration
+- `monitoring.py` - Prometheus metrics and monitoring
+- `api/jobs_cached.py` - Example of cached job endpoints
+- `api/dashboard_optimized.py` - Optimized dashboard queries
+
+**Usage Pattern**:
+```python
+from app.cache import cache_get, cache_set
+from app.rate_limiter import limiter
+
+# Caching
+@router.get("/endpoint")
+async def cached_endpoint():
+    cached = await cache_get("key")
+    if cached:
+        return cached
+    result = await fetch_data()
+    await cache_set("key", result, ttl=300)
+    return result
+
+# Rate limiting
+@router.post("/endpoint")
+@limiter.limit("5/minute")
+async def rate_limited_endpoint():
+    pass
+```
+
+**Note**: Caching and monitoring are optional and require Redis/Prometheus setup in production. The app works without them.
 
 ## Deployment
 
@@ -548,3 +692,85 @@ All git operations are automated via scripts in `/scripts`:
 16. **Async/Await**: ALL backend routes and database operations use async/await - never use synchronous SQLAlchemy patterns
 17. **React Query Cache**: Frontend data is cached - use `queryClient.invalidateQueries()` after mutations to ensure UI updates
 18. **Database Performance**: Check `PostgreSQL_Database_Analysis.md` before writing queries that scan large tables
+19. **Annotated Types**: Backend uses `Annotated[Type, Depends(...)]` pattern for dependencies (FastAPI 0.100+)
+20. **Virtual Environment**: Backend requires Python venv activation: `source venv/bin/activate` before running commands
+
+## Troubleshooting
+
+### Backend Issues
+
+**Import Errors / Module Not Found**:
+```bash
+# Ensure virtual environment is activated
+cd backend
+source venv/bin/activate  # Linux/Mac
+# OR venv\Scripts\activate  # Windows
+
+# Reinstall dependencies if needed
+pip install -r requirements.txt
+```
+
+**Database Connection Errors**:
+```bash
+# Check PostgreSQL is running
+docker ps | grep postgres
+
+# Verify DATABASE_URL in .env
+# Should be: postgresql://postgres:postgres@localhost:5433/intowork
+
+# Restart PostgreSQL if needed
+docker restart postgres
+```
+
+**Migration Errors**:
+```bash
+# Check current migration state
+alembic current
+
+# Reset to head if stuck
+alembic upgrade head
+
+# If conflicts, check for multiple heads
+alembic heads
+
+# Merge heads if needed (see alembic documentation)
+```
+
+### Frontend Issues
+
+**Module Not Found / Dependencies Issues**:
+```bash
+cd frontend
+rm -rf node_modules package-lock.json
+npm install
+```
+
+**NextAuth Configuration Errors**:
+```bash
+# Verify .env.local has all required variables
+# NEXTAUTH_SECRET must match backend NEXTAUTH_SECRET
+# NEXT_PUBLIC_API_URL must end with /api
+
+# Regenerate NEXTAUTH_SECRET if needed
+openssl rand -base64 32
+```
+
+**API Connection Issues**:
+- Check backend is running on port 8001
+- Verify CORS settings in `backend/app/main.py`
+- Check browser console for actual error messages
+- Verify JWT token is being sent in Authorization header
+
+### Common Development Workflow Issues
+
+**Changes Not Reflected**:
+- Backend: Check uvicorn is in `--reload` mode
+- Frontend: Check Next.js dev server console for errors
+- Database: Run migrations if schema changed
+- Cache: Clear React Query cache or browser cache
+
+**Authentication Not Working**:
+- Verify NEXTAUTH_SECRET matches in both .env files
+- Check JWT token expiration (24 hours by default)
+- Verify user exists in database
+- Check backend logs for JWT validation errors
