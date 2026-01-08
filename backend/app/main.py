@@ -60,6 +60,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",  # Next.js dev server
+        "https://www.intowork.co",  # Production custom domain
+        "https://intowork.co",  # Production custom domain (without www)
         "https://intowork-dashboard.vercel.app",  # Production frontend
         "https://intowork-dashboard-56y4i4dix-saas-hc.vercel.app",  # Vercel preview
         "https://*.vercel.app",  # All Vercel deployments
