@@ -16,6 +16,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/queryKeys';
 import { applicationsAPI, type JobApplication, type CreateApplicationData, type ApplicationsResponse } from '@/lib/api';
 import { useAuth } from '@/hooks/useNextAuth';
+import { getApiUrl } from '@/lib/getApiUrl';
 import toast from 'react-hot-toast';
 
 // ============================================================
@@ -142,7 +143,7 @@ export function useEmployerApplications(
       const token = await getToken();
       if (!token) throw new Error('Non authentifié');
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api';
+      const apiUrl = getApiUrl();
       const params = new URLSearchParams({
         page: page.toString(),
         limit: limit.toString()

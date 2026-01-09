@@ -16,7 +16,9 @@ import {
 import toast from 'react-hot-toast';
 import axios from 'axios';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api';
+import { getApiUrl } from '@/lib/getApiUrl';
+
+const API_URL = getApiUrl();
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');

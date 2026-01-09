@@ -1,8 +1,9 @@
 import NextAuth from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import axios from "axios"
+import { getApiUrl } from "./lib/getApiUrl"
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8001/api"
+const API_URL = getApiUrl()
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useUser, useAuth } from '@/hooks/useNextAuth';
 import DashboardLayout from '@/components/DashboardLayout';
 import { candidatesAPI, CV } from '@/lib/api';
+import { getApiUrl } from '@/lib/getApiUrl';
 import { 
   DocumentTextIcon,
   EyeIcon,
@@ -223,7 +224,7 @@ export default function MesCVPage() {
       const formData = new FormData();
       formData.append('cv', file);
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api';
+      const apiUrl = getApiUrl();
       const response = await fetch(`${apiUrl}/candidates/cv`, {
         method: 'POST',
         headers: {

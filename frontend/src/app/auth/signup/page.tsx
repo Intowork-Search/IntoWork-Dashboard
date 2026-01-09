@@ -18,7 +18,9 @@ import axios from 'axios';
 import PasswordStrengthIndicator from '@/components/PasswordStrengthIndicator';
 import { validatePassword } from '@/lib/passwordValidation';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api';
+import { getApiUrl } from '@/lib/getApiUrl';
+
+const API_URL = getApiUrl();
 
 export default function SignUpPage() {
   const router = useRouter();

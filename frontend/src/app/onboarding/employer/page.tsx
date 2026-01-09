@@ -7,7 +7,9 @@ import toast from 'react-hot-toast';
 import axios from 'axios';
 import { BuildingOfficeIcon } from '@heroicons/react/24/outline';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api';
+import { getApiUrl } from '@/lib/getApiUrl';
+
+const API_URL = getApiUrl();
 
 const EMPLOYER_POSITIONS = [
   'Recruteur interne (Talent Acquisition)',

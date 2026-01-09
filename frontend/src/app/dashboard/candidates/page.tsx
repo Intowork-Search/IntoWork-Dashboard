@@ -11,6 +11,7 @@
 
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
+import { getApiUrl } from '@/lib/getApiUrl';
 import { 
   useEmployerApplications,
   useUpdateApplicationStatus,
@@ -430,7 +431,7 @@ export default function CandidatesPage(): React.JSX.Element {
                   <a
                     href={viewingApplication.cv_url.startsWith('http') 
                       ? viewingApplication.cv_url 
-                      : `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}/${viewingApplication.cv_url}`
+                      : `${getApiUrl().replace('/api', '')}/${viewingApplication.cv_url}`
                     }
                     target="_blank"
                     rel="noopener noreferrer"
