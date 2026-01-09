@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useUser, useAuth } from '@/hooks/useNextAuth';
 import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/DashboardLayout';
@@ -37,7 +37,7 @@ export default function Dashboard() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Fonction pour charger les données du dashboard
-  const loadDashboardData = async () => {
+  const loadDashboardData = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -125,10 +125,10 @@ export default function Dashboard() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [getToken, userRole]); // ⚠️ Dépendances de useCallback
 
   // Fonction pour gérer le téléchargement de CV
-  const handleCVUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCVUpload = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -183,7 +183,7 @@ export default function Dashboard() {
         fileInputRef.current.value = '';
       }
     }
-  };
+  }, [getToken, loadDashboardData, router]); // ⚠️ Dépendances de useCallback
 
   // Ouvrir le sélecteur de fichiers
   const openFileSelector = () => {
@@ -202,7 +202,7 @@ export default function Dashboard() {
     if (user && userRole !== 'admin') {
       loadDashboardData();
     }
-  }, [user, userRole]);
+  }, [user, userRole, loadDashboardData]); // ⚠️ Ajout de loadDashboardData dans les dépendances
 
   // ⚠️ CORRECTIF PERFORMANCE: Event listeners manuels supprimés
   // Les listeners window.focus et visibilitychange causaient un polling excessif
