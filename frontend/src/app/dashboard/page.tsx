@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useUser, useAuth } from '@/hooks/useNextAuth';
 import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/DashboardLayout';
-import { candidatesAPI, CandidateProfile, jobsAPI } from '@/lib/api';
+import { candidatesAPI, CandidateProfile, jobsAPI, getApiUrl } from '@/lib/api';
 import { dashboardAPI, DashboardData } from '@/lib/api/dashboard';
 import { 
   UserIcon, 
@@ -155,7 +155,7 @@ export default function Dashboard() {
       const formData = new FormData();
       formData.append('cv', file);
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/candidates/cv`, {
+      const response = await fetch(`${getApiUrl()}/candidates/cv`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

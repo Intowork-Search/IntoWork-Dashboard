@@ -14,6 +14,9 @@ const getApiUrl = () => {
   return url.replace(/^http:\/\//i, 'https://');
 };
 
+// Export pour utilisation dans d'autres fichiers
+export { getApiUrl };
+
 // Configuration de l'API client
 const apiClient = axios.create({
   baseURL: getApiUrl(),
