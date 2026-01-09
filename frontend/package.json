@@ -15,6 +15,9 @@
     "@tailwindcss/postcss": "^4",
     "@tanstack/react-query": "^5.90.16",
     "@tanstack/react-query-devtools": "^5.91.2",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
     "axios": "^1.13.2",
     "daisyui": "^5.5.14",
     "date-fns": "^4.1.0",
@@ -23,15 +26,12 @@
     "react": "19.2.1",
     "react-dom": "19.2.1",
     "react-hot-toast": "^2.6.0",
-    "tailwindcss": "^4"
+    "tailwindcss": "^4",
+    "typescript": "^5"
   },
   "devDependencies": {
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
-    "eslint-config-next": "16.0.10",
-    "typescript": "^5"
+    "eslint-config-next": "16.0.10"
   }
 }
