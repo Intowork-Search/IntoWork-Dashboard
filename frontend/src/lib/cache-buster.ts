@@ -1,8 +1,8 @@
 // CACHE BUSTER - Force Vercel rebuild pour Mixed Content fix
-// Timestamp: 2025-12-17T18:33:00Z
+// Timestamp: 2026-01-09T14:00:00Z
 // Railway HTTPS enforced globally
-// NUCLEAR OPTION: Force complete redeploy
+// FINAL FIX: Proper HTTPS configuration
 
-export const CACHE_BUSTER = "v2025-12-17-1833-NUCLEAR";
+export const CACHE_BUSTER = "v2026-01-09-1400-HTTPS-FIX";
 export const FORCE_HTTPS = true;
-export const VERCEL_REDEPLOY_TRIGGER = "FORCE_REBUILD_1833";
+export const VERCEL_REDEPLOY_TRIGGER = "FORCE_REBUILD_JAN09";
