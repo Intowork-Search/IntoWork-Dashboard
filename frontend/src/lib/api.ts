@@ -4,19 +4,7 @@ import axios from 'axios';
 const getApiUrl = () => {
   const url = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api';
   // CRITICAL: Force HTTPS replacement for production
-  const finalUrl = url.replace(/^http:\/\//i, 'https://');
-  
-  // Debug log (will show in build logs and console)
-  if (typeof window !== 'undefined') {
-    console.log('🔍 API URL Debug:', {
-      original: process.env.NEXT_PUBLIC_API_URL,
-      url,
-      finalUrl,
-      protocol: window.location.protocol
-    });
-  }
-  
-  return finalUrl;
+  return url.replace(/^http:\/\//i, 'https://');
 };
 
 // Configuration de l'API client

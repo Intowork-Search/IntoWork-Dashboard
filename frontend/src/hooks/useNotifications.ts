@@ -57,6 +57,8 @@ export function useNotifications(
     // ⚠️ CORRECTIF PERFORMANCE: Polling désactivé par défaut pour éviter surcharge
     // Pour activer le polling: passez refetchInterval en option
     refetchInterval: options.refetchInterval ?? false,
+    // ⚠️ TEMPORARY: Disable retry to prevent infinite loop during Mixed Content debug
+    retry: false,
   });
 }
 
@@ -86,6 +88,8 @@ export function useUnreadNotificationsCount(
     staleTime: 1000 * 60 * 2, // 2 minutes
     // ⚠️ CORRECTIF PERFORMANCE: Polling désactivé par défaut
     refetchInterval: options.refetchInterval ?? false,
+    // ⚠️ TEMPORARY: Disable retry to prevent infinite loop during Mixed Content debug
+    retry: false,
   });
 }
 
