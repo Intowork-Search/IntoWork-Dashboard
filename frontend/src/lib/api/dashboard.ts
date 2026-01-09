@@ -1,15 +1,7 @@
 // Utiliser la variable d'environnement pour l'URL de l'API
 const getApiBaseUrl = () => {
-  // En production, toujours forcer l'URL HTTPS complète
-  if (process.env.NODE_ENV === 'production') {
-    return 'https://intowork-dashboard-production-1ede.up.railway.app/api';
-  }
-  
-  // En développement, utiliser la variable d'environnement
-  const url = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api';
-  
-  // Nettoyer et forcer HTTPS si nécessaire
-  return url.replace(/^http:\/\//i, 'https://');
+  // ALWAYS return HTTPS - hardcoded to prevent any issues
+  return 'https://intowork-dashboard-production-1ede.up.railway.app/api';
 };
 
 interface DashboardStat {
