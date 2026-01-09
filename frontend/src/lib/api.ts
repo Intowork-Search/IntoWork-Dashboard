@@ -2,51 +2,35 @@ import axios from 'axios';
 
 // Force HTTPS for API URL - ALWAYS
 const getApiUrl = () => {
+  // En production, toujours forcer l'URL HTTPS complète
+  if (process.env.NODE_ENV === 'production') {
+    return 'https://intowork-dashboard-production-1ede.up.railway.app/api';
+  }
+  
+  // En développement, utiliser la variable d'environnement
   const url = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api';
-  // CRITICAL: Force HTTPS replacement for production
+  
+  // Nettoyer et forcer HTTPS si nécessaire
   return url.replace(/^http:\/\//i, 'https://');
 };
 
 // Configuration de l'API client
 const apiClient = axios.create({
-  baseURL: getApiUrl(), // Appeler getApiUrl() dynamiquement
+  baseURL: getApiUrl(),
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// CRITICAL: Intercepteur pour forcer HTTPS dans toutes les requêtes
-apiClient.interceptors.request.use((config) => {
-  if (typeof window !== 'undefined' && config.url) {
-    // Force HTTPS si on est sur une page HTTPS
-    if (window.location.protocol === 'https:' && config.baseURL) {
-      config.baseURL = config.baseURL.replace(/^http:\/\//i, 'https://');
-    }
-  }
-  return config;
-});
-
 // Function to create authenticated axios instance
 export const createAuthenticatedClient = (token: string) => {
-  const client = axios.create({
-    baseURL: getApiUrl(), // Appeler getApiUrl() dynamiquement
+  return axios.create({
+    baseURL: getApiUrl(),
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
     },
   });
-  
-  // Apply the same HTTPS interceptor
-  client.interceptors.request.use((config) => {
-    if (typeof window !== 'undefined' && config.url) {
-      if (window.location.protocol === 'https:' && config.baseURL) {
-        config.baseURL = config.baseURL.replace(/^http:\/\//i, 'https://');
-      }
-    }
-    return config;
-  });
-  
-  return client;
 };
 
 // Intercepteur pour gérer les erreurs
@@ -355,7 +339,11 @@ export const candidatesAPI = {
   
   // Obtenir l'URL du CV pour prévisualisation
   getCVUrl: (token: string): string => {
-    return `${process.env.NEXT_PUBLIC_API_URL}/candidates/cv/download?token=${token}`;
+    // Force HTTPS en production
+    const apiUrl = process.env.NODE_ENV === 'production'
+      ? 'https://intowork-dashboard-production-1ede.up.railway.app/api'
+      : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api');
+    return `${apiUrl}/candidates/cv/download?token=${token}`;
   },
   
   // Lister tous les CV
