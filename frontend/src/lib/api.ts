@@ -29,6 +29,17 @@ const apiClient = axios.create({
   },
 });
 
+// CRITICAL: Intercepteur pour forcer HTTPS dans toutes les requêtes
+apiClient.interceptors.request.use((config) => {
+  if (typeof window !== 'undefined' && config.url) {
+    // Force HTTPS si on est sur une page HTTPS
+    if (window.location.protocol === 'https:' && config.baseURL) {
+      config.baseURL = config.baseURL.replace(/^http:\/\//i, 'https://');
+    }
+  }
+  return config;
+});
+
 // Function to create authenticated axios instance
 export const createAuthenticatedClient = (token: string) => {
   const client = axios.create({
@@ -38,6 +49,17 @@ export const createAuthenticatedClient = (token: string) => {
       'Authorization': `Bearer ${token}`,
     },
   });
+  
+  // Apply the same HTTPS interceptor
+  client.interceptors.request.use((config) => {
+    if (typeof window !== 'undefined' && config.url) {
+      if (window.location.protocol === 'https:' && config.baseURL) {
+        config.baseURL = config.baseURL.replace(/^http:\/\//i, 'https://');
+      }
+    }
+    return config;
+  });
+  
   return client;
 };
 
