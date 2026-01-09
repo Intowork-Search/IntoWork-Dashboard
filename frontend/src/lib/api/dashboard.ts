@@ -1,11 +1,8 @@
 // Utiliser la variable d'environnement pour l'URL de l'API
 const getApiBaseUrl = () => {
   const url = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api';
-  // Force HTTPS in production
-  if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
-    return url.replace('http://', 'https://');
-  }
-  return url;
+  // CRITICAL: Force HTTPS replacement for production
+  return url.replace(/^http:\/\//i, 'https://');
 };
 
 interface DashboardStat {

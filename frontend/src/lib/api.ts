@@ -1,18 +1,29 @@
 import axios from 'axios';
 
-// Force HTTPS for API URL
+// Force HTTPS for API URL - ALWAYS
 const getApiUrl = () => {
   const url = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api';
-  // Force HTTPS in production
-  if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
-    return url.replace('http://', 'https://');
+  // CRITICAL: Force HTTPS replacement for production
+  const finalUrl = url.replace(/^http:\/\//i, 'https://');
+  
+  // Debug log (will show in build logs and console)
+  if (typeof window !== 'undefined') {
+    console.log('🔍 API URL Debug:', {
+      original: process.env.NEXT_PUBLIC_API_URL,
+      url,
+      finalUrl,
+      protocol: window.location.protocol
+    });
   }
-  return url;
+  
+  return finalUrl;
 };
+
+const API_BASE_URL = getApiUrl();
 
 // Configuration de l'API client
 const apiClient = axios.create({
-  baseURL: getApiUrl(),
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -21,7 +32,7 @@ const apiClient = axios.create({
 // Function to create authenticated axios instance
 export const createAuthenticatedClient = (token: string) => {
   const client = axios.create({
-    baseURL: getApiUrl(),
+    baseURL: API_BASE_URL,
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
