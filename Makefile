@@ -14,11 +14,11 @@ help:
 	@echo "  make stop     - Arrêter tous les services"
 	@echo "  make clean    - Nettoyer les fichiers temporaires"
 	@echo ""
-	@echo "🔄 Git - Synchronisation GitHub & GitLab:"
-	@echo "  make push     - Push vers GitHub et GitLab"
-	@echo "  make commit MSG=\"message\" - Commit et push vers les deux"
-	@echo "  make sync     - Synchroniser les deux dépôts"
-	@echo "  make status-all - Voir le statut des deux dépôts"
+	@echo "🔄 Git - GitHub Synchronization:"
+	@echo "  make push     - Push to GitHub repositories"
+	@echo "  make commit MSG=\"message\" - Commit and push to GitHub"
+	@echo "  make sync     - Synchronize GitHub repositories"
+	@echo "  make status-all - View status of GitHub repositories"
 	@echo ""
 
 # Lancer les deux services simultanément
@@ -92,15 +92,15 @@ commit:
 # Synchroniser les deux dépôts
 sync: push
 
-# Voir le statut des deux dépôts
+# Voir le statut des dépôts GitHub
 status-all:
 	@echo "📊 Statut local:"
 	@git status -sb
 	@echo ""
-	@echo "📍 GitLab (origin):"
-	@git fetch origin -q 2>/dev/null || true
-	@git rev-list --left-right --count origin/$$(git branch --show-current)...HEAD 2>/dev/null | awk '{print "  En retard: "$$1" | En avance: "$$2}' || echo "  ⚠️  Impossible de comparer"
-	@echo ""
 	@echo "📍 GitHub (old-origin):"
 	@git fetch old-origin -q 2>/dev/null || true
 	@git rev-list --left-right --count old-origin/$$(git branch --show-current)...HEAD 2>/dev/null | awk '{print "  En retard: "$$1" | En avance: "$$2}' || echo "  ⚠️  Impossible de comparer"
+	@echo ""
+	@echo "📍 GitHub (github):"
+	@git fetch github -q 2>/dev/null || true
+	@git rev-list --left-right --count github/$$(git branch --show-current)...HEAD 2>/dev/null | awk '{print "  En retard: "$$1" | En avance: "$$2}' || echo "  ⚠️  Impossible de comparer"

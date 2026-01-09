@@ -1,5 +1,5 @@
 #!/bin/bash
-# Script to push to both GitHub and GitLab repositories
+# Script to push to GitHub repositories
 
 set -e
 
@@ -10,7 +10,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-echo -e "${BLUE}🚀 Pushing to both GitHub and GitLab...${NC}"
+echo -e "${BLUE}🚀 Pushing to GitHub repositories...${NC}"
 echo ""
 
 # Get current branch
@@ -33,35 +33,35 @@ if ! git diff-index --quiet HEAD --; then
     fi
 fi
 
-# Push to GitLab (origin)
-echo ""
-echo -e "${BLUE}📤 Pushing to GitLab (origin)...${NC}"
-if git push origin "$CURRENT_BRANCH"; then
-    echo -e "${GREEN}✅ Successfully pushed to GitLab${NC}"
-else
-    echo -e "${RED}❌ Failed to push to GitLab${NC}"
-    exit 1
-fi
-
 # Push to GitHub (old-origin)
 echo ""
 echo -e "${BLUE}📤 Pushing to GitHub (old-origin)...${NC}"
 if git push old-origin "$CURRENT_BRANCH"; then
-    echo -e "${GREEN}✅ Successfully pushed to GitHub${NC}"
+    echo -e "${GREEN}✅ Successfully pushed to GitHub (old-origin)${NC}"
 else
-    echo -e "${RED}❌ Failed to push to GitHub${NC}"
+    echo -e "${RED}❌ Failed to push to GitHub (old-origin)${NC}"
+    exit 1
+fi
+
+# Push to GitHub (github)
+echo ""
+echo -e "${BLUE}📤 Pushing to GitHub (github)...${NC}"
+if git push github "$CURRENT_BRANCH"; then
+    echo -e "${GREEN}✅ Successfully pushed to GitHub (github)${NC}"
+else
+    echo -e "${RED}❌ Failed to push to GitHub (github)${NC}"
     exit 1
 fi
 
 # Push tags
 echo ""
-echo -e "${BLUE}🏷️  Pushing tags to both remotes...${NC}"
-git push origin --tags 2>/dev/null || echo -e "${YELLOW}⚠️  No new tags for GitLab${NC}"
-git push old-origin --tags 2>/dev/null || echo -e "${YELLOW}⚠️  No new tags for GitHub${NC}"
+echo -e "${BLUE}🏷️  Pushing tags to GitHub remotes...${NC}"
+git push old-origin --tags 2>/dev/null || echo -e "${YELLOW}⚠️  No new tags for old-origin${NC}"
+git push github --tags 2>/dev/null || echo -e "${YELLOW}⚠️  No new tags for github${NC}"
 
 echo ""
-echo -e "${GREEN}✨ All done! Your code is synced on GitHub and GitLab! ✨${NC}"
+echo -e "${GREEN}✨ All done! Your code is synced on GitHub! ✨${NC}"
 echo ""
 echo -e "${BLUE}📊 Repository URLs:${NC}"
-echo -e "  • GitHub: https://github.com/Intowork-Search/IntoWork-Dashboard"
-echo -e "  • GitLab: https://gitlab.com/badalot/intowork-dashboard"
+echo -e "  • GitHub (old-origin): https://github.com/Intowork-Search/IntoWork-Dashboard"
+echo -e "  • GitHub (github): https://github.com/badalot/IntoWork-Dashboard.git"

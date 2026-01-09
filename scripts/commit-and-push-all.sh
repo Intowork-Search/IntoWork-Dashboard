@@ -1,5 +1,5 @@
 #!/bin/bash
-# Script to commit and push to both GitHub and GitLab in one command
+# Script to commit and push to GitHub repositories in one command
 
 set -e
 
@@ -21,7 +21,7 @@ fi
 COMMIT_MSG="$1"
 CURRENT_BRANCH=$(git branch --show-current)
 
-echo -e "${BLUE}🚀 Commit and Push to Both Repositories${NC}"
+echo -e "${BLUE}🚀 Commit and Push to GitHub Repositories${NC}"
 echo -e "${YELLOW}Branch: ${CURRENT_BRANCH}${NC}"
 echo -e "${YELLOW}Message: ${COMMIT_MSG}${NC}"
 echo ""
@@ -50,23 +50,23 @@ Co-Authored-By: IntoWork Team <team@intowork.com>"
     echo -e "${GREEN}✅ Commit created${NC}"
 fi
 
-# Push to GitLab
+# Push to GitHub (old-origin)
 echo ""
-echo -e "${BLUE}📤 Pushing to GitLab...${NC}"
-if git push origin "$CURRENT_BRANCH"; then
-    echo -e "${GREEN}✅ GitLab sync complete${NC}"
+echo -e "${BLUE}📤 Pushing to GitHub (old-origin)...${NC}"
+if git push old-origin "$CURRENT_BRANCH"; then
+    echo -e "${GREEN}✅ GitHub (old-origin) sync complete${NC}"
 else
-    echo -e "${RED}❌ GitLab push failed${NC}"
+    echo -e "${RED}❌ GitHub (old-origin) push failed${NC}"
     exit 1
 fi
 
-# Push to GitHub
+# Push to GitHub (github)
 echo ""
-echo -e "${BLUE}📤 Pushing to GitHub...${NC}"
-if git push old-origin "$CURRENT_BRANCH"; then
-    echo -e "${GREEN}✅ GitHub sync complete${NC}"
+echo -e "${BLUE}📤 Pushing to GitHub (github)...${NC}"
+if git push github "$CURRENT_BRANCH"; then
+    echo -e "${GREEN}✅ GitHub (github) sync complete${NC}"
 else
-    echo -e "${RED}❌ GitHub push failed${NC}"
+    echo -e "${RED}❌ GitHub (github) push failed${NC}"
     exit 1
 fi
 
@@ -75,8 +75,8 @@ echo ""
 echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${GREEN}✨ Success! Your changes are now on:${NC}"
 echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "  🐙 GitHub:  https://github.com/Intowork-Search/IntoWork-Dashboard"
-echo -e "  🦊 GitLab:  https://gitlab.com/badalot/intowork-dashboard"
+echo -e "  🐙 GitHub (old-origin): https://github.com/Intowork-Search/IntoWork-Dashboard"
+echo -e "  🐙 GitHub (github): https://github.com/badalot/IntoWork-Dashboard.git"
 echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 echo -e "${BLUE}📊 Latest commit:${NC}"

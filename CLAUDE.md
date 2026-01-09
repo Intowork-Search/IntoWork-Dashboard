@@ -188,6 +188,11 @@ CV uploads are handled via:
 ./start-dev.sh
 # OR
 make dev
+
+# Stop all services
+# Press Ctrl+C in the terminal running start-dev.sh
+# OR use make command:
+make stop
 ```
 
 ### Backend Commands
@@ -259,11 +264,11 @@ make install    # Install all dependencies
 make stop       # Stop all services
 make clean      # Clean temporary files
 
-# Git automation (dual-repo: GitHub + GitLab)
-make push       # Push to both GitHub and GitLab
-make commit MSG="message"  # Commit and push to both repos
-make sync       # Synchronize both repositories
-make status-all # Show status of both repos
+# Git automation (GitHub repositories)
+make push       # Push to GitHub repositories
+make commit MSG="message"  # Commit and push to GitHub
+make sync       # Synchronize GitHub repositories
+make status-all # Show status of GitHub repositories
 ```
 
 ### Testing
@@ -326,7 +331,7 @@ python apply_rate_limits.py
 
 Required variables in `backend/.env`:
 ```env
-# Database
+# Database (automatically converted to postgresql+asyncpg:// for async engine)
 DATABASE_URL=postgresql://postgres:postgres@localhost:5433/intowork
 
 # NextAuth JWT Configuration (must match frontend)
@@ -404,7 +409,16 @@ result = await db.execute(
 - `frontend/src/lib/queryClient.ts` - QueryClient configuration
 - `frontend/src/lib/queryKeys.ts` - Centralized cache keys
 - `frontend/src/components/QueryProvider.tsx` - Provider wrapper
-- `frontend/src/hooks/*` - Custom hooks per resource (useJobs, useApplications, etc.)
+- `frontend/src/hooks/*` - Custom hooks per resource
+
+**Available React Query Hooks**:
+- `useJobs(filters)` - Job listings with filters
+- `useApplications(filters)` - Application listings
+- `useCandidates()` - Candidate profile data
+- `useDashboard()` - Dashboard stats and activities
+- `useNotifications()` - User notifications
+- `useAdmin()` - Admin-specific data and operations
+- `useAuthenticatedAPI()` - Authenticated API client wrapper
 
 **Key Patterns**:
 ```typescript
@@ -508,6 +522,12 @@ async def endpoint(db: Annotated[AsyncSession, Depends(get_db)]):
     # db is an AsyncSession for database operations
     pass
 ```
+
+**Connection Pool Configuration** (in `backend/app/database.py`):
+- Pool size: 20 concurrent connections
+- Max overflow: 10 additional connections
+- Pre-ping enabled: Validates connections before use
+- URL automatically converted from `postgresql://` to `postgresql+asyncpg://` for async support
 
 ### Role-Based Access Control
 
@@ -639,8 +659,8 @@ async def rate_limited_endpoint():
 - `deploy-vercel.sh` - Deploy frontend to Vercel
 - `generate-secrets.sh` - Generate secure environment secrets
 - `verify-deployment.sh` - Verify deployment status
-- `push-all.sh` - Push to GitHub and GitLab simultaneously
-- `commit-and-push-all.sh` - Commit and push to both repos
+- `push-all.sh` - Push to GitHub repositories simultaneously
+- `commit-and-push-all.sh` - Commit and push to GitHub repos
 - `setup-github-ssh.sh` - Setup GitHub SSH authentication
 
 **Documentation**: See `docs/deployment/` for detailed deployment guides
@@ -655,20 +675,20 @@ The project has comprehensive documentation organized in the `docs/` directory:
 - **Email** (`docs/email/`) - Email service configuration and templates
 - **API** (`docs/api/`) - API documentation and examples
 - **Design** (`docs/design/`) - UI/UX design guidelines
-- **Git Automation** (`docs/git-automation/`) - Dual-repo setup and workflows
+- **Git Automation** (`docs/git-automation/`) - GitHub repository setup and workflows
 
 See `docs/README.md` for complete documentation index.
 
 ## Git Repository Setup
 
-This project uses a **dual-repository setup** for redundancy:
+This project uses **GitHub** for version control:
 
-- **Primary**: GitLab (origin)
-- **Mirror**: GitHub (old-origin)
+- **Primary**: GitHub (github) - https://github.com/badalot/IntoWork-Dashboard.git
+- **Secondary**: GitHub (old-origin) - https://github.com/Intowork-Search/IntoWork-Dashboard
 
 All git operations are automated via scripts in `/scripts`:
 
-- Push to both repos: `make push` or `./scripts/push-all.sh`
+- Push to GitHub repos: `make push` or `./scripts/push-all.sh`
 - Commit and push: `make commit MSG="message"`
 - Check status: `make status-all`
 
@@ -676,24 +696,25 @@ All git operations are automated via scripts in `/scripts`:
 
 1. **Port Configuration**: Backend uses port 8001 (not 8000) to avoid conflicts
 2. **PostgreSQL Port**: Development DB uses port 5433 (not default 5432)
-3. **CORS**: Backend explicitly allows frontend origins in `main.py`
-4. **Token Format**: Always use `Bearer <token>` in Authorization header
-5. **NEXTAUTH_SECRET Sync**: Must be identical in both backend and frontend `.env` files
-6. **API URL**: Frontend `NEXT_PUBLIC_API_URL` MUST include `/api` suffix (e.g., `http://localhost:8001/api`) since all backend routes use this prefix
-7. **JWT Algorithm**: Backend uses HS256 (symmetric) not RS256 (asymmetric like Clerk)
-8. **Password Hashing**: Use `PasswordHasher.hash_password()` and `verify_password()` from `auth.py`
-9. **Email Service**: Resend API key required for password reset; gracefully disabled if not configured
-10. **File Uploads**: Backend serves uploads via `/uploads` StaticFiles mount
-11. **has_applied Flag**: Only available when user is authenticated; computed per-request
-12. **Migration Order**: Always review autogenerated migrations before applying
-13. **Session Strategy**: NextAuth uses JWT strategy (not database sessions) for performance
-14. **Legacy Fields**: `clerk_id` field in User model is nullable and kept for migration compatibility
-15. **Dual Repos**: Always push to both GitHub and GitLab using `make push` to keep them in sync
-16. **Async/Await**: ALL backend routes and database operations use async/await - never use synchronous SQLAlchemy patterns
-17. **React Query Cache**: Frontend data is cached - use `queryClient.invalidateQueries()` after mutations to ensure UI updates
-18. **Database Performance**: Check `PostgreSQL_Database_Analysis.md` before writing queries that scan large tables
-19. **Annotated Types**: Backend uses `Annotated[Type, Depends(...)]` pattern for dependencies (FastAPI 0.100+)
-20. **Virtual Environment**: Backend requires Python venv activation: `source venv/bin/activate` before running commands
+3. **Database URL Async**: Backend automatically converts `postgresql://` to `postgresql+asyncpg://` for async engine
+4. **CORS**: Backend explicitly allows frontend origins in `main.py`
+5. **Token Format**: Always use `Bearer <token>` in Authorization header
+6. **NEXTAUTH_SECRET Sync**: Must be identical in both backend and frontend `.env` files
+7. **API URL**: Frontend `NEXT_PUBLIC_API_URL` MUST include `/api` suffix (e.g., `http://localhost:8001/api`) since all backend routes use this prefix
+8. **JWT Algorithm**: Backend uses HS256 (symmetric) not RS256 (asymmetric like Clerk)
+9. **Password Hashing**: Use `PasswordHasher.hash_password()` and `verify_password()` from `auth.py`
+10. **Email Service**: Resend API key required for password reset; gracefully disabled if not configured
+11. **File Uploads**: Backend serves uploads via `/uploads` StaticFiles mount
+12. **has_applied Flag**: Only available when user is authenticated; computed per-request
+13. **Migration Order**: Always review autogenerated migrations before applying
+14. **Session Strategy**: NextAuth uses JWT strategy (not database sessions) for performance
+15. **Legacy Fields**: `clerk_id` field in User model is nullable and kept for migration compatibility
+16. **GitHub Repositories**: Always push to GitHub repositories using `make push` to keep them in sync
+17. **Async/Await**: ALL backend routes and database operations use async/await - never use synchronous SQLAlchemy patterns
+18. **React Query Cache**: Frontend data is cached - use `queryClient.invalidateQueries()` after mutations to ensure UI updates
+19. **Database Performance**: Check `PostgreSQL_Database_Analysis.md` before writing queries that scan large tables
+20. **Annotated Types**: Backend uses `Annotated[Type, Depends(...)]` pattern for dependencies (FastAPI 0.100+)
+21. **Virtual Environment**: Backend requires Python venv activation: `source venv/bin/activate` before running commands
 
 ## Troubleshooting
 
