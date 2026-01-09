@@ -19,11 +19,9 @@ const getApiUrl = () => {
   return finalUrl;
 };
 
-const API_BASE_URL = getApiUrl();
-
 // Configuration de l'API client
 const apiClient = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: getApiUrl(), // Appeler getApiUrl() dynamiquement
   headers: {
     'Content-Type': 'application/json',
   },
@@ -43,7 +41,7 @@ apiClient.interceptors.request.use((config) => {
 // Function to create authenticated axios instance
 export const createAuthenticatedClient = (token: string) => {
   const client = axios.create({
-    baseURL: API_BASE_URL,
+    baseURL: getApiUrl(), // Appeler getApiUrl() dynamiquement
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
