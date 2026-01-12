@@ -211,7 +211,6 @@ NEXT_PUBLIC_API_URL=http://localhost:8001
 - [x] **Gestion entreprises** : Vue grille avec pagination, statut actif/inactif
 - [x] **Gestion offres d'emploi** : Liste détaillée, statuts corrects, pagination
 - [x] **Middleware admin** : require_admin() pour routes protégées
-- [x] **Admin test** : software@hcexecutive.net / Admin123456789!
 
 ## 🔜 Phase 4 - Matching IA & Analytics (Futur)
 
