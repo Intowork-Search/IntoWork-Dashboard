@@ -17,6 +17,7 @@ import jwt
 from jwt.exceptions import InvalidTokenError
 from datetime import datetime, timedelta, timezone
 import bcrypt
+import hashlib
 
 # Configuration NextAuth
 NEXTAUTH_SECRET = os.getenv("NEXTAUTH_SECRET")
@@ -44,6 +45,36 @@ class PasswordHasher:
     def verify_password(password: str, hashed: str) -> bool:
         """Vérifie un mot de passe"""
         return bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))
+
+    @staticmethod
+    def hash_token(token: str) -> str:
+        """
+        Hash a token (like JWT refresh token) for storage.
+
+        Uses SHA256 instead of bcrypt because tokens can exceed bcrypt's 72-byte limit.
+        This is secure for tokens since they are already high-entropy random values.
+
+        Args:
+            token: The token to hash (e.g., JWT refresh token)
+
+        Returns:
+            str: SHA256 hash of the token (64 hex characters)
+        """
+        return hashlib.sha256(token.encode('utf-8')).hexdigest()
+
+    @staticmethod
+    def verify_token(plain_token: str, hashed_token: str) -> bool:
+        """
+        Verify a token against its hash.
+
+        Args:
+            plain_token: The token to verify
+            hashed_token: The SHA256 hash to compare against
+
+        Returns:
+            bool: True if token matches, False otherwise
+        """
+        return hashlib.sha256(plain_token.encode('utf-8')).hexdigest() == hashed_token
 
     @staticmethod
     def validate_password_strength(password: str) -> tuple[bool, str]:

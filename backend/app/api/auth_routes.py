@@ -185,7 +185,8 @@ async def signin(
     )
 
     # Store refresh token hash in database for validation
-    refresh_token_hash = PasswordHasher.hash_password(refresh_token)
+    # Use hash_token instead of hash_password because tokens exceed bcrypt's 72-byte limit
+    refresh_token_hash = PasswordHasher.hash_token(refresh_token)
 
     # Create session with refresh token
     session = Session(
