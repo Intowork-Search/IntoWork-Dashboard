@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
+from app.rate_limiter import limiter
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 from sqlalchemy.orm import selectinload
@@ -126,7 +127,7 @@ async def get_my_applications(
         total=total,
         page=page,
         limit=limit,
-        total_pages=total_pages
+tal_pages=total_pages
     )
 
 @router.post("/my/applications", response_model=JobApplicationResponse)

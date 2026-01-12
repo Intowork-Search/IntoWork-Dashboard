@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from app.rate_limiter import limiter
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete as sql_delete
 from sqlalchemy.orm import selectinload
@@ -8,11 +9,8 @@ from app.auth import get_current_user, require_user
 from pydantic import BaseModel, Field
 from typing import Optional, List
 from datetime import datetime
-import logging
-
+from loguru import logger
 router = APIRouter()
-logger = logging.getLogger(__name__)
-
 # Schémas Pydantic pour les données du profil
 
 class CVResponse(BaseModel):
@@ -530,6 +528,7 @@ async def update_skill(
 # Import pour le téléchargement de fichiers
 from fastapi import File, UploadFile
 from sqlalchemy import func
+import aiofiles
 
 # Endpoint pour télécharger un CV
 @router.post("/cv")
@@ -627,9 +626,9 @@ async def upload_cv(
                 detail="Invalid file path detected"
             )
         
-        # Écrire le fichier sur le disque
-        with open(cv_path, "wb") as f:
-            f.write(cv_content)
+        # Écrire le fichier sur le disque de manière asynchrone
+        async with aiofiles.open(cv_path, "wb") as f:
+            await f.write(cv_content)
         
         # Créer un nouvel enregistrement CV au lieu d'écraser l'ancien
         new_cv = CandidateCV(
@@ -858,11 +857,12 @@ async def delete_cv(
             detail="CV non trouvé"
         )
 
-    # Supprimer le fichier du disque
+    # Supprimer le fichier du disque de manière asynchrone
     import os
+    import aiofiles.os
     try:
         if os.path.exists(cv.file_path):
-            os.remove(cv.file_path)
+            await aiofiles.os.remove(cv.file_path)
             logger.info(f"🗑️ Fichier supprimé: {cv.file_path}")
     except Exception as e:
         logger.warning(f"⚠️ Erreur suppression fichier: {e}")

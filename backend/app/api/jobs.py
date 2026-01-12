@@ -1,89 +1,69 @@
-from pydantic import BaseModel
-from typing import Optional, List
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import desc, select, func, join
-from sqlalchemy.orm import selectinload
-from fastapi import status, APIRouter, Depends, HTTPException, Query, Response
-import logging
-from datetime import timezone, datetime, timedelta
+"""
+Phase 2 - Tasks 14 & 15: Jobs Routes with Response Models and Annotated Types
 
-from app.auth import require_user, get_current_user
+This module implements job posting endpoints using FastAPI 0.100+ patterns:
+- Explicit response_model on all endpoints
+- Annotated types for dependency injection
+- Centralized Pydantic schemas
+"""
+
+from typing import Annotated, Optional
+from fastapi import status, APIRouter, Depends, HTTPException, Query, Response, Path
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import desc, select, func
+from sqlalchemy.orm import selectinload
+from datetime import timezone, datetime, timedelta
+from loguru import logger
+
+from app.rate_limiter import limiter
+from app.auth import (
+    CurrentUser, CurrentUserOptional, DBSession
+)
 from app.models.base import (
     User, UserRole, Job, Employer, Company, Candidate,
     JobLocation, JobType, JobStatus, JobApplication
 )
 from app.database import get_db
+from app.schemas import (
+    JobCreateRequest, JobResponse, JobDetailResponse, JobListResponse,
+    RecentJobsCountResponse
+)
 
 router = APIRouter()
-logger = logging.getLogger(__name__)
 
-# ==================== Modèles Pydantic ====================
 
-class JobCreateRequest(BaseModel):
-    title: str
-    description: str
-    location: Optional[str] = None
-    location_type: str
-    job_type: str
-    salary_min: Optional[int] = None
-    salary_max: Optional[int] = None
-    currency: str
-    requirements: Optional[str] = None
-    responsibilities: Optional[str] = None
-    benefits: Optional[str] = None
+# ==============================================================================
+# Query Parameter Type Aliases (FastAPI 0.100+ Annotated style)
+# ==============================================================================
 
-class JobResponse(BaseModel):
-    id: int
-    title: str
-    description: str
-    company_name: str
-    company_logo_url: Optional[str] = None
-    location: Optional[str] = None
-    location_type: str
-    job_type: str
-    salary_min: Optional[int] = None
-    salary_max: Optional[int] = None
-    currency: str
-    posted_at: Optional[datetime] = None
-    is_featured: bool = False
-    views_count: int = 0
-    applications_count: int = 0
-    has_applied: bool = False  # Nouveau champ pour savoir si l'utilisateur a déjà postulé
+PageParam = Annotated[int, Query(ge=1, description="Page number")]
+LimitParam = Annotated[int, Query(ge=1, le=50, description="Items per page")]
+SearchParam = Annotated[Optional[str], Query(description="Search term")]
+LocationParam = Annotated[Optional[str], Query(description="Location filter")]
+JobTypeParam = Annotated[Optional[str], Query(description="Job type filter")]
+LocationTypeParam = Annotated[Optional[str], Query(description="Location type filter")]
+SalaryMinParam = Annotated[Optional[int], Query(description="Minimum salary filter")]
+StatusFilterParam = Annotated[Optional[str], Query(description="Status filter")]
+DaysParam = Annotated[int, Query(ge=1, le=30, description="Number of days")]
+JobIdPath = Annotated[int, Path(ge=1, description="Job ID")]
 
-class JobDetailResponse(JobResponse):
-    requirements: Optional[str] = None
-    responsibilities: Optional[str] = None
-    benefits: Optional[str] = None
-    company_description: Optional[str] = None
-    company_industry: Optional[str] = None
-    company_size: Optional[str] = None
-    status: str
-    created_at: Optional[datetime] = None
-    employment_type: Optional[str] = None
-    salary_range: Optional[str] = None
 
-class JobListResponse(BaseModel):
-    jobs: List[JobResponse]
-    total: int
-    page: int
-    limit: int
-    total_pages: int
-
-# ==================== Routes ====================
-# ⚠️ IMPORTANT : Routes spécifiques AVANT les routes dynamiques !
+# ==============================================================================
+# Routes
+# ==============================================================================
 
 @router.get("/", response_model=JobListResponse)
 async def get_jobs(
-    page: int = Query(1, ge=1),
-    limit: int = Query(10, ge=1, le=50),
-    search: Optional[str] = None,
-    location: Optional[str] = None,
-    job_type: Optional[str] = None,
-    location_type: Optional[str] = None,
-    salary_min: Optional[int] = None,
-    current_user: Optional[User] = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
-):
+    page: PageParam = 1,
+    limit: LimitParam = 10,
+    search: SearchParam = None,
+    location: LocationParam = None,
+    job_type: JobTypeParam = None,
+    location_type: LocationTypeParam = None,
+    salary_min: SalaryMinParam = None,
+    current_user: CurrentUserOptional = None,
+    db: DBSession = None
+) -> JobListResponse:
     """
     Récupérer la liste des offres d'emploi avec filtres et pagination
     """
@@ -110,7 +90,6 @@ async def get_jobs(
 
     # Filtres - Using parameterized queries to prevent SQL injection
     if search:
-        # Use SQLAlchemy's parameterized query with bind parameters (prevents SQL injection)
         search_pattern = f"%{search}%"
         stmt = stmt.filter(
             Job.title.ilike(search_pattern) |
@@ -119,7 +98,6 @@ async def get_jobs(
         )
 
     if location:
-        # Use SQLAlchemy's parameterized query with bind parameters (prevents SQL injection)
         location_pattern = f"%{location}%"
         stmt = stmt.filter(Job.location.ilike(location_pattern))
 
@@ -150,7 +128,7 @@ async def get_jobs(
     stmt = stmt.order_by(desc(Job.posted_at)).offset(offset).limit(limit)
     results_data = await db.execute(stmt)
     results = results_data.all()
-    
+
     # Construire la réponse
     jobs = []
     for job, company in results:
@@ -172,9 +150,9 @@ async def get_jobs(
             applications_count=job.applications_count,
             has_applied=job.id in user_applications
         ))
-    
+
     total_pages = (total + limit - 1) // limit
-    
+
     return JobListResponse(
         jobs=jobs,
         total=total,
@@ -183,15 +161,16 @@ async def get_jobs(
         total_pages=total_pages
     )
 
+
 @router.get("/my-jobs", response_model=JobListResponse)
 async def get_my_jobs(
-    page: int = Query(1, ge=1),
-    limit: int = Query(10, ge=1, le=50),
-    search: Optional[str] = None,
-    status_filter: Optional[str] = None,
-    current_user: User = Depends(require_user),
-    db: AsyncSession = Depends(get_db)
-):
+    page: PageParam = 1,
+    limit: LimitParam = 10,
+    search: SearchParam = None,
+    status_filter: StatusFilterParam = None,
+    current_user: CurrentUser = None,
+    db: DBSession = None
+) -> JobListResponse:
     """
     Récupérer les offres d'emploi créées par l'employeur connecté
     """
@@ -212,7 +191,6 @@ async def get_my_jobs(
 
     # Filtres - Using parameterized queries to prevent SQL injection
     if search:
-        # Use SQLAlchemy's parameterized query with bind parameters (prevents SQL injection)
         search_pattern = f"%{search}%"
         stmt = stmt.filter(
             Job.title.ilike(search_pattern) |
@@ -224,7 +202,7 @@ async def get_my_jobs(
             status_enum = JobStatus(status_filter)
             stmt = stmt.filter(Job.status == status_enum)
         except ValueError:
-            pass  # Ignorer les valeurs invalides
+            pass
 
     # Pagination - Count total
     count_stmt = select(func.count()).select_from(stmt.subquery())
@@ -236,7 +214,7 @@ async def get_my_jobs(
     stmt = stmt.order_by(desc(Job.posted_at)).offset(offset).limit(limit)
     results_data = await db.execute(stmt)
     results = results_data.all()
-    
+
     # Construire la réponse
     jobs = []
     for job, company in results:
@@ -258,9 +236,9 @@ async def get_my_jobs(
             applications_count=job.applications_count,
             has_applied=False  # L'employeur ne postule pas à ses propres offres
         ))
-    
+
     total_pages = (total + limit - 1) // limit
-    
+
     return JobListResponse(
         jobs=jobs,
         total=total,
@@ -269,11 +247,12 @@ async def get_my_jobs(
         total_pages=total_pages
     )
 
-@router.get("/stats/recent")
+
+@router.get("/stats/recent", response_model=RecentJobsCountResponse)
 async def get_recent_jobs_count(
-    days: int = Query(7, ge=1, le=30),
-    db: AsyncSession = Depends(get_db)
-):
+    days: DaysParam = 7,
+    db: DBSession = None
+) -> RecentJobsCountResponse:
     """
     Récupérer le nombre d'offres d'emploi récentes
     """
@@ -287,14 +266,15 @@ async def get_recent_jobs_count(
     )
     count = count_result.scalar()
 
-    return {"count": count, "days": days}
+    return RecentJobsCountResponse(count=count, days=days)
+
 
 @router.post("/create", response_model=JobResponse, status_code=status.HTTP_201_CREATED)
 async def create_job(
     job: JobCreateRequest,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(require_user)
-):
+    db: DBSession,
+    current_user: CurrentUser
+) -> JobResponse:
     """
     Créer une nouvelle offre d'emploi (employeur authentifié)
     """
@@ -324,7 +304,7 @@ async def create_job(
     except ValueError:
         logger.error(f"Valeur location_type invalide: {job.location_type}")
         raise HTTPException(status_code=400, detail=f"Type de lieu invalide: {job.location_type}")
-    
+
     try:
         job_type_enum = JobType(job.job_type)
     except ValueError:
@@ -362,9 +342,7 @@ async def create_job(
         raise HTTPException(status_code=500, detail=f"Erreur lors de la création de l'offre: {str(e)}")
 
     logger.info(f"Offre créée avec succès: id={job_obj.id}")
-    logger.info(f"JobResponse debug: id={job_obj.id}, title={job_obj.title}, company_name={company.name}, posted_at={job_obj.posted_at}, logo_url={getattr(company, 'logo_url', None)}")
-    # Conversion explicite du datetime en string ISO si besoin
-    posted_at = job_obj.posted_at.isoformat() if job_obj.posted_at else None
+
     return JobResponse(
         id=job_obj.id,
         title=job_obj.title,
@@ -377,20 +355,20 @@ async def create_job(
         salary_min=job_obj.salary_min,
         salary_max=job_obj.salary_max,
         currency=job_obj.currency,
-        posted_at=posted_at,
+        posted_at=job_obj.posted_at,
         is_featured=job_obj.is_featured,
         views_count=job_obj.views_count,
         applications_count=job_obj.applications_count
     )
 
-# ==================== Mise à jour d'une offre ====================
+
 @router.put("/{job_id}", response_model=JobResponse)
 async def update_job(
-    job_id: int,
+    job_id: JobIdPath,
     job: JobCreateRequest,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(require_user)
-):
+    db: DBSession,
+    current_user: CurrentUser
+) -> JobResponse:
     """
     Mettre à jour une offre d'emploi (employeur propriétaire uniquement)
     """
@@ -420,7 +398,7 @@ async def update_job(
     except ValueError:
         logger.error(f"Valeur location_type invalide: {job.location_type}")
         raise HTTPException(status_code=400, detail=f"Type de lieu invalide: {job.location_type}")
-    
+
     try:
         job_type_enum = JobType(job.job_type)
     except ValueError:
@@ -446,7 +424,6 @@ async def update_job(
         logger.info(f"Offre id={job_id} mise à jour avec succès")
 
         company = employer.company
-        posted_at = job_obj.posted_at.isoformat() if job_obj.posted_at else None
         return JobResponse(
             id=job_obj.id,
             title=job_obj.title,
@@ -459,7 +436,7 @@ async def update_job(
             salary_min=job_obj.salary_min,
             salary_max=job_obj.salary_max,
             currency=job_obj.currency,
-            posted_at=posted_at,
+            posted_at=job_obj.posted_at,
             is_featured=job_obj.is_featured,
             views_count=job_obj.views_count,
             applications_count=job_obj.applications_count
@@ -469,13 +446,13 @@ async def update_job(
         logger.error(f"Erreur lors de la mise à jour de l'offre id={job_id}: {e}")
         raise HTTPException(status_code=500, detail="Erreur lors de la mise à jour de l'offre")
 
-# ==================== Suppression d'une offre ====================
+
 @router.delete("/{job_id}", status_code=204)
 async def delete_job(
-    job_id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(require_user)
-):
+    job_id: JobIdPath,
+    db: DBSession,
+    current_user: CurrentUser
+) -> Response:
     """
     Supprimer une offre d'emploi (employeur propriétaire uniquement)
     """
@@ -509,13 +486,14 @@ async def delete_job(
         logger.error(f"Erreur lors de la suppression de l'offre id={job_id}: {e}")
         raise HTTPException(status_code=500, detail="Erreur lors de la suppression de l'offre")
 
-# ⚠️ Cette route DOIT être en DERNIER car elle capture tout
+
+# Cette route DOIT être en DERNIER car elle capture tout
 @router.get("/{job_id}", response_model=JobDetailResponse)
 async def get_job(
-    job_id: int,
-    current_user: Optional[User] = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
-):
+    job_id: JobIdPath,
+    current_user: CurrentUserOptional = None,
+    db: DBSession = None
+) -> JobDetailResponse:
     """
     Récupérer les détails d'une offre d'emploi
     """
@@ -552,7 +530,7 @@ async def get_job(
     # Incrémenter le compteur de vues
     job.views_count += 1
     await db.commit()
-    
+
     return JobDetailResponse(
         id=job.id,
         title=job.title,
@@ -581,10 +559,3 @@ async def get_job(
         status=job.status.value,
         created_at=job.created_at
     )
-
-
-## 🎯 Ordre correct des routes
-# ✅ GET  /api/jobs/                  (liste)
-# ✅ GET  /api/jobs/stats/recent      (stats)
-# ✅ POST /api/jobs/create            (création)
-# ✅ GET  /api/jobs/{job_id}          (détail) ← EN DERNIER

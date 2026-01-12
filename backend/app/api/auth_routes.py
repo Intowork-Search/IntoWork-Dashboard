@@ -1,48 +1,52 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Request
+"""
+Phase 2 - Tasks 14 & 15: Authentication Routes with Response Models and Annotated Types
+
+This module implements authentication endpoints using FastAPI 0.100+ patterns:
+- Explicit response_model on all endpoints
+- Annotated types for dependency injection
+- Centralized Pydantic schemas
+"""
+
+from typing import Annotated
+from fastapi import APIRouter, Depends, HTTPException, status, Request, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from pydantic import BaseModel, EmailStr
-from app.database import get_db
-from app.models.base import User, UserRole, Candidate, Employer, PasswordResetToken
-from app.auth import PasswordHasher, Auth, require_user
-from app.services.email_service import email_service
-from typing import Optional
+from sqlalchemy import select, update
 from datetime import datetime, timedelta, timezone
 import secrets
-import logging
+from loguru import logger
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 
+from app.database import get_db
+from app.models.base import User, UserRole, Candidate, Employer, PasswordResetToken, Session
+from app.auth import (
+    PasswordHasher, Auth, CurrentUser, DBSession,
+    REFRESH_TOKEN_EXPIRATION_DAYS
+)
+from app.services.email_service import email_service
+from app.schemas import (
+    SignUpRequest, SignInRequest, AuthResponse, AuthUserData,
+    RefreshTokenRequest, RefreshTokenResponse,
+    ChangePasswordRequest, ChangePasswordResponse,
+    ChangeEmailRequest, ChangeEmailResponse,
+    ForgotPasswordRequest, ForgotPasswordResponse,
+    ResetPasswordRequest, ResetPasswordResponse,
+    DeleteAccountResponse, UserMeResponse
+)
+
 router = APIRouter()
-logger = logging.getLogger(__name__)
 
 # Security: Rate limiter to prevent brute force attacks
 limiter = Limiter(key_func=get_remote_address)
 
 
-# Schemas
-class SignUpRequest(BaseModel):
-    email: EmailStr
-    password: str
-    first_name: str
-    last_name: str
-    role: str  # "candidate" or "employer"
-
-
-class SignInRequest(BaseModel):
-    email: EmailStr
-    password: str
-
-
-class AuthResponse(BaseModel):
-    access_token: str
-    token_type: str = "bearer"
-    user: dict
-
-
 @router.post("/signup", response_model=AuthResponse, status_code=status.HTTP_201_CREATED)
-@limiter.limit("3/hour")  # Security: Limit signup to 3 attempts per hour per IP to prevent abuse
-async def signup(request: Request, signup_data: SignUpRequest, db: AsyncSession = Depends(get_db)):
+@limiter.limit("3/hour")
+async def signup(
+    request: Request,
+    signup_data: SignUpRequest,
+    db: DBSession
+) -> AuthResponse:
     """
     Inscription d'un nouvel utilisateur
 
@@ -103,30 +107,40 @@ async def signup(request: Request, signup_data: SignUpRequest, db: AsyncSession 
         db.add(employer)
 
     await db.commit()
-    
-    # Générer le token JWT
+
+    # Phase 2 - Task 12: Generate both access and refresh tokens
     access_token = Auth.create_access_token(
         user_id=new_user.id,
         email=new_user.email,
         role=new_user.role.value
     )
-    
-    return {
-        "access_token": access_token,
-        "token_type": "bearer",
-        "user": {
-            "id": new_user.id,
-            "email": new_user.email,
-            "first_name": new_user.first_name,
-            "last_name": new_user.last_name,
-            "role": new_user.role.value
-        }
-    }
+
+    refresh_token = Auth.create_refresh_token(
+        user_id=new_user.id,
+        email=new_user.email
+    )
+
+    return AuthResponse(
+        access_token=access_token,
+        refresh_token=refresh_token,
+        token_type="bearer",
+        user=AuthUserData(
+            id=new_user.id,
+            email=new_user.email,
+            first_name=new_user.first_name,
+            last_name=new_user.last_name,
+            role=new_user.role.value
+        )
+    )
 
 
 @router.post("/signin", response_model=AuthResponse)
-@limiter.limit("5/15minutes")  # Security: Limit login to 5 attempts per 15 minutes per IP to prevent brute force
-async def signin(request: Request, signin_data: SignInRequest, db: AsyncSession = Depends(get_db)):
+@limiter.limit("5/15minutes")
+async def signin(
+    request: Request,
+    signin_data: SignInRequest,
+    db: DBSession
+) -> AuthResponse:
     """
     Connexion d'un utilisateur existant
 
@@ -157,75 +171,189 @@ async def signin(request: Request, signin_data: SignInRequest, db: AsyncSession 
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Account is inactive"
         )
-    
-    # Générer le token JWT
+
+    # Phase 2 - Task 12: Generate both access and refresh tokens
     access_token = Auth.create_access_token(
         user_id=user.id,
         email=user.email,
         role=user.role.value
     )
-    
-    return {
-        "access_token": access_token,
-        "token_type": "bearer",
-        "user": {
-            "id": user.id,
-            "email": user.email,
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-            "role": user.role.value,
-            "image": user.image
-        }
-    }
+
+    refresh_token = Auth.create_refresh_token(
+        user_id=user.id,
+        email=user.email
+    )
+
+    # Store refresh token hash in database for validation
+    refresh_token_hash = PasswordHasher.hash_password(refresh_token)
+
+    # Create session with refresh token
+    session = Session(
+        user_id=user.id,
+        session_token=access_token[-32:],
+        expires=datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRATION_DAYS),
+        refresh_token_hash=refresh_token_hash
+    )
+    db.add(session)
+    await db.commit()
+
+    return AuthResponse(
+        access_token=access_token,
+        refresh_token=refresh_token,
+        token_type="bearer",
+        user=AuthUserData(
+            id=user.id,
+            email=user.email,
+            first_name=user.first_name,
+            last_name=user.last_name,
+            role=user.role.value,
+            image=user.image
+        )
+    )
 
 
-@router.get("/me")
-async def get_current_user_info(user: User = Depends(require_user)):
+@router.post("/refresh", response_model=RefreshTokenResponse)
+@limiter.limit("10/minute")
+async def refresh_tokens(
+    request: Request,
+    refresh_data: RefreshTokenRequest,
+    db: DBSession
+) -> RefreshTokenResponse:
+    """
+    Phase 2 - Task 12: Refresh access token using refresh token
+
+    This endpoint implements token rotation:
+    1. Validates the refresh token
+    2. Issues a new access token
+    3. Issues a new refresh token (invalidates old one)
+    4. Updates session with new refresh token hash
+
+    Rate limit: 10 requests per minute per IP address
+    """
+    try:
+        # Verify refresh token JWT signature and expiration
+        payload = Auth.verify_token(refresh_data.refresh_token, token_type="refresh")
+        user_id = int(payload.get("sub"))
+        email = payload.get("email")
+
+        if not user_id or not email:
+            raise HTTPException(status_code=401, detail="Invalid refresh token payload")
+
+        # Find session with matching refresh token hash
+        result = await db.execute(
+            select(Session).filter(Session.user_id == user_id)
+        )
+        sessions = result.scalars().all()
+
+        # Verify refresh token hash matches stored hash
+        valid_session = None
+        for session in sessions:
+            if session.refresh_token_hash and PasswordHasher.verify_password(
+                refresh_data.refresh_token, session.refresh_token_hash
+            ):
+                valid_session = session
+                break
+
+        if not valid_session:
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid or revoked refresh token"
+            )
+
+        # Check session expiration
+        if datetime.now(timezone.utc) > valid_session.expires:
+            await db.delete(valid_session)
+            await db.commit()
+            raise HTTPException(
+                status_code=401,
+                detail="Refresh token expired. Please sign in again."
+            )
+
+        # Get user to include role in new access token
+        user_result = await db.execute(
+            select(User).filter(User.id == user_id)
+        )
+        user = user_result.scalar_one_or_none()
+
+        if not user or not user.is_active:
+            raise HTTPException(status_code=401, detail="User not found or inactive")
+
+        # Generate new tokens (token rotation)
+        new_access_token = Auth.create_access_token(
+            user_id=user.id,
+            email=user.email,
+            role=user.role.value
+        )
+
+        new_refresh_token = Auth.create_refresh_token(
+            user_id=user.id,
+            email=user.email
+        )
+
+        # Update session with new refresh token hash
+        new_refresh_token_hash = PasswordHasher.hash_password(new_refresh_token)
+        valid_session.refresh_token_hash = new_refresh_token_hash
+        valid_session.session_token = new_access_token[-32:]
+        valid_session.expires = datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRATION_DAYS)
+        valid_session.updated_at = datetime.now(timezone.utc)
+
+        await db.commit()
+
+        logger.info(f"Tokens refreshed for user {user.email}")
+
+        return RefreshTokenResponse(
+            access_token=new_access_token,
+            refresh_token=new_refresh_token,
+            token_type="bearer"
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error refreshing tokens: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to refresh tokens"
+        )
+
+
+@router.get("/me", response_model=UserMeResponse)
+async def get_current_user_info(
+    user: CurrentUser
+) -> UserMeResponse:
     """
     Récupérer les informations de l'utilisateur connecté
     """
-    return {
-        "id": user.id,
-        "email": user.email,
-        "first_name": user.first_name,
-        "last_name": user.last_name,
-        "name": user.name,
-        "role": user.role.value,
-        "image": user.image,
-        "is_active": user.is_active
-    }
+    return UserMeResponse(
+        id=user.id,
+        email=user.email,
+        first_name=user.first_name,
+        last_name=user.last_name,
+        name=user.name,
+        role=user.role.value,
+        image=user.image,
+        is_active=user.is_active
+    )
 
 
-# Schemas pour changement de mot de passe et email
-class ChangePasswordRequest(BaseModel):
-    current_password: str
-    new_password: str
-
-
-class ChangeEmailRequest(BaseModel):
-    new_email: EmailStr
-    password: str  # Demander le mot de passe pour confirmer
-
-
-@router.post("/change-password")
+@router.post("/change-password", response_model=ChangePasswordResponse)
 async def change_password(
-    request: ChangePasswordRequest,
-    user: User = Depends(require_user),
-    db: AsyncSession = Depends(get_db)
-):
+    request_data: ChangePasswordRequest,
+    user: CurrentUser,
+    db: DBSession
+) -> ChangePasswordResponse:
     """
     Changer le mot de passe de l'utilisateur connecté
     """
     # Vérifier l'ancien mot de passe
-    hasher = PasswordHasher()
-    if not hasher.verify_password(request.current_password, user.password_hash):
+    if not PasswordHasher.verify_password(request_data.current_password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Current password is incorrect"
         )
 
     # Security: Validate new password strength
-    is_valid, error_message = PasswordHasher.validate_password_strength(request.new_password)
+    is_valid, error_message = PasswordHasher.validate_password_strength(request_data.new_password)
     if not is_valid:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -233,24 +361,23 @@ async def change_password(
         )
 
     # Hasher et sauvegarder le nouveau mot de passe
-    user.password_hash = hasher.hash_password(request.new_password)
+    user.password_hash = PasswordHasher.hash_password(request_data.new_password)
     await db.commit()
 
-    return {"message": "Password changed successfully"}
+    return ChangePasswordResponse(message="Password changed successfully")
 
 
-@router.post("/change-email")
+@router.post("/change-email", response_model=ChangeEmailResponse)
 async def change_email(
-    request: ChangeEmailRequest,
-    user: User = Depends(require_user),
-    db: AsyncSession = Depends(get_db)
-):
+    request_data: ChangeEmailRequest,
+    user: CurrentUser,
+    db: DBSession
+) -> ChangeEmailResponse:
     """
     Changer l'adresse email de l'utilisateur connecté
     """
     # Vérifier le mot de passe pour confirmer l'identité
-    hasher = PasswordHasher()
-    if not hasher.verify_password(request.password, user.password_hash):
+    if not PasswordHasher.verify_password(request_data.password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Password is incorrect"
@@ -259,7 +386,7 @@ async def change_email(
     # Vérifier si le nouvel email existe déjà (ASYNC)
     result = await db.execute(
         select(User).filter(
-            User.email == request.new_email,
+            User.email == request_data.new_email,
             User.id != user.id
         )
     )
@@ -272,17 +399,20 @@ async def change_email(
         )
 
     # Mettre à jour l'email
-    user.email = request.new_email
+    user.email = request_data.new_email
     await db.commit()
 
-    return {"message": "Email changed successfully", "new_email": request.new_email}
+    return ChangeEmailResponse(
+        message="Email changed successfully",
+        new_email=request_data.new_email
+    )
 
 
-@router.delete("/delete-account")
+@router.delete("/delete-account", response_model=DeleteAccountResponse)
 async def delete_account(
-    user: User = Depends(require_user),
-    db: AsyncSession = Depends(get_db)
-):
+    user: CurrentUser,
+    db: DBSession
+) -> DeleteAccountResponse:
     """
     Supprimer le compte de l'utilisateur connecté
     """
@@ -320,7 +450,7 @@ async def delete_account(
         await db.delete(user)
         await db.commit()
 
-        return {"message": "Account deleted successfully"}
+        return DeleteAccountResponse(message="Account deleted successfully")
     except Exception as e:
         await db.rollback()
         raise HTTPException(
@@ -329,23 +459,13 @@ async def delete_account(
         )
 
 
-# Schemas pour réinitialisation de mot de passe
-class ForgotPasswordRequest(BaseModel):
-    email: EmailStr
-
-
-class ResetPasswordRequest(BaseModel):
-    token: str
-    new_password: str
-
-
-@router.post("/forgot-password")
-@limiter.limit("3/hour")  # Security: Limit password reset requests to 3 per hour per IP to prevent abuse
+@router.post("/forgot-password", response_model=ForgotPasswordResponse)
+@limiter.limit("3/hour")
 async def forgot_password(
     request: Request,
     forgot_data: ForgotPasswordRequest,
-    db: AsyncSession = Depends(get_db)
-):
+    db: DBSession
+) -> ForgotPasswordResponse:
     """
     Demander une réinitialisation de mot de passe
 
@@ -362,7 +482,6 @@ async def forgot_password(
         user = result.scalar_one_or_none()
 
         if user:
-            from sqlalchemy import update
             # Invalider tous les tokens existants non utilisés de cet utilisateur (ASYNC)
             await db.execute(
                 update(PasswordResetToken).filter(
@@ -396,26 +515,26 @@ async def forgot_password(
                 # Ne pas lever d'exception pour ne pas révéler si l'email existe
 
         # Toujours retourner un succès (sécurité: ne pas révéler si l'email existe)
-        return {
-            "message": "If this email exists in our system, you will receive password reset instructions shortly."
-        }
+        return ForgotPasswordResponse(
+            message="If this email exists in our system, you will receive password reset instructions shortly."
+        )
 
     except Exception as e:
         logger.error(f"Error in forgot_password: {str(e)}")
         await db.rollback()
         # Retourner un succès même en cas d'erreur (sécurité)
-        return {
-            "message": "If this email exists in our system, you will receive password reset instructions shortly."
-        }
+        return ForgotPasswordResponse(
+            message="If this email exists in our system, you will receive password reset instructions shortly."
+        )
 
 
-@router.post("/reset-password")
-@limiter.limit("5/15minutes")  # Security: Limit password reset attempts to 5 per 15 minutes per IP
+@router.post("/reset-password", response_model=ResetPasswordResponse)
+@limiter.limit("5/15minutes")
 async def reset_password(
     request: Request,
     reset_data: ResetPasswordRequest,
-    db: AsyncSession = Depends(get_db)
-):
+    db: DBSession
+) -> ResetPasswordResponse:
     """
     Réinitialiser le mot de passe avec un token valide
 
@@ -476,7 +595,6 @@ async def reset_password(
     reset_token.used_at = datetime.now(timezone.utc)
 
     # Invalider tous les autres tokens de cet utilisateur (ASYNC)
-    from sqlalchemy import update
     await db.execute(
         update(PasswordResetToken).filter(
             PasswordResetToken.user_id == user.id,
@@ -489,6 +607,6 @@ async def reset_password(
 
     logger.info(f"Password successfully reset for user {user.email}")
 
-    return {
-        "message": "Password reset successfully. You can now sign in with your new password."
-    }
+    return ResetPasswordResponse(
+        message="Password reset successfully. You can now sign in with your new password."
+    )

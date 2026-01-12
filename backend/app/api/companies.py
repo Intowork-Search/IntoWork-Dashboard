@@ -1,18 +1,16 @@
 from fastapi import APIRouter, Depends, HTTPException
+from app.rate_limiter import limiter
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 from sqlalchemy.orm import selectinload
 from pydantic import BaseModel
 from typing import Optional
-import logging
-
+from loguru import logger
 from app.database import get_db
 from app.auth import require_user
 from app.models.base import User, UserRole, Company, Employer, Job, JobStatus, JobApplication
 
 router = APIRouter()
-logger = logging.getLogger(__name__)
-
 # ==================== Modèles Pydantic ====================
 
 class CompanyResponse(BaseModel):
@@ -58,7 +56,7 @@ class CompanyStatsResponse(BaseModel):
     total_applications: int
     total_employers: int
 
-# ==================== Routes ====================
+# Routes
 
 @router.post("", response_model=CompanyResponse, status_code=201)
 async def create_company(

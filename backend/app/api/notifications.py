@@ -1,18 +1,16 @@
 from fastapi import APIRouter, Depends, HTTPException
+from app.rate_limiter import limiter
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import desc, select, func, update, delete as sql_delete
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
-import logging
-
+from loguru import logger
 from app.database import get_db
 from app.auth import require_user
 from app.models.base import User, Notification, NotificationType
 
 router = APIRouter()
-logger = logging.getLogger(__name__)
-
 # ==================== Modèles Pydantic ====================
 
 class NotificationResponse(BaseModel):
@@ -34,7 +32,7 @@ class NotificationListResponse(BaseModel):
 class MarkAsReadRequest(BaseModel):
     notification_ids: List[int]
 
-# ==================== Routes ====================
+# Routes
 
 @router.get("/", response_model=NotificationListResponse)
 async def get_notifications(
