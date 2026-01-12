@@ -9,7 +9,7 @@ Ce dossier contient la configuration GitHub pour le projet IntoWork Dashboard.
 ├── workflows/              # GitHub Actions workflows
 │   └── sync-repositories.yml
 ├── GITLAB_SYNC_SETUP.md   # Guide de configuration GitLab sync
-└── README.md              # Ce fichier
+└── WORKFLOWS.md           # Ce fichier
 ```
 
 ## 🔄 Workflows GitHub Actions
