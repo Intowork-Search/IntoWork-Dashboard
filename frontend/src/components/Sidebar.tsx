@@ -103,9 +103,9 @@ export default function Sidebar({ userRole }: SidebarProps) {
           // Récupérer le nombre de CV
           const cvs = await candidatesAPI.listCVs(token);
           setCvCount(cvs.length);
-          // Récupérer le nombre d'emplois des 7 derniers jours
-          const recentJobsData = await jobsAPI.getRecentJobsCount(7);
-          setJobsCount(recentJobsData.count);
+          // Récupérer le nombre d'emplois récents (pour candidats)
+          const recentJobs = await jobsAPI.getRecentJobsCount(7);
+          setJobsCount(recentJobs.count);
           // Récupérer le nombre de candidatures
           const applicationsCount = await applicationsAPI.getApplicationsCount(token);
           setApplicationsCount(applicationsCount);
@@ -201,13 +201,13 @@ export default function Sidebar({ userRole }: SidebarProps) {
       {/* Sidebar */}
       <div className={`fixed top-0 left-0 z-40 h-screen transition-all duration-300 ease-in-out ${
         isCollapsed ? 'w-16' : 'w-64'
-      } bg-white border-r border-gray-200 shadow-lg flex flex-col`}>
+      } bg-white border-r border-gray-200 shadow-lg`}>
         
         {/* Header avec logo et toggle */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
           {!isCollapsed && (
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-linear-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">IW</span>
               </div>
               <span className="font-bold text-gray-900 text-lg">INTOWORK</span>
@@ -228,8 +228,36 @@ export default function Sidebar({ userRole }: SidebarProps) {
           </div>
         </div>
 
+        {/* Profil utilisateur */}
+        <div className="p-4 border-b border-gray-200">
+          <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'}`}>
+            <div className="relative">
+              {/* Avatar */}
+              <div className="w-10 h-10 rounded-full bg-linear-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white font-semibold">
+                {user?.firstName?.[0]}{user?.lastName?.[0]}
+              </div>
+              <div className={`absolute -bottom-1 -right-1 w-4 h-4 ${roleColor} rounded-full border-2 border-white flex items-center justify-center`}>
+                <span className="text-xs text-white font-bold">
+                  {getRoleBadgeLetter()}
+                </span>
+              </div>
+            </div>
+            
+            {!isCollapsed && (
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900 truncate">
+                  {user?.firstName} {user?.lastName}
+                </p>
+                <p className="text-xs text-gray-500 truncate">
+                  {roleLabel}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Navigation */}
-        <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
+        <nav className="flex-1 px-2 py-4 space-y-1">
           {navigation.map((item) => {
             const isActive = pathname === item.href;
             return (
@@ -274,56 +302,32 @@ export default function Sidebar({ userRole }: SidebarProps) {
           })}
         </nav>
 
-        {/* Footer avec Profil utilisateur et Déconnexion */}
-        <div className="border-t border-gray-200">
-          {/* Profil utilisateur */}
-          <div className="p-4">
-            <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'}`}>
-              <div className="relative">
-                {/* Avatar */}
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white font-semibold">
-                  {user?.firstName?.[0]}{user?.lastName?.[0]}
-                </div>
-                <div className={`absolute -bottom-1 -right-1 w-4 h-4 ${roleColor} rounded-full border-2 border-white flex items-center justify-center`}>
-                  <span className="text-xs text-white font-bold">
-                    {getRoleBadgeLetter()}
-                  </span>
-                </div>
+        {/* Footer avec bouton déconnexion */}
+        <div className="p-4 border-t border-gray-200">
+          <button
+            onClick={() => signOut({ callbackUrl: '/auth/signin' })}
+            className={`w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 text-red-600 hover:bg-red-50 ${
+              isCollapsed ? 'justify-center' : 'gap-3'
+            }`}
+            title={isCollapsed ? 'Se déconnecter' : ''}
+          >
+            <ArrowRightOnRectangleIcon className={`shrink-0 ${isCollapsed ? 'w-6 h-6' : 'w-5 h-5'}`} />
+            {!isCollapsed && <span>Se déconnecter</span>}
+            
+            {/* Tooltip pour mode collapsed */}
+            {isCollapsed && (
+              <div className="absolute left-16 bg-gray-900 text-white px-2 py-1 rounded-lg text-xs opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+                Se déconnecter
               </div>
-              
-              {!isCollapsed && (
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">
-                    {user?.firstName} {user?.lastName}
-                  </p>
-                  <p className="text-xs text-gray-500 truncate">
-                    {roleLabel}
-                  </p>
-                </div>
-              )}
+            )}
+          </button>
+          
+          {!isCollapsed && (
+            <div className="flex items-center space-x-2 text-xs text-gray-500 mt-3">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <span>En ligne</span>
             </div>
-          </div>
-
-          {/* Bouton déconnexion */}
-          <div className="px-4 pb-4">
-            <button
-              onClick={() => signOut({ callbackUrl: '/auth/signin' })}
-              className={`w-full group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 text-red-600 hover:bg-red-50 ${
-                isCollapsed ? 'justify-center' : 'gap-3'
-              }`}
-              title={isCollapsed ? 'Se déconnecter' : ''}
-            >
-              <ArrowRightOnRectangleIcon className={`shrink-0 ${isCollapsed ? 'w-6 h-6' : 'w-5 h-5'}`} />
-              {!isCollapsed && <span>Se déconnecter</span>}
-              
-              {/* Tooltip pour mode collapsed */}
-              {isCollapsed && (
-                <div className="absolute left-16 bg-gray-900 text-white px-2 py-1 rounded-lg text-xs opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
-                  Se déconnecter
-                </div>
-              )}
-            </button>
-          </div>
+          )}
         </div>
       </div>
     </>

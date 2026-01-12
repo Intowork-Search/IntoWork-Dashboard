@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from app.rate_limiter import limiter
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 from sqlalchemy.orm import selectinload
@@ -11,10 +10,12 @@ from app.models.base import (
 from app.auth import require_user
 from pydantic import BaseModel
 from typing import List, Optional
-from loguru import logger
+import logging
 from datetime import datetime, timedelta, timezone
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
+
 # Schémas pour les statistiques du dashboard
 class DashboardStat(BaseModel):
     title: str
@@ -32,7 +33,7 @@ class RecentActivity(BaseModel):
 
 class DashboardData(BaseModel):
     stats: List[DashboardStat]
-
+    recentActivities: List[RecentActivity]
     profileCompletion: int
 
 @router.get("/dashboard", response_model=DashboardData)
