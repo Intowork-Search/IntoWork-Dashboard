@@ -14,6 +14,26 @@ INTOWORK Search is a B2B2C recruitment platform with AI-powered job matching. Th
 - Phase 3 (In Progress): Admin dashboard and platform management
 - Phase 4 (Planned): AI matching system and advanced analytics
 
+## MCP Server Integrations
+
+This project is configured with Model Context Protocol (MCP) servers that provide enhanced tooling:
+
+1. **Railway MCP Server** - Deployment automation for Railway platform
+   - Deploy backend, view logs, manage environments
+   - Check deployment status and service health
+   - Set environment variables programmatically
+
+2. **Context7 MCP Server** - Up-to-date library documentation
+   - Query documentation for FastAPI, Next.js, SQLAlchemy, React Query
+   - Get code examples and best practices
+   - Access latest API references
+
+3. **IDE Integration** - Development tools
+   - Get language diagnostics from VS Code
+   - Execute code in Jupyter kernels
+
+See relevant sections below for detailed usage of each MCP server.
+
 ## Architecture
 
 ### Stack Overview
@@ -37,6 +57,8 @@ INTOWORK Search is a B2B2C recruitment platform with AI-powered job matching. Th
 - **TanStack React Query v5** for server state management and caching
 - Axios for API communication
 - React Hot Toast for notifications
+
+**Note**: `@clerk/nextjs` and `@clerk/themes` still appear in `package.json` as legacy dependencies but are no longer used. The application has been fully migrated to NextAuth v5. These can be safely removed in a future cleanup.
 
 ### Authentication Flow
 
@@ -639,18 +661,47 @@ async def rate_limited_endpoint():
 
 ## Deployment
 
+### Railway MCP Integration
+
+This project includes Railway MCP server tools for deployment automation. Available commands:
+
+```bash
+# Check Railway CLI status
+mcp__railway-mcp-server__check-railway-status
+
+# Deploy backend to Railway
+mcp__railway-mcp-server__deploy --workspacePath=/home/jdtkd/IntoWork-Dashboard/backend
+
+# View logs
+mcp__railway-mcp-server__get-logs --workspacePath=/home/jdtkd/IntoWork-Dashboard/backend --logType=deploy
+
+# List services
+mcp__railway-mcp-server__list-services --workspacePath=/home/jdtkd/IntoWork-Dashboard/backend
+```
+
+### Manual Deployment
+
 **Backend**: Railway (PostgreSQL + FastAPI)
+- Railway project linked to `backend/` directory
 - Use `./scripts/deploy-railway.sh` for backend deployment
 - Or use `./scripts/deploy-all.sh` to deploy both backend and frontend
-- Migrations run automatically via `backend/start.sh`
-- Environment variables set in Railway dashboard
+- Migrations run automatically via `backend/start.sh` on each deployment
+- Environment variables set in Railway dashboard or via Railway CLI
+- Startup checks: DATABASE_URL and NEXTAUTH_SECRET must be set
 
 **Frontend**: Vercel (Next.js)
+- Vercel project linked to `frontend/` directory
+- Custom domain: **intowork.co** (configured in Vercel)
 - Use `./scripts/deploy-vercel.sh` for frontend deployment
 - Or use `./scripts/deploy-all.sh` to deploy both backend and frontend
-- Connected to GitHub repository
+- Connected to GitHub repository (auto-deploys on push to main)
 - Environment variables set in Vercel dashboard
-- Automatic deployments on git push
+- NEXT_PUBLIC_API_URL must point to Railway backend API
+
+**Domain Configuration**:
+- Production domain: https://intowork.co (frontend)
+- Backend API: https://your-api.railway.app/api (set in frontend env)
+- Ensure ALLOWED_ORIGINS includes production domain in backend .env
 
 **Deployment Utilities** (`/scripts`):
 
@@ -664,6 +715,24 @@ async def rate_limited_endpoint():
 - `setup-github-ssh.sh` - Setup GitHub SSH authentication
 
 **Documentation**: See `docs/deployment/` for detailed deployment guides
+
+### Context7 MCP Integration
+
+This project includes Context7 MCP server for accessing up-to-date documentation for any library or framework used in the project.
+
+**Usage Pattern**:
+```bash
+# Search for library documentation
+mcp__plugin_context7_context7__resolve-library-id --libraryName="FastAPI" --query="async routes patterns"
+
+# Query specific documentation
+mcp__plugin_context7_context7__query-docs --libraryId="/tiangolo/fastapi" --query="How to use async dependencies?"
+```
+
+**Useful for**:
+- Getting latest documentation for FastAPI, Next.js, SQLAlchemy, React Query
+- Finding code examples and best practices
+- Resolving API changes in newer versions
 
 ## Project Documentation
 
@@ -715,6 +784,9 @@ All git operations are automated via scripts in `/scripts`:
 19. **Database Performance**: Check `PostgreSQL_Database_Analysis.md` before writing queries that scan large tables
 20. **Annotated Types**: Backend uses `Annotated[Type, Depends(...)]` pattern for dependencies (FastAPI 0.100+)
 21. **Virtual Environment**: Backend requires Python venv activation: `source venv/bin/activate` before running commands
+22. **Railway Startup**: `backend/start.sh` runs migrations automatically on deploy; migrations MUST be in `backend/alembic/versions/` directory
+23. **Production Domain**: Frontend uses `intowork.co` domain; ensure CORS includes this in backend ALLOWED_ORIGINS
+24. **Clerk Cleanup**: Legacy `@clerk/nextjs` packages remain in package.json but are unused (safe to remove)
 
 ## Troubleshooting
 
@@ -795,3 +867,43 @@ openssl rand -base64 32
 - Check JWT token expiration (24 hours by default)
 - Verify user exists in database
 - Check backend logs for JWT validation errors
+
+## Development Workflow Best Practices
+
+### Before Starting Work
+
+1. **Check Current Status**: Run `make status-all` to see git status across all repos
+2. **Pull Latest Changes**: Ensure you're up-to-date with GitHub
+3. **Activate Backend Environment**: Always `cd backend && source venv/bin/activate`
+4. **Check Services**: Verify PostgreSQL is running with `docker ps | grep postgres`
+
+### During Development
+
+1. **Use Quick Start**: Run `make dev` or `./start-dev.sh` to start both services
+2. **Monitor Both Servers**: Backend logs show on port 8001, frontend on 3000
+3. **Test Changes**: Use provided test scripts (`test_api.py`, `test_complete_backend.py`)
+4. **Check Database**: Use utility scripts (`check_user.py`, `check_jobs.py`) to verify data
+
+### After Making Changes
+
+1. **Review Migrations**: If you changed models, check generated migration with `alembic current`
+2. **Test Locally**: Run comprehensive tests before committing
+3. **Commit with Message**: Use `make commit MSG="your message"` to commit and push to all repos
+4. **Verify Deployment**: Use Railway MCP tools or deployment scripts to deploy
+
+### File Organization
+
+- **Documentation**: All docs go in `/docs` directory, organized by category
+- **Scripts**: Automation scripts in `/scripts` directory
+- **Backend Tests**: Test files in `backend/` root (e.g., `test_api.py`)
+- **Migrations**: Alembic versions in `backend/alembic/versions/`
+- **Uploads**: CV files stored in `backend/uploads/cvs/{candidate_id}/`
+
+### Git Workflow
+
+This project uses dual GitHub repositories. Always use provided scripts:
+
+- `make push` - Push to both GitHub repos
+- `make commit MSG="message"` - Commit and push simultaneously
+- `make status-all` - Check sync status of both repos
+- Never push directly with `git push` - use automation scripts
