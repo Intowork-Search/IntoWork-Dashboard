@@ -18,6 +18,7 @@ import { applicationsAPI, type JobApplication, type CreateApplicationData, type 
 import { useAuth } from '@/hooks/useNextAuth';
 import { getApiUrl } from '@/lib/getApiUrl';
 import toast from 'react-hot-toast';
+import { getErrorMessage } from '@/types';
 
 // ============================================================
 // QUERIES (Lecture)
@@ -205,8 +206,8 @@ export function useApplyToJob() {
 
       toast.success('✅ Candidature envoyée avec succès !');
     },
-    onError: (error: any) => {
-      const message = error.response?.data?.detail || 'Erreur lors de l\'envoi de la candidature';
+    onError: (error: unknown) => {
+      const message = getErrorMessage(error, 'Erreur lors de l\'envoi de la candidature');
       toast.error(`❌ ${message}`);
       console.error('Erreur apply to job:', error);
     },
@@ -265,7 +266,7 @@ export function useWithdrawApplication() {
 
       toast.success('✅ Candidature retirée avec succès !');
     },
-    onError: (error: any, _applicationId, context) => {
+    onError: (error: unknown, _applicationId, context) => {
       // Rollback en cas d'erreur
       if (context?.previousLists) {
         context.previousLists.forEach(({ key, data }) => {
@@ -275,7 +276,7 @@ export function useWithdrawApplication() {
         });
       }
 
-      const message = error.response?.data?.detail || 'Erreur lors du retrait de la candidature';
+      const message = getErrorMessage(error, 'Erreur lors du retrait de la candidature');
       toast.error(`❌ ${message}`);
       console.error('Erreur withdraw application:', error);
     },
@@ -326,13 +327,13 @@ export function useUpdateApplicationStatus() {
 
       toast.success(`✅ Statut mis à jour: ${status}`);
     },
-    onError: (error: any, _variables, context) => {
+    onError: (error: unknown, _variables, context) => {
       // Rollback
       if (context?.previousApplication && context.queryKey) {
         queryClient.setQueryData(context.queryKey, context.previousApplication);
       }
 
-      const message = error.response?.data?.detail || 'Erreur lors de la mise à jour du statut';
+      const message = getErrorMessage(error, 'Erreur lors de la mise à jour du statut');
       toast.error(`❌ ${message}`);
       console.error('Erreur update application status:', error);
     },
@@ -377,13 +378,13 @@ export function useUpdateApplicationNotes() {
     onSuccess: () => {
       toast.success('✅ Notes mises à jour avec succès !');
     },
-    onError: (error: any, _variables, context) => {
+    onError: (error: unknown, _variables, context) => {
       // Rollback
       if (context?.previousApplication && context.queryKey) {
         queryClient.setQueryData(context.queryKey, context.previousApplication);
       }
 
-      const message = error.response?.data?.detail || 'Erreur lors de la mise à jour des notes';
+      const message = getErrorMessage(error, 'Erreur lors de la mise à jour des notes');
       toast.error(`❌ ${message}`);
       console.error('Erreur update application notes:', error);
     },

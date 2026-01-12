@@ -17,6 +17,7 @@ import { queryKeys } from '@/lib/queryKeys';
 import { jobsAPI, type JobFilters, type Job, type JobDetail, type JobListResponse } from '@/lib/api';
 import { useAuth } from '@/hooks/useNextAuth';
 import toast from 'react-hot-toast';
+import { getErrorMessage } from '@/types';
 
 // ============================================================
 // QUERIES (Lecture)
@@ -153,8 +154,8 @@ export function useCreateJob() {
 
       toast.success('✅ Offre d\'emploi créée avec succès !');
     },
-    onError: (error: any) => {
-      const message = error.response?.data?.detail || 'Erreur lors de la création de l\'offre';
+    onError: (error: unknown) => {
+      const message = getErrorMessage(error, 'Erreur lors de la création de l\'offre');
       toast.error(`❌ ${message}`);
       console.error('Erreur création job:', error);
     },
@@ -209,13 +210,13 @@ export function useUpdateJob() {
 
       toast.success('✅ Offre mise à jour avec succès !');
     },
-    onError: (error: any, _variables, context) => {
+    onError: (error: unknown, _variables, context) => {
       // Rollback en cas d'erreur
       if (context?.previousJob && context.queryKey) {
         queryClient.setQueryData(context.queryKey, context.previousJob);
       }
 
-      const message = error.response?.data?.detail || 'Erreur lors de la mise à jour';
+      const message = getErrorMessage(error, 'Erreur lors de la mise à jour');
       toast.error(`❌ ${message}`);
       console.error('Erreur update job:', error);
     },
@@ -273,7 +274,7 @@ export function useDeleteJob() {
 
       toast.success('✅ Offre supprimée avec succès !');
     },
-    onError: (error: any, _jobId, context) => {
+    onError: (error: unknown, _jobId, context) => {
       // Rollback en cas d'erreur
       if (context?.previousLists) {
         context.previousLists.forEach(({ key, data }) => {
@@ -283,7 +284,7 @@ export function useDeleteJob() {
         });
       }
 
-      const message = error.response?.data?.detail || 'Erreur lors de la suppression';
+      const message = getErrorMessage(error, 'Erreur lors de la suppression');
       toast.error(`❌ ${message}`);
       console.error('Erreur delete job:', error);
     },
