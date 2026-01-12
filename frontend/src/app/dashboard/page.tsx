@@ -4,7 +4,8 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useUser, useAuth } from '@/hooks/useNextAuth';
 import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/DashboardLayout';
-import { candidatesAPI, CandidateProfile, jobsAPI, getApiUrl } from '@/lib/api';
+import { candidatesAPI, jobsAPI } from '@/lib/api';
+import { getApiUrl } from '@/lib/getApiUrl';
 import { dashboardAPI, DashboardData } from '@/lib/api/dashboard';
 import { 
   UserIcon, 
