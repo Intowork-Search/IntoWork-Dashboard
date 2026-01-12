@@ -67,8 +67,8 @@ export default function SignInPage() {
       <div className="flex min-h-screen overflow-hidden">
         {/* Left Panel - Branding & Features */}
         <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden flex-col justify-between p-12">
-          {/* Background solid color */}
-          <div className="absolute inset-0 bg-primary"></div>
+          {/* Background gradient - bleu/violet comme le dashboard */}
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-700 to-purple-600"></div>
 
           {/* Content */}
           <div className="relative z-10">
@@ -151,7 +151,7 @@ export default function SignInPage() {
           <div className="w-full max-w-md relative z-10">
             {/* Mobile Logo */}
             <div className="lg:hidden flex items-center gap-3 mb-10 animate-fade-in">
-              <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center shadow-lg">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
                 <SparklesIcon className="w-6 h-6 text-white" />
               </div>
               <div>
@@ -188,7 +188,7 @@ export default function SignInPage() {
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full px-4 py-3 pl-12 bg-base-100 border border-base-300 rounded-xl text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300"
+                        className="w-full px-4 py-3 pl-12 bg-base-100 border border-base-300 rounded-xl text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-600 transition-all duration-300"
                         placeholder="nom.prenom@entreprise.com"
                       />
                       <EnvelopeIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-base-content/40" />
@@ -209,7 +209,7 @@ export default function SignInPage() {
                         required
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full px-4 py-3 pl-12 bg-base-100 border border-base-300 rounded-xl text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300"
+                        className="w-full px-4 py-3 pl-12 bg-base-100 border border-base-300 rounded-xl text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-600 transition-all duration-300"
                         placeholder="••••••••••••"
                       />
                       <LockClosedIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-base-content/40" />
@@ -223,13 +223,13 @@ export default function SignInPage() {
                         type="checkbox"
                         checked={rememberMe}
                         onChange={(e) => setRememberMe(e.target.checked)}
-                        className="w-5 h-5 rounded-lg border-2 border-base-300 text-primary focus:ring-2 focus:ring-primary/50 transition-all duration-300 accent-primary"
+                        className="w-5 h-5 rounded-lg border-2 border-base-300 text-blue-600 focus:ring-2 focus:ring-blue-500/50 transition-all duration-300 accent-blue-600"
                       />
                       <span className="text-sm text-base-content/70 group-hover:text-base-content transition-colors">Se souvenir de moi</span>
                     </label>
                     <Link
                       href="/auth/forgot-password"
-                      className="text-sm font-medium text-primary hover:text-primary/80 transition-colors duration-300 no-underline"
+                      className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors duration-300 no-underline"
                     >
                       Mot de passe oublié ?
                     </Link>
@@ -239,7 +239,7 @@ export default function SignInPage() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full h-12 mt-2 bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 group shadow-lg hover:shadow-xl relative overflow-hidden"
+                    className="w-full h-12 mt-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-xl transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 group shadow-lg hover:shadow-xl relative overflow-hidden"
                   >
 
                     {loading ? (
@@ -261,7 +261,7 @@ export default function SignInPage() {
                     Première visite ?{' '}
                     <Link
                       href="/auth/signup"
-                      className="font-semibold text-primary hover:text-primary/80 transition-colors duration-300 no-underline"
+                      className="font-semibold text-blue-600 hover:text-blue-700 transition-colors duration-300 no-underline"
                     >
                       Créer un compte professionnel
                     </Link>

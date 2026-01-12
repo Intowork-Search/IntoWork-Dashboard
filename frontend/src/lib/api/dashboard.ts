@@ -1,8 +1,7 @@
-// Utiliser la variable d'environnement pour l'URL de l'API
-const getApiBaseUrl = () => {
-  // ALWAYS return HTTPS - hardcoded to prevent any issues
-  return 'https://intowork-dashboard-production-1ede.up.railway.app/api';
-};
+import { getApiUrl } from '../getApiUrl';
+
+// Use centralized API URL function
+const getApiBaseUrl = getApiUrl;
 
 interface DashboardStat {
   title: string;

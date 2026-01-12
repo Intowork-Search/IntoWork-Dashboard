@@ -50,8 +50,8 @@ export default function ForgotPasswordPage() {
       <div className="flex min-h-screen overflow-hidden">
         {/* Left Panel - Branding & Features (Identical to signin/signup) */}
         <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden flex-col justify-between p-12">
-          {/* Background solid color */}
-          <div className="absolute inset-0 bg-primary"></div>
+          {/* Background gradient - bleu/violet comme le dashboard */}
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-700 to-purple-600"></div>
 
           {/* Content */}
           <div className="relative z-10">
@@ -134,7 +134,7 @@ export default function ForgotPasswordPage() {
           <div className="w-full max-w-md relative z-10">
             {/* Mobile Logo */}
             <div className="lg:hidden flex items-center gap-3 mb-10 animate-fade-in">
-              <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center shadow-lg">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
                 <SparklesIcon className="w-6 h-6 text-white" />
               </div>
               <div>
@@ -148,8 +148,8 @@ export default function ForgotPasswordPage() {
                 {/* Form Header */}
                 <div className="mb-10 animate-fade-in animation-delay-100">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center">
-                      <KeyIcon className="w-6 h-6 text-primary" />
+                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <KeyIcon className="w-6 h-6 text-blue-600" />
                     </div>
                     <h2 className="text-4xl font-bold text-base-content">
                       Mot de passe oublié ?
@@ -178,7 +178,7 @@ export default function ForgotPasswordPage() {
                             required
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full px-4 py-3 pl-12 bg-base-100 border border-base-300 rounded-xl text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300"
+                            className="w-full px-4 py-3 pl-12 bg-base-100 border border-base-300 rounded-xl text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-600 transition-all duration-300"
                             placeholder="nom.prenom@entreprise.com"
                           />
                           <EnvelopeIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-base-content/40" />
@@ -194,7 +194,7 @@ export default function ForgotPasswordPage() {
                       <button
                         type="submit"
                         disabled={loading}
-                        className="w-full h-12 mt-2 bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 group shadow-lg hover:shadow-xl relative overflow-hidden"
+                        className="w-full h-12 mt-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-xl transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 group shadow-lg hover:shadow-xl relative overflow-hidden"
                       >
 
                         {loading ? (
@@ -215,7 +215,7 @@ export default function ForgotPasswordPage() {
                     <div className="mt-8 pt-6 border-t border-base-300 text-center">
                       <Link
                         href="/auth/signin"
-                        className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors duration-300 no-underline"
+                        className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors duration-300 no-underline"
                       >
                         <ArrowLeftIcon className="w-4 h-4" />
                         Retour à la connexion
@@ -273,7 +273,7 @@ export default function ForgotPasswordPage() {
                         <p className="text-base-content/70">
                           Nous avons envoyé les instructions de réinitialisation à :
                         </p>
-                        <p className="text-lg font-semibold text-primary mt-3 break-all">
+                        <p className="text-lg font-semibold text-blue-600 mt-3 break-all">
                           {email}
                         </p>
                       </div>
@@ -298,7 +298,7 @@ export default function ForgotPasswordPage() {
                             setEmailSent(false);
                             setEmail('');
                           }}
-                          className="text-primary font-semibold hover:text-primary/80 transition-colors no-underline cursor-pointer"
+                          className="text-blue-600 font-semibold hover:text-blue-700 transition-colors no-underline cursor-pointer"
                         >
                           Essayez une autre adresse
                         </button>
@@ -309,7 +309,7 @@ export default function ForgotPasswordPage() {
                     <div className="mt-8 pt-6 border-t border-base-300 text-center">
                       <Link
                         href="/auth/signin"
-                        className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors duration-300 no-underline"
+                        className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors duration-300 no-underline"
                       >
                         <ArrowLeftIcon className="w-4 h-4" />
                         Retour à la connexion

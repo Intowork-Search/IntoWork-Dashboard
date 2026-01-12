@@ -111,8 +111,8 @@ export default function SignUpPage() {
       <div className="flex min-h-screen overflow-hidden">
         {/* Left Panel - Branding & Features */}
         <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden flex-col justify-between p-12">
-          {/* Background solid color */}
-          <div className="absolute inset-0 bg-primary"></div>
+          {/* Background gradient - bleu/violet comme le dashboard */}
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-700 to-purple-600"></div>
 
           {/* Content */}
           <div className="relative z-10">
@@ -195,7 +195,7 @@ export default function SignUpPage() {
           <div className="w-full max-w-md relative z-10">
             {/* Mobile Logo */}
             <div className="lg:hidden flex items-center gap-3 mb-10 animate-fade-in">
-              <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center shadow-lg">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
                 <SparklesIcon className="w-6 h-6 text-white" />
               </div>
               <div>
@@ -227,7 +227,7 @@ export default function SignUpPage() {
                         required
                         value={formData.firstName}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 bg-base-100 border border-base-300 rounded-xl text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300"
+                        className="w-full px-4 py-3 bg-base-100 border border-base-300 rounded-xl text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-600 transition-all duration-300"
                         placeholder="Jean"
                       />
                     </div>
@@ -242,7 +242,7 @@ export default function SignUpPage() {
                         required
                         value={formData.lastName}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 bg-base-100 border border-base-300 rounded-xl text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300"
+                        className="w-full px-4 py-3 bg-base-100 border border-base-300 rounded-xl text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-600 transition-all duration-300"
                         placeholder="Dupont"
                       />
                     </div>
@@ -260,8 +260,8 @@ export default function SignUpPage() {
                         onClick={() => setFormData({ ...formData, role: 'candidate' })}
                         className={`relative p-5 rounded-2xl border-2 transition-all duration-300 group overflow-hidden ${
                           formData.role === 'candidate'
-                            ? 'border-primary bg-primary/10 shadow-lg shadow-primary/20'
-                            : 'border-base-300 bg-base-100 hover:border-primary/50 hover:shadow-md'
+                            ? 'border-blue-600 bg-blue-50 shadow-lg shadow-blue-600/20'
+                            : 'border-base-300 bg-base-100 hover:border-blue-500/50 hover:shadow-md'
                         }`}
                       >
 
@@ -270,15 +270,15 @@ export default function SignUpPage() {
                             <div
                               className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors duration-300 ${
                                 formData.role === 'candidate'
-                                  ? 'bg-primary text-white'
-                                  : 'bg-base-200 text-base-content/60 group-hover:bg-primary/20'
+                                  ? 'bg-blue-600 text-white'
+                                  : 'bg-base-200 text-base-content/60 group-hover:bg-blue-100'
                               }`}
                             >
                               <UserCircleIcon className="w-6 h-6" />
                             </div>
                           </div>
                           <div className="font-semibold text-base-content mb-1">Candidat</div>
-                          <div className={`text-xs transition-colors duration-300 ${formData.role === 'candidate' ? 'text-primary/80' : 'text-base-content/60'}`}>
+                          <div className={`text-xs transition-colors duration-300 ${formData.role === 'candidate' ? 'text-blue-600/80' : 'text-base-content/60'}`}>
                             Je cherche un emploi
                           </div>
                         </div>
@@ -290,8 +290,8 @@ export default function SignUpPage() {
                         onClick={() => setFormData({ ...formData, role: 'employer' })}
                         className={`relative p-5 rounded-2xl border-2 transition-all duration-300 group overflow-hidden ${
                           formData.role === 'employer'
-                            ? 'border-secondary bg-secondary/10 shadow-lg shadow-secondary/20'
-                            : 'border-base-300 bg-base-100 hover:border-secondary/50 hover:shadow-md'
+                            ? 'border-purple-600 bg-purple-600/10 shadow-lg shadow-secondary/20'
+                            : 'border-base-300 bg-base-100 hover:border-purple-600/50 hover:shadow-md'
                         }`}
                       >
 
@@ -300,15 +300,15 @@ export default function SignUpPage() {
                             <div
                               className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors duration-300 ${
                                 formData.role === 'employer'
-                                  ? 'bg-secondary text-white'
-                                  : 'bg-base-200 text-base-content/60 group-hover:bg-secondary/20'
+                                  ? 'bg-purple-600 text-white'
+                                  : 'bg-base-200 text-base-content/60 group-hover:bg-purple-600/20'
                               }`}
                             >
                               <BuildingOfficeIcon className="w-6 h-6" />
                             </div>
                           </div>
                           <div className="font-semibold text-base-content mb-1">Employeur</div>
-                          <div className={`text-xs transition-colors duration-300 ${formData.role === 'employer' ? 'text-secondary/80' : 'text-base-content/60'}`}>
+                          <div className={`text-xs transition-colors duration-300 ${formData.role === 'employer' ? 'text-purple-600/80' : 'text-base-content/60'}`}>
                             Je recrute des talents
                           </div>
                         </div>
@@ -330,7 +330,7 @@ export default function SignUpPage() {
                         required
                         value={formData.email}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 pl-12 bg-base-100 border border-base-300 rounded-xl text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300"
+                        className="w-full px-4 py-3 pl-12 bg-base-100 border border-base-300 rounded-xl text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-600 transition-all duration-300"
                         placeholder="nom.prenom@entreprise.com"
                       />
                       <EnvelopeIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-base-content/40" />
@@ -351,7 +351,7 @@ export default function SignUpPage() {
                         required
                         value={formData.password}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 pl-12 bg-base-100 border border-base-300 rounded-xl text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300"
+                        className="w-full px-4 py-3 pl-12 bg-base-100 border border-base-300 rounded-xl text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-600 transition-all duration-300"
                         placeholder="••••••••••••"
                       />
                       <LockClosedIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-base-content/40" />
@@ -375,7 +375,7 @@ export default function SignUpPage() {
                         required
                         value={formData.confirmPassword}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 pl-12 bg-base-100 border border-base-300 rounded-xl text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300"
+                        className="w-full px-4 py-3 pl-12 bg-base-100 border border-base-300 rounded-xl text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-600 transition-all duration-300"
                         placeholder="••••••••••••"
                       />
                       <LockClosedIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-base-content/40" />
@@ -386,7 +386,7 @@ export default function SignUpPage() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full h-12 mt-6 bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 group shadow-lg hover:shadow-xl relative overflow-hidden"
+                    className="w-full h-12 mt-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-xl transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 group shadow-lg hover:shadow-xl relative overflow-hidden"
                   >
 
                     {loading ? (
@@ -416,7 +416,7 @@ export default function SignUpPage() {
                     Vous avez déjà un compte ?{' '}
                     <Link
                       href="/auth/signin"
-                      className="font-semibold text-primary hover:text-primary/80 transition-colors duration-300 no-underline"
+                      className="font-semibold text-blue-600 hover:text-blue-600/80 transition-colors duration-300 no-underline"
                     >
                       Se connecter
                     </Link>
