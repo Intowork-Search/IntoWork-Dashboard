@@ -1,7 +1,13 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
+from contextlib import asynccontextmanager
+from app.logging_config import logger
+from app.middleware.request_id import RequestIDMiddleware
+from app.monitoring import setup_monitoring, create_metrics_endpoint, update_db_pool_metrics
+from app.cache import cache
 from app.api.ping import router as ping_router
 from app.api.users import router as users_router
 from app.api.auth_routes import router as auth_routes_router
@@ -24,17 +30,61 @@ from slowapi.errors import RateLimitExceeded
 load_dotenv()
 
 # Security: Initialize rate limiter to prevent brute force and abuse
-limiter = Limiter(key_func=get_remote_address)
+from app.rate_limiter import limiter
+
+# Lifespan context manager for startup/shutdown events
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    logger.info("Starting up INTOWORK Backend API...")
+
+    # Initialize Redis cache
+    await cache.connect()
+
+    # Update database pool metrics
+    from app.database import engine
+    await update_db_pool_metrics(engine)
+
+    logger.info("All services initialized successfully")
+
+    yield
+
+    # Shutdown
+    logger.info("Shutting down INTOWORK Backend API...")
+
+    # Disconnect Redis
+    await cache.disconnect()
+
+    # Dispose database engine
+    await engine.dispose()
+    logger.info("Database engine disposed successfully")
+
+    logger.info("Shutdown complete")
 
 app = FastAPI(
     title="INTOWORK Search - Backend",
     description="Plateforme de recrutement B2B2C - API Backend",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
 
 # Security: Add rate limiter state and exception handler
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# Setup Prometheus monitoring and metrics endpoint
+instrumentator = setup_monitoring(app)
+create_metrics_endpoint(app)
+instrumentator.expose(app, endpoint="/metrics", include_in_schema=False)
+
+# Global exception handler for unhandled exceptions
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.error(f"Unhandled exception: {exc}", exc_info=True)
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Internal server error"}
+    )
 
 
 # Security Headers Middleware
@@ -55,17 +105,27 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 # Ajouter le middleware de sécurité
 app.add_middleware(SecurityHeadersMiddleware)
 
+# Add Request ID middleware for distributed tracing
+app.add_middleware(RequestIDMiddleware)
+
 # CORS middleware pour le frontend
+# Note: Wildcard origins with credentials not supported by CORS spec
+# For dynamic Vercel preview URLs, validate origin in middleware
+allowed_origins = [
+    "http://localhost:3000",  # Next.js dev server
+    "https://intowork.co",  # Production frontend
+    "https://www.intowork.co",  # Production frontend with www
+    "https://intowork-dashboard.vercel.app",  # Production Vercel deployment
+]
+
+# Get additional allowed origins from environment
+env_origins = os.getenv("ALLOWED_ORIGINS", "")
+if env_origins:
+    allowed_origins.extend([origin.strip() for origin in env_origins.split(",") if origin.strip()])
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",  # Next.js dev server
-        "https://www.intowork.co",  # Production custom domain
-        "https://intowork.co",  # Production custom domain (without www)
-        "https://intowork-dashboard.vercel.app",  # Production frontend
-        "https://intowork-dashboard-56y4i4dix-saas-hc.vercel.app",  # Vercel preview
-        "https://*.vercel.app",  # All Vercel deployments
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allow_headers=["*"],

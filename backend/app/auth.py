@@ -1,11 +1,18 @@
+"""
+Phase 2 - Task 15: Authentication Module with Annotated Types
+
+This module provides authentication utilities using FastAPI 0.100+ patterns
+with Annotated types for improved type inference and cleaner dependency injection.
+"""
+
 import os
+from typing import Annotated, Optional
 from fastapi import HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.database import get_db
 from app.models.base import User, UserRole
-from typing import Optional
 import jwt
 from jwt.exceptions import InvalidTokenError
 from datetime import datetime, timedelta, timezone
@@ -18,6 +25,7 @@ if not NEXTAUTH_SECRET:
 
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRATION_HOURS = 24
+REFRESH_TOKEN_EXPIRATION_DAYS = 7  # Phase 2 - Task 12: Refresh tokens expire in 7 days
 
 # Security scheme
 security = HTTPBearer(auto_error=False)
@@ -74,28 +82,62 @@ class PasswordHasher:
 
 class Auth:
     """Classe pour gérer l'authentification NextAuth"""
-    
+
     @staticmethod
     def create_access_token(user_id: int, email: str, role: str) -> str:
-        """Créer un JWT token"""
+        """Créer un JWT access token (24h expiration)"""
         payload = {
             "sub": str(user_id),
             "email": email,
             "role": role,
+            "type": "access",  # Distinguish from refresh tokens
             "exp": datetime.now(timezone.utc) + timedelta(hours=JWT_EXPIRATION_HOURS),
             "iat": datetime.now(timezone.utc)
         }
         return jwt.encode(payload, NEXTAUTH_SECRET, algorithm=JWT_ALGORITHM)
-    
+
     @staticmethod
-    def verify_token(token: str) -> dict:
-        """Vérifier et décoder un token JWT NextAuth"""
+    def create_refresh_token(user_id: int, email: str) -> str:
+        """
+        Phase 2 - Task 12: Create JWT refresh token (7-day expiration)
+
+        Refresh tokens are used to obtain new access tokens without re-authentication.
+        They have longer expiration but contain minimal user data.
+        """
+        import secrets
+        payload = {
+            "sub": str(user_id),
+            "email": email,
+            "type": "refresh",
+            "jti": secrets.token_urlsafe(32),  # Unique token ID for revocation
+            "exp": datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRATION_DAYS),
+            "iat": datetime.now(timezone.utc)
+        }
+        return jwt.encode(payload, NEXTAUTH_SECRET, algorithm=JWT_ALGORITHM)
+
+    @staticmethod
+    def verify_token(token: str, token_type: str = "access") -> dict:
+        """
+        Vérifier et décoder un token JWT NextAuth
+
+        Args:
+            token: JWT token string
+            token_type: Expected token type ("access" or "refresh")
+        """
         try:
             payload = jwt.decode(
                 token,
                 NEXTAUTH_SECRET,
                 algorithms=[JWT_ALGORITHM]
             )
+
+            # Verify token type matches expectation
+            if payload.get("type") != token_type:
+                raise HTTPException(
+                    status_code=401,
+                    detail=f"Invalid token type. Expected {token_type}, got {payload.get('type')}"
+                )
+
             return payload
         except jwt.ExpiredSignatureError:
             raise HTTPException(status_code=401, detail="Token expired")
@@ -103,12 +145,25 @@ class Auth:
             raise HTTPException(status_code=401, detail=f"Invalid token: {str(e)}")
 
 
+# ==============================================================================
+# Type Aliases for Annotated Dependencies (FastAPI 0.100+ Modern Style)
+# ==============================================================================
+
+# Database session dependency
+DBSession = Annotated[AsyncSession, Depends(get_db)]
+
+# HTTP Bearer credentials dependency
+BearerCredentials = Annotated[Optional[HTTPAuthorizationCredentials], Depends(security)]
+
+
 async def get_current_user(
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
-    db: AsyncSession = Depends(get_db)
+    credentials: BearerCredentials,
+    db: DBSession
 ) -> Optional[User]:
     """
     Dépendance pour récupérer l'utilisateur actuel depuis le token NextAuth JWT
+
+    Uses Annotated types for cleaner dependency injection.
     """
     if not credentials:
         return None
@@ -141,23 +196,35 @@ async def get_current_user(
         raise HTTPException(status_code=401, detail=f"Authentication failed: {str(e)}")
 
 
+# Type alias for optional current user
+CurrentUserOptional = Annotated[Optional[User], Depends(get_current_user)]
+
+
 async def require_user(
-    current_user: User = Depends(get_current_user)
+    current_user: CurrentUserOptional
 ) -> User:
     """
     Dépendance qui exige qu'un utilisateur soit authentifié
+
+    Uses Annotated types for cleaner dependency injection.
     """
     if not current_user:
         raise HTTPException(status_code=401, detail="Authentication required")
     return current_user
 
 
+# Type alias for required current user
+CurrentUser = Annotated[User, Depends(require_user)]
+
+
 def require_role(*allowed_roles: UserRole):
     """
     Décorateur pour exiger des rôles spécifiques
     Usage: @require_role(UserRole.EMPLOYER, UserRole.ADMIN)
+
+    Returns a dependency that can be used with Annotated.
     """
-    async def role_dependency(current_user: User = Depends(require_user)) -> User:
+    async def role_dependency(current_user: CurrentUser) -> User:
         if current_user.role not in allowed_roles:
             raise HTTPException(
                 status_code=403,
@@ -167,7 +234,64 @@ def require_role(*allowed_roles: UserRole):
     return role_dependency
 
 
-# Dépendances prêtes à utiliser
+# ==============================================================================
+# Pre-configured Role Dependencies (for use with Annotated)
+# ==============================================================================
+
+# Role-specific dependency functions
+async def _require_candidate(current_user: CurrentUser) -> User:
+    """Require candidate role"""
+    if current_user.role != UserRole.CANDIDATE:
+        raise HTTPException(
+            status_code=403,
+            detail="Access denied. Required role: candidate"
+        )
+    return current_user
+
+
+async def _require_employer(current_user: CurrentUser) -> User:
+    """Require employer role"""
+    if current_user.role != UserRole.EMPLOYER:
+        raise HTTPException(
+            status_code=403,
+            detail="Access denied. Required role: employer"
+        )
+    return current_user
+
+
+async def _require_admin(current_user: CurrentUser) -> User:
+    """Require admin role"""
+    if current_user.role != UserRole.ADMIN:
+        raise HTTPException(
+            status_code=403,
+            detail="Access denied. Required role: admin"
+        )
+    return current_user
+
+
+async def _require_employer_or_admin(current_user: CurrentUser) -> User:
+    """Require employer or admin role"""
+    if current_user.role not in (UserRole.EMPLOYER, UserRole.ADMIN):
+        raise HTTPException(
+            status_code=403,
+            detail="Access denied. Required roles: employer, admin"
+        )
+    return current_user
+
+
+# Type aliases for role-specific dependencies (Annotated style)
+CandidateUser = Annotated[User, Depends(_require_candidate)]
+EmployerUser = Annotated[User, Depends(_require_employer)]
+AdminUser = Annotated[User, Depends(_require_admin)]
+EmployerOrAdminUser = Annotated[User, Depends(_require_employer_or_admin)]
+
+
+# ==============================================================================
+# Legacy Dependencies (for backward compatibility)
+# ==============================================================================
+
+# These use the old Depends() style for backward compatibility
+# New code should use the Annotated type aliases above
 require_candidate = require_role(UserRole.CANDIDATE)
 require_employer = require_role(UserRole.EMPLOYER)
 require_admin = require_role(UserRole.ADMIN)
