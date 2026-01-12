@@ -366,16 +366,19 @@ class Account(Base):
 class Session(Base):
     """NextAuth Session model - pour database sessions"""
     __tablename__ = "sessions"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
-    
+
     session_token = Column(String, unique=True, nullable=False, index=True)
     expires = Column(DateTime(timezone=True), nullable=False)
-    
+
+    # Refresh token support (Phase 2 - Task 12)
+    refresh_token_hash = Column(String(255), nullable=True, index=True)  # bcrypt hash of refresh token
+
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
-    
+
     # Relations
     user = relationship("User", back_populates="sessions")
 
