@@ -1,13 +1,5 @@
 import axios from 'axios';
-
-// Force HTTPS for API URL - ALWAYS HARDCODED
-const getApiUrl = () => {
-  // ALWAYS return HTTPS - no conditions to avoid any issues
-  return 'https://intowork-dashboard-production-1ede.up.railway.app/api';
-};
-
-// Export pour utilisation dans d'autres fichiers
-export { getApiUrl };
+import { getApiUrl } from './getApiUrl';
 
 // Configuration de l'API client
 const apiClient = axios.create({
