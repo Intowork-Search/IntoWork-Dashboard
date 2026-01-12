@@ -54,6 +54,11 @@ logs/
 *.sqlite3
 *.db
 
+# Database backups
+*.sql
+backup_*.sql
+**/backup_*.sql
+
 # Cache
 .cache/
 *.pid
