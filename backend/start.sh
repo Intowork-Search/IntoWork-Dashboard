@@ -14,16 +14,21 @@ if [ -z "$NEXTAUTH_SECRET" ]; then
     exit 1
 fi
 
-# Migrations désactivées temporairement (tables déjà créées)
-# echo "📊 Exécution des migrations de base de données..."
-# python -m alembic upgrade head
+# Exécuter les migrations
+echo "📊 Exécution des migrations de base de données..."
+alembic upgrade head
 
-echo "✅ Migrations ignorées (tables déjà existantes)"
+if [ $? -ne 0 ]; then
+    echo "❌ Erreur lors des migrations"
+    exit 1
+fi
+
+echo "✅ Migrations terminées"
 
 # Créer le répertoire uploads s'il n'existe pas
 mkdir -p uploads/cv
 
 echo "🎯 Démarrage du serveur FastAPI sur le port ${PORT:-8000}"
 
-# Démarrer l'application
-exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers 1
+# Démarrer l'application avec python -m uvicorn (comme en local)
+exec python -m uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers 1
