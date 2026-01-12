@@ -14,7 +14,7 @@ INTOWORK Search est une plateforme complète de recrutement avec :
 
 ## 🏗️ Architecture
 
-```
+```bash
 INTOWORK/
 ├── backend/           # API FastAPI + PostgreSQL + JWT
 ├── frontend/          # Next.js 16 + TypeScript + NextAuth v5
@@ -24,6 +24,7 @@ INTOWORK/
 ## ✅ Phase 1 - Fondation (TERMINÉE)
 
 ### Backend (FastAPI)
+
 - ✅ Structure FastAPI complète avec Docker
 - ✅ Base de données PostgreSQL (9 modèles : User, Candidate, Company, Employer, Job, Application, Notification, Session, Account)
 - ✅ Migrations Alembic configurées
@@ -34,6 +35,7 @@ INTOWORK/
 - ✅ Système de notifications temps réel
 
 ### Frontend (Next.js)
+
 - ✅ Projet Next.js 16 + TypeScript + Tailwind CSS + Turbopack
 - ✅ NextAuth v5 Beta configuré avec JWT
 - ✅ Pages d'authentification (/sign-in, /sign-up)
@@ -45,7 +47,6 @@ INTOWORK/
 ## 🚀 Démarrage rapide
 
 > **🎯 Nouveau développeur ?** Lisez d'abord **[QUICKSTART.md](./QUICKSTART.md)** - Guide complet en 5 minutes !
-
 > **💻 Première installation ?** Lisez **[INSTALLATION.md](./INSTALLATION.md)** - Installation détaillée par OS
 
 ### Option 1: Lancement automatique (Recommandé)
@@ -86,8 +87,9 @@ alembic upgrade head
 uvicorn app.main:app --reload --port 8001
 ```
 
-**API disponible sur : http://localhost:8001**
-- Documentation : http://localhost:8001/docs
+**API disponible sur : <http://localhost:8001>**
+
+- Documentation : <http://localhost:8001/docs>
 - Endpoints : `/api/ping`, `/api/users`, `/api/auth/*`
 
 ### 2. Frontend
@@ -106,13 +108,14 @@ cp .env.local.example .env.local
 npm run dev
 ```
 
-**Frontend disponible sur : http://localhost:3000**
+**Frontend disponible sur : <http://localhost:3000>**
 
 ## 🔐 Configuration NextAuth
 
 ### Variables d'environnement
 
 **Backend (.env)** :
+
 ```env
 DATABASE_URL=postgresql://postgres:postgres@localhost:5433/intowork
 JWT_SECRET=your-super-secret-jwt-key-change-in-production
@@ -120,6 +123,7 @@ JWT_ALGORITHM=HS256
 ```
 
 **Frontend (.env.local)** :
+
 ```env
 NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=your-nextauth-secret-min-32-characters
@@ -129,6 +133,7 @@ NEXT_PUBLIC_API_URL=http://localhost:8001
 ## 📋 Fonctionnalités actuelles
 
 ### ✅ Dashboard Admin (Nouveau!)
+
 - [x] **Onglet Statistiques** : 4 graphiques professionnels (Recharts)
   - Statistiques Actuelles (AreaChart) - Données réelles BD
   - Distribution Utilisateurs (PieChart) - Candidats/Employeurs/Actifs
@@ -141,6 +146,7 @@ NEXT_PUBLIC_API_URL=http://localhost:8001
 - [x] **Données réelles** : Toutes les données viennent de la BD Railway (pas de mock data)
 
 ### ✅ Authentification (NextAuth v5)
+
 - [x] Inscription/Connexion avec JWT natif
 - [x] Migration Clerk → NextAuth (économies $300k-600k/an)
 - [x] Gestion de session avec JWT (HS256)
@@ -150,6 +156,7 @@ NEXT_PUBLIC_API_URL=http://localhost:8001
 - [x] Mot de passe oublié avec thème cohérent
 
 ### ✅ Dashboard Employeur
+
 - [x] **Gestion offres d'emploi** : Création, édition, suppression
 - [x] **Filtrage intelligent** : Employeur voit uniquement SES offres
 - [x] **Gestion candidatures** : Liste, filtres, statuts, notes, téléchargement CV
@@ -158,6 +165,7 @@ NEXT_PUBLIC_API_URL=http://localhost:8001
 - [x] **Notifications** : Alertes candidatures en temps réel
 
 ### ✅ Dashboard Candidat
+
 - [x] **Recherche d'emploi** : Voir toutes les offres disponibles
 - [x] **Profil personnel** : Nom, téléphone, localisation, bio, liens sociaux
 - [x] **Upload CV** : Drag & drop, affichage dans sidebar
@@ -166,6 +174,7 @@ NEXT_PUBLIC_API_URL=http://localhost:8001
 - [x] **Paramètres** : Préférences, confidentialité, compte
 
 ### ✅ Design & UI/UX
+
 - [x] **Thème cohérent** : Bleu/violet gradient (`from-blue-600 via-blue-700 to-purple-600`)
 - [x] **Sidebar améliorée** : Profil en bas, badges dynamiques, rôle (A/C/E)
 - [x] **Responsive** : Mobile, tablet, desktop optimisés
@@ -173,6 +182,7 @@ NEXT_PUBLIC_API_URL=http://localhost:8001
 - [x] **États vides** : Messages clairs quand pas de données
 
 ### ✅ Système de Notifications
+
 - [x] **Types** : new_application (employeur), status_change (candidat)
 - [x] **Temps réel** : Auto-refresh 30 secondes
 - [x] **Badge non lues** : Compte dynamique
@@ -180,18 +190,21 @@ NEXT_PUBLIC_API_URL=http://localhost:8001
 - [x] **Icônes contextuelles** : 📝 Candidature, 📬 Statut, etc.
 
 ### ✅ Base de données
+
 - [x] **9 modèles complets** : User, Candidate, Company, Employer, Job, Application, Notification, Session, Account
 - [x] **Relations FK** : employer_id, company_id, user_id
 - [x] **Migrations Alembic** : Révision 411cd9a350e0 (head)
 - [x] **Persistance validée** : Tests companies update ✅
 
 ### ✅ API Backend
+
 - [x] **Route filtrage** : GET /jobs/my-jobs (employer-specific)
 - [x] **CRUD complet** : Jobs, Companies, Applications, Notifications
 - [x] **Middleware JWT** : require_user(), require_admin()
 - [x] **Gestion permissions** : Rôles et autorisations
 
 ### ✅ Interface utilisateur
+
 - [x] **Layout dashboard** : Sidebar responsive, header avec notifications
 - [x] **Mobile optimisé** : Overlay transparent, une icône notification
 - [x] **Visibilité texte** : text-gray-900 sur tous les inputs
@@ -201,6 +214,7 @@ NEXT_PUBLIC_API_URL=http://localhost:8001
 ## 🔜 Phase 3 - Back-office Admin (✅ TERMINÉE!)
 
 ### Fonctionnalités Livrées
+
 - [x] **Rôle admin** : Gestion complète dans UserRole enum
 - [x] **Dashboard admin** : 4 graphiques professionnels avec Recharts
   - Statistiques Actuelles (AreaChart)
@@ -221,7 +235,8 @@ NEXT_PUBLIC_API_URL=http://localhost:8001
 
 ## 🛠️ Commandes utiles
 
-### Backend
+### Backend (Commands)
+
 ```bash
 # Tests API
 python test_api.py
@@ -237,6 +252,7 @@ docker-compose up --build
 ```
 
 ### Frontend
+
 ```bash
 # Build production
 npm run build
@@ -251,6 +267,7 @@ npm test
 ## 📊 Technologies utilisées
 
 **Backend :**
+
 - FastAPI 0.104+ (API REST)
 - SQLAlchemy 2.0+ (ORM)
 - PostgreSQL 15 (Base de données)
@@ -263,6 +280,7 @@ npm test
 - Docker (Containerisation)
 
 **Frontend :**
+
 - **Next.js 16** (React Framework) + **Turbopack**
 - TypeScript (Types)
 - Tailwind CSS (Styles)
@@ -274,12 +292,14 @@ npm test
 - Axios (HTTP Client)
 
 **Authentification :**
+
 - **NextAuth v5** (Auth provider)
 - **JWT natif** : HS256 algorithm
 - **Sessions** : Stockage PostgreSQL
 - **Économies** : $300,000 - $600,000/an vs Clerk
 
 **Base de données :**
+
 - PostgreSQL 15
 - 9 tables : users, candidates, companies, employers, jobs, applications, notifications, sessions, accounts
 - Migrations Alembic (révision: 411cd9a350e0)
@@ -288,11 +308,13 @@ npm test
 ## 👥 Équipe et rôles
 
 **Rôles utilisateurs :**
+
 - **Candidate** : Cherche un emploi, crée un profil, postule aux offres
 - **Employer** : Recrute, gère les offres, utilise l'ATS, reçoit candidatures
 - **Admin** : Administration générale de la plateforme (à venir Phase 3)
 
 **Architecture de filtrage :**
+
 - Employeur voit UNIQUEMENT ses propres offres d'emploi
 - Candidat voit TOUTES les offres publiques disponibles
 - Système de notifications rôle-spécifique
@@ -300,12 +322,14 @@ npm test
 ## 📞 Support
 
 Pour les questions sur cette phase :
+
 - Backend : Vérifier les logs FastAPI et PostgreSQL
 - Frontend : Vérifier la console navigateur et les tokens JWT
 - Auth : Vérifier la configuration NextAuth (.env.local)
 - BD : `docker logs postgres-intowork` ou `alembic current`
 
 **Documentation complète :**
+
 - Installation : Voir `INSTALLATION.md`
 - Pré-push : Voir `PRE_PUSH_VERIFICATION.md`
 - Changelog : Voir `CHANGELOG.md`

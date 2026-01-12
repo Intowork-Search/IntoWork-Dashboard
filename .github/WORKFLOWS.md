@@ -4,7 +4,7 @@ Ce dossier contient la configuration GitHub pour le projet IntoWork Dashboard.
 
 ## 📁 Structure
 
-```
+``` bash
 .github/
 ├── workflows/              # GitHub Actions workflows
 │   └── sync-repositories.yml
@@ -19,25 +19,29 @@ Ce dossier contient la configuration GitHub pour le projet IntoWork Dashboard.
 **Description** : Synchronise automatiquement le code entre GitHub et GitLab
 
 **Déclencheurs** :
+
 - Push vers `main`
 - Push vers `develop`
 - Push vers branches `feature/*`
 - Push vers branches `hotfix/*`
 
 **Actions** :
+
 1. Clone le dépôt complet (historique entier)
 2. Configure le remote GitLab avec OAuth2
 3. Pousse la branche courante vers GitLab
 4. Synchronise tous les tags vers GitLab
 
 **Configuration Requise** :
+
 - Secret GitHub : `GITLAB_TOKEN` (voir [GITLAB_SYNC_SETUP.md](./GITLAB_SYNC_SETUP.md))
 
 **Statut Actuel** :
 ⚠️ Le workflow est **configuré mais le token n'est pas défini**
 
 Le workflow détectera automatiquement l'absence du token et affichera un avertissement sans échouer :
-```
+
+```sh
 ⚠️ GITLAB_TOKEN secret is not configured
 To enable GitLab sync, add a Personal Access Token to GitHub Secrets
 ```
@@ -48,6 +52,7 @@ To enable GitLab sync, add a Personal Access Token to GitHub Secrets
 
 | Secret | Description | Documentation |
 |--------|-------------|---------------|
+
 | `GITLAB_TOKEN` | Personal Access Token GitLab | [GITLAB_SYNC_SETUP.md](./GITLAB_SYNC_SETUP.md) |
 
 ### Comment Configurer
@@ -98,9 +103,11 @@ make sync          # Synchroniser les repos
 ### Voir les Exécutions du Workflow
 
 Accédez à l'onglet **Actions** sur GitHub :
-https://github.com/Intowork-Search/IntoWork-Dashboard/actions
+
+<https://github.com/Intowork-Search/IntoWork-Dashboard/actions>
 
 Vous y verrez :
+
 - ✅ Exécutions réussies (code synchronisé)
 - ⚠️ Exécutions avec avertissements (token non configuré, mais pas d'erreur)
 - ❌ Exécutions échouées (problème d'authentification si token invalide)
@@ -108,6 +115,7 @@ Vous y verrez :
 ### Logs Détaillés
 
 Cliquez sur une exécution pour voir :
+
 - Checkout code
 - Push to GitLab
 - Sync tags
@@ -125,6 +133,7 @@ Cliquez sur une exécution pour voir :
 ### Permissions du Token GitLab
 
 Le token a accès **uniquement** à :
+
 - ✅ `write_repository` : Écriture sur le dépôt GitLab
 - ✅ `api` : Gestion des tags et métadonnées
 - ❌ Pas d'accès à d'autres projets
@@ -141,10 +150,12 @@ Le token a accès **uniquement** à :
 ### Désactiver la Synchronisation
 
 **Option 1** : Ne pas configurer le token
+
 - Le workflow s'exécutera mais affichera un avertissement
 - Aucune erreur ne sera générée
 
 **Option 2** : Désactiver le workflow
+
 ```bash
 mv .github/workflows/sync-repositories.yml .github/workflows/sync-repositories.yml.disabled
 git commit -m "chore: disable GitLab sync workflow"
@@ -163,6 +174,7 @@ git push
 
 | Problème | Solution |
 |----------|----------|
+
 | "Authentication failed" | Configurez `GITLAB_TOKEN` (voir [guide](./GITLAB_SYNC_SETUP.md)) |
 | "Permission denied" | Vérifiez les scopes du token GitLab |
 | Workflow ne se déclenche pas | Vérifiez la branche (main, develop, feature/*, hotfix/*) |
@@ -170,6 +182,7 @@ git push
 ### Contacts
 
 Pour toute question :
+
 1. Consultez [GITLAB_SYNC_SETUP.md](./GITLAB_SYNC_SETUP.md)
 2. Vérifiez les [GitHub Actions logs](https://github.com/Intowork-Search/IntoWork-Dashboard/actions)
 3. Créez une issue sur GitHub
