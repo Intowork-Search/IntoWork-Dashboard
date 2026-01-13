@@ -146,7 +146,7 @@ export default function Home() {
             <Link href="/auth/signup" className="btn btn-primary btn-md sm:btn-lg rounded-full px-8 sm:px-10 normal-case font-semibold text-sm sm:text-base">
               Commencer gratuitement
             </Link>
-            <button type="button" className="btn btn-outline btn-md sm:btn-lg rounded-full px-8 sm:px-10 normal-case font-semibold text-sm sm:text-base">
+            <button type="button" className="btn bg-white border-2 border-slate-300 text-slate-900 hover:bg-slate-50 hover:border-slate-400 btn-md sm:btn-lg rounded-full px-8 sm:px-10 normal-case font-semibold text-sm sm:text-base transition-all duration-300">
               Voir une démo
             </button>
           </div>
@@ -420,7 +420,7 @@ export default function Home() {
             <Link href="/auth/signup" className="btn btn-primary btn-md sm:btn-lg rounded-full px-8 sm:px-12 normal-case font-bold text-sm sm:text-base">
               Créer mon compte gratuit
             </Link>
-            <button type="button" className="btn btn-secondary btn-md sm:btn-lg rounded-full px-8 sm:px-12 normal-case font-semibold text-sm sm:text-base">
+            <button type="button" className="btn bg-white border-2 border-slate-300 text-slate-900 hover:bg-slate-50 hover:border-slate-400 btn-md sm:btn-lg rounded-full px-8 sm:px-12 normal-case font-semibold text-sm sm:text-base transition-all duration-300">
               Planifier une démo
             </button>
           </div>
