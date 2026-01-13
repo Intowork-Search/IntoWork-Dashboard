@@ -38,12 +38,12 @@ export default function Home() {
           <div className="flex justify-between items-center h-20">
             {/* Logo */}
             <div className="flex items-center space-x-2">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+              <div className="w-10 h-10 rounded-2xl bg-primary flex items-center justify-center">
                 <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
               </div>
-              <span className="text-2xl font-bold tracking-tight bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              <span className="text-2xl font-bold tracking-tight text-primary">
                 INTOWORK
               </span>
             </div>
@@ -93,7 +93,7 @@ export default function Home() {
 
               <h1 className="text-5xl lg:text-7xl font-bold leading-tight tracking-tight animate-fade-in animation-delay-200">
                 Recrutez les meilleurs talents.{' '}
-                <span className="bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
+                <span className="text-primary">
                   Trouvez votre emploi idéal.
                 </span>
               </h1>
@@ -121,15 +121,15 @@ export default function Home() {
               {/* Stats */}
               <div className="grid grid-cols-3 gap-8 pt-8 animate-fade-in animation-delay-500">
                 <div>
-                  <div className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">10K+</div>
+                  <div className="text-4xl font-bold text-primary">10K+</div>
                   <div className="text-sm text-base-content/60 mt-1">Candidats actifs</div>
                 </div>
                 <div>
-                  <div className="text-4xl font-bold bg-gradient-to-r from-accent to-secondary bg-clip-text text-transparent">500+</div>
+                  <div className="text-4xl font-bold text-accent">500+</div>
                   <div className="text-sm text-base-content/60 mt-1">Entreprises</div>
                 </div>
                 <div>
-                  <div className="text-4xl font-bold bg-gradient-to-r from-secondary to-primary bg-clip-text text-transparent">95%</div>
+                  <div className="text-4xl font-bold text-secondary">95%</div>
                   <div className="text-sm text-base-content/60 mt-1">Satisfaction</div>
                 </div>
               </div>
@@ -142,7 +142,7 @@ export default function Home() {
                 {/* Card 1 - Job Posting */}
                 <div className="absolute top-0 right-0 w-80 bg-white rounded-3xl shadow-2xl p-6 border border-slate-200 hover:shadow-primary/20 hover:-translate-y-2 transition-all duration-300">
                   <div className="flex items-start justify-between mb-4">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center">
                       <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
@@ -161,9 +161,9 @@ export default function Home() {
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex -space-x-2">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent border-2 border-base-100"></div>
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent to-secondary border-2 border-base-100"></div>
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-secondary to-primary border-2 border-base-100 flex items-center justify-center text-xs font-bold text-white">+12</div>
+                      <div className="w-8 h-8 rounded-full bg-primary border-2 border-white"></div>
+                      <div className="w-8 h-8 rounded-full bg-accent border-2 border-white"></div>
+                      <div className="w-8 h-8 rounded-full bg-secondary border-2 border-white flex items-center justify-center text-xs font-bold text-white">+12</div>
                     </div>
                     <span className="text-sm font-semibold text-primary">14 candidats</span>
                   </div>
@@ -172,7 +172,7 @@ export default function Home() {
                 {/* Card 2 - Candidate Profile */}
                 <div className="absolute top-48 left-0 w-72 bg-white rounded-3xl shadow-2xl p-6 border border-slate-200 hover:shadow-accent/20 hover:-translate-y-2 transition-all duration-300">
                   <div className="flex items-center space-x-4 mb-4">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent to-secondary"></div>
+                    <div className="w-16 h-16 rounded-2xl bg-accent"></div>
                     <div>
                       <h3 className="font-bold">Marie Dubois</h3>
                       <p className="text-sm text-base-content/60">Product Designer</p>
@@ -183,8 +183,8 @@ export default function Home() {
                       <span className="text-base-content/60">Match IA</span>
                       <span className="font-bold text-accent">96%</span>
                     </div>
-                    <div className="w-full bg-base-200 rounded-full h-2">
-                      <div className="bg-gradient-to-r from-accent to-secondary h-2 rounded-full" style={{ width: '96%' }}></div>
+                    <div className="w-full bg-slate-100 rounded-full h-2">
+                      <div className="bg-accent h-2 rounded-full" style={{ width: '96%' }}></div>
                     </div>
                     <div className="flex flex-wrap gap-2 mt-3">
                       <span className="badge badge-outline badge-sm">UI/UX</span>
@@ -197,7 +197,7 @@ export default function Home() {
                 {/* Card 3 - Notification */}
                 <div className="absolute bottom-0 right-8 w-80 bg-white rounded-3xl shadow-2xl p-5 border border-slate-200 hover:shadow-secondary/20 hover:-translate-y-2 transition-all duration-300">
                   <div className="flex items-start space-x-4">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-secondary to-primary flex items-center justify-center flex-shrink-0">
+                    <div className="w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center flex-shrink-0">
                       <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
@@ -234,7 +234,7 @@ export default function Home() {
             {/* Step 1 */}
             <div className="relative group">
               <div className="relative bg-white rounded-3xl p-8 border border-slate-200 hover:border-primary/50 transition-all duration-300">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mb-6">
+                <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mb-6">
                   <span className="text-3xl font-bold text-white">1</span>
                 </div>
                 <h3 className="text-2xl font-bold mb-4">Créez votre profil</h3>
@@ -254,7 +254,7 @@ export default function Home() {
             {/* Step 2 */}
             <div className="relative group lg:mt-8">
               <div className="relative bg-white rounded-3xl p-8 border border-slate-200 hover:border-accent/50 transition-all duration-300">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent to-secondary flex items-center justify-center mb-6">
+                <div className="w-16 h-16 rounded-2xl bg-accent flex items-center justify-center mb-6">
                   <span className="text-3xl font-bold text-white">2</span>
                 </div>
                 <h3 className="text-2xl font-bold mb-4">IA de matching</h3>
@@ -273,7 +273,7 @@ export default function Home() {
             {/* Step 3 */}
             <div className="relative group lg:mt-16">
               <div className="relative bg-white rounded-3xl p-8 border border-slate-200 hover:border-secondary/50 transition-all duration-300">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-secondary to-primary flex items-center justify-center mb-6">
+                <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center mb-6">
                   <span className="text-3xl font-bold text-white">3</span>
                 </div>
                 <h3 className="text-2xl font-bold mb-4">Connectez-vous</h3>
@@ -310,7 +310,7 @@ export default function Home() {
             <div className="relative group">
               <div className="relative bg-white rounded-3xl p-10 border border-slate-200 hover:border-primary/50 transition-all duration-300">
                 <div className="flex items-center space-x-4 mb-8">
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                  <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center">
                     <svg className="w-9 h-9 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
@@ -347,7 +347,7 @@ export default function Home() {
             <div className="relative group">
               <div className="relative bg-white rounded-3xl p-10 border border-slate-200 hover:border-accent/50 transition-all duration-300">
                 <div className="flex items-center space-x-4 mb-8">
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent to-secondary flex items-center justify-center">
+                  <div className="w-16 h-16 rounded-2xl bg-accent flex items-center justify-center">
                     <svg className="w-9 h-9 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
@@ -445,7 +445,7 @@ export default function Home() {
                 "J'ai trouvé mon emploi de rêve en moins de deux semaines ! Le système de matching est vraiment impressionnant."
               </p>
               <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent"></div>
+                <div className="w-12 h-12 rounded-full bg-primary"></div>
                 <div>
                   <div className="font-bold">Sophie Martin</div>
                   <div className="text-sm text-base-content/60">UX Designer</div>
@@ -466,7 +466,7 @@ export default function Home() {
                 "En tant que recruteur, INTOWORK a transformé notre processus. Nous gagnons un temps précieux sur chaque embauche."
               </p>
               <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-secondary"></div>
+                <div className="w-12 h-12 rounded-full bg-accent"></div>
                 <div>
                   <div className="font-bold">Pierre Durand</div>
                   <div className="text-sm text-base-content/60">RH Manager, TechCorp</div>
@@ -487,7 +487,7 @@ export default function Home() {
                 "Interface intuitive, fonctionnalités complètes. C'est exactement ce dont notre startup avait besoin."
               </p>
               <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-secondary to-primary"></div>
+                <div className="w-12 h-12 rounded-full bg-secondary"></div>
                 <div>
                   <div className="font-bold">Laura Chen</div>
                   <div className="text-sm text-base-content/60">CEO, Startup Innovante</div>
@@ -504,7 +504,7 @@ export default function Home() {
           <div className="bg-white border-4 border-primary/20 rounded-3xl p-12 lg:p-16 text-center">
             <h2 className="text-4xl lg:text-6xl font-bold mb-6 tracking-tight">
               Prêt à transformer votre{' '}
-              <span className="bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
+              <span className="text-primary">
                 carrière ou votre recrutement ?
               </span>
             </h2>
@@ -536,7 +536,7 @@ export default function Home() {
             {/* Brand */}
             <div className="md:col-span-1">
               <div className="flex items-center space-x-2 mb-4">
-                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                <div className="w-10 h-10 rounded-2xl bg-primary flex items-center justify-center">
                   <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
