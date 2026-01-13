@@ -128,32 +128,32 @@ export default function Home() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
-            <div className="bg-white rounded-3xl p-10 border border-slate-200 hover:shadow-lg transition-all duration-300">
-              <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mb-6">
-                <span className="text-3xl font-bold text-white">1</span>
+            <div className="bg-white rounded-3xl p-12 border border-slate-200 hover:shadow-xl transition-all duration-300">
+              <div className="w-20 h-20 rounded-2xl bg-primary flex items-center justify-center mb-8">
+                <span className="text-4xl font-bold text-white">1</span>
               </div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-4">Créez votre profil</h3>
-              <p className="text-slate-600 leading-relaxed">
+              <h3 className="text-3xl font-bold text-slate-900 mb-5">Créez votre profil</h3>
+              <p className="text-lg text-slate-700 leading-relaxed">
                 Candidats : Complétez votre profil et uploadez votre CV. Recruteurs : Présentez votre entreprise et vos besoins.
               </p>
             </div>
 
-            <div className="bg-white rounded-3xl p-10 border border-slate-200 hover:shadow-lg transition-all duration-300">
-              <div className="w-16 h-16 rounded-2xl bg-accent flex items-center justify-center mb-6">
-                <span className="text-3xl font-bold text-white">2</span>
+            <div className="bg-white rounded-3xl p-12 border border-slate-200 hover:shadow-xl transition-all duration-300">
+              <div className="w-20 h-20 rounded-2xl bg-accent flex items-center justify-center mb-8">
+                <span className="text-4xl font-bold text-white">2</span>
               </div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-4">IA de matching</h3>
-              <p className="text-slate-600 leading-relaxed">
+              <h3 className="text-3xl font-bold text-slate-900 mb-5">IA de matching</h3>
+              <p className="text-lg text-slate-700 leading-relaxed">
                 Notre IA analyse et crée des correspondances parfaites basées sur les compétences, l'expérience et les aspirations.
               </p>
             </div>
 
-            <div className="bg-white rounded-3xl p-10 border border-slate-200 hover:shadow-lg transition-all duration-300">
-              <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center mb-6">
-                <span className="text-3xl font-bold text-white">3</span>
+            <div className="bg-white rounded-3xl p-12 border border-slate-200 hover:shadow-xl transition-all duration-300">
+              <div className="w-20 h-20 rounded-2xl bg-secondary flex items-center justify-center mb-8">
+                <span className="text-4xl font-bold text-white">3</span>
               </div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-4">Connectez-vous</h3>
-              <p className="text-slate-600 leading-relaxed">
+              <h3 className="text-3xl font-bold text-slate-900 mb-5">Connectez-vous</h3>
+              <p className="text-lg text-slate-700 leading-relaxed">
                 Candidats : Postulez en un clic. Recruteurs : Organisez vos entretiens directement depuis la plateforme.
               </p>
             </div>
@@ -287,62 +287,62 @@ export default function Home() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white rounded-3xl p-10 border border-slate-200">
-              <div className="flex items-center space-x-1 mb-6">
+            <div className="bg-white rounded-3xl p-12 border border-slate-200 hover:shadow-xl transition-all duration-300">
+              <div className="flex items-center space-x-1 mb-8">
                 {[...Array(5)].map((_, i) => (
-                  <svg key={i} className="w-5 h-5 text-warning fill-current" viewBox="0 0 20 20">
+                  <svg key={i} className="w-6 h-6 text-warning fill-current" viewBox="0 0 20 20">
                     <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
                   </svg>
                 ))}
               </div>
-              <p className="text-slate-700 mb-8 leading-relaxed text-lg">
+              <p className="text-xl text-slate-800 mb-10 leading-relaxed font-medium">
                 "Emploi de rêve trouvé en deux semaines. Le matching IA est impressionnant."
               </p>
               <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 rounded-full bg-primary"></div>
+                <div className="w-14 h-14 rounded-full bg-primary"></div>
                 <div>
-                  <div className="font-bold text-slate-900">Sophie Martin</div>
-                  <div className="text-sm text-slate-600">UX Designer</div>
+                  <div className="font-bold text-lg text-slate-900">Sophie Martin</div>
+                  <div className="text-base text-slate-600">UX Designer</div>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-3xl p-10 border border-slate-200">
-              <div className="flex items-center space-x-1 mb-6">
+            <div className="bg-white rounded-3xl p-12 border border-slate-200 hover:shadow-xl transition-all duration-300">
+              <div className="flex items-center space-x-1 mb-8">
                 {[...Array(5)].map((_, i) => (
-                  <svg key={i} className="w-5 h-5 text-warning fill-current" viewBox="0 0 20 20">
+                  <svg key={i} className="w-6 h-6 text-warning fill-current" viewBox="0 0 20 20">
                     <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
                   </svg>
                 ))}
               </div>
-              <p className="text-slate-700 mb-8 leading-relaxed text-lg">
+              <p className="text-xl text-slate-800 mb-10 leading-relaxed font-medium">
                 "INTOWORK a transformé notre processus. Gain de temps énorme sur chaque embauche."
               </p>
               <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 rounded-full bg-accent"></div>
+                <div className="w-14 h-14 rounded-full bg-accent"></div>
                 <div>
-                  <div className="font-bold text-slate-900">Pierre Durand</div>
-                  <div className="text-sm text-slate-600">RH Manager</div>
+                  <div className="font-bold text-lg text-slate-900">Pierre Durand</div>
+                  <div className="text-base text-slate-600">RH Manager</div>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-3xl p-10 border border-slate-200">
-              <div className="flex items-center space-x-1 mb-6">
+            <div className="bg-white rounded-3xl p-12 border border-slate-200 hover:shadow-xl transition-all duration-300">
+              <div className="flex items-center space-x-1 mb-8">
                 {[...Array(5)].map((_, i) => (
-                  <svg key={i} className="w-5 h-5 text-warning fill-current" viewBox="0 0 20 20">
+                  <svg key={i} className="w-6 h-6 text-warning fill-current" viewBox="0 0 20 20">
                     <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
                   </svg>
                 ))}
               </div>
-              <p className="text-slate-700 mb-8 leading-relaxed text-lg">
+              <p className="text-xl text-slate-800 mb-10 leading-relaxed font-medium">
                 "Interface intuitive, fonctionnalités complètes. Exactement ce qu'il nous fallait."
               </p>
               <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 rounded-full bg-secondary"></div>
+                <div className="w-14 h-14 rounded-full bg-secondary"></div>
                 <div>
-                  <div className="font-bold text-slate-900">Laura Chen</div>
-                  <div className="text-sm text-slate-600">CEO</div>
+                  <div className="font-bold text-lg text-slate-900">Laura Chen</div>
+                  <div className="text-base text-slate-600">CEO</div>
                 </div>
               </div>
             </div>
