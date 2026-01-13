@@ -81,15 +81,8 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center pt-20 overflow-hidden bg-gradient-to-br from-base-100 via-primary/5 to-accent/10">
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-blob"></div>
-          <div className="absolute top-40 right-20 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-blob animation-delay-2000"></div>
-          <div className="absolute bottom-20 left-1/3 w-80 h-80 bg-secondary/20 rounded-full blur-3xl animate-blob animation-delay-4000"></div>
-        </div>
-
-        <div className="relative max-w-7xl mx-auto px-6 lg:px-8 py-20 lg:py-32">
+      <section className="relative min-h-screen flex items-center pt-20 bg-base-100">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-20 lg:py-32">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Left Column - Text Content */}
             <div className="space-y-8 animate-fade-in">
@@ -223,7 +216,7 @@ export default function Home() {
       </section>
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="py-20 lg:py-32 bg-base-200/50">
+      <section id="how-it-works" className="py-20 lg:py-32 bg-base-100">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
             <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 mb-6">
@@ -240,7 +233,6 @@ export default function Home() {
           <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
             {/* Step 1 */}
             <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-300 opacity-0 group-hover:opacity-100"></div>
               <div className="relative bg-base-100 rounded-3xl p-8 border border-base-300 hover:border-primary/50 transition-all duration-300">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mb-6">
                   <span className="text-3xl font-bold text-white">1</span>
@@ -261,7 +253,6 @@ export default function Home() {
 
             {/* Step 2 */}
             <div className="relative group lg:mt-8">
-              <div className="absolute inset-0 bg-gradient-to-br from-accent/20 to-secondary/20 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-300 opacity-0 group-hover:opacity-100"></div>
               <div className="relative bg-base-100 rounded-3xl p-8 border border-base-300 hover:border-accent/50 transition-all duration-300">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent to-secondary flex items-center justify-center mb-6">
                   <span className="text-3xl font-bold text-white">2</span>
@@ -281,7 +272,6 @@ export default function Home() {
 
             {/* Step 3 */}
             <div className="relative group lg:mt-16">
-              <div className="absolute inset-0 bg-gradient-to-br from-secondary/20 to-primary/20 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-300 opacity-0 group-hover:opacity-100"></div>
               <div className="relative bg-base-100 rounded-3xl p-8 border border-base-300 hover:border-secondary/50 transition-all duration-300">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-secondary to-primary flex items-center justify-center mb-6">
                   <span className="text-3xl font-bold text-white">3</span>
@@ -318,7 +308,6 @@ export default function Home() {
           <div className="grid lg:grid-cols-2 gap-8 mb-16">
             {/* Candidates Card */}
             <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-accent/10 rounded-3xl"></div>
               <div className="relative bg-base-100 rounded-3xl p-10 border border-base-300 hover:border-primary/50 transition-all duration-300">
                 <div className="flex items-center space-x-4 mb-8">
                   <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
@@ -356,7 +345,6 @@ export default function Home() {
 
             {/* Employers Card */}
             <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-br from-accent/10 to-secondary/10 rounded-3xl"></div>
               <div className="relative bg-base-100 rounded-3xl p-10 border border-base-300 hover:border-accent/50 transition-all duration-300">
                 <div className="flex items-center space-x-4 mb-8">
                   <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent to-secondary flex items-center justify-center">
@@ -429,7 +417,7 @@ export default function Home() {
       </section>
 
       {/* Testimonials Section */}
-      <section id="testimonials" className="py-20 lg:py-32 bg-gradient-to-br from-base-200/50 to-primary/5">
+      <section id="testimonials" className="py-20 lg:py-32 bg-base-200">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
             <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-secondary/10 border border-secondary/20 mb-6">
@@ -511,33 +499,33 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 lg:py-32 bg-gradient-to-br from-primary via-accent to-secondary relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 left-20 w-96 h-96 bg-white rounded-full blur-3xl animate-blob"></div>
-          <div className="absolute bottom-20 right-20 w-96 h-96 bg-white rounded-full blur-3xl animate-blob animation-delay-2000"></div>
-        </div>
-
-        <div className="relative max-w-4xl mx-auto px-6 lg:px-8 text-center">
-          <h2 className="text-4xl lg:text-6xl font-bold text-white mb-6 tracking-tight">
-            Prêt à transformer votre carrière ou votre recrutement ?
-          </h2>
-          <p className="text-xl text-white/90 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Rejoignez les milliers de professionnels qui ont déjà fait le choix de l'excellence avec INTOWORK.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/auth/signup"
-              className="btn btn-lg bg-white text-primary hover:bg-base-100 border-0 rounded-full px-10 normal-case text-lg font-bold"
-            >
-              Créer mon compte gratuit
-            </Link>
-            <button className="btn btn-lg btn-outline border-2 border-white text-white hover:bg-white hover:text-primary hover:border-white rounded-full px-10 normal-case text-lg font-semibold">
-              Planifier une démo
-            </button>
+      <section className="py-20 lg:py-32 bg-base-100">
+        <div className="max-w-4xl mx-auto px-6 lg:px-8">
+          <div className="bg-base-100 border-4 border-primary/20 rounded-3xl p-12 lg:p-16 text-center">
+            <h2 className="text-4xl lg:text-6xl font-bold mb-6 tracking-tight">
+              Prêt à transformer votre{' '}
+              <span className="bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
+                carrière ou votre recrutement ?
+              </span>
+            </h2>
+            <p className="text-xl text-base-content/70 mb-10 max-w-2xl mx-auto leading-relaxed">
+              Rejoignez les milliers de professionnels qui ont déjà fait le choix de l'excellence avec INTOWORK.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                href="/auth/signup"
+                className="btn btn-primary btn-lg rounded-full px-10 normal-case text-lg font-bold"
+              >
+                Créer mon compte gratuit
+              </Link>
+              <button className="btn btn-outline btn-lg rounded-full px-10 normal-case text-lg font-semibold">
+                Planifier une démo
+              </button>
+            </div>
+            <p className="text-base-content/60 text-sm mt-6">
+              Aucune carte bancaire requise • Essai gratuit • Sans engagement
+            </p>
           </div>
-          <p className="text-white/70 text-sm mt-6">
-            Aucune carte bancaire requise • Essai gratuit • Sans engagement
-          </p>
         </div>
       </section>
 
