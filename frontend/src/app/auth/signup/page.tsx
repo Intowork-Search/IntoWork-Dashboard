@@ -119,7 +119,7 @@ export default function SignUpPage() {
         {/* Left Panel - Branding & Features */}
         <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden flex-col justify-between p-12 xl:p-16">
           {/* Background solid color */}
-          <div className="absolute inset-0 bg-accent"></div>
+          <div className="absolute inset-0 bg-[var(--color-brand-green)]"></div>
 
           {/* Content */}
           <div className="relative z-10">
@@ -202,7 +202,7 @@ export default function SignUpPage() {
           <div className="w-full max-w-md relative z-10">
             {/* Mobile Logo */}
             <div className="lg:hidden flex items-center gap-2 sm:gap-3 mb-8 sm:mb-10 animate-fade-in">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-accent rounded-xl flex items-center justify-center shadow-lg">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-secondary rounded-xl flex items-center justify-center shadow-lg">
                 <SparklesIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
               <div>
@@ -234,7 +234,7 @@ export default function SignUpPage() {
                         required
                         value={formData.firstName}
                         onChange={handleChange}
-                        className="w-full px-3 sm:px-4 py-2 sm:py-2.5 bg-slate-50 border border-slate-300 rounded-lg sm:rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300 text-sm sm:text-base"
+                        className="w-full px-3 sm:px-4 py-2 sm:py-2.5 bg-slate-50 border border-slate-300 rounded-lg sm:rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-green)]/50 focus:border-[var(--color-brand-green)] transition-all duration-300 text-sm sm:text-base"
                         placeholder="Jean"
                       />
                     </div>
@@ -249,7 +249,7 @@ export default function SignUpPage() {
                         required
                         value={formData.lastName}
                         onChange={handleChange}
-                        className="w-full px-3 sm:px-4 py-2 sm:py-2.5 bg-slate-50 border border-slate-300 rounded-lg sm:rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300 text-sm sm:text-base"
+                        className="w-full px-3 sm:px-4 py-2 sm:py-2.5 bg-slate-50 border border-slate-300 rounded-lg sm:rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-green)]/50 focus:border-[var(--color-brand-green)] transition-all duration-300 text-sm sm:text-base"
                         placeholder="Dupont"
                       />
                     </div>
@@ -267,8 +267,8 @@ export default function SignUpPage() {
                         onClick={() => setFormData({ ...formData, role: 'candidate' })}
                         className={`relative p-4 sm:p-5 rounded-xl sm:rounded-2xl border-2 transition-all duration-300 group overflow-hidden ${
                           formData.role === 'candidate'
-                            ? 'border-primary bg-primary/10 shadow-lg shadow-primary/20'
-                            : 'border-slate-300 bg-slate-50 hover:border-primary/50 hover:shadow-md'
+                            ? 'border-[var(--color-brand-green)] bg-[var(--green-100)] shadow-lg shadow-green-500/20'
+                            : 'border-slate-300 bg-slate-50 hover:border-[var(--color-brand-green)]/50 hover:shadow-md'
                         }`}
                       >
 
@@ -277,15 +277,15 @@ export default function SignUpPage() {
                             <div
                               className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center transition-colors duration-300 ${
                                 formData.role === 'candidate'
-                                  ? 'bg-primary text-white'
-                                  : 'bg-slate-200 text-slate-600 group-hover:bg-primary/20'
+                                  ? 'bg-[var(--color-brand-green)] text-white'
+                                  : 'bg-slate-200 text-slate-600 group-hover:bg-[var(--green-100)]'
                               }`}
                             >
                               <UserCircleIcon className="w-5 h-5 sm:w-6 sm:h-6" />
                             </div>
                           </div>
                           <div className="font-semibold text-slate-900 mb-0.5 sm:mb-1 text-sm sm:text-base">Candidat</div>
-                          <div className={`text-xs transition-colors duration-300 ${formData.role === 'candidate' ? 'text-primary/80' : 'text-slate-600'}`}>
+                          <div className={`text-xs transition-colors duration-300 ${formData.role === 'candidate' ? 'text-[var(--color-brand-green)]/80' : 'text-slate-600'}`}>
                             Je cherche un emploi
                           </div>
                         </div>
@@ -297,8 +297,8 @@ export default function SignUpPage() {
                         onClick={() => setFormData({ ...formData, role: 'employer' })}
                         className={`relative p-4 sm:p-5 rounded-xl sm:rounded-2xl border-2 transition-all duration-300 group overflow-hidden ${
                           formData.role === 'employer'
-                            ? 'border-secondary bg-secondary/10 shadow-lg shadow-secondary/20'
-                            : 'border-slate-300 bg-slate-50 hover:border-secondary/50 hover:shadow-md'
+                            ? 'border-[var(--color-brand-gold)] bg-[var(--gold-100)] shadow-lg shadow-amber-500/20'
+                            : 'border-slate-300 bg-slate-50 hover:border-[var(--color-brand-gold)]/50 hover:shadow-md'
                         }`}
                       >
 
@@ -307,15 +307,15 @@ export default function SignUpPage() {
                             <div
                               className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center transition-colors duration-300 ${
                                 formData.role === 'employer'
-                                  ? 'bg-secondary text-white'
-                                  : 'bg-slate-200 text-slate-600 group-hover:bg-secondary/20'
+                                  ? 'bg-[var(--color-brand-gold)] text-slate-900'
+                                  : 'bg-slate-200 text-slate-600 group-hover:bg-[var(--gold-100)]'
                               }`}
                             >
                               <BuildingOfficeIcon className="w-5 h-5 sm:w-6 sm:h-6" />
                             </div>
                           </div>
                           <div className="font-semibold text-slate-900 mb-0.5 sm:mb-1 text-sm sm:text-base">Employeur</div>
-                          <div className={`text-xs transition-colors duration-300 ${formData.role === 'employer' ? 'text-secondary/80' : 'text-slate-600'}`}>
+                          <div className={`text-xs transition-colors duration-300 ${formData.role === 'employer' ? 'text-[var(--color-brand-gold)]/80' : 'text-slate-600'}`}>
                             Je recrute des talents
                           </div>
                         </div>
@@ -337,7 +337,7 @@ export default function SignUpPage() {
                         required
                         value={formData.email}
                         onChange={handleChange}
-                        className="w-full px-4 py-2.5 sm:py-3 pl-10 sm:pl-12 bg-slate-50 border border-slate-300 rounded-lg sm:rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300 text-sm sm:text-base"
+                        className="w-full px-4 py-2.5 sm:py-3 pl-10 sm:pl-12 bg-slate-50 border border-slate-300 rounded-lg sm:rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-green)]/50 focus:border-[var(--color-brand-green)] transition-all duration-300 text-sm sm:text-base"
                         placeholder="nom.prenom@entreprise.com"
                       />
                       <EnvelopeIcon className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-slate-400" />
@@ -358,7 +358,7 @@ export default function SignUpPage() {
                         required
                         value={formData.password}
                         onChange={handleChange}
-                        className="w-full px-4 py-2.5 sm:py-3 pl-10 sm:pl-12 bg-slate-50 border border-slate-300 rounded-lg sm:rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300 text-sm sm:text-base"
+                        className="w-full px-4 py-2.5 sm:py-3 pl-10 sm:pl-12 bg-slate-50 border border-slate-300 rounded-lg sm:rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-green)]/50 focus:border-[var(--color-brand-green)] transition-all duration-300 text-sm sm:text-base"
                         placeholder="••••••••••••"
                       />
                       <LockClosedIcon className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-slate-400" />
@@ -382,7 +382,7 @@ export default function SignUpPage() {
                         required
                         value={formData.confirmPassword}
                         onChange={handleChange}
-                        className="w-full px-4 py-2.5 sm:py-3 pl-10 sm:pl-12 bg-slate-50 border border-slate-300 rounded-lg sm:rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300 text-sm sm:text-base"
+                        className="w-full px-4 py-2.5 sm:py-3 pl-10 sm:pl-12 bg-slate-50 border border-slate-300 rounded-lg sm:rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-green)]/50 focus:border-[var(--color-brand-green)] transition-all duration-300 text-sm sm:text-base"
                         placeholder="••••••••••••"
                       />
                       <LockClosedIcon className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-slate-400" />
@@ -393,7 +393,7 @@ export default function SignUpPage() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full h-11 sm:h-12 mt-4 sm:mt-6 bg-primary hover:bg-primary/90 text-white font-semibold rounded-lg sm:rounded-xl transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 group shadow-lg hover:shadow-xl relative overflow-hidden text-sm sm:text-base"
+                    className="w-full h-11 sm:h-12 mt-4 sm:mt-6 bg-[var(--color-brand-green)] hover:bg-[var(--green-600)] text-white font-semibold rounded-lg sm:rounded-xl transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 group shadow-lg hover:shadow-xl relative overflow-hidden text-sm sm:text-base"
                   >
 
                     {loading ? (
@@ -423,7 +423,7 @@ export default function SignUpPage() {
                     Vous avez déjà un compte ?{' '}
                     <Link
                       href="/auth/signin"
-                      className="font-semibold text-primary hover:text-primary/80 transition-colors duration-300 no-underline"
+                      className="font-semibold text-[var(--color-brand-green)] hover:text-[var(--color-brand-green)]/80 transition-colors duration-300 no-underline"
                     >
                       Se connecter
                     </Link>

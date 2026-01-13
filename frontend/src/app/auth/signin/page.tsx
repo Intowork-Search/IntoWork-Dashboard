@@ -75,7 +75,7 @@ export default function SignInPage() {
         {/* Left Panel - Branding & Features */}
         <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden flex-col justify-between p-12 xl:p-16">
           {/* Background solid color */}
-          <div className="absolute inset-0 bg-primary"></div>
+          <div className="absolute inset-0 bg-[var(--color-brand-green)]"></div>
 
           {/* Content */}
           <div className="relative z-10">
@@ -158,7 +158,7 @@ export default function SignInPage() {
           <div className="w-full max-w-md relative z-10">
             {/* Mobile Logo */}
             <div className="lg:hidden flex items-center gap-2 sm:gap-3 mb-8 sm:mb-10 animate-fade-in">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary rounded-xl flex items-center justify-center shadow-lg">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-secondary rounded-xl flex items-center justify-center shadow-lg">
                 <SparklesIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
               <div>

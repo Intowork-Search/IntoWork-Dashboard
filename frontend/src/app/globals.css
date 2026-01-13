@@ -37,6 +37,9 @@
   --noise: 0;
 }
 
+/* Import Brand Colors - Charte Graphique INTOWORK */
+@import '../styles/brand-colors.css';
+
 :root {
   --background: #ffffff;
   --foreground: #171717;

@@ -30,12 +30,15 @@ class EmailService:
         if RESEND_AVAILABLE and RESEND_API_KEY:
             resend.api_key = RESEND_API_KEY
             self.enabled = True
+            logger.info("✅ Email service ENABLED - Resend is configured")
         else:
             self.enabled = False
             if not RESEND_AVAILABLE:
-                logger.warning("Email service disabled: Resend package not available")
-            elif not RESEND_API_KEY:
-                logger.warning("Email service disabled: RESEND_API_KEY not configured")
+                logger.warning("❌ Email service disabled: Resend package not available")
+            if not RESEND_API_KEY:
+                logger.error("❌ Email service disabled: RESEND_API_KEY environment variable NOT SET - Check Railway variables")
+                logger.error(f"   FROM_EMAIL value: {FROM_EMAIL}")
+                logger.error(f"   FRONTEND_URL value: {FRONTEND_URL}")
 
     def send_password_reset_email(
         self,
@@ -55,7 +58,9 @@ class EmailService:
             True si l'email a été envoyé avec succès, False sinon
         """
         if not self.enabled:
-            logger.error("Cannot send email: Email service is disabled")
+            logger.error(f"❌ Cannot send email to {email}: Email service is DISABLED")
+            logger.error(f"   RESEND_API_KEY is set: {bool(RESEND_API_KEY)}")
+            logger.error(f"   Resend package available: {RESEND_AVAILABLE}")
             return False
 
         reset_link = f"{FRONTEND_URL}/auth/reset-password?token={token}"
@@ -74,12 +79,19 @@ class EmailService:
                 "html": html_content,
             }
 
+            logger.info(f"📧 Sending password reset email from {FROM_EMAIL} to {email}")
             response = resend.Emails.send(params)
-            logger.info(f"Password reset email sent successfully to {email}. ID: {response.get('id')}")
-            return True
+            
+            if response and 'id' in response:
+                logger.info(f"✅ Password reset email sent successfully to {email}. ID: {response.get('id')}")
+                return True
+            else:
+                logger.error(f"❌ Resend API returned unexpected response: {response}")
+                return False
 
         except Exception as e:
-            logger.error(f"Failed to send password reset email to {email}: {str(e)}")
+            logger.error(f"❌ Failed to send password reset email to {email}: {str(e)}")
+            logger.error(f"   Exception type: {type(e).__name__}")
             return False
 
     def _get_password_reset_template(self, reset_link: str, user_name: str) -> str:

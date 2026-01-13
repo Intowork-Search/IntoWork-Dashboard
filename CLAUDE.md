@@ -51,12 +51,14 @@ See relevant sections below for detailed usage of each MCP server.
 **Frontend** (`/frontend`):
 - Next.js 16 (App Router with React Server Components)
 - TypeScript with strict type checking
-- Tailwind CSS 4 with PostCSS
-- DaisyUI 5.5+ for component library
+- Tailwind CSS 4 with inline theming (no separate config file)
+- DaisyUI 5.5+ for component library with custom light theme
 - NextAuth v5 for authentication with JWT strategy
 - **TanStack React Query v5** for server state management and caching
 - Axios for API communication
 - React Hot Toast for notifications
+- Plus Jakarta Sans font for premium typography
+- Custom animations (fadeIn, slideInFromLeft, slideInFromRight, blob)
 
 **Note**: `@clerk/nextjs` and `@clerk/themes` still appear in `package.json` as legacy dependencies but are no longer used. The application has been fully migrated to NextAuth v5. These can be safely removed in a future cleanup.
 

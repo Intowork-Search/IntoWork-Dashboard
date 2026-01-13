@@ -20,10 +20,17 @@ import toast from 'react-hot-toast';
 import axios from 'axios';
 import PasswordStrengthIndicator from '@/components/PasswordStrengthIndicator';
 import { validatePassword } from '@/lib/passwordValidation';
+import { Plus_Jakarta_Sans } from 'next/font/google';
 
 import { getApiUrl } from '@/lib/getApiUrl';
 
 const API_URL = getApiUrl();
+
+const plusJakarta = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-plus-jakarta',
+});
 
 function ResetPasswordContent() {
   const router = useRouter();
@@ -95,39 +102,39 @@ function ResetPasswordContent() {
 
   if (!token) {
     return (
-      <div className="min-h-screen bg-base-100 flex items-center justify-center">
+      <div className={`${plusJakarta.variable} font-sans min-h-screen bg-white flex items-center justify-center`}>
         <div className="text-center">
-          <div className="loading loading-spinner loading-lg text-primary"></div>
-          <p className="mt-4 text-base-content/60">Redirection...</p>
+          <div className="loading loading-spinner loading-lg text-[var(--color-brand-green)]"></div>
+          <p className="mt-4 text-slate-600">Redirection...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-base-100" data-theme="light">
+    <div className={`${plusJakarta.variable} font-sans min-h-screen bg-white`} data-theme="light">
       <div className="flex min-h-screen overflow-hidden">
         {/* Left Panel - Branding & Features (Identical to forgot-password) */}
-        <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden flex-col justify-between p-12">
+        <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden flex-col justify-between p-12 xl:p-16">
           {/* Background solid color */}
-          <div className="absolute inset-0 bg-primary"></div>
+          <div className="absolute inset-0 bg-[var(--color-brand-green)]"></div>
 
           {/* Content */}
           <div className="relative z-10">
             {/* Logo */}
-            <div className="flex items-center gap-3 mb-20 animate-fade-in">
-              <div className="w-14 h-14 bg-white/15 rounded-xl flex items-center justify-center backdrop-blur-md border border-white/20 shadow-xl">
-                <SparklesIcon className="w-7 h-7 text-white" />
+            <div className="flex items-center gap-3 mb-16 xl:mb-20 animate-fade-in">
+              <div className="w-12 h-12 xl:w-14 xl:h-14 bg-white/15 rounded-xl flex items-center justify-center backdrop-blur-md border border-white/20 shadow-xl">
+                <SparklesIcon className="w-6 h-6 xl:w-7 xl:h-7 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-white">INTOWORK</h1>
-                <p className="text-sm text-white/80">Plateforme de Recrutement B2B2C</p>
+                <h1 className="text-xl xl:text-2xl font-bold text-white">INTOWORK</h1>
+                <p className="text-xs xl:text-sm text-white/80">Plateforme de Recrutement B2B2C</p>
               </div>
             </div>
 
             {/* Features */}
             <div className="space-y-10">
-              <h2 className="text-4xl font-bold mb-12 text-white leading-tight animate-fade-in animation-delay-100">
+              <h2 className="text-3xl xl:text-4xl font-bold mb-10 xl:mb-12 text-white leading-tight animate-fade-in animation-delay-100">
                 Créez un nouveau mot de passe sécurisé
               </h2>
 
@@ -184,49 +191,44 @@ function ResetPasswordContent() {
         </div>
 
         {/* Right Panel - Reset Password Form */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-8 bg-base-100 relative overflow-hidden">
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-white relative overflow-hidden">
           {/* Subtle background pattern */}
-          <div className="absolute inset-0 opacity-40">
+          <div className="absolute inset-0 opacity-30">
             <div className="absolute inset-0 bg-[linear-gradient(to_right,transparent_1px,rgba(0,0,0,0.02)_1px)] bg-[length:4rem_4rem]"></div>
           </div>
 
           <div className="w-full max-w-md relative z-10">
             {/* Mobile Logo */}
-            <div className="lg:hidden flex items-center gap-3 mb-10 animate-fade-in">
-              <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center shadow-lg">
-                <SparklesIcon className="w-6 h-6 text-white" />
+            <div className="lg:hidden flex items-center gap-2 sm:gap-3 mb-8 sm:mb-10 animate-fade-in">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-secondary rounded-xl flex items-center justify-center shadow-lg">
+                <SparklesIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-base-content">INTOWORK</h1>
-                <p className="text-sm text-base-content/60">Plateforme de Recrutement</p>
+                <h1 className="text-xl sm:text-2xl font-bold text-slate-900">INTOWORK</h1>
+                <p className="text-xs sm:text-sm text-slate-600">Plateforme de Recrutement</p>
               </div>
             </div>
 
             {!resetSuccess ? (
               <>
                 {/* Form Header */}
-                <div className="mb-10 animate-fade-in animation-delay-100">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center">
-                      <LockClosedIcon className="w-6 h-6 text-primary" />
-                    </div>
-                    <h2 className="text-4xl font-bold text-base-content">
-                      Nouveau mot de passe
-                    </h2>
-                  </div>
-                  <p className="text-base-content/60 text-lg">
+                <div className="mb-8 sm:mb-10 animate-fade-in animation-delay-100">
+                  <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-2 sm:mb-3">
+                    Nouveau mot de passe
+                  </h2>
+                  <p className="text-slate-600 text-base sm:text-lg">
                     Choisissez un mot de passe fort et sécurisé
                   </p>
                 </div>
 
                 {/* Reset Password Card */}
                 <div className="animate-fade-in animation-delay-200">
-                  <div className="bg-white rounded-2xl shadow-lg border border-base-200 p-8 backdrop-blur-sm">
-                    <form className="space-y-6" onSubmit={handleSubmit}>
+                  <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl border border-slate-200 p-6 sm:p-8 backdrop-blur-sm">
+                    <form className="space-y-5 sm:space-y-6" onSubmit={handleSubmit}>
                       {/* New Password Input */}
                       <div className="form-control">
-                        <label className="label pb-2" htmlFor="newPassword">
-                          <span className="label-text font-semibold text-base-content text-base">
+                        <label className="label pb-1 sm:pb-2" htmlFor="newPassword">
+                          <span className="label-text font-semibold text-slate-900 text-sm sm:text-base">
                             Nouveau mot de passe
                           </span>
                         </label>
@@ -239,19 +241,19 @@ function ResetPasswordContent() {
                             required
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
-                            className="w-full px-4 py-3 pl-12 pr-12 bg-base-100 border border-base-300 rounded-xl text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300"
-                            placeholder="Minimum 12 caractères"
+                            className="w-full px-4 py-2.5 sm:py-3 pl-10 sm:pl-12 pr-10 sm:pr-12 bg-slate-50 border border-slate-300 rounded-lg sm:rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-green)]/50 focus:border-[var(--color-brand-green)] transition-all duration-300 text-sm sm:text-base"
+                            placeholder="Minimum 8 caractères"
                           />
-                          <LockClosedIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-base-content/40" />
+                          <LockClosedIcon className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-slate-400" />
                           <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-base-content/40 hover:text-base-content transition-colors"
+                            className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-900 transition-colors"
                           >
                             {showPassword ? (
-                              <EyeSlashIcon className="h-5 w-5" />
+                              <EyeSlashIcon className="h-4 w-4 sm:h-5 sm:w-5" />
                             ) : (
-                              <EyeIcon className="h-5 w-5" />
+                              <EyeIcon className="h-4 w-4 sm:h-5 sm:w-5" />
                             )}
                           </button>
                         </div>
@@ -261,8 +263,8 @@ function ResetPasswordContent() {
 
                       {/* Confirm Password Input */}
                       <div className="form-control">
-                        <label className="label pb-2" htmlFor="confirmPassword">
-                          <span className="label-text font-semibold text-base-content text-base">
+                        <label className="label pb-1 sm:pb-2" htmlFor="confirmPassword">
+                          <span className="label-text font-semibold text-slate-900 text-sm sm:text-base">
                             Confirmer le mot de passe
                           </span>
                         </label>
@@ -275,19 +277,19 @@ function ResetPasswordContent() {
                             required
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
-                            className="w-full px-4 py-3 pl-12 pr-12 bg-base-100 border border-base-300 rounded-xl text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300"
+                            className="w-full px-4 py-2.5 sm:py-3 pl-10 sm:pl-12 pr-10 sm:pr-12 bg-slate-50 border border-slate-300 rounded-lg sm:rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-green)]/50 focus:border-[var(--color-brand-green)] transition-all duration-300 text-sm sm:text-base"
                             placeholder="Retapez votre mot de passe"
                           />
-                          <LockClosedIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-base-content/40" />
+                          <LockClosedIcon className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-slate-400" />
                           <button
                             type="button"
                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-base-content/40 hover:text-base-content transition-colors"
+                            className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-900 transition-colors"
                           >
                             {showConfirmPassword ? (
-                              <EyeSlashIcon className="h-5 w-5" />
+                              <EyeSlashIcon className="h-4 w-4 sm:h-5 sm:w-5" />
                             ) : (
-                              <EyeIcon className="h-5 w-5" />
+                              <EyeIcon className="h-4 w-4 sm:h-5 sm:w-5" />
                             )}
                           </button>
                         </div>
@@ -302,9 +304,8 @@ function ResetPasswordContent() {
                       <button
                         type="submit"
                         disabled={loading || !newPassword || !confirmPassword}
-                        className="w-full h-12 mt-2 bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 group shadow-lg hover:shadow-xl relative overflow-hidden"
+                        className="w-full h-11 sm:h-12 mt-2 bg-[var(--color-brand-green)] hover:bg-[var(--green-600)] text-white font-semibold rounded-lg sm:rounded-xl transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 group shadow-lg hover:shadow-xl relative overflow-hidden text-sm sm:text-base"
                       >
-
                         {loading ? (
                           <>
                             <span className="loading loading-spinner loading-sm"></span>
@@ -313,17 +314,17 @@ function ResetPasswordContent() {
                         ) : (
                           <>
                             <span>Réinitialiser le mot de passe</span>
-                            <ArrowRightIcon className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                            <ArrowRightIcon className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
                           </>
                         )}
                       </button>
                     </form>
 
                     {/* Back to sign in */}
-                    <div className="mt-8 pt-6 border-t border-base-300 text-center">
+                    <div className="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-slate-200 text-center">
                       <Link
                         href="/auth/signin"
-                        className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors duration-300 no-underline"
+                        className="inline-flex items-center gap-2 text-sm font-medium text-[var(--color-brand-green)] hover:text-[var(--color-brand-green)]/80 transition-colors duration-300 no-underline"
                       >
                         <ArrowLeftIcon className="w-4 h-4" />
                         Retour à la connexion
@@ -335,18 +336,18 @@ function ResetPasswordContent() {
             ) : (
               <>
                 {/* Success State */}
-                <div className="mb-10 animate-fade-in animation-delay-100">
-                  <h2 className="text-4xl font-bold text-base-content">
+                <div className="mb-8 sm:mb-10 animate-fade-in animation-delay-100">
+                  <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-2 sm:mb-3">
                     Réinitialisation réussie !
                   </h2>
-                  <p className="text-base-content/60 text-lg mt-3">
+                  <p className="text-slate-600 text-base sm:text-lg">
                     Votre mot de passe a été mis à jour avec succès
                   </p>
                 </div>
 
                 {/* Success Card */}
                 <div className="animate-fade-in animation-delay-200">
-                  <div className="bg-white rounded-2xl shadow-lg border border-base-200 p-8 backdrop-blur-sm">
+                  <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl border border-slate-200 p-6 sm:p-8 backdrop-blur-sm">
                     {/* Success Icon */}
                     <div className="flex justify-center mb-8 animate-fade-in animation-delay-300">
                       <div className="relative w-24 h-24">
@@ -360,18 +361,18 @@ function ResetPasswordContent() {
                     </div>
 
                     {/* Success message */}
-                    <div className="text-center space-y-6">
+                    <div className="text-center space-y-5 sm:space-y-6">
                       <div>
-                        <p className="text-base-content text-lg font-semibold mb-2">
+                        <p className="text-slate-900 text-base sm:text-lg font-semibold mb-2">
                           Mot de passe réinitialisé !
                         </p>
-                        <p className="text-base-content/70">
+                        <p className="text-slate-700 text-sm sm:text-base">
                           Vous pouvez maintenant vous connecter avec votre nouveau mot de passe.
                         </p>
                       </div>
 
-                      <div className="bg-base-100 rounded-lg p-4 border border-base-300/50">
-                        <p className="text-sm text-base-content/60">
+                      <div className="bg-slate-50 rounded-lg p-3 sm:p-4 border border-slate-200">
+                        <p className="text-xs sm:text-sm text-slate-600">
                           Vous allez être redirigé vers la page de connexion dans quelques secondes...
                         </p>
                       </div>
@@ -379,10 +380,10 @@ function ResetPasswordContent() {
                       {/* Sign in button */}
                       <Link
                         href="/auth/signin"
-                        className="btn btn-primary w-full h-12 mt-4 flex items-center justify-center gap-2 no-underline"
+                        className="btn btn-primary w-full h-11 sm:h-12 mt-4 flex items-center justify-center gap-2 no-underline text-sm sm:text-base"
                       >
                         <span>Se connecter maintenant</span>
-                        <ArrowRightIcon className="w-5 h-5" />
+                        <ArrowRightIcon className="w-4 h-4 sm:w-5 sm:h-5" />
                       </Link>
                     </div>
                   </div>
@@ -391,10 +392,10 @@ function ResetPasswordContent() {
             )}
 
             {/* Footer */}
-            <div className="mt-10 text-center animate-fade-in animation-delay-300">
-              <p className="text-xs text-base-content/50">
+            <div className="mt-8 sm:mt-10 text-center animate-fade-in animation-delay-300">
+              <p className="text-xs text-slate-500 leading-relaxed">
                 Besoin d'aide ?{' '}
-                <Link href="/support" className="hover:text-base-content/70 transition-colors">
+                <Link href="/support" className="hover:text-slate-700 transition-colors underline underline-offset-2">
                   Contactez le support
                 </Link>
               </p>
@@ -409,10 +410,10 @@ function ResetPasswordContent() {
 export default function ResetPasswordPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-base-100 flex items-center justify-center">
+      <div className={`${plusJakarta.variable} font-sans min-h-screen bg-white flex items-center justify-center`}>
         <div className="text-center">
-          <div className="loading loading-spinner loading-lg text-primary"></div>
-          <p className="mt-4 text-base-content/60">Chargement...</p>
+          <div className="loading loading-spinner loading-lg text-[var(--color-brand-green)]"></div>
+          <p className="mt-4 text-slate-600">Chargement...</p>
         </div>
       </div>
     }>

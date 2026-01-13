@@ -1,0 +1,479 @@
+/**
+ * INTOWORK - Brand Colors & Design System
+ * Inspiré du logo officiel et des harmonies Sanzo Wada
+ *
+ * Import dans globals.css :
+ * @import './brand-colors.css';
+ */
+
+:root {
+  /* ========================================
+     COULEURS PRINCIPALES DU LOGO
+     ======================================== */
+
+  /* Vert Principal - "Meadow Green" */
+  --color-brand-green: #6B9B5F;
+  --color-brand-green-rgb: 107, 155, 95;
+  --color-brand-green-oklch: oklch(63% 0.12 145);
+
+  /* Or/Jaune - "Golden Accent" */
+  --color-brand-gold: #F7C700;
+  --color-brand-gold-rgb: 247, 199, 0;
+  --color-brand-gold-oklch: oklch(82% 0.18 95);
+
+  /* Violet Profond - "Deep Violet" */
+  --color-brand-violet: #6B46C1;
+  --color-brand-violet-rgb: 107, 70, 193;
+  --color-brand-violet-oklch: oklch(48% 0.20 290);
+
+  /* ========================================
+     PALETTE VERTE (Natural Harmony)
+     ======================================== */
+  --green-50: #F4F7F3;
+  --green-100: #E6EFE4;
+  --green-200: #C8DBC3;
+  --green-300: #A3C599;
+  --green-400: #84AD77;
+  --green-500: #6B9B5F;
+  --green-600: #5A8150;
+  --green-700: #496842;
+  --green-800: #3A5335;
+  --green-900: #2B3E28;
+
+  /* Terre (Complémentaire Naturelle) */
+  --earth-50: #F9F7F4;
+  --earth-100: #F0EDE7;
+  --earth-200: #DDD7CB;
+  --earth-300: #C5BBA9;
+  --earth-400: #A8997F;
+  --earth-500: #8B7A5E;
+  --earth-600: #73644D;
+  --earth-700: #5C503E;
+  --earth-800: #483F31;
+  --earth-900: #362F25;
+
+  /* ========================================
+     PALETTE OR (Dynamic Energy)
+     ======================================== */
+  --gold-50: #FFFDF0;
+  --gold-100: #FEF9DB;
+  --gold-200: #FDF1B3;
+  --gold-300: #FCE680;
+  --gold-400: #FAD944;
+  --gold-500: #F7C700;
+  --gold-600: #D4A800;
+  --gold-700: #B08900;
+  --gold-800: #8C6C00;
+  --gold-900: #685000;
+
+  /* Corail (Complémentaire Énergique) */
+  --coral-50: #FFF5F2;
+  --coral-100: #FFE8E0;
+  --coral-200: #FFC9B8;
+  --coral-300: #FFA38A;
+  --coral-400: #FF7A59;
+  --coral-500: #FF5733;
+  --coral-600: #E63F1F;
+  --coral-700: #C02F14;
+  --coral-800: #9A230D;
+  --coral-900: #731908;
+
+  /* ========================================
+     PALETTE VIOLET (Premium Luxury)
+     ======================================== */
+  --violet-50: #F7F5FC;
+  --violet-100: #EBE6F7;
+  --violet-200: #D3C6ED;
+  --violet-300: #B39FE0;
+  --violet-400: #9176D1;
+  --violet-500: #6B46C1;
+  --violet-600: #5735A3;
+  --violet-700: #452885;
+  --violet-800: #361F6A;
+  --violet-900: #28174F;
+
+  /* Indigo (Complémentaire Profondeur) */
+  --indigo-50: #F4F6FB;
+  --indigo-100: #E6EBF5;
+  --indigo-200: #C5D2E9;
+  --indigo-300: #9DB3DA;
+  --indigo-400: #7391C7;
+  --indigo-500: #4D6FB0;
+  --indigo-600: #3E5A94;
+  --indigo-700: #32477A;
+  --indigo-800: #283761;
+  --indigo-900: #1F2A4A;
+
+  /* ========================================
+     PALETTE NEUTRE (Slate)
+     ======================================== */
+  --slate-50: #F8FAFC;
+  --slate-100: #F1F5F9;
+  --slate-200: #E2E8F0;
+  --slate-300: #CBD5E1;
+  --slate-400: #94A3B8;
+  --slate-500: #64748B;
+  --slate-600: #475569;
+  --slate-700: #334155;
+  --slate-800: #1E293B;
+  --slate-900: #0F172A;
+
+  /* ========================================
+     COULEURS SÉMANTIQUES
+     ======================================== */
+
+  /* Succès (Inspiré du vert) */
+  --success-light: #D1FAE5;
+  --success: #10B981;
+  --success-dark: #065F46;
+
+  /* Avertissement (Inspiré de l'or) */
+  --warning-light: #FEF3C7;
+  --warning: #F59E0B;
+  --warning-dark: #92400E;
+
+  /* Erreur */
+  --error-light: #FEE2E2;
+  --error: #EF4444;
+  --error-dark: #991B1B;
+
+  /* Information (Inspiré du violet) */
+  --info-light: #DBEAFE;
+  --info: #3B82F6;
+  --info-dark: #1E40AF;
+
+  /* ========================================
+     TYPOGRAPHIE
+     ======================================== */
+  --font-family-base: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* ========================================
+     ESPACEMENT (Système de 4px)
+     ======================================== */
+  --space-0: 0;
+  --space-1: 0.25rem;    /* 4px */
+  --space-2: 0.5rem;     /* 8px */
+  --space-3: 0.75rem;    /* 12px */
+  --space-4: 1rem;       /* 16px */
+  --space-5: 1.25rem;    /* 20px */
+  --space-6: 1.5rem;     /* 24px */
+  --space-8: 2rem;       /* 32px */
+  --space-10: 2.5rem;    /* 40px */
+  --space-12: 3rem;      /* 48px */
+  --space-16: 4rem;      /* 64px */
+  --space-20: 5rem;      /* 80px */
+  --space-24: 6rem;      /* 96px */
+  --space-32: 8rem;      /* 128px */
+
+  /* ========================================
+     OMBRES
+     ======================================== */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+  /* Ombres colorées */
+  --shadow-green: 0 10px 15px -3px rgba(107, 155, 95, 0.2), 0 4px 6px -4px rgba(107, 155, 95, 0.15);
+  --shadow-gold: 0 10px 15px -3px rgba(247, 199, 0, 0.2), 0 4px 6px -4px rgba(247, 199, 0, 0.15);
+  --shadow-violet: 0 10px 15px -3px rgba(107, 70, 193, 0.2), 0 4px 6px -4px rgba(107, 70, 193, 0.15);
+
+  /* ========================================
+     BORDER RADIUS
+     ======================================== */
+  --radius-none: 0;
+  --radius-sm: 0.375rem;   /* 6px */
+  --radius: 0.5rem;        /* 8px */
+  --radius-md: 0.75rem;    /* 12px */
+  --radius-lg: 1rem;       /* 16px */
+  --radius-xl: 1.5rem;     /* 24px */
+  --radius-2xl: 2rem;      /* 32px */
+  --radius-3xl: 3rem;      /* 48px */
+  --radius-full: 9999px;
+
+  /* ========================================
+     BORDER WIDTH
+     ======================================== */
+  --border-0: 0px;
+  --border: 1px;
+  --border-2: 2px;
+  --border-4: 4px;
+  --border-8: 8px;
+
+  /* ========================================
+     ANIMATIONS
+     ======================================== */
+  --duration-fast: 150ms;
+  --duration-base: 300ms;
+  --duration-slow: 500ms;
+  --duration-slower: 700ms;
+
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Animation delays */
+  --animation-delay-100: 0.1s;
+  --animation-delay-200: 0.2s;
+  --animation-delay-300: 0.3s;
+  --animation-delay-400: 0.4s;
+  --animation-delay-500: 0.5s;
+
+  /* ========================================
+     BREAKPOINTS (pour référence JS)
+     ======================================== */
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+}
+
+/* ========================================
+   ANIMATIONS KEYFRAMES
+   ======================================== */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-2rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(2rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromBottom {
+  from {
+    opacity: 0;
+    transform: translateY(2rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+
+.animate-fade-in {
+  animation: fadeIn var(--duration-base) var(--ease-out);
+}
+
+.animate-slide-in-left {
+  animation: slideInFromLeft var(--duration-base) var(--ease-out);
+}
+
+.animate-slide-in-right {
+  animation: slideInFromRight var(--duration-base) var(--ease-out);
+}
+
+.animate-slide-in-bottom {
+  animation: slideInFromBottom var(--duration-base) var(--ease-out);
+}
+
+.animate-scale-in {
+  animation: scaleIn var(--duration-base) var(--ease-out);
+}
+
+.animation-delay-100 {
+  animation-delay: var(--animation-delay-100);
+}
+
+.animation-delay-200 {
+  animation-delay: var(--animation-delay-200);
+}
+
+.animation-delay-300 {
+  animation-delay: var(--animation-delay-300);
+}
+
+.animation-delay-400 {
+  animation-delay: var(--animation-delay-400);
+}
+
+.animation-delay-500 {
+  animation-delay: var(--animation-delay-500);
+}
+
+/* ========================================
+   DAISYUI THEME OVERRIDE
+   ======================================== */
+
+@layer base {
+  [data-theme="light"] {
+    /* Couleurs principales basées sur le logo */
+    --color-primary: oklch(63% 0.12 145);      /* Vert #6B9B5F */
+    --color-primary-content: oklch(100% 0 0);  /* Blanc */
+
+    --color-secondary: oklch(82% 0.18 95);     /* Or #F7C700 */
+    --color-secondary-content: oklch(10% 0 0); /* Noir */
+
+    --color-accent: oklch(48% 0.20 290);       /* Violet #6B46C1 */
+    --color-accent-content: oklch(100% 0 0);   /* Blanc */
+
+    --color-neutral: oklch(28% 0.02 256);      /* Slate-800 */
+    --color-neutral-content: oklch(100% 0 0);  /* Blanc */
+
+    --color-base-100: oklch(100% 0 0);         /* Blanc */
+    --color-base-200: oklch(96% 0 0);          /* Slate-50 */
+    --color-base-300: oklch(92% 0 0);          /* Slate-100 */
+    --color-base-content: oklch(10% 0 0);      /* Slate-900 */
+
+    /* États sémantiques */
+    --color-success: oklch(67% 0.15 160);      /* Vert succès */
+    --color-success-content: oklch(100% 0 0);
+
+    --color-warning: oklch(75% 0.15 85);       /* Or warning */
+    --color-warning-content: oklch(10% 0 0);
+
+    --color-error: oklch(60% 0.20 25);         /* Rouge erreur */
+    --color-error-content: oklch(100% 0 0);
+
+    --color-info: oklch(65% 0.15 250);         /* Bleu info */
+    --color-info-content: oklch(100% 0 0);
+  }
+}
+
+/* ========================================
+   CLASSES DE COMPOSANTS
+   ======================================== */
+
+/* Boutons */
+.btn-brand-primary {
+  background-color: var(--color-brand-green);
+  color: white;
+  border: none;
+  transition: all var(--duration-base) var(--ease-out);
+  box-shadow: var(--shadow-green);
+}
+
+.btn-brand-primary:hover {
+  background-color: var(--green-600);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn-brand-secondary {
+  background-color: var(--color-brand-gold);
+  color: var(--slate-900);
+  border: none;
+  transition: all var(--duration-base) var(--ease-out);
+  box-shadow: var(--shadow-gold);
+}
+
+.btn-brand-secondary:hover {
+  background-color: var(--gold-600);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn-brand-tertiary {
+  background-color: var(--color-brand-violet);
+  color: white;
+  border: none;
+  transition: all var(--duration-base) var(--ease-out);
+  box-shadow: var(--shadow-violet);
+}
+
+.btn-brand-tertiary:hover {
+  background-color: var(--violet-600);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Cartes */
+.card-brand {
+  background: white;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  border: var(--border) solid var(--slate-200);
+  transition: all var(--duration-base) var(--ease-out);
+}
+
+.card-brand:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-4px);
+}
+
+/* Inputs */
+.input-brand {
+  background: var(--slate-50);
+  border: var(--border) solid var(--slate-300);
+  border-radius: var(--radius-lg);
+  color: var(--slate-900);
+  transition: all var(--duration-base) var(--ease-out);
+}
+
+.input-brand::placeholder {
+  color: var(--slate-400);
+}
+
+.input-brand:focus {
+  outline: none;
+  border-color: var(--color-brand-green);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(107, 155, 95, 0.1);
+}
+
+/* Badges */
+.badge-brand-success {
+  background: var(--success-light);
+  color: var(--success-dark);
+  border-radius: var(--radius-full);
+}
+
+.badge-brand-warning {
+  background: var(--warning-light);
+  color: var(--warning-dark);
+  border-radius: var(--radius-full);
+}
+
+.badge-brand-error {
+  background: var(--error-light);
+  color: var(--error-dark);
+  border-radius: var(--radius-full);
+}
+
+.badge-brand-info {
+  background: var(--info-light);
+  color: var(--info-dark);
+  border-radius: var(--radius-full);
+}
