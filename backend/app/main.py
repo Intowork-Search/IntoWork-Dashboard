@@ -97,8 +97,20 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["X-XSS-Protection"] = "1; mode=block"
         response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-        # CSP - À adapter selon vos besoins
-        response.headers["Content-Security-Policy"] = "default-src 'self'"
+        
+        # CSP - Autoriser Swagger UI pour /docs et /redoc
+        if request.url.path in ["/docs", "/redoc", "/openapi.json"]:
+            response.headers["Content-Security-Policy"] = (
+                "default-src 'self'; "
+                "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+                "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+                "img-src 'self' data: https://fastapi.tiangolo.com; "
+                "font-src 'self' https://cdn.jsdelivr.net"
+            )
+        else:
+            # CSP stricte pour les autres routes
+            response.headers["Content-Security-Policy"] = "default-src 'self'"
+        
         return response
 
 
@@ -109,6 +121,7 @@ app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(RequestIDMiddleware)
 
 # CORS middleware pour le frontend
+# NOTE: register CORS early so headers are applied even on error responses
 # Note: Wildcard origins with credentials not supported by CORS spec
 # For dynamic Vercel preview URLs, validate origin in middleware
 allowed_origins = [
@@ -130,6 +143,9 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allow_headers=["*"],
 )
+
+# Add Request ID middleware for distributed tracing
+app.add_middleware(RequestIDMiddleware)
 
 # Inclure les routers
 app.include_router(ping_router, prefix="/api")

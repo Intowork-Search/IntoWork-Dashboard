@@ -81,12 +81,11 @@ async def get_my_applications(
     stmt = stmt.order_by(JobApplication.applied_at.desc())
 
     # Calculer le total
-    count_stmt = select(func.count()).select_from(
-        select(JobApplication).filter(
-            JobApplication.candidate_id == candidate.id,
-            JobApplication.status == status if status else True
-        ).subquery()
-    )
+    count_filter = JobApplication.candidate_id == candidate.id
+    if status:
+        count_filter = (count_filter) & (JobApplication.status == status)
+    
+    count_stmt = select(func.count()).select_from(JobApplication).where(count_filter)
     total_result = await db.execute(count_stmt)
     total = total_result.scalar()
     total_pages = (total + limit - 1) // limit
@@ -127,7 +126,7 @@ async def get_my_applications(
         total=total,
         page=page,
         limit=limit,
-tal_pages=total_pages
+        total_pages=total_pages
     )
 
 @router.post("/my/applications", response_model=JobApplicationResponse)
