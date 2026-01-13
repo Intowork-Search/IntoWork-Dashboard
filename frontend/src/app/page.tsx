@@ -24,7 +24,7 @@ export default function Home() {
 
   if (!isLoaded) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-base-100">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="loading loading-spinner loading-lg text-primary"></div>
       </div>
     );
@@ -33,7 +33,7 @@ export default function Home() {
   return (
     <div className={`${plusJakarta.variable} font-sans`}>
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-base-100/80 backdrop-blur-xl border-b border-base-300">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             {/* Logo */}
@@ -81,7 +81,7 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center pt-20 bg-base-100">
+      <section className="relative min-h-screen flex items-center pt-20 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-20 lg:py-32">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Left Column - Text Content */}
@@ -140,7 +140,7 @@ export default function Home() {
               {/* Floating Cards */}
               <div className="relative h-[600px]">
                 {/* Card 1 - Job Posting */}
-                <div className="absolute top-0 right-0 w-80 bg-base-100 rounded-3xl shadow-2xl p-6 border border-base-300 hover:shadow-primary/20 hover:-translate-y-2 transition-all duration-300">
+                <div className="absolute top-0 right-0 w-80 bg-white rounded-3xl shadow-2xl p-6 border border-slate-200 hover:shadow-primary/20 hover:-translate-y-2 transition-all duration-300">
                   <div className="flex items-start justify-between mb-4">
                     <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
                       <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -170,7 +170,7 @@ export default function Home() {
                 </div>
 
                 {/* Card 2 - Candidate Profile */}
-                <div className="absolute top-48 left-0 w-72 bg-base-100 rounded-3xl shadow-2xl p-6 border border-base-300 hover:shadow-accent/20 hover:-translate-y-2 transition-all duration-300">
+                <div className="absolute top-48 left-0 w-72 bg-white rounded-3xl shadow-2xl p-6 border border-slate-200 hover:shadow-accent/20 hover:-translate-y-2 transition-all duration-300">
                   <div className="flex items-center space-x-4 mb-4">
                     <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent to-secondary"></div>
                     <div>
@@ -195,7 +195,7 @@ export default function Home() {
                 </div>
 
                 {/* Card 3 - Notification */}
-                <div className="absolute bottom-0 right-8 w-80 bg-base-100 rounded-3xl shadow-2xl p-5 border border-base-300 hover:shadow-secondary/20 hover:-translate-y-2 transition-all duration-300">
+                <div className="absolute bottom-0 right-8 w-80 bg-white rounded-3xl shadow-2xl p-5 border border-slate-200 hover:shadow-secondary/20 hover:-translate-y-2 transition-all duration-300">
                   <div className="flex items-start space-x-4">
                     <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-secondary to-primary flex items-center justify-center flex-shrink-0">
                       <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -216,7 +216,7 @@ export default function Home() {
       </section>
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="py-20 lg:py-32 bg-base-100">
+      <section id="how-it-works" className="py-20 lg:py-32 bg-slate-50/50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
             <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 mb-6">
@@ -233,7 +233,7 @@ export default function Home() {
           <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
             {/* Step 1 */}
             <div className="relative group">
-              <div className="relative bg-base-100 rounded-3xl p-8 border border-base-300 hover:border-primary/50 transition-all duration-300">
+              <div className="relative bg-white rounded-3xl p-8 border border-slate-200 hover:border-primary/50 transition-all duration-300">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mb-6">
                   <span className="text-3xl font-bold text-white">1</span>
                 </div>
@@ -253,7 +253,7 @@ export default function Home() {
 
             {/* Step 2 */}
             <div className="relative group lg:mt-8">
-              <div className="relative bg-base-100 rounded-3xl p-8 border border-base-300 hover:border-accent/50 transition-all duration-300">
+              <div className="relative bg-white rounded-3xl p-8 border border-slate-200 hover:border-accent/50 transition-all duration-300">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent to-secondary flex items-center justify-center mb-6">
                   <span className="text-3xl font-bold text-white">2</span>
                 </div>
@@ -272,7 +272,7 @@ export default function Home() {
 
             {/* Step 3 */}
             <div className="relative group lg:mt-16">
-              <div className="relative bg-base-100 rounded-3xl p-8 border border-base-300 hover:border-secondary/50 transition-all duration-300">
+              <div className="relative bg-white rounded-3xl p-8 border border-slate-200 hover:border-secondary/50 transition-all duration-300">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-secondary to-primary flex items-center justify-center mb-6">
                   <span className="text-3xl font-bold text-white">3</span>
                 </div>
@@ -294,7 +294,7 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 lg:py-32 bg-base-100">
+      <section id="features" className="py-20 lg:py-32 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
             <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
@@ -308,7 +308,7 @@ export default function Home() {
           <div className="grid lg:grid-cols-2 gap-8 mb-16">
             {/* Candidates Card */}
             <div className="relative group">
-              <div className="relative bg-base-100 rounded-3xl p-10 border border-base-300 hover:border-primary/50 transition-all duration-300">
+              <div className="relative bg-white rounded-3xl p-10 border border-slate-200 hover:border-primary/50 transition-all duration-300">
                 <div className="flex items-center space-x-4 mb-8">
                   <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
                     <svg className="w-9 h-9 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -345,7 +345,7 @@ export default function Home() {
 
             {/* Employers Card */}
             <div className="relative group">
-              <div className="relative bg-base-100 rounded-3xl p-10 border border-base-300 hover:border-accent/50 transition-all duration-300">
+              <div className="relative bg-white rounded-3xl p-10 border border-slate-200 hover:border-accent/50 transition-all duration-300">
                 <div className="flex items-center space-x-4 mb-8">
                   <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent to-secondary flex items-center justify-center">
                     <svg className="w-9 h-9 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -383,7 +383,7 @@ export default function Home() {
 
           {/* Additional Features Grid */}
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-base-200/50 rounded-2xl p-6 border border-base-300 hover:border-primary/30 transition-all duration-300">
+            <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200 hover:border-primary/30 transition-all duration-300">
               <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center mb-4">
                 <svg className="w-7 h-7 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -393,7 +393,7 @@ export default function Home() {
               <p className="text-sm text-base-content/70">Vos données sont protégées avec un cryptage de niveau bancaire.</p>
             </div>
 
-            <div className="bg-base-200/50 rounded-2xl p-6 border border-base-300 hover:border-accent/30 transition-all duration-300">
+            <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200 hover:border-accent/30 transition-all duration-300">
               <div className="w-12 h-12 rounded-xl bg-accent/20 flex items-center justify-center mb-4">
                 <svg className="w-7 h-7 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -403,7 +403,7 @@ export default function Home() {
               <p className="text-sm text-base-content/70">Matching en temps réel grâce à notre infrastructure optimisée.</p>
             </div>
 
-            <div className="bg-base-200/50 rounded-2xl p-6 border border-base-300 hover:border-secondary/30 transition-all duration-300">
+            <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200 hover:border-secondary/30 transition-all duration-300">
               <div className="w-12 h-12 rounded-xl bg-secondary/20 flex items-center justify-center mb-4">
                 <svg className="w-7 h-7 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -417,7 +417,7 @@ export default function Home() {
       </section>
 
       {/* Testimonials Section */}
-      <section id="testimonials" className="py-20 lg:py-32 bg-base-200">
+      <section id="testimonials" className="py-20 lg:py-32 bg-slate-50/50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
             <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-secondary/10 border border-secondary/20 mb-6">
@@ -433,7 +433,7 @@ export default function Home() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {/* Testimonial 1 */}
-            <div className="bg-base-100 rounded-3xl p-8 border border-base-300 hover:shadow-xl transition-all duration-300">
+            <div className="bg-white rounded-3xl p-8 border border-slate-200 hover:shadow-xl transition-all duration-300">
               <div className="flex items-center space-x-1 mb-4">
                 {[...Array(5)].map((_, i) => (
                   <svg key={i} className="w-5 h-5 text-warning fill-current" viewBox="0 0 20 20">
@@ -454,7 +454,7 @@ export default function Home() {
             </div>
 
             {/* Testimonial 2 */}
-            <div className="bg-base-100 rounded-3xl p-8 border border-base-300 hover:shadow-xl transition-all duration-300">
+            <div className="bg-white rounded-3xl p-8 border border-slate-200 hover:shadow-xl transition-all duration-300">
               <div className="flex items-center space-x-1 mb-4">
                 {[...Array(5)].map((_, i) => (
                   <svg key={i} className="w-5 h-5 text-warning fill-current" viewBox="0 0 20 20">
@@ -475,7 +475,7 @@ export default function Home() {
             </div>
 
             {/* Testimonial 3 */}
-            <div className="bg-base-100 rounded-3xl p-8 border border-base-300 hover:shadow-xl transition-all duration-300">
+            <div className="bg-white rounded-3xl p-8 border border-slate-200 hover:shadow-xl transition-all duration-300">
               <div className="flex items-center space-x-1 mb-4">
                 {[...Array(5)].map((_, i) => (
                   <svg key={i} className="w-5 h-5 text-warning fill-current" viewBox="0 0 20 20">
@@ -499,9 +499,9 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 lg:py-32 bg-base-100">
+      <section className="py-20 lg:py-32 bg-white">
         <div className="max-w-4xl mx-auto px-6 lg:px-8">
-          <div className="bg-base-100 border-4 border-primary/20 rounded-3xl p-12 lg:p-16 text-center">
+          <div className="bg-white border-4 border-primary/20 rounded-3xl p-12 lg:p-16 text-center">
             <h2 className="text-4xl lg:text-6xl font-bold mb-6 tracking-tight">
               Prêt à transformer votre{' '}
               <span className="bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
