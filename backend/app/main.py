@@ -121,6 +121,7 @@ app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(RequestIDMiddleware)
 
 # CORS middleware pour le frontend
+# NOTE: register CORS early so headers are applied even on error responses
 # Note: Wildcard origins with credentials not supported by CORS spec
 # For dynamic Vercel preview URLs, validate origin in middleware
 allowed_origins = [
@@ -142,6 +143,9 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allow_headers=["*"],
 )
+
+# Add Request ID middleware for distributed tracing
+app.add_middleware(RequestIDMiddleware)
 
 # Inclure les routers
 app.include_router(ping_router, prefix="/api")
