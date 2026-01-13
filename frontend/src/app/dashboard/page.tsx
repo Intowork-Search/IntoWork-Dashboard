@@ -340,13 +340,6 @@ export default function Dashboard() {
                 </p>
               )}
             </div>
-            <button 
-              onClick={loadDashboardData}
-              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-              disabled={isLoading}
-            >
-              {isLoading ? 'Actualisation...' : 'Actualiser'}
-            </button>
           </div>
           <div className="p-6">
             <div className="space-y-4">
