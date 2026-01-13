@@ -351,24 +351,24 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 lg:py-32 bg-secondary/5">
+      <section className="py-24 lg:py-32 bg-secondary">
         <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
-          <h2 className="text-4xl lg:text-6xl font-bold text-slate-900 mb-8 tracking-tight">
+          <h2 className="text-4xl lg:text-6xl font-bold text-white mb-8 tracking-tight">
             Prêt à transformer votre{' '}
-            <span className="text-secondary">carrière</span> ?
+            <span className="text-white font-extrabold">carrière</span> ?
           </h2>
-          <p className="text-xl text-slate-600 mb-12 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-xl text-white/90 mb-12 max-w-2xl mx-auto leading-relaxed">
             Rejoignez les milliers de professionnels qui ont fait le choix de l'excellence avec INTOWORK.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
             <Link href="/auth/signup" className="btn btn-primary btn-lg rounded-full px-12 normal-case font-bold text-base">
               Créer mon compte gratuit
             </Link>
-            <button type="button" className="btn btn-outline btn-lg rounded-full px-12 normal-case font-semibold text-base">
+            <button type="button" className="btn bg-white text-secondary hover:bg-white/90 border-white btn-lg rounded-full px-12 normal-case font-semibold text-base">
               Planifier une démo
             </button>
           </div>
-          <p className="text-slate-500 text-sm">
+          <p className="text-white/70 text-sm">
             Aucune carte bancaire • Gratuit • Sans engagement
           </p>
         </div>
