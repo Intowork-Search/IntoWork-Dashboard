@@ -407,24 +407,24 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 sm:py-24 lg:py-32 bg-secondary">
+      <section className="py-16 sm:py-24 lg:py-32 bg-slate-100">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-white mb-6 sm:mb-8 tracking-tight">
+          <h2 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-slate-900 mb-6 sm:mb-8 tracking-tight">
             Prêt à transformer votre{' '}
-            <span className="text-white font-extrabold">carrière</span> ?
+            <span className="text-primary font-extrabold">carrière</span> ?
           </h2>
-          <p className="text-base sm:text-lg lg:text-xl text-white/90 mb-8 sm:mb-12 max-w-2xl mx-auto leading-relaxed px-4">
+          <p className="text-base sm:text-lg lg:text-xl text-slate-700 mb-8 sm:mb-12 max-w-2xl mx-auto leading-relaxed px-4">
             Rejoignez les milliers de professionnels qui ont fait le choix de l'excellence avec INTOWORK.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-6 sm:mb-8 px-4 sm:px-0">
             <Link href="/auth/signup" className="btn btn-primary btn-md sm:btn-lg rounded-full px-8 sm:px-12 normal-case font-bold text-sm sm:text-base">
               Créer mon compte gratuit
             </Link>
-            <button type="button" className="btn bg-white text-secondary hover:bg-white/90 border-white btn-md sm:btn-lg rounded-full px-8 sm:px-12 normal-case font-semibold text-sm sm:text-base">
+            <button type="button" className="btn btn-secondary btn-md sm:btn-lg rounded-full px-8 sm:px-12 normal-case font-semibold text-sm sm:text-base">
               Planifier une démo
             </button>
           </div>
-          <p className="text-white/70 text-xs sm:text-sm">
+          <p className="text-slate-600 text-xs sm:text-sm">
             Aucune carte bancaire • Gratuit • Sans engagement
           </p>
         </div>
