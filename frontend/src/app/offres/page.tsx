@@ -146,7 +146,7 @@ export default function OffresPage() {
               <img 
                 src="/logo-intowork.png" 
                 alt="INTOWORK" 
-                className="h-20 sm:h-24 md:h-28 lg:h-32 w-auto"
+                className="h-24 sm:h-28 md:h-32 lg:h-40 w-auto"
               />
             </Link>
 
@@ -378,7 +378,7 @@ export default function OffresPage() {
                 <img 
                   src="/logo-intowork.png" 
                   alt="INTOWORK" 
-                  className="h-20 sm:h-24 md:h-28 w-auto"
+                  className="h-24 sm:h-28 md:h-32 w-auto"
                 />
               </Link>
               <p className="text-slate-400 text-xs sm:text-sm leading-relaxed">
