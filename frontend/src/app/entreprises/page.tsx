@@ -131,7 +131,7 @@ export default function EntreprisesPage() {
               <img 
                 src="/logo-intowork.png" 
                 alt="INTOWORK" 
-                className="h-[58px] sm:h-[66px] md:h-[74px] w-auto"
+                className="h-20 sm:h-24 md:h-28 lg:h-32 w-auto"
               />
             </Link>
 
@@ -381,7 +381,7 @@ export default function EntreprisesPage() {
                 <img 
                   src="/logo-intowork.png" 
                   alt="INTOWORK" 
-                  className="h-[58px] sm:h-[66px] md:h-[74px] w-auto brightness-0 invert"
+                  className="h-20 sm:h-24 md:h-28 w-auto"
                 />
               </Link>
               <p className="text-slate-400 text-xs sm:text-sm leading-relaxed">
