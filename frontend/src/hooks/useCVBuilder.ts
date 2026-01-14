@@ -59,10 +59,12 @@ export interface SkillItem {
   level: number;
 }
 
+export type LanguageLevel = 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2' | 'Natif';
+
 export interface LanguageItem {
   id: string;
   name: string;
-  level: string;
+  level: LanguageLevel;
 }
 
 export interface CVData {

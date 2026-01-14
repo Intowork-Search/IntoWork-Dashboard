@@ -6,7 +6,16 @@ import { Plus_Jakarta_Sans } from 'next/font/google';
 import toast from 'react-hot-toast';
 import { useAuth } from '@/hooks/useNextAuth';
 import { useCVDocument, useSaveCV, useTogglePublic, useCVAnalytics } from '@/hooks/useCVBuilder';
-import type { CVTemplate } from '@/hooks/useCVBuilder';
+import type {
+  CVTemplate,
+  CVData,
+  PersonalInfo,
+  ExperienceItem as Experience,
+  EducationItem as Education,
+  SkillItem as Skill,
+  LanguageItem as Language,
+  LanguageLevel
+} from '@/hooks/useCVBuilder';
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -29,59 +38,8 @@ const BRAND = {
   violetLight: '#EDE9F7',
 };
 
-// Types
-interface PersonalInfo {
-  photo: string | null;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  address: string;
-  title: string;
-  summary: string;
-}
-
-interface Experience {
-  id: string;
-  company: string;
-  position: string;
-  startDate: string;
-  endDate: string;
-  current: boolean;
-  description: string;
-}
-
-interface Education {
-  id: string;
-  school: string;
-  degree: string;
-  field: string;
-  startDate: string;
-  endDate: string;
-  description: string;
-}
-
-interface Skill {
-  id: string;
-  name: string;
-  level: number;
-}
-
-interface Language {
-  id: string;
-  name: string;
-  level: 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2' | 'Natif';
-}
-
-interface CVData {
-  personalInfo: PersonalInfo;
-  experiences: Experience[];
-  educations: Education[];
-  skills: Skill[];
-  languages: Language[];
-}
-
-type Template = 'elegance' | 'bold' | 'minimal' | 'creative' | 'executive';
+// Types are imported from useCVBuilder hook
+type Template = CVTemplate;
 
 const STEPS = [
   { id: 'info', label: 'Profil', description: 'Vos informations personnelles', emoji: '👤' },
@@ -99,7 +57,7 @@ const TEMPLATES: { id: Template; name: string; description: string; colors: stri
   { id: 'executive', name: 'Executive', description: 'Sobre et professionnel', colors: ['#1e3a5f', '#0f172a', '#f8fafc'] },
 ];
 
-const LANGUAGE_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'Natif'] as const;
+const LANGUAGE_LEVELS: LanguageLevel[] = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'Natif'];
 
 // Initial empty CV data
 const initialCvData: CVData = {
