@@ -204,7 +204,7 @@ export default function EntreprisesPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-24 sm:pt-32 pb-12 sm:pb-16 bg-linear-to-br from-green-50 via-blue-50 to-purple-50">
+      <section className="pt-24 sm:pt-32 pb-12 sm:pb-16 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-green-100 mb-6">
@@ -226,7 +226,7 @@ export default function EntreprisesPage() {
                 key={stat.label}
                 className="bg-white rounded-2xl p-6 text-center border border-slate-200 hover:shadow-lg transition-all"
               >
-                <div className={`text-3xl sm:text-4xl font-bold bg-linear-to-r ${stat.color} bg-clip-text text-transparent mb-2`}>
+                <div className="text-3xl sm:text-4xl font-bold text-green-600 mb-2">
                   {stat.value}
                 </div>
                 <div className="text-sm text-slate-600">{stat.label}</div>
@@ -284,7 +284,7 @@ export default function EntreprisesPage() {
                   {company.logo_url ? (
                     <img src={company.logo_url} alt={company.name} className="w-16 h-16 rounded-2xl object-cover shrink-0" />
                   ) : (
-                    <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-green-500 to-blue-600 flex items-center justify-center text-white text-xl font-bold shrink-0">
+                    <div className="w-16 h-16 rounded-2xl bg-green-600 flex items-center justify-center text-white text-xl font-bold shrink-0">
                       {getCompanyInitials(company.name)}
                     </div>
                   )}
@@ -353,7 +353,7 @@ export default function EntreprisesPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 sm:py-24 bg-linear-to-br from-green-600 to-blue-600">
+      <section className="py-16 sm:py-24 bg-green-600">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <BuildingOfficeIcon className="w-16 h-16 text-white mx-auto mb-6" />
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6">

@@ -219,7 +219,7 @@ export default function OffresPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-24 sm:pt-32 pb-12 sm:pb-16 bg-linear-to-br from-green-50 to-blue-50">
+      <section className="pt-24 sm:pt-32 pb-12 sm:pb-16 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8 sm:mb-12">
             <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-slate-900 mb-4 sm:mb-6">
@@ -240,7 +240,7 @@ export default function OffresPage() {
                   placeholder="Poste, mots-clés..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all text-slate-900 placeholder:text-slate-400"
                 />
               </div>
               
@@ -251,14 +251,14 @@ export default function OffresPage() {
                   placeholder="Ville, région..."
                   value={locationFilter}
                   onChange={(e) => setLocationFilter(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all text-slate-900 placeholder:text-slate-400"
                 />
               </div>
 
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all text-slate-900"
                 aria-label="Filtrer par type de contrat"
               >
                 <option value="all">Tous les types</option>
@@ -299,7 +299,7 @@ export default function OffresPage() {
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                     <div className="flex-1">
                       <div className="flex items-start gap-4 mb-4">
-                        <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl bg-linear-to-br from-green-500 to-blue-600 flex items-center justify-center shrink-0">
+                        <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl bg-green-600 flex items-center justify-center shrink-0">
                           <BuildingOfficeIcon className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                         </div>
                         <div className="flex-1">
@@ -351,7 +351,7 @@ export default function OffresPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 sm:py-24 bg-linear-to-br from-green-600 to-blue-600">
+      <section className="py-16 sm:py-24 bg-green-600">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6">
             Prêt à postuler ?
