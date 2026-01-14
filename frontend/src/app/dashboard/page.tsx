@@ -373,7 +373,10 @@ export default function Dashboard() {
           <div className="p-6 space-y-3">
             {userRole === 'candidate' ? (
               <>
-                <button className="w-full flex items-center justify-between p-3 text-left bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
+                <button 
+                  onClick={() => router.push('/dashboard/profile')}
+                  className="w-full flex items-center justify-between p-3 text-left bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
+                >
                   <div>
                     <p className="font-medium text-blue-900">Compléter mon profil</p>
                     <p className="text-xs text-blue-700">{profileCompletion}% complété</p>
