@@ -29,9 +29,9 @@ interface Company {
   country?: string;
   size?: string;
   description?: string;
-  website_url?: string;
+  website_url?: string | null;
   total_jobs?: number;
-  logo_url?: string;
+  logo_url?: string | null;
 }
 
 const stats = [
@@ -53,12 +53,39 @@ export default function EntreprisesPage() {
     const fetchCompanies = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${API_URL}/companies/public`);
+        // Récupérer les jobs pour extraire les entreprises
+        const response = await fetch(`${API_URL}/jobs/?page=1&limit=100`);
         
         if (response.ok) {
           const data = await response.json();
-          setCompanies(data.companies || []);
-          setTotalCompanies(data.total_companies || 0);
+          
+          // Extraire les entreprises uniques des jobs
+          const companiesMap = new Map<string, Company>();
+          data.jobs.forEach((job: any) => {
+            if (job.company_name && !companiesMap.has(job.company_name)) {
+              companiesMap.set(job.company_name, {
+                id: companiesMap.size + 1,
+                name: job.company_name,
+                industry: 'Non spécifié',
+                city: job.location.split('/')[0] || job.location,
+                country: 'Sénégal',
+                size: 'Non spécifié',
+                description: `${job.company_name} recrute sur INTOWORK.`,
+                website_url: null,
+                total_jobs: 0,
+                logo_url: job.company_logo_url
+              });
+            }
+            // Compter les jobs par entreprise
+            const company = companiesMap.get(job.company_name);
+            if (company) {
+              company.total_jobs = (company.total_jobs || 0) + 1;
+            }
+          });
+          
+          const companiesArray = Array.from(companiesMap.values());
+          setCompanies(companiesArray);
+          setTotalCompanies(companiesArray.length);
         } else {
           console.error('Erreur lors du chargement des entreprises');
         }
