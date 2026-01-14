@@ -58,31 +58,7 @@ export default function AdminDashboard() {
   const [jobsPage, setJobsPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
 
-  useEffect(() => {
-    if (status === 'loading') return;
-    
-    if (!session) {
-      router.push('/sign-in');
-      return;
-    }
-
-    // Vérifier que l'utilisateur est admin
-    if (session.user?.role !== 'admin') {
-      toast.error('Accès refusé : Vous devez être administrateur');
-      router.push('/dashboard');
-      return;
-    }
-
-    loadData();
-  }, [session, status, router, activeTab, loadData]); // ✅ Ajout de loadData
-
-  // Recharger quand la pagination change
-  useEffect(() => {
-    if (session && (activeTab === 'employers' || activeTab === 'jobs')) {
-      loadData();
-    }
-  }, [employersPage, jobsPage, session, activeTab, loadData]); // ✅ Ajout de loadData
-
+  // ✅ Déclaration de loadData AVANT les useEffect qui l'utilisent
   const loadData = useCallback(async () => {
     if (!session?.accessToken) return;
 
@@ -130,7 +106,32 @@ export default function AdminDashboard() {
     } finally {
       setLoading(false);
     }
-  }, [session?.accessToken, activeTab, userSearch, userRoleFilter, employersPage, jobsPage]); // ✅ useCallback avec dépendances
+  }, [session?.accessToken, activeTab, userSearch, userRoleFilter, employersPage, jobsPage]);
+
+  useEffect(() => {
+    if (status === 'loading') return;
+    
+    if (!session) {
+      router.push('/sign-in');
+      return;
+    }
+
+    // Vérifier que l'utilisateur est admin
+    if (session.user?.role !== 'admin') {
+      toast.error('Accès refusé : Vous devez être administrateur');
+      router.push('/dashboard');
+      return;
+    }
+
+    loadData();
+  }, [session, status, router, activeTab, loadData]);
+
+  // Recharger quand la pagination change
+  useEffect(() => {
+    if (session && (activeTab === 'employers' || activeTab === 'jobs')) {
+      loadData();
+    }
+  }, [employersPage, jobsPage, session, activeTab, loadData]);
 
   const handleToggleUserStatus = async (userId: number, currentStatus: boolean) => {
     if (!session?.accessToken) return;
