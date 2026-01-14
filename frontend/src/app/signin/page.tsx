@@ -71,6 +71,19 @@ export default function SignInPage() {
 
   return (
     <div className={`${plusJakarta.variable} font-sans min-h-screen bg-white`} data-theme="light">
+      {/* Bouton retour à l'accueil */}
+      <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-50">
+        <Link
+          href="/"
+          className="flex items-center gap-2 px-4 py-2 bg-white/90 hover:bg-white backdrop-blur-sm rounded-full border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 group"
+        >
+          <svg className="w-4 h-4 text-slate-600 group-hover:text-green-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          <span className="text-sm font-medium text-slate-600 group-hover:text-green-600 transition-colors">Accueil</span>
+        </Link>
+      </div>
+
       <div className="flex min-h-screen overflow-hidden">
         {/* Left Panel - Branding & Features */}
         <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden flex-col justify-between p-12 xl:p-16">
