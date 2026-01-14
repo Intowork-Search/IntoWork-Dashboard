@@ -351,7 +351,7 @@ export default function OffresPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 sm:py-24 bg-green-600">
+      <section className="py-16 sm:py-24 bg-(--color-brand-green)">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6">
             Prêt à postuler ?
@@ -360,10 +360,10 @@ export default function OffresPage() {
             Créez votre compte gratuitement et accédez à toutes nos offres d'emploi
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/signup" className="btn bg-white text-green-600 hover:bg-slate-50 btn-lg rounded-full px-8 normal-case font-bold">
+            <Link href="/signup" className="btn bg-white text-(--color-brand-green) hover:bg-slate-50 btn-lg rounded-full px-8 normal-case font-bold">
               Créer mon compte
             </Link>
-            <Link href="/signin" className="btn btn-outline border-2 border-white text-white hover:bg-white hover:text-green-600 btn-lg rounded-full px-8 normal-case font-semibold">
+            <Link href="/signin" className="btn btn-outline border-2 border-white text-white hover:bg-white hover:text-(--color-brand-green) btn-lg rounded-full px-8 normal-case font-semibold">
               Se connecter
             </Link>
           </div>
