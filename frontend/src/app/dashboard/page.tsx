@@ -126,7 +126,7 @@ export default function Dashboard() {
     } finally {
       setIsLoading(false);
     }
-  }, [getToken, userRole, user]); // ✅ Ajout de 'user' pour éviter la boucle
+  }, [getToken, userRole, user?.id]); // ✅ user?.id au lieu de user pour éviter la boucle
 
   // Fonction pour gérer le téléchargement de CV
   const handleCVUpload = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -203,7 +203,7 @@ export default function Dashboard() {
     if (user && userRole !== 'admin') {
       loadDashboardData();
     }
-  }, [user, userRole]); // ✅ Retiré loadDashboardData des dépendances pour éviter la boucle
+  }, [user?.id, userRole, loadDashboardData]); // ✅ user?.id au lieu de user + loadDashboardData pour stabilité
 
   // ⚠️ CORRECTIF PERFORMANCE: Event listeners manuels supprimés
   // Les listeners window.focus et visibilitychange causaient un polling excessif
