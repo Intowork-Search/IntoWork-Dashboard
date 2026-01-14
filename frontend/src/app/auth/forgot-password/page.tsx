@@ -82,7 +82,7 @@ export default function ForgotPasswordPage() {
               <div className="space-y-8">
                 {/* Feature 1 - Secure Recovery */}
                 <div className="flex gap-4 animate-fade-in animation-delay-200">
-                  <div className="flex-shrink-0">
+                  <div className="shrink-0">
                     <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center backdrop-blur-sm border border-white/20">
                       <KeyIcon className="w-6 h-6 text-white" />
                     </div>
@@ -95,7 +95,7 @@ export default function ForgotPasswordPage() {
 
                 {/* Feature 2 - Quick Reset */}
                 <div className="flex gap-4 animate-fade-in animation-delay-300">
-                  <div className="flex-shrink-0">
+                  <div className="shrink-0">
                     <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center backdrop-blur-sm border border-white/20">
                       <BoltIcon className="w-6 h-6 text-white" />
                     </div>
@@ -108,7 +108,7 @@ export default function ForgotPasswordPage() {
 
                 {/* Feature 3 - Support 24/7 */}
                 <div className="flex gap-4 animate-fade-in animation-delay-400">
-                  <div className="flex-shrink-0">
+                  <div className="shrink-0">
                     <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center backdrop-blur-sm border border-white/20">
                       <ChatBubbleLeftRightIcon className="w-6 h-6 text-white" />
                     </div>
@@ -125,7 +125,7 @@ export default function ForgotPasswordPage() {
           {/* Trust badges */}
           <div className="relative z-10 border-t border-white/20 pt-8 animate-fade-in animation-delay-500">
             <div className="flex items-center gap-2 text-sm text-white/80">
-              <ShieldCheckIcon className="w-5 h-5 flex-shrink-0" />
+              <ShieldCheckIcon className="w-5 h-5 shrink-0" />
               <span>Plateforme sécurisée et conforme RGPD</span>
             </div>
           </div>
@@ -135,7 +135,7 @@ export default function ForgotPasswordPage() {
         <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-white relative overflow-hidden">
           {/* Subtle background pattern */}
           <div className="absolute inset-0 opacity-30">
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,transparent_1px,rgba(0,0,0,0.02)_1px)] bg-[length:4rem_4rem]"></div>
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,transparent_1px,rgba(0,0,0,0.02)_1px)] bg-size-[4rem_4rem]"></div>
           </div>
 
           <div className="w-full max-w-md relative z-10">
