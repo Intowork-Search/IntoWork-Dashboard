@@ -262,7 +262,7 @@ export const StatsExamples = () => {
           label="Taux de Matching"
           value="89%"
           icon={<ChartBarIcon className="w-6 h-6" />}
-          trend={{ value: 8.3, label: 'd'amélioration' }}
+          trend={{ value: 8.3, label: "d'amélioration" }}
           variant="violet"
         />
       </div>

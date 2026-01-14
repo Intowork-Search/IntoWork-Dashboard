@@ -93,3 +93,5 @@ deployment-secrets.txt
 
 # Temporary Git Directories
 *.git/
+.vercel
+.env*.local

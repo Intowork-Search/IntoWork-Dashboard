@@ -738,7 +738,7 @@ export default function ProfilePage() {
                   {profile.skills && profile.skills.length > 0 ? (
                     <div className="flex flex-wrap gap-2">
                       {profile.skills.map((skill, index) => {
-                        const colors = getSkillColor(skill.category);
+                        const colors = getSkillColor(skill.category || '');
                         return (
                           <div
                             key={skill.id || index}
