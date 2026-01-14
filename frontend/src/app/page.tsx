@@ -47,13 +47,16 @@ export default function Home() {
             </div>
 
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-slate-600 hover:text-(--color-brand-green) font-medium transition-colors text-sm">
+              <a href="#features" className="text-slate-600 hover:text-green-600 font-medium transition-colors text-sm">
                 Fonctionnalités
               </a>
-              <a href="#how-it-works" className="text-slate-600 hover:text-(--color-brand-green) font-medium transition-colors text-sm">
-                Comment ça marche
-              </a>
-              <a href="#testimonials" className="text-slate-600 hover:text-(--color-brand-green) font-medium transition-colors text-sm">
+              <Link href="/offres" className="text-slate-600 hover:text-green-600 font-medium transition-colors text-sm">
+                Offres
+              </Link>
+              <Link href="/entreprises" className="text-slate-600 hover:text-green-600 font-medium transition-colors text-sm">
+                Entreprises
+              </Link>
+              <a href="#testimonials" className="text-slate-600 hover:text-green-600 font-medium transition-colors text-sm">
                 Témoignages
               </a>
             </div>
@@ -92,21 +95,28 @@ export default function Home() {
               <div className="flex flex-col space-y-3">
                 <a
                   href="#features"
-                  className="text-slate-600 hover:text-(--color-brand-green) font-medium transition-colors py-2"
+                  className="text-slate-600 hover:text-green-600 font-medium transition-colors py-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Fonctionnalités
                 </a>
-                <a
-                  href="#how-it-works"
-                  className="text-slate-600 hover:text-(--color-brand-green) font-medium transition-colors py-2"
+                <Link
+                  href="/offres"
+                  className="text-slate-600 hover:text-green-600 font-medium transition-colors py-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  Comment ça marche
-                </a>
+                  Offres
+                </Link>
+                <Link
+                  href="/entreprises"
+                  className="text-slate-600 hover:text-green-600 font-medium transition-colors py-2"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Entreprises
+                </Link>
                 <a
                   href="#testimonials"
-                  className="text-slate-600 hover:text-(--color-brand-green) font-medium transition-colors py-2"
+                  className="text-slate-600 hover:text-green-600 font-medium transition-colors py-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Témoignages
