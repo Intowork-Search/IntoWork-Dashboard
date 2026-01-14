@@ -63,7 +63,7 @@ class EmailService:
             logger.error(f"   Resend package available: {RESEND_AVAILABLE}")
             return False
 
-        reset_link = f"{FRONTEND_URL}/auth/reset-password?token={token}"
+        reset_link = f"{FRONTEND_URL}/reset-password?token={token}"
 
         # Préparer le contenu HTML
         html_content = self._get_password_reset_template(
