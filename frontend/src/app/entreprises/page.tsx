@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Plus_Jakarta_Sans } from 'next/font/google';
 import {
@@ -9,9 +9,11 @@ import {
   MapPinIcon,
   BriefcaseIcon,
   CheckBadgeIcon,
-  StarIcon,
   GlobeAltIcon,
 } from '@heroicons/react/24/outline';
+import { getApiUrl } from '@/lib/getApiUrl';
+
+const API_URL = getApiUrl();
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -22,124 +24,15 @@ const plusJakarta = Plus_Jakarta_Sans({
 interface Company {
   id: number;
   name: string;
-  sector: string;
-  location: string;
-  employees: string;
-  description: string;
-  openPositions: number;
-  rating: number;
-  verified: boolean;
-  website?: string;
-  logo: string;
+  industry?: string;
+  city?: string;
+  country?: string;
+  size?: string;
+  description?: string;
+  website_url?: string;
+  total_jobs?: number;
+  logo_url?: string;
 }
-
-// Données d'exemple (à remplacer par l'API plus tard)
-const companies: Company[] = [
-  {
-    id: 1,
-    name: 'TechCorp Innovation',
-    sector: 'Technologies de l\'information',
-    location: 'Paris, France',
-    employees: '500-1000',
-    description: 'Leader européen des solutions cloud et IA, nous transformons les entreprises avec des technologies de pointe.',
-    openPositions: 12,
-    rating: 4.8,
-    verified: true,
-    website: 'techcorp.com',
-    logo: 'TC',
-  },
-  {
-    id: 2,
-    name: 'Digital Agency Plus',
-    sector: 'Marketing Digital',
-    location: 'Lyon, France',
-    employees: '50-200',
-    description: 'Agence digitale primée spécialisée dans la création de campagnes innovantes et performantes.',
-    openPositions: 5,
-    rating: 4.6,
-    verified: true,
-    website: 'digitalagency.fr',
-    logo: 'DA',
-  },
-  {
-    id: 3,
-    name: 'Creative Studio',
-    sector: 'Design & UX',
-    location: 'Remote',
-    employees: '20-50',
-    description: 'Studio de design créatif primé, nous créons des expériences numériques exceptionnelles.',
-    openPositions: 8,
-    rating: 4.9,
-    verified: true,
-    website: 'creative-studio.io',
-    logo: 'CS',
-  },
-  {
-    id: 4,
-    name: 'AI Solutions',
-    sector: 'Intelligence Artificielle',
-    location: 'Toulouse, France',
-    employees: '100-500',
-    description: 'Pionniers de l\'IA en France, nous développons des solutions d\'apprentissage automatique révolutionnaires.',
-    openPositions: 15,
-    rating: 4.7,
-    verified: true,
-    website: 'ai-solutions.fr',
-    logo: 'AI',
-  },
-  {
-    id: 5,
-    name: 'StartUp Innovante',
-    sector: 'FinTech',
-    location: 'Paris, France',
-    employees: '10-50',
-    description: 'Révolutionnons les services financiers avec des solutions mobiles innovantes et accessibles.',
-    openPositions: 7,
-    rating: 4.5,
-    verified: true,
-    website: 'startup-innovante.com',
-    logo: 'SI',
-  },
-  {
-    id: 6,
-    name: 'Mobile First',
-    sector: 'Développement Mobile',
-    location: 'Bordeaux, France',
-    employees: '50-100',
-    description: 'Experts en développement d\'applications mobiles natives et cross-platform pour iOS et Android.',
-    openPositions: 6,
-    rating: 4.8,
-    verified: true,
-    website: 'mobile-first.fr',
-    logo: 'MF',
-  },
-  {
-    id: 7,
-    name: 'Green Energy Corp',
-    sector: 'Énergies Renouvelables',
-    location: 'Nantes, France',
-    employees: '200-500',
-    description: 'Acteur majeur de la transition énergétique, nous développons des solutions d\'énergie verte innovantes.',
-    openPositions: 10,
-    rating: 4.6,
-    verified: true,
-    website: 'greenenergy.fr',
-    logo: 'GE',
-  },
-  {
-    id: 8,
-    name: 'HealthTech Pro',
-    sector: 'Santé & Technologie',
-    location: 'Lille, France',
-    employees: '100-200',
-    description: 'Innovons dans le secteur de la santé avec des technologies médicales de pointe et des solutions digitales.',
-    openPositions: 9,
-    rating: 4.7,
-    verified: true,
-    website: 'healthtech-pro.com',
-    logo: 'HT',
-  },
-];
 
 const stats = [
   { label: 'Entreprises partenaires', value: '500+', color: 'from-green-500 to-emerald-600' },
@@ -151,12 +44,55 @@ const stats = [
 export default function EntreprisesPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [sectorFilter, setSectorFilter] = useState('all');
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [totalCompanies, setTotalCompanies] = useState(0);
+
+  // Charger les entreprises depuis l'API
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`${API_URL}/companies/public`);
+        
+        if (response.ok) {
+          const data = await response.json();
+          setCompanies(data.companies || []);
+          setTotalCompanies(data.total_companies || 0);
+        } else {
+          console.error('Erreur lors du chargement des entreprises');
+        }
+      } catch (error) {
+        console.error('Erreur:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCompanies();
+  }, []);
 
   const filteredCompanies = sectorFilter === 'all' 
     ? companies 
-    : companies.filter(c => c.sector === sectorFilter);
+    : companies.filter(c => c.industry === sectorFilter);
 
-  const uniqueSectors = ['all', ...Array.from(new Set(companies.map(c => c.sector)))];
+  const uniqueSectors = ['all', ...Array.from(new Set(companies.map(c => c.industry).filter(Boolean)))];
+
+  const getCompanyInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word[0])
+      .join('')
+      .slice(0, 2)
+      .toUpperCase();
+  };
+
+  const getLocation = (company: Company) => {
+    if (company.city && company.country) {
+      return `${company.city}, ${company.country}`;
+    }
+    return company.city || company.country || 'France';
+  };
 
   return (
     <div className={`${plusJakarta.variable} font-sans min-h-screen bg-slate-50`}>
@@ -252,15 +188,15 @@ export default function EntreprisesPage() {
               Les meilleures <span className="text-green-600">entreprises</span> recrutent sur INTOWORK
             </h1>
             <p className="text-base sm:text-lg lg:text-xl text-slate-600 max-w-3xl mx-auto">
-              Découvrez les entreprises innovantes qui font confiance à notre plateforme pour trouver leurs talents
+              {loading ? 'Chargement...' : `Découvrez les ${totalCompanies} entreprises innovantes qui font confiance à notre plateforme pour trouver leurs talents`}
             </p>
           </div>
 
           {/* Stats */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-12">
-            {stats.map((stat, index) => (
+            {stats.map((stat) => (
               <div
-                key={index}
+                key={stat.label}
                 className="bg-white rounded-2xl p-6 text-center border border-slate-200 hover:shadow-lg transition-all"
               >
                 <div className={`text-3xl sm:text-4xl font-bold bg-linear-to-r ${stat.color} bg-clip-text text-transparent mb-2`}>
@@ -272,89 +208,97 @@ export default function EntreprisesPage() {
           </div>
 
           {/* Filtres */}
-          <div className="flex flex-wrap gap-3 justify-center">
-            {uniqueSectors.map((sector) => (
-              <button
-                key={sector}
-                onClick={() => setSectorFilter(sector)}
-                className={`px-4 py-2 rounded-full font-medium transition-all ${
-                  sectorFilter === sector
-                    ? 'bg-green-600 text-white shadow-lg'
-                    : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
-                }`}
-              >
-                {sector === 'all' ? 'Tous les secteurs' : sector}
-              </button>
-            ))}
-          </div>
+          {!loading && uniqueSectors.length > 1 && (
+            <div className="flex flex-wrap gap-3 justify-center">
+              {uniqueSectors.map((sector) => (
+                <button
+                  key={sector || 'all'}
+                  onClick={() => setSectorFilter(sector || 'all')}
+                  className={`px-4 py-2 rounded-full font-medium transition-all ${
+                    sectorFilter === sector
+                      ? 'bg-green-600 text-white shadow-lg'
+                      : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
+                  }`}
+                >
+                  {sector === 'all' ? 'Tous les secteurs' : sector}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
       {/* Liste des entreprises */}
       <section className="py-16 sm:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
-            {filteredCompanies.map((company) => (
+          {loading && (
+            <div className="flex items-center justify-center py-12">
+              <div className="w-12 h-12 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          )}
+          
+          {!loading && filteredCompanies.length === 0 && (
+            <div className="text-center py-12">
+              <BuildingOfficeIcon className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-slate-900 mb-2">Aucune entreprise trouvée</h3>
+              <p className="text-slate-600">Essayez de modifier vos critères de recherche</p>
+            </div>
+          )}
+          
+          {!loading && filteredCompanies.length > 0 && (
+            <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
+              {filteredCompanies.map((company) => (
               <div
                 key={company.id}
                 className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 hover:border-green-500 hover:shadow-xl transition-all duration-300 group"
               >
                 {/* Header */}
                 <div className="flex items-start gap-4 mb-6">
-                  <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-green-500 to-blue-600 flex items-center justify-center text-white text-2xl font-bold shrink-0">
-                    {company.logo}
-                  </div>
+                  {company.logo_url ? (
+                    <img src={company.logo_url} alt={company.name} className="w-16 h-16 rounded-2xl object-cover shrink-0" />
+                  ) : (
+                    <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-green-500 to-blue-600 flex items-center justify-center text-white text-xl font-bold shrink-0">
+                      {getCompanyInitials(company.name)}
+                    </div>
+                  )}
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       <h3 className="text-xl sm:text-2xl font-bold text-slate-900 group-hover:text-green-600 transition-colors">
                         {company.name}
                       </h3>
-                      {company.verified && (
-                        <CheckBadgeIcon className="w-6 h-6 text-green-600" />
-                      )}
+                      <CheckBadgeIcon className="w-6 h-6 text-green-600" />
                     </div>
-                    <p className="text-slate-600 font-medium mb-2">{company.sector}</p>
-                    <div className="flex items-center gap-2">
-                      <div className="flex items-center">
-                        {[...Array(5)].map((_, i) => (
-                          <StarIcon
-                            key={i}
-                            className={`w-4 h-4 ${
-                              i < Math.floor(company.rating)
-                                ? 'text-amber-400 fill-amber-400'
-                                : 'text-slate-300'
-                            }`}
-                          />
-                        ))}
-                      </div>
-                      <span className="text-sm font-semibold text-slate-700">{company.rating}</span>
-                    </div>
+                    {company.industry && (
+                      <p className="text-slate-600 font-medium mb-2">{company.industry}</p>
+                    )}
                   </div>
                 </div>
 
                 {/* Description */}
-                <p className="text-slate-600 mb-6 leading-relaxed">
-                  {company.description}
+                <p className="text-slate-600 mb-6 leading-relaxed line-clamp-3">
+                  {company.description || 'Cette entreprise recrute sur INTOWORK.'}
                 </p>
 
                 {/* Infos */}
                 <div className="grid grid-cols-2 gap-3 mb-6">
                   <div className="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 px-3 py-2 rounded-lg">
                     <MapPinIcon className="w-4 h-4" />
-                    <span>{company.location}</span>
+                    <span>{getLocation(company)}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 px-3 py-2 rounded-lg">
-                    <UserGroupIcon className="w-4 h-4" />
-                    <span>{company.employees} employés</span>
-                  </div>
+                  {company.size && (
+                    <div className="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 px-3 py-2 rounded-lg">
+                      <UserGroupIcon className="w-4 h-4" />
+                      <span>{company.size} employés</span>
+                    </div>
+                  )}
                   <div className="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 px-3 py-2 rounded-lg">
                     <BriefcaseIcon className="w-4 h-4" />
-                    <span>{company.openPositions} postes ouverts</span>
+                    <span>{company.total_jobs || 0} postes ouverts</span>
                   </div>
-                  {company.website && (
+                  {company.website_url && (
                     <div className="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 px-3 py-2 rounded-lg">
                       <GlobeAltIcon className="w-4 h-4" />
-                      <span className="truncate">{company.website}</span>
+                      <span className="truncate">{company.website_url.replace(/^https?:\/\//, '')}</span>
                     </div>
                   )}
                 </div>
@@ -377,6 +321,7 @@ export default function EntreprisesPage() {
               </div>
             ))}
           </div>
+          )}
         </div>
       </section>
 
