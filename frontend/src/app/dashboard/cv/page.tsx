@@ -272,7 +272,7 @@ export default function MesCVPage() {
       <DashboardLayout title="Mes CV" subtitle="Gérez vos CV téléchargés">
         <div className="flex items-center justify-center min-h-96">
           <div className="w-12 h-12 border-4 border-t-transparent rounded-full animate-spin" style={{
-            borderColor: 'var(--gold-600)',
+            borderColor: '#D97706',
             borderTopColor: 'transparent',
           }}></div>
         </div>
@@ -336,14 +336,14 @@ export default function MesCVPage() {
           }}>
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{
-                background: 'var(--sage-100)',
+                background: '#DCFCE7',
               }}>
-                <EyeIcon className="w-6 h-6" style={{ color: 'var(--sage-600)' }} />
+                <EyeIcon className="w-6 h-6" style={{ color: '#16A34A' }} />
               </div>
               <div>
-                <p className="text-sm font-medium mb-1" style={{ color: 'var(--sage-600)' }}>Vues par les recruteurs</p>
+                <p className="text-sm font-medium mb-1" style={{ color: '#16A34A' }}>Vues par les recruteurs</p>
                 <p className="text-2xl font-bold" style={{
-                  color: 'var(--sage-900)',
+                  color: '#14532D',
                   fontFamily: 'var(--font-display)',
                 }}>0</p>
               </div>
@@ -396,12 +396,12 @@ export default function MesCVPage() {
               disabled={isUploadingCV}
               className="flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-300 disabled:opacity-50"
               style={{
-                background: 'var(--gold-600)',
+                background: '#D97706',
                 color: 'white',
                 boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
               }}
-              onMouseEnter={(e) => !isUploadingCV && (e.currentTarget.style.background = 'var(--gold-700)')}
-              onMouseLeave={(e) => e.currentTarget.style.background = 'var(--gold-600)'}
+              onMouseEnter={(e) => !isUploadingCV && (e.currentTarget.style.background = '#B45309')}
+              onMouseLeave={(e) => e.currentTarget.style.background = '#D97706'}
               title="Ajouter un nouveau CV"
             >
               <PlusIcon className="w-5 h-5" />
@@ -424,12 +424,12 @@ export default function MesCVPage() {
                 disabled={isUploadingCV}
                 className="px-6 py-3 rounded-xl font-medium transition-all duration-300 disabled:opacity-50"
                 style={{
-                  background: 'var(--gold-600)',
+                  background: '#D97706',
                   color: 'white',
                   boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
                 }}
-                onMouseEnter={(e) => !isUploadingCV && (e.currentTarget.style.background = 'var(--gold-700)')}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'var(--gold-600)'}
+                onMouseEnter={(e) => !isUploadingCV && (e.currentTarget.style.background = '#B45309')}
+                onMouseLeave={(e) => e.currentTarget.style.background = '#D97706'}
               >
                 {isUploadingCV ? 'Téléchargement...' : 'Télécharger un CV'}
               </button>
@@ -482,14 +482,14 @@ export default function MesCVPage() {
                       title="Télécharger le CV"
                       onClick={() => handleDownloadCV(cv)}
                       className="p-2 rounded-lg transition-all duration-300"
-                      style={{ color: 'var(--sage-500)' }}
+                      style={{ color: '#22C55E' }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.background = 'var(--sage-100)';
-                        e.currentTarget.style.color = 'var(--sage-700)';
+                        e.currentTarget.style.background = '#DCFCE7';
+                        e.currentTarget.style.color = '#15803D';
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.background = 'transparent';
-                        e.currentTarget.style.color = 'var(--sage-500)';
+                        e.currentTarget.style.color = '#22C55E';
                       }}
                     >
                       <ArrowDownTrayIcon className="w-5 h-5" />
@@ -519,15 +519,15 @@ export default function MesCVPage() {
 
         {/* Conseils */}
         <div className="rounded-2xl p-6 animate-elegant-fade-in" style={{
-          background: 'var(--gold-50)',
-          border: '1px solid var(--gold-200)',
+          background: '#FFFBEB',
+          border: '1px solid #FDE68A',
           animationDelay: '400ms',
         }}>
-          <h3 className="font-bold mb-3 flex items-center gap-2" style={{ color: 'var(--gold-900)' }}>
+          <h3 className="font-bold mb-3 flex items-center gap-2" style={{ color: '#78350F' }}>
             <CheckCircleIcon className="w-5 h-5" />
             Conseils pour optimiser votre CV
           </h3>
-          <ul className="text-sm space-y-2" style={{ color: 'var(--gold-800)' }}>
+          <ul className="text-sm space-y-2" style={{ color: '#92400E' }}>
             <li>• Utilisez un format PDF pour une meilleure compatibilité</li>
             <li>• Gardez votre CV à jour avec vos dernières expériences</li>
             <li>• Adaptez votre CV en fonction du poste visé</li>

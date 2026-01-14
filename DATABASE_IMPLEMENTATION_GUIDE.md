@@ -1,4 +1,5 @@
 # PostgreSQL Database Implementation Guide
+
 ## IntoWork Dashboard - Production Deployment
 
 **Date**: January 6, 2026
@@ -51,7 +52,8 @@ ORDER BY tablename, indexname;
 ```
 
 **Expected Output** (16 indexes):
-```
+
+```bash
  schemaname | tablename        | indexname                              | indexdef
  public     | accounts         | unique_user_provider_account           | CREATE UNIQUE INDEX...
  public     | candidates       | idx_candidates_user_id                 | CREATE INDEX...
@@ -235,6 +237,7 @@ curl http://localhost:8001/metrics/database/pool
 ### Optimization 1: Dashboard Statistics Query
 
 **Current Implementation** (dashboard.py lines 52-62):
+
 ```python
 # Multiple separate queries
 result = await db.execute(select(func.count()).select_from(User))
@@ -250,6 +253,7 @@ applications_count = result.scalar()
 **Problem**: 3 database queries instead of 1
 
 **Optimized Implementation**:
+
 ```python
 # Single aggregation query
 from sqlalchemy import select, func
@@ -271,6 +275,7 @@ applications_count = row.applications_count
 **Performance Impact**: 3 queries → 1 query = **3x faster dashboard load**
 
 **SQL Generated**:
+
 ```sql
 SELECT
     COUNT(users.id) as users_count,
@@ -282,6 +287,7 @@ FROM users;
 ### Optimization 2: Job List with Proper Index Usage
 
 **Current Implementation** (jobs.py lines 107-143):
+
 ```python
 stmt = select(Job, Company).join(Company, Job.company_id == Company.id)
 stmt = stmt.filter(Job.status == JobStatus.PUBLISHED)
@@ -294,7 +300,8 @@ if location_type:
 ```
 
 **Query Plan Analysis**:
-```
+
+```python
 Before Index:
   -> Seq Scan on jobs  (cost=0.00..50000.00 rows=10000)
      Filter: (status = 'PUBLISHED' AND location_type = 'remote')
@@ -315,6 +322,7 @@ After Index:
 **Scenario**: Employer sees application status breakdown
 
 **Inefficient Pattern**:
+
 ```python
 # Loop through each status (5 separate queries)
 status_counts = {}
@@ -329,6 +337,7 @@ for status in ApplicationStatus:
 ```
 
 **Optimized Pattern**:
+
 ```python
 # Single aggregation query
 stmt = select(
@@ -347,6 +356,7 @@ status_counts = {row[0].value: row[1] for row in result.all()}
 **Performance Impact**: 5 queries → 1 query = **5x faster**
 
 **SQL Generated**:
+
 ```sql
 SELECT
     job_applications.status,
@@ -591,9 +601,11 @@ async def get_connection_info(
 - [ ] Review this implementation guide with team
 - [ ] Plan maintenance window (if needed)
 - [ ] Backup current database
+
   ```bash
   pg_dump -U postgres -h localhost intowork > backup_$(date +%Y%m%d).sql
   ```
+
 - [ ] Test migration in staging environment
 - [ ] Load test with production-like data
 - [ ] Document rollback procedures
@@ -602,9 +614,11 @@ async def get_connection_info(
 
 - [ ] Schedule notification to users (if needed)
 - [ ] Start with staging environment
+
   ```bash
   alembic upgrade head  # Apply migration
   ```
+
 - [ ] Verify all 15 indexes created
 - [ ] Run performance tests
 - [ ] Monitor metrics closely
@@ -631,6 +645,7 @@ async def get_connection_info(
 ### Issue: Migration fails with "index already exists"
 
 **Solution**:
+
 ```sql
 -- Drop the conflicting index and try again
 DROP INDEX IF EXISTS unique_candidate_job_application;
@@ -643,6 +658,7 @@ alembic upgrade head
 ### Issue: Query timeout during migration
 
 **Solution**:
+
 ```bash
 # Increase timeout temporarily
 export PGSTATEMENTTIMEOUT=300000  # 5 minutes
@@ -659,6 +675,7 @@ unset PGSTATEMENTTIMEOUT
 **Symptoms**: "QueuePool limit of size 20 overflow 40 reached"
 
 **Solution**:
+
 ```python
 # In database_production.py, increase pool size
 pool_size = 30  # Increase from 20
@@ -671,6 +688,7 @@ systemctl restart intowork-api
 ### Issue: Index not being used for queries
 
 **Diagnosis**:
+
 ```sql
 -- Analyze query plan
 EXPLAIN ANALYZE
@@ -682,6 +700,7 @@ WHERE status = 'PUBLISHED' AND location_type = 'remote';
 ```
 
 **Solution**:
+
 ```sql
 -- Force analyze to update statistics
 ANALYZE jobs;
@@ -729,12 +748,14 @@ Following this guide will:
 5. **Establish SLOs** for production database performance
 
 **Expected Timeline**:
+
 - Implementation: 1-2 hours
 - Testing: 4-8 hours
 - Deployment: 1 hour
 - Monitoring: Ongoing
 
 **Expected Results**:
+
 - Query performance: 50-100x faster (500ms → 5-10ms)
 - Data integrity: 100% duplicate prevention
 - Production readiness: 88/100 quality score

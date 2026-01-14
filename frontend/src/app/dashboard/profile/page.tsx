@@ -44,15 +44,15 @@ const skillLevelToNumber = (level: string): number => {
 const getSkillColor = (category: string) => {
   switch (category) {
     case 'technical': return { bg: '#F1F5F9', text: '#334155' };
-    case 'soft': return { bg: 'var(--sage-100)', text: 'var(--sage-700)' };
+    case 'soft': return { bg: '#DCFCE7', text: '#15803D' };
     case 'language': return { bg: '#EDE9FE', text: '#6B21A8' };
     default: return { bg: '#F8FAFC', text: '#475569' };
   }
 };
 
 const getProgressColor = (percentage: number) => {
-  if (percentage >= 90) return 'var(--sage-500)';
-  if (percentage >= 70) return 'var(--gold-500)';
+  if (percentage >= 90) return '#22C55E';
+  if (percentage >= 70) return '#F59E0B';
   if (percentage >= 50) return '#F59E0B';
   return '#EF4444';
 };
@@ -183,7 +183,7 @@ export default function ProfilePage() {
       <DashboardLayout title="Mon Profil" subtitle="Chargement...">
         <div className="flex items-center justify-center min-h-96">
           <div className="w-12 h-12 border-4 border-t-transparent rounded-full animate-spin" style={{
-            borderColor: 'var(--gold-600)',
+            borderColor: '#D97706',
             borderTopColor: 'transparent',
           }}></div>
         </div>
@@ -242,9 +242,9 @@ export default function ProfilePage() {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-xl flex items-center justify-center" style={{
-              background: 'var(--gold-100)',
+              background: '#FEF3C7',
             }}>
-              <UserIcon className="w-8 h-8" style={{ color: 'var(--gold-700)' }} />
+              <UserIcon className="w-8 h-8" style={{ color: '#B45309' }} />
             </div>
             <div>
               <h2 className="text-2xl font-bold" style={{
@@ -350,11 +350,11 @@ export default function ProfilePage() {
                     onClick={() => setIsEditing(true)}
                     className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-300"
                     style={{
-                      background: 'var(--gold-100)',
-                      color: 'var(--gold-700)',
+                      background: '#FEF3C7',
+                      color: '#B45309',
                     }}
-                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--gold-200)'}
-                    onMouseLeave={(e) => e.currentTarget.style.background = 'var(--gold-100)'}
+                    onMouseEnter={(e) => e.currentTarget.style.background = '#FDE68A'}
+                    onMouseLeave={(e) => e.currentTarget.style.background = '#FEF3C7'}
                   >
                     <PencilIcon className="w-4 h-4" />
                     <span>Modifier</span>
@@ -367,11 +367,11 @@ export default function ProfilePage() {
                       disabled={isSaving}
                       className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-300 disabled:opacity-50"
                       style={{
-                        background: 'var(--sage-500)',
+                        background: '#22C55E',
                         color: 'white',
                       }}
-                      onMouseEnter={(e) => !isSaving && (e.currentTarget.style.background = 'var(--sage-600)')}
-                      onMouseLeave={(e) => e.currentTarget.style.background = 'var(--sage-500)'}
+                      onMouseEnter={(e) => !isSaving && (e.currentTarget.style.background = '#16A34A')}
+                      onMouseLeave={(e) => e.currentTarget.style.background = '#22C55E'}
                     >
                       <CheckIcon className="w-4 h-4" />
                       <span>{isSaving ? 'Sauvegarde...' : 'Sauvegarder'}</span>
@@ -399,11 +399,31 @@ export default function ProfilePage() {
               {/* Section Informations personnelles */}
               {activeSection === 'personal' && (
                 <div className="space-y-6">
+                  {/* En-tête élégant */}
+                  <div className="bg-linear-to-br from-blue-50 via-purple-50 to-pink-50 p-6 rounded-2xl border border-blue-100">
+                    <div className="flex items-start gap-4">
+                      <div className="w-16 h-16 bg-linear-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                        {user?.firstName?.[0]}{user?.lastName?.[0]}
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-2xl font-bold text-gray-900 mb-1">
+                          {user?.firstName} {user?.lastName}
+                        </h3>
+                        <p className="text-gray-600 flex items-center gap-2">
+                          <span className="inline-block w-2 h-2 bg-green-500 rounded-full"></span>
+                          Profil actif
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Téléphone */}
-                    <div>
-                      <label className="block mb-2 font-medium" style={{ color: '#0F172A' }}>
-                        <PhoneIcon className="w-4 h-4 inline mr-2" />
+                    <div className="group">
+                      <label className="flex items-center gap-2 mb-2 font-semibold text-gray-900">
+                        <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                          <PhoneIcon className="w-5 h-5 text-blue-600" />
+                        </div>
                         Téléphone
                       </label>
                       {isEditing ? (
@@ -411,15 +431,15 @@ export default function ProfilePage() {
                           type="tel"
                           value={profile.phone || ''}
                           onChange={(e) => updateProfile({ phone: e.target.value })}
-                          className="w-full px-4 py-3 rounded-xl transition-all duration-300 focus:outline-none"
+                          className="w-full px-4 py-3.5 rounded-xl transition-all duration-300 focus:outline-none font-medium"
                           style={{
                             background: '#F8FAFC',
-                            border: '1px solid #E2E8F0',
+                            border: '2px solid #E2E8F0',
                             color: '#0F172A',
                           }}
                           onFocus={(e) => {
-                            e.currentTarget.style.borderColor = 'var(--gold-600)';
-                            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(217, 119, 6, 0.1)';
+                            e.currentTarget.style.borderColor = '#3B82F6';
+                            e.currentTarget.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.1)';
                           }}
                           onBlur={(e) => {
                             e.currentTarget.style.borderColor = '#E2E8F0';
@@ -428,16 +448,20 @@ export default function ProfilePage() {
                           placeholder="+33 6 12 34 56 78"
                         />
                       ) : (
-                        <p style={{ color: '#334155' }}>
-                          {profile.phone || 'Non renseigné'}
-                        </p>
+                        <div className="px-4 py-3.5 rounded-xl bg-gray-50 border border-gray-200">
+                          <p className="font-medium text-gray-900">
+                            {profile.phone || <span className="text-gray-400 italic">Non renseigné</span>}
+                          </p>
+                        </div>
                       )}
                     </div>
 
                     {/* Localisation */}
-                    <div>
-                      <label className="block mb-2 font-medium" style={{ color: '#0F172A' }}>
-                        <MapPinIcon className="w-4 h-4 inline mr-2" />
+                    <div className="group">
+                      <label className="flex items-center gap-2 mb-2 font-semibold text-gray-900">
+                        <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                          <MapPinIcon className="w-5 h-5 text-purple-600" />
+                        </div>
                         Localisation
                       </label>
                       {isEditing ? (
@@ -445,15 +469,15 @@ export default function ProfilePage() {
                           type="text"
                           value={profile.location || ''}
                           onChange={(e) => updateProfile({ location: e.target.value })}
-                          className="w-full px-4 py-3 rounded-xl transition-all duration-300 focus:outline-none"
+                          className="w-full px-4 py-3.5 rounded-xl transition-all duration-300 focus:outline-none font-medium"
                           style={{
                             background: '#F8FAFC',
-                            border: '1px solid #E2E8F0',
+                            border: '2px solid #E2E8F0',
                             color: '#0F172A',
                           }}
                           onFocus={(e) => {
-                            e.currentTarget.style.borderColor = 'var(--gold-600)';
-                            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(217, 119, 6, 0.1)';
+                            e.currentTarget.style.borderColor = '#8B5CF6';
+                            e.currentTarget.style.boxShadow = '0 0 0 4px rgba(139, 92, 246, 0.1)';
                           }}
                           onBlur={(e) => {
                             e.currentTarget.style.borderColor = '#E2E8F0';
@@ -462,17 +486,21 @@ export default function ProfilePage() {
                           placeholder="Paris, France"
                         />
                       ) : (
-                        <p style={{ color: '#334155' }}>
-                          {profile.location || 'Non renseigné'}
-                        </p>
+                        <div className="px-4 py-3.5 rounded-xl bg-gray-50 border border-gray-200">
+                          <p className="font-medium text-gray-900">
+                            {profile.location || <span className="text-gray-400 italic">Non renseigné</span>}
+                          </p>
+                        </div>
                       )}
                     </div>
                   </div>
 
                   {/* Titre */}
-                  <div>
-                    <label className="block mb-2 font-medium" style={{ color: '#0F172A' }}>
-                      <BriefcaseIcon className="w-4 h-4 inline mr-2" />
+                  <div className="group">
+                    <label className="flex items-center gap-2 mb-2 font-semibold text-gray-900">
+                      <div className="w-8 h-8 bg-pink-100 rounded-lg flex items-center justify-center">
+                        <BriefcaseIcon className="w-5 h-5 text-pink-600" />
+                      </div>
                       Titre professionnel
                     </label>
                     {isEditing ? (
@@ -480,15 +508,15 @@ export default function ProfilePage() {
                         type="text"
                         value={profile.title || ''}
                         onChange={(e) => updateProfile({ title: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl transition-all duration-300 focus:outline-none"
+                        className="w-full px-4 py-3.5 rounded-xl transition-all duration-300 focus:outline-none font-medium"
                         style={{
                           background: '#F8FAFC',
-                          border: '1px solid #E2E8F0',
+                          border: '2px solid #E2E8F0',
                           color: '#0F172A',
                         }}
                         onFocus={(e) => {
-                          e.currentTarget.style.borderColor = 'var(--gold-600)';
-                          e.currentTarget.style.boxShadow = '0 0 0 3px rgba(217, 119, 6, 0.1)';
+                          e.currentTarget.style.borderColor = '#EC4899';
+                          e.currentTarget.style.boxShadow = '0 0 0 4px rgba(236, 72, 153, 0.1)';
                         }}
                         onBlur={(e) => {
                           e.currentTarget.style.borderColor = '#E2E8F0';
@@ -497,15 +525,17 @@ export default function ProfilePage() {
                         placeholder="ex: Développeur Full Stack"
                       />
                     ) : (
-                      <p style={{ color: '#334155' }}>
-                        {profile.title || 'Non renseigné'}
-                      </p>
+                      <div className="px-4 py-3.5 rounded-xl bg-gray-50 border border-gray-200">
+                        <p className="font-medium text-gray-900">
+                          {profile.title || <span className="text-gray-400 italic">Non renseigné</span>}
+                        </p>
+                      </div>
                     )}
                   </div>
 
                   {/* Résumé */}
-                  <div>
-                    <label className="block mb-2 font-medium" style={{ color: '#0F172A' }}>
+                  <div className="group">
+                    <label className="block mb-2 font-semibold text-gray-900">
                       Résumé professionnel
                     </label>
                     {isEditing ? (
@@ -520,7 +550,7 @@ export default function ProfilePage() {
                           color: '#0F172A',
                         }}
                         onFocus={(e) => {
-                          e.currentTarget.style.borderColor = 'var(--gold-600)';
+                          e.currentTarget.style.borderColor = '#D97706';
                           e.currentTarget.style.boxShadow = '0 0 0 3px rgba(217, 119, 6, 0.1)';
                         }}
                         onBlur={(e) => {
@@ -555,7 +585,7 @@ export default function ProfilePage() {
                             color: '#0F172A',
                           }}
                           onFocus={(e) => {
-                            e.currentTarget.style.borderColor = 'var(--gold-600)';
+                            e.currentTarget.style.borderColor = '#D97706';
                             e.currentTarget.style.boxShadow = '0 0 0 3px rgba(217, 119, 6, 0.1)';
                           }}
                           onBlur={(e) => {
@@ -572,7 +602,7 @@ export default function ProfilePage() {
                               target="_blank"
                               rel="noopener noreferrer"
                               className="hover:underline"
-                              style={{ color: 'var(--gold-700)' }}
+                              style={{ color: '#B45309' }}
                             >
                               Voir le profil
                             </a>
@@ -600,7 +630,7 @@ export default function ProfilePage() {
                             color: '#0F172A',
                           }}
                           onFocus={(e) => {
-                            e.currentTarget.style.borderColor = 'var(--gold-600)';
+                            e.currentTarget.style.borderColor = '#D97706';
                             e.currentTarget.style.boxShadow = '0 0 0 3px rgba(217, 119, 6, 0.1)';
                           }}
                           onBlur={(e) => {
@@ -617,7 +647,7 @@ export default function ProfilePage() {
                               target="_blank"
                               rel="noopener noreferrer"
                               className="hover:underline"
-                              style={{ color: 'var(--gold-700)' }}
+                              style={{ color: '#B45309' }}
                             >
                               Visiter le site
                             </a>
@@ -672,11 +702,11 @@ export default function ProfilePage() {
                     onClick={() => setShowExperienceModal(true)}
                     className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium transition-all duration-300"
                     style={{
-                      background: 'var(--gold-100)',
-                      color: 'var(--gold-700)',
+                      background: '#FEF3C7',
+                      color: '#B45309',
                     }}
-                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--gold-200)'}
-                    onMouseLeave={(e) => e.currentTarget.style.background = 'var(--gold-100)'}
+                    onMouseEnter={(e) => e.currentTarget.style.background = '#FDE68A'}
+                    onMouseLeave={(e) => e.currentTarget.style.background = '#FEF3C7'}
                   >
                     <PlusIcon className="w-5 h-5" />
                     <span>Ajouter une expérience</span>
@@ -693,17 +723,17 @@ export default function ProfilePage() {
                         key={edu.id || index}
                         className="p-4 rounded-xl"
                         style={{
-                          background: 'var(--sage-50)',
-                          border: '1px solid #E2E8F0',
+                          background: '#F0FDF4',
+                          border: '1px solid #BBF7D0',
                         }}
                       >
-                        <h4 className="font-bold mb-1" style={{ color: 'var(--sage-900)' }}>
+                        <h4 className="font-bold mb-1" style={{ color: '#14532D' }}>
                           {edu.degree}
                         </h4>
-                        <p className="text-sm mb-2" style={{ color: 'var(--sage-700)' }}>
+                        <p className="text-sm mb-2" style={{ color: '#15803D' }}>
                           {edu.institution} • {edu.location}
                         </p>
-                        <p className="text-sm" style={{ color: 'var(--sage-600)' }}>
+                        <p className="text-sm" style={{ color: '#16A34A' }}>
                           {new Date(edu.start_date).getFullYear()} -
                           {edu.end_date ? new Date(edu.end_date).getFullYear() : 'Présent'}
                         </p>
@@ -711,8 +741,8 @@ export default function ProfilePage() {
                     ))
                   ) : (
                     <div className="text-center py-12">
-                      <AcademicCapIcon className="w-12 h-12 mx-auto mb-3" style={{ color: 'var(--sage-300)' }} />
-                      <p style={{ color: 'var(--sage-600)' }}>Aucune formation ajoutée</p>
+                      <AcademicCapIcon className="w-12 h-12 mx-auto mb-3" style={{ color: '#86EFAC' }} />
+                      <p style={{ color: '#16A34A' }}>Aucune formation ajoutée</p>
                     </div>
                   )}
 
@@ -720,11 +750,11 @@ export default function ProfilePage() {
                     onClick={() => setShowEducationModal(true)}
                     className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium transition-all duration-300"
                     style={{
-                      background: 'var(--sage-100)',
-                      color: 'var(--sage-700)',
+                      background: '#DCFCE7',
+                      color: '#15803D',
                     }}
-                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--sage-200)'}
-                    onMouseLeave={(e) => e.currentTarget.style.background = 'var(--sage-100)'}
+                    onMouseEnter={(e) => e.currentTarget.style.background = '#BBF7D0'}
+                    onMouseLeave={(e) => e.currentTarget.style.background = '#DCFCE7'}
                   >
                     <PlusIcon className="w-5 h-5" />
                     <span>Ajouter une formation</span>

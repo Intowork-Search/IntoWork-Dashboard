@@ -7,6 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 INTOWORK Search is a B2B2C recruitment platform with AI-powered job matching. The platform serves two main user types: candidates seeking jobs and employers managing hiring.
 
 **Current Status**: Phase 2 - Multi-Role Dashboard (Complete)
+
 - Phase 1 (Complete): Foundation with NextAuth authentication, user management
 - Phase 2 (Complete): Candidate and Employer dashboards with full functionality
   - Candidate: Profile, CV upload, job search, applications, notifications
@@ -39,6 +40,7 @@ See relevant sections below for detailed usage of each MCP server.
 ### Stack Overview
 
 **Backend** (`/backend`):
+
 - FastAPI 0.104+ with **full async/await support** (AsyncSession, async routes)
 - SQLAlchemy 2.0+ ORM with **async engine** and declarative models
 - PostgreSQL 15 (development: port 5433)
@@ -49,6 +51,7 @@ See relevant sections below for detailed usage of each MCP server.
 - SlowAPI for rate limiting
 
 **Frontend** (`/frontend`):
+
 - Next.js 16 (App Router with React Server Components)
 - TypeScript with strict type checking
 - Tailwind CSS 4 with inline theming (no separate config file)
@@ -76,6 +79,7 @@ The application uses **NextAuth v5** for authentication with native JWT:
 8. Password reset via email tokens (Resend service, 24-hour expiration)
 
 **Key Authentication Files**:
+
 - Backend: `backend/app/auth.py` - Auth class with JWT verification, PasswordHasher
 - Backend: `backend/app/services/email_service.py` - EmailService for password reset
 - Frontend: `frontend/src/auth.ts` - NextAuth v5 configuration with CredentialsProvider
@@ -129,13 +133,14 @@ The application uses **NextAuth v5** for authentication with native JWT:
    - Tracks application lifecycle and has_applied flag
 
 9. **Session** - NextAuth session management
-   - Links to User via `user_id`
-   - `session_token`: Unique session identifier
-   - `expires`: Session expiration timestamp
+- Links to User via `user_id`
+- `session_token`: Unique session identifier
+- `expires`: Session expiration timestamp
 
 10. **Account** - OAuth provider accounts (NextAuth)
-   - Links to User via `user_id`
-   - Supports multiple OAuth providers per user
+
+- Links to User via `user_id`
+- Supports multiple OAuth providers per user
 
 11. **PasswordResetToken** - Password reset tokens
    - `email`: User email requesting reset
