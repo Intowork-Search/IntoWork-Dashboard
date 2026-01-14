@@ -414,3 +414,75 @@ class PasswordResetToken(Base):
 
     # Relations
     user = relationship("User")
+
+
+# CV Builder Models
+
+class CVTemplate(enum.Enum):
+    """Templates de CV disponibles"""
+    ELEGANCE = "elegance"
+    BOLD = "bold"
+    MINIMAL = "minimal"
+    CREATIVE = "creative"
+    EXECUTIVE = "executive"
+
+
+class CVDocument(Base):
+    """CV Builder - Document de CV interactif avec données JSON"""
+    __tablename__ = "cv_documents"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+
+    # Données du CV (format JSON)
+    cv_data = Column(Text, nullable=False)  # JSON string contenant toutes les données
+
+    # Template et personnalisation
+    template = Column(SQLEnum(CVTemplate), nullable=False, default=CVTemplate.ELEGANCE)
+
+    # Métadonnées
+    title = Column(String, nullable=True)  # Titre du CV (pour l'utilisateur)
+    slug = Column(String, unique=True, nullable=False, index=True)  # URL publique unique (ex: john-doe)
+    is_public = Column(Boolean, default=False, index=True)  # CV partagé publiquement
+
+    # Statistiques
+    views_count = Column(Integer, default=0)
+    downloads_count = Column(Integer, default=0)
+
+    # PDF généré (optionnel - cache)
+    pdf_url = Column(String, nullable=True)  # Chemin du PDF généré
+    pdf_generated_at = Column(DateTime(timezone=True), nullable=True)
+
+    # Timestamps
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    # Relations
+    user = relationship("User")
+    analytics = relationship("CVAnalytics", back_populates="cv_document", cascade="all, delete-orphan")
+
+
+class CVAnalytics(Base):
+    """Analytics pour les vues et téléchargements de CV"""
+    __tablename__ = "cv_analytics"
+
+    id = Column(Integer, primary_key=True, index=True)
+    cv_document_id = Column(Integer, ForeignKey("cv_documents.id"), nullable=False, index=True)
+
+    # Type d'événement
+    event_type = Column(String, nullable=False, index=True)  # "view", "download", "share"
+
+    # Informations de l'événement
+    ip_address = Column(String, nullable=True)  # IP du visiteur (anonymisée)
+    user_agent = Column(String, nullable=True)  # User agent du navigateur
+    referrer = Column(String, nullable=True)  # D'où vient le visiteur
+
+    # Géolocalisation (optionnel)
+    country = Column(String, nullable=True)
+    city = Column(String, nullable=True)
+
+    # Timestamp
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), index=True)
+
+    # Relations
+    cv_document = relationship("CVDocument", back_populates="analytics")

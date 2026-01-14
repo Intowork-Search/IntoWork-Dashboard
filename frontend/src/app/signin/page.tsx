@@ -12,7 +12,6 @@ import {
   UserGroupIcon,
   ChartBarIcon,
   ArrowRightIcon,
-  SparklesIcon
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { Plus_Jakarta_Sans } from 'next/font/google';
@@ -71,19 +70,6 @@ export default function SignInPage() {
 
   return (
     <div className={`${plusJakarta.variable} font-sans min-h-screen bg-white`} data-theme="light">
-      {/* Bouton retour à l'accueil */}
-      <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-50">
-        <Link
-          href="/"
-          className="flex items-center gap-2 px-4 py-2 bg-white/90 hover:bg-white backdrop-blur-sm rounded-full border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 group"
-        >
-          <svg className="w-4 h-4 text-slate-600 group-hover:text-green-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-          <span className="text-sm font-medium text-slate-600 group-hover:text-green-600 transition-colors">Accueil</span>
-        </Link>
-      </div>
-
       <div className="flex min-h-screen overflow-hidden">
         {/* Left Panel - Branding & Features */}
         <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden flex-col justify-between p-12 xl:p-16">
@@ -93,14 +79,14 @@ export default function SignInPage() {
           {/* Content */}
           <div className="relative z-10">
             {/* Logo */}
-            <div className="flex items-center gap-3 mb-16 xl:mb-20 animate-fade-in">
-              <div className="w-12 h-12 xl:w-14 xl:h-14 bg-white/15 rounded-xl flex items-center justify-center backdrop-blur-md border border-white/20 shadow-xl">
-                <SparklesIcon className="w-6 h-6 xl:w-7 xl:h-7 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl xl:text-2xl font-bold text-white">INTOWORK</h1>
-                <p className="text-xs xl:text-sm text-white/80">Plateforme de Recrutement B2B2C</p>
-              </div>
+            <div className="mb-16 xl:mb-20 animate-fade-in">
+              <Link href="/">
+                <img
+                  src="/logo-intowork.png"
+                  alt="INTOWORK"
+                  className="h-24 sm:h-28 md:h-32 xl:h-36 w-auto brightness-0 invert"
+                />
+              </Link>
             </div>
 
             {/* Features */}
@@ -170,14 +156,14 @@ export default function SignInPage() {
 
           <div className="w-full max-w-md relative z-10">
             {/* Mobile Logo */}
-            <div className="lg:hidden flex items-center gap-2 sm:gap-3 mb-8 sm:mb-10 animate-fade-in">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-secondary rounded-xl flex items-center justify-center shadow-lg">
-                <SparklesIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl sm:text-2xl font-bold text-slate-900">INTOWORK</h1>
-                <p className="text-xs sm:text-sm text-slate-600">Plateforme de Recrutement</p>
-              </div>
+            <div className="lg:hidden mb-8 sm:mb-10 animate-fade-in">
+              <Link href="/">
+                <img
+                  src="/logo-intowork.png"
+                  alt="INTOWORK"
+                  className="h-20 sm:h-24 w-auto"
+                />
+              </Link>
             </div>
 
             {/* Form Header */}

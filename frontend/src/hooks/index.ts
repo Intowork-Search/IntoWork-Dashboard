@@ -71,3 +71,26 @@ export {
 
 // Auth (NextAuth)
 export { useAuth, useUser } from './useNextAuth';
+
+// CV Builder
+export {
+  useCVDocument,
+  useSaveCV,
+  useGeneratePDF,
+  useCVAnalytics,
+  useTogglePublic,
+  useDeleteCV as useDeleteCVBuilder,
+  usePublicCV,
+  useTrackCVView,
+  cvBuilderKeys,
+  type CVData,
+  type CVDocument,
+  type CVTemplate,
+  type CVAnalytics,
+  type CVSaveRequest,
+  type PersonalInfo,
+  type ExperienceItem,
+  type EducationItem,
+  type SkillItem,
+  type LanguageItem,
+} from './useCVBuilder';

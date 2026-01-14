@@ -461,8 +461,8 @@ export default function Home() {
               <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
                 <li><a href="#features" className="text-slate-400 hover:text-(--color-brand-green) transition-colors">Fonctionnalités</a></li>
                 <li><a href="#how-it-works" className="text-slate-400 hover:text-(--color-brand-green) transition-colors">Comment ça marche</a></li>
+                <li><Link href="/cv-builder" className="text-slate-400 hover:text-(--color-brand-green) transition-colors">Créateur de CV</Link></li>
                 <li><a href="#" className="text-slate-400 hover:text-(--color-brand-green) transition-colors">Tarifs</a></li>
-                <li><a href="#" className="text-slate-400 hover:text-(--color-brand-green) transition-colors">Changelog</a></li>
               </ul>
             </div>
 
