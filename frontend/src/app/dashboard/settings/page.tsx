@@ -332,7 +332,7 @@ export default function SettingsPage() {
         await signOut({ redirect: false });
         
         // Rediriger vers la page de connexion
-        globalThis.location.href = '/auth/signin';
+        globalThis.location.href = '/signin';
       } catch (error) {
         console.error('Erreur lors de la suppression:', error);
         toast.error('Erreur lors de la suppression du compte');

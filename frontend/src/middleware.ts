@@ -8,8 +8,10 @@ export default auth((req) => {
   // Pages publiques (accessibles sans authentification)
   const publicPaths = [
     '/',
-    '/auth/signin',
-    '/auth/signup',
+    '/signin',
+    '/signup',
+    '/forgot-password',
+    '/reset-password',
     '/auth/error',
     '/terms',
     '/privacy',
@@ -24,13 +26,13 @@ export default auth((req) => {
 
   // Si non authentifié et route protégée, rediriger vers signin
   if (!isAuthenticated && pathname.startsWith('/dashboard')) {
-    const signInUrl = new URL('/auth/signin', req.url)
+    const signInUrl = new URL('/signin', req.url)
     signInUrl.searchParams.set('callbackUrl', pathname)
     return NextResponse.redirect(signInUrl)
   }
 
   // Si authentifié et sur page auth, rediriger vers dashboard
-  if (isAuthenticated && pathname.startsWith('/auth/')) {
+  if (isAuthenticated && (pathname.startsWith('/signin') || pathname.startsWith('/signup') || pathname.startsWith('/forgot-password') || pathname.startsWith('/reset-password'))) {
     return NextResponse.redirect(new URL('/dashboard', req.url))
   }
 

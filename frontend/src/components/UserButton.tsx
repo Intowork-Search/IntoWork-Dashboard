@@ -76,7 +76,7 @@ export default function UserButton() {
             
             <button
               onClick={() => {
-                signOut({ callbackUrl: '/auth/signin' });
+                signOut({ callbackUrl: '/signin' });
                 setIsOpen(false);
               }}
               className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"

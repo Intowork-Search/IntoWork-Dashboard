@@ -34,7 +34,7 @@ export default function SupportPage() {
               </div>
             </Link>
             <Link
-              href="/auth/signin"
+              href="/signin"
               className="inline-flex items-center gap-2 text-sm font-medium text-[var(--color-brand-green)] hover:text-[var(--color-brand-green)]/80 transition-colors no-underline"
             >
               <ArrowLeftIcon className="w-4 h-4" />

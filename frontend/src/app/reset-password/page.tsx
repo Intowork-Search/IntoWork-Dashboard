@@ -47,7 +47,7 @@ function ResetPasswordContent() {
   useEffect(() => {
     if (!token) {
       toast.error('Token de réinitialisation manquant');
-      setTimeout(() => router.push('/auth/forgot-password'), 2000);
+      setTimeout(() => router.push('/forgot-password'), 2000);
     }
   }, [token, router]);
 
@@ -86,7 +86,7 @@ function ResetPasswordContent() {
 
       // Rediriger vers la page de connexion après 3 secondes
       setTimeout(() => {
-        router.push('/auth/signin');
+        router.push('/signin');
       }, 3000);
     } catch (error: any) {
       if (error.response?.data?.detail) {
@@ -323,7 +323,7 @@ function ResetPasswordContent() {
                     {/* Back to sign in */}
                     <div className="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-slate-200 text-center">
                       <Link
-                        href="/auth/signin"
+                        href="/signin"
                         className="inline-flex items-center gap-2 text-sm font-medium text-[var(--color-brand-green)] hover:text-[var(--color-brand-green)]/80 transition-colors duration-300 no-underline"
                       >
                         <ArrowLeftIcon className="w-4 h-4" />
@@ -379,7 +379,7 @@ function ResetPasswordContent() {
 
                       {/* Sign in button */}
                       <Link
-                        href="/auth/signin"
+                        href="/signin"
                         className="btn btn-primary w-full h-11 sm:h-12 mt-4 flex items-center justify-center gap-2 no-underline text-sm sm:text-base"
                       >
                         <span>Se connecter maintenant</span>

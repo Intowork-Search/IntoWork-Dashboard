@@ -89,7 +89,7 @@ export default function SignUpPage() {
 
         if (result?.error) {
           toast.error('Erreur lors de la connexion automatique');
-          router.push('/auth/signin');
+          router.push('/signin');
         } else {
           // Rediriger selon le rôle
           if (formData.role === 'employer') {
@@ -422,7 +422,7 @@ export default function SignUpPage() {
                   <p className="text-xs sm:text-sm text-slate-600">
                     Vous avez déjà un compte ?{' '}
                     <Link
-                      href="/auth/signin"
+                      href="/signin"
                       className="font-semibold text-[var(--color-brand-green)] hover:text-[var(--color-brand-green)]/80 transition-colors duration-300 no-underline"
                     >
                       Se connecter

@@ -215,7 +215,7 @@ export default function ForgotPasswordPage() {
                     {/* Back to sign in */}
                     <div className="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-slate-200 text-center">
                       <Link
-                        href="/auth/signin"
+                        href="/signin"
                         className="inline-flex items-center gap-2 text-sm font-medium text-[var(--color-brand-green)] hover:text-[var(--color-brand-green)]/80 transition-colors duration-300 no-underline"
                       >
                         <ArrowLeftIcon className="w-4 h-4" />
@@ -310,7 +310,7 @@ export default function ForgotPasswordPage() {
                     {/* Back to sign in */}
                     <div className="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-slate-200 text-center">
                       <Link
-                        href="/auth/signin"
+                        href="/signin"
                         className="inline-flex items-center gap-2 text-sm font-medium text-[var(--color-brand-green)] hover:text-[var(--color-brand-green)]/80 transition-colors duration-300 no-underline"
                       >
                         <ArrowLeftIcon className="w-4 h-4" />

@@ -235,7 +235,7 @@ export default function SignInPage() {
                       <span className="text-xs sm:text-sm text-slate-600 group-hover:text-slate-900 transition-colors">Se souvenir de moi</span>
                     </label>
                     <Link
-                      href="/auth/forgot-password"
+                      href="/forgot-password"
                       className="text-xs sm:text-sm font-medium text-primary hover:text-primary/80 transition-colors duration-300 no-underline"
                     >
                       Mot de passe oublié ?
@@ -267,7 +267,7 @@ export default function SignInPage() {
                   <p className="text-xs sm:text-sm text-slate-600">
                     Première visite ?{' '}
                     <Link
-                      href="/auth/signup"
+                      href="/signup"
                       className="font-semibold text-primary hover:text-primary/80 transition-colors duration-300 no-underline"
                     >
                       Créer un compte professionnel

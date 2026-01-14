@@ -59,10 +59,10 @@ export default function Home() {
             </div>
 
             <div className="hidden sm:flex items-center space-x-3 sm:space-x-4">
-              <Link href="/auth/signin" className="text-slate-700 hover:text-(--color-brand-green) font-semibold transition-colors text-sm">
+              <Link href="/signin" className="text-slate-700 hover:text-(--color-brand-green) font-semibold transition-colors text-sm">
                 Connexion
               </Link>
-              <Link href="/auth/signup" className="btn btn-primary btn-sm rounded-full px-4 sm:px-6 normal-case font-semibold text-sm h-9 sm:h-10">
+              <Link href="/signup" className="btn btn-primary btn-sm rounded-full px-4 sm:px-6 normal-case font-semibold text-sm h-9 sm:h-10">
                 Inscription
               </Link>
             </div>
@@ -112,10 +112,10 @@ export default function Home() {
                   Témoignages
                 </a>
                 <div className="border-t border-slate-200 pt-3 flex flex-col space-y-2">
-                  <Link href="/auth/signin" className="text-slate-700 hover:text-(--color-brand-green) font-semibold transition-colors py-2 text-center">
+                  <Link href="/signin" className="text-slate-700 hover:text-(--color-brand-green) font-semibold transition-colors py-2 text-center">
                     Connexion
                   </Link>
-                  <Link href="/auth/signup" className="btn btn-primary rounded-full normal-case font-semibold w-full">
+                  <Link href="/signup" className="btn btn-primary rounded-full normal-case font-semibold w-full">
                     Inscription
                   </Link>
                 </div>
@@ -143,7 +143,7 @@ export default function Home() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-12 sm:mb-16 animate-fade-in animation-delay-300 px-4 sm:px-0">
-            <Link href="/auth/signup" className="btn btn-primary btn-md sm:btn-lg rounded-full px-8 sm:px-10 normal-case font-semibold text-sm sm:text-base">
+            <Link href="/signup" className="btn btn-primary btn-md sm:btn-lg rounded-full px-8 sm:px-10 normal-case font-semibold text-sm sm:text-base">
               Commencer gratuitement
             </Link>
             <button type="button" className="btn bg-white border-2 border-slate-300 text-slate-900 hover:bg-slate-50 hover:border-slate-400 btn-md sm:btn-lg rounded-full px-8 sm:px-10 normal-case font-semibold text-sm sm:text-base transition-all duration-300">
@@ -257,7 +257,7 @@ export default function Home() {
                   </li>
                 ))}
               </ul>
-              <Link href="/auth/signup" className="btn btn-primary rounded-full px-6 sm:px-8 mt-6 sm:mt-8 normal-case font-semibold w-full sm:w-auto">
+              <Link href="/signup" className="btn btn-primary rounded-full px-6 sm:px-8 mt-6 sm:mt-8 normal-case font-semibold w-full sm:w-auto">
                 Créer mon profil
               </Link>
             </div>
@@ -286,7 +286,7 @@ export default function Home() {
                   </li>
                 ))}
               </ul>
-              <Link href="/auth/signup" className="btn btn-accent rounded-full px-6 sm:px-8 mt-6 sm:mt-8 normal-case font-semibold w-full sm:w-auto">
+              <Link href="/signup" className="btn btn-accent rounded-full px-6 sm:px-8 mt-6 sm:mt-8 normal-case font-semibold w-full sm:w-auto">
                 Créer mon espace
               </Link>
             </div>
@@ -417,7 +417,7 @@ export default function Home() {
             Rejoignez les milliers de professionnels qui ont fait le choix de l'excellence avec INTOWORK.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-6 sm:mb-8 px-4 sm:px-0">
-            <Link href="/auth/signup" className="btn btn-primary btn-md sm:btn-lg rounded-full px-8 sm:px-12 normal-case font-bold text-sm sm:text-base">
+            <Link href="/signup" className="btn btn-primary btn-md sm:btn-lg rounded-full px-8 sm:px-12 normal-case font-bold text-sm sm:text-base">
               Créer mon compte gratuit
             </Link>
             <button type="button" className="btn bg-white border-2 border-slate-300 text-slate-900 hover:bg-slate-50 hover:border-slate-400 btn-md sm:btn-lg rounded-full px-8 sm:px-12 normal-case font-semibold text-sm sm:text-base transition-all duration-300">

@@ -59,7 +59,7 @@ export default function EmployerOnboardingPage() {
       
       if (!token) {
         toast.error('Session expirée. Veuillez vous reconnecter.');
-        router.push('/auth/signin');
+        router.push('/signin');
         return;
       }
       
