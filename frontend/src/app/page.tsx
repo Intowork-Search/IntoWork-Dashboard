@@ -26,7 +26,7 @@ export default function Home() {
   if (!isLoaded) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="loading loading-spinner loading-lg text-[var(--color-brand-green)]"></div>
+        <div className="loading loading-spinner loading-lg text-(--color-brand-green)"></div>
       </div>
     );
   }
@@ -38,7 +38,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16 sm:h-20">
             <div className="flex items-center space-x-2 sm:space-x-3">
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[var(--color-brand-green)] flex items-center justify-center">
+              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-(--color-brand-green) flex items-center justify-center">
                 <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
@@ -47,19 +47,19 @@ export default function Home() {
             </div>
 
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-slate-600 hover:text-[var(--color-brand-green)] font-medium transition-colors text-sm">
+              <a href="#features" className="text-slate-600 hover:text-(--color-brand-green) font-medium transition-colors text-sm">
                 Fonctionnalités
               </a>
-              <a href="#how-it-works" className="text-slate-600 hover:text-[var(--color-brand-green)] font-medium transition-colors text-sm">
+              <a href="#how-it-works" className="text-slate-600 hover:text-(--color-brand-green) font-medium transition-colors text-sm">
                 Comment ça marche
               </a>
-              <a href="#testimonials" className="text-slate-600 hover:text-[var(--color-brand-green)] font-medium transition-colors text-sm">
+              <a href="#testimonials" className="text-slate-600 hover:text-(--color-brand-green) font-medium transition-colors text-sm">
                 Témoignages
               </a>
             </div>
 
             <div className="hidden sm:flex items-center space-x-3 sm:space-x-4">
-              <Link href="/auth/signin" className="text-slate-700 hover:text-[var(--color-brand-green)] font-semibold transition-colors text-sm">
+              <Link href="/auth/signin" className="text-slate-700 hover:text-(--color-brand-green) font-semibold transition-colors text-sm">
                 Connexion
               </Link>
               <Link href="/auth/signup" className="btn btn-primary btn-sm rounded-full px-4 sm:px-6 normal-case font-semibold text-sm h-9 sm:h-10">
@@ -92,27 +92,27 @@ export default function Home() {
               <div className="flex flex-col space-y-3">
                 <a
                   href="#features"
-                  className="text-slate-600 hover:text-[var(--color-brand-green)] font-medium transition-colors py-2"
+                  className="text-slate-600 hover:text-(--color-brand-green) font-medium transition-colors py-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Fonctionnalités
                 </a>
                 <a
                   href="#how-it-works"
-                  className="text-slate-600 hover:text-[var(--color-brand-green)] font-medium transition-colors py-2"
+                  className="text-slate-600 hover:text-(--color-brand-green) font-medium transition-colors py-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Comment ça marche
                 </a>
                 <a
                   href="#testimonials"
-                  className="text-slate-600 hover:text-[var(--color-brand-green)] font-medium transition-colors py-2"
+                  className="text-slate-600 hover:text-(--color-brand-green) font-medium transition-colors py-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Témoignages
                 </a>
                 <div className="border-t border-slate-200 pt-3 flex flex-col space-y-2">
-                  <Link href="/auth/signin" className="text-slate-700 hover:text-[var(--color-brand-green)] font-semibold transition-colors py-2 text-center">
+                  <Link href="/auth/signin" className="text-slate-700 hover:text-(--color-brand-green) font-semibold transition-colors py-2 text-center">
                     Connexion
                   </Link>
                   <Link href="/auth/signup" className="btn btn-primary rounded-full normal-case font-semibold w-full">
@@ -128,14 +128,14 @@ export default function Home() {
       {/* Hero Section */}
       <section className="pt-24 pb-16 sm:pt-32 sm:pb-24 lg:pt-48 lg:pb-32 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center space-x-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[var(--green-100)] mb-6 sm:mb-8 animate-fade-in">
-            <span className="w-2 h-2 bg-[var(--color-brand-green)] rounded-full"></span>
-            <span className="text-xs sm:text-sm font-semibold text-[var(--color-brand-green)]">IA de recrutement nouvelle génération</span>
+          <div className="inline-flex items-center space-x-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-(--green-100) mb-6 sm:mb-8 animate-fade-in">
+            <span className="w-2 h-2 bg-(--color-brand-green) rounded-full"></span>
+            <span className="text-xs sm:text-sm font-semibold text-(--color-brand-green)">IA de recrutement nouvelle génération</span>
           </div>
 
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl xl:text-8xl font-bold text-slate-900 mb-6 sm:mb-8 leading-[1.15] sm:leading-[1.1] tracking-tight animate-fade-in animation-delay-100">
             Trouvez votre talent idéal.{' '}
-            <span className="text-[var(--color-brand-green)]">Trouvez votre emploi parfait.</span>
+            <span className="text-(--color-brand-green)">Trouvez votre emploi parfait.</span>
           </h1>
 
           <p className="text-base sm:text-lg lg:text-xl xl:text-2xl text-slate-600 mb-8 sm:mb-12 max-w-3xl mx-auto leading-relaxed animate-fade-in animation-delay-200">
@@ -153,15 +153,15 @@ export default function Home() {
 
           <div className="grid grid-cols-3 gap-4 sm:gap-8 lg:gap-16 max-w-2xl mx-auto animate-fade-in animation-delay-400">
             <div>
-              <div className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-[var(--color-brand-green)] mb-1 sm:mb-2">10K+</div>
+              <div className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-(--color-brand-green) mb-1 sm:mb-2">10K+</div>
               <div className="text-xs sm:text-sm text-slate-600">Candidats</div>
             </div>
             <div>
-              <div className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-[var(--color-brand-violet)] mb-1 sm:mb-2">500+</div>
+              <div className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-(--color-brand-violet) mb-1 sm:mb-2">500+</div>
               <div className="text-xs sm:text-sm text-slate-600">Entreprises</div>
             </div>
             <div>
-              <div className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-[var(--color-brand-gold)] mb-1 sm:mb-2">95%</div>
+              <div className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-(--color-brand-gold) mb-1 sm:mb-2">95%</div>
               <div className="text-xs sm:text-sm text-slate-600">Satisfaction</div>
             </div>
           </div>
@@ -169,7 +169,7 @@ export default function Home() {
       </section>
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="py-16 sm:py-24 lg:py-32 bg-[var(--color-brand-green)]">
+      <section id="how-it-works" className="py-16 sm:py-24 lg:py-32 bg-(--color-brand-green)">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12 sm:mb-20">
             <span className="inline-block px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white/20 text-white text-xs sm:text-sm font-semibold mb-4 sm:mb-6">
@@ -185,7 +185,7 @@ export default function Home() {
 
           <div className="grid md:grid-cols-3 gap-6 sm:gap-8 lg:gap-12">
             <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-12 border border-slate-200 hover:shadow-xl transition-all duration-300">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-xl sm:rounded-2xl bg-[var(--color-brand-green)] flex items-center justify-center mb-5 sm:mb-6 lg:mb-8">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-xl sm:rounded-2xl bg-(--color-brand-green) flex items-center justify-center mb-5 sm:mb-6 lg:mb-8">
                 <span className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">1</span>
               </div>
               <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 mb-3 sm:mb-4 lg:mb-5">Créez votre profil</h3>
@@ -195,7 +195,7 @@ export default function Home() {
             </div>
 
             <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-12 border border-slate-200 hover:shadow-xl transition-all duration-300">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-xl sm:rounded-2xl bg-[var(--color-brand-violet)] flex items-center justify-center mb-5 sm:mb-6 lg:mb-8">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-xl sm:rounded-2xl bg-(--color-brand-violet) flex items-center justify-center mb-5 sm:mb-6 lg:mb-8">
                 <span className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">2</span>
               </div>
               <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 mb-3 sm:mb-4 lg:mb-5">IA de matching</h3>
@@ -205,7 +205,7 @@ export default function Home() {
             </div>
 
             <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-12 border border-slate-200 hover:shadow-xl transition-all duration-300">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-xl sm:rounded-2xl bg-[var(--color-brand-gold)] flex items-center justify-center mb-5 sm:mb-6 lg:mb-8">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-xl sm:rounded-2xl bg-(--color-brand-gold) flex items-center justify-center mb-5 sm:mb-6 lg:mb-8">
                 <span className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900">3</span>
               </div>
               <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 mb-3 sm:mb-4 lg:mb-5">Connectez-vous</h3>
@@ -221,7 +221,7 @@ export default function Home() {
       <section id="features" className="py-16 sm:py-24 lg:py-32 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12 sm:mb-20">
-            <span className="inline-block px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[var(--green-100)] text-[var(--color-brand-green)] text-xs sm:text-sm font-semibold mb-4 sm:mb-6">
+            <span className="inline-block px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-(--green-100) text-(--color-brand-green) text-xs sm:text-sm font-semibold mb-4 sm:mb-6">
               Fonctionnalités
             </span>
             <h2 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-slate-900 mb-4 sm:mb-6 tracking-tight px-4">
@@ -234,8 +234,8 @@ export default function Home() {
 
           <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 mb-8 sm:mb-12">
             {/* Candidates */}
-            <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-12 border-2 border-[var(--green-200)] hover:border-[var(--color-brand-green)] transition-all duration-300">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl bg-[var(--color-brand-green)] flex items-center justify-center mb-5 sm:mb-6 lg:mb-8">
+            <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-12 border-2 border-(--green-200) hover:border-(--color-brand-green) transition-all duration-300">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl bg-(--color-brand-green) flex items-center justify-center mb-5 sm:mb-6 lg:mb-8">
                 <svg className="w-6 h-6 sm:w-7 sm:h-7 lg:w-9 lg:h-9 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
@@ -250,7 +250,7 @@ export default function Home() {
                   'Suivi de candidatures'
                 ].map((feature, i) => (
                   <li key={i} className="flex items-start space-x-2 sm:space-x-3">
-                    <svg className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--color-brand-green)] flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <svg className="w-5 h-5 sm:w-6 sm:h-6 text-(--color-brand-green) shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                     <span className="text-slate-700 text-sm sm:text-base lg:text-lg">{feature}</span>
@@ -263,8 +263,8 @@ export default function Home() {
             </div>
 
             {/* Employers */}
-            <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-12 border-2 border-[var(--violet-200)] hover:border-[var(--color-brand-violet)] transition-all duration-300">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl bg-[var(--color-brand-violet)] flex items-center justify-center mb-5 sm:mb-6 lg:mb-8">
+            <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-12 border-2 border-(--violet-200) hover:border-(--color-brand-violet) transition-all duration-300">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl bg-(--color-brand-violet) flex items-center justify-center mb-5 sm:mb-6 lg:mb-8">
                 <svg className="w-6 h-6 sm:w-7 sm:h-7 lg:w-9 lg:h-9 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
@@ -279,7 +279,7 @@ export default function Home() {
                   'Analytics détaillées'
                 ].map((feature, i) => (
                   <li key={i} className="flex items-start space-x-2 sm:space-x-3">
-                    <svg className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--color-brand-violet)] flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <svg className="w-5 h-5 sm:w-6 sm:h-6 text-(--color-brand-violet) shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                     <span className="text-slate-700 text-sm sm:text-base lg:text-lg">{feature}</span>
@@ -295,8 +295,8 @@ export default function Home() {
           {/* Additional Features */}
           <div className="grid md:grid-cols-3 gap-4 sm:gap-6 mt-8 sm:mt-12">
             <div className="bg-slate-50 rounded-xl sm:rounded-2xl p-6 sm:p-8 text-center">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl bg-[var(--green-100)] flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                <svg className="w-6 h-6 sm:w-7 sm:h-7 text-[var(--color-brand-green)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl bg-(--green-100) flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                <svg className="w-6 h-6 sm:w-7 sm:h-7 text-(--color-brand-green)" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
               </div>
@@ -305,8 +305,8 @@ export default function Home() {
             </div>
 
             <div className="bg-slate-50 rounded-xl sm:rounded-2xl p-6 sm:p-8 text-center">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl bg-[var(--violet-100)] flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                <svg className="w-6 h-6 sm:w-7 sm:h-7 text-[var(--color-brand-violet)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl bg-(--violet-100) flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                <svg className="w-6 h-6 sm:w-7 sm:h-7 text-(--color-brand-violet)" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
@@ -315,8 +315,8 @@ export default function Home() {
             </div>
 
             <div className="bg-slate-50 rounded-xl sm:rounded-2xl p-6 sm:p-8 text-center">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl bg-[var(--gold-100)] flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                <svg className="w-6 h-6 sm:w-7 sm:h-7 text-[var(--color-brand-gold)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl bg-(--gold-100) flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                <svg className="w-6 h-6 sm:w-7 sm:h-7 text-(--color-brand-gold)" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
               </div>
@@ -328,7 +328,7 @@ export default function Home() {
       </section>
 
       {/* Testimonials Section */}
-      <section id="testimonials" className="py-16 sm:py-24 lg:py-32 bg-[var(--color-brand-violet)]">
+      <section id="testimonials" className="py-16 sm:py-24 lg:py-32 bg-(--color-brand-violet)">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12 sm:mb-20">
             <span className="inline-block px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white/20 text-white text-xs sm:text-sm font-semibold mb-4 sm:mb-6">
@@ -355,7 +355,7 @@ export default function Home() {
                 "Emploi de rêve trouvé en deux semaines. Le matching IA est impressionnant."
               </p>
               <div className="flex items-center space-x-3 sm:space-x-4">
-                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[var(--color-brand-green)] flex-shrink-0"></div>
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-(--color-brand-green) shrink-0"></div>
                 <div>
                   <div className="font-bold text-base sm:text-lg text-slate-900">Sophie Martin</div>
                   <div className="text-sm sm:text-base text-slate-600">UX Designer</div>
@@ -375,7 +375,7 @@ export default function Home() {
                 "INTOWORK a transformé notre processus. Gain de temps énorme sur chaque embauche."
               </p>
               <div className="flex items-center space-x-3 sm:space-x-4">
-                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[var(--color-brand-violet)] flex-shrink-0"></div>
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-(--color-brand-violet) shrink-0"></div>
                 <div>
                   <div className="font-bold text-base sm:text-lg text-slate-900">Pierre Durand</div>
                   <div className="text-sm sm:text-base text-slate-600">RH Manager</div>
@@ -395,7 +395,7 @@ export default function Home() {
                 "Interface intuitive, fonctionnalités complètes. Exactement ce qu'il nous fallait."
               </p>
               <div className="flex items-center space-x-3 sm:space-x-4">
-                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[var(--color-brand-gold)] flex-shrink-0"></div>
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-(--color-brand-gold) shrink-0"></div>
                 <div>
                   <div className="font-bold text-base sm:text-lg text-slate-900">Laura Chen</div>
                   <div className="text-sm sm:text-base text-slate-600">CEO</div>
@@ -411,7 +411,7 @@ export default function Home() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-slate-900 mb-6 sm:mb-8 tracking-tight">
             Prêt à transformer votre{' '}
-            <span className="text-[var(--color-brand-green)] font-extrabold">carrière</span> ?
+            <span className="text-(--color-brand-green) font-extrabold">carrière</span> ?
           </h2>
           <p className="text-base sm:text-lg lg:text-xl text-slate-700 mb-8 sm:mb-12 max-w-2xl mx-auto leading-relaxed px-4">
             Rejoignez les milliers de professionnels qui ont fait le choix de l'excellence avec INTOWORK.
@@ -436,7 +436,7 @@ export default function Home() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12 mb-12 sm:mb-16">
             <div className="col-span-2 md:col-span-1">
               <div className="flex items-center space-x-2 sm:space-x-3 mb-4 sm:mb-6">
-                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[var(--color-brand-green)] flex items-center justify-center">
+                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-(--color-brand-green) flex items-center justify-center">
                   <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
@@ -451,30 +451,30 @@ export default function Home() {
             <div>
               <h4 className="font-bold mb-3 sm:mb-4 text-white text-sm sm:text-base">Produit</h4>
               <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
-                <li><a href="#features" className="text-slate-400 hover:text-[var(--color-brand-green)] transition-colors">Fonctionnalités</a></li>
-                <li><a href="#how-it-works" className="text-slate-400 hover:text-[var(--color-brand-green)] transition-colors">Comment ça marche</a></li>
-                <li><a href="#" className="text-slate-400 hover:text-[var(--color-brand-green)] transition-colors">Tarifs</a></li>
-                <li><a href="#" className="text-slate-400 hover:text-[var(--color-brand-green)] transition-colors">Changelog</a></li>
+                <li><a href="#features" className="text-slate-400 hover:text-(--color-brand-green) transition-colors">Fonctionnalités</a></li>
+                <li><a href="#how-it-works" className="text-slate-400 hover:text-(--color-brand-green) transition-colors">Comment ça marche</a></li>
+                <li><a href="#" className="text-slate-400 hover:text-(--color-brand-green) transition-colors">Tarifs</a></li>
+                <li><a href="#" className="text-slate-400 hover:text-(--color-brand-green) transition-colors">Changelog</a></li>
               </ul>
             </div>
 
             <div>
               <h4 className="font-bold mb-3 sm:mb-4 text-white text-sm sm:text-base">Entreprise</h4>
               <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
-                <li><a href="#" className="text-slate-400 hover:text-[var(--color-brand-green)] transition-colors">À propos</a></li>
-                <li><a href="#" className="text-slate-400 hover:text-[var(--color-brand-green)] transition-colors">Blog</a></li>
-                <li><a href="#" className="text-slate-400 hover:text-[var(--color-brand-green)] transition-colors">Carrières</a></li>
-                <li><a href="#" className="text-slate-400 hover:text-[var(--color-brand-green)] transition-colors">Contact</a></li>
+                <li><a href="#" className="text-slate-400 hover:text-(--color-brand-green) transition-colors">À propos</a></li>
+                <li><a href="#" className="text-slate-400 hover:text-(--color-brand-green) transition-colors">Blog</a></li>
+                <li><a href="#" className="text-slate-400 hover:text-(--color-brand-green) transition-colors">Carrières</a></li>
+                <li><a href="#" className="text-slate-400 hover:text-(--color-brand-green) transition-colors">Contact</a></li>
               </ul>
             </div>
 
             <div>
               <h4 className="font-bold mb-3 sm:mb-4 text-white text-sm sm:text-base">Légal</h4>
               <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
-                <li><a href="#" className="text-slate-400 hover:text-[var(--color-brand-green)] transition-colors">Conditions</a></li>
-                <li><a href="#" className="text-slate-400 hover:text-[var(--color-brand-green)] transition-colors">Confidentialité</a></li>
-                <li><a href="#" className="text-slate-400 hover:text-[var(--color-brand-green)] transition-colors">Mentions légales</a></li>
-                <li><a href="#" className="text-slate-400 hover:text-[var(--color-brand-green)] transition-colors">Cookies</a></li>
+                <li><a href="#" className="text-slate-400 hover:text-(--color-brand-green) transition-colors">Conditions</a></li>
+                <li><a href="#" className="text-slate-400 hover:text-(--color-brand-green) transition-colors">Confidentialité</a></li>
+                <li><a href="#" className="text-slate-400 hover:text-(--color-brand-green) transition-colors">Mentions légales</a></li>
+                <li><a href="#" className="text-slate-400 hover:text-(--color-brand-green) transition-colors">Cookies</a></li>
               </ul>
             </div>
           </div>
@@ -484,17 +484,17 @@ export default function Home() {
               © 2026 INTOWORK. Tous droits réservés.
             </p>
             <div className="flex items-center space-x-4 sm:space-x-6">
-              <a href="#" className="text-slate-400 hover:text-[var(--color-brand-green)] transition-colors" aria-label="Twitter">
+              <a href="#" className="text-slate-400 hover:text-(--color-brand-green) transition-colors" aria-label="Twitter">
                 <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
                 </svg>
               </a>
-              <a href="#" className="text-slate-400 hover:text-[var(--color-brand-green)] transition-colors" aria-label="LinkedIn">
+              <a href="#" className="text-slate-400 hover:text-(--color-brand-green) transition-colors" aria-label="LinkedIn">
                 <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
                 </svg>
               </a>
-              <a href="#" className="text-slate-400 hover:text-[var(--color-brand-green)] transition-colors" aria-label="GitHub">
+              <a href="#" className="text-slate-400 hover:text-(--color-brand-green) transition-colors" aria-label="GitHub">
                 <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
                 </svg>
