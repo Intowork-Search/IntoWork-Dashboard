@@ -37,14 +37,13 @@ export default function Home() {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16 sm:h-20">
-            <div className="flex items-center space-x-2 sm:space-x-3">
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-(--color-brand-green) flex items-center justify-center">
-                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <span className="text-lg sm:text-xl font-bold text-slate-900">INTOWORK</span>
-            </div>
+            <Link href="/" className="flex items-center space-x-2 sm:space-x-3">
+              <img 
+                src="/logo-intowork.png" 
+                alt="INTOWORK" 
+                className="h-8 sm:h-10 w-auto"
+              />
+            </Link>
 
             <div className="hidden md:flex items-center space-x-8">
               <a href="#features" className="text-slate-600 hover:text-green-600 font-medium transition-colors text-sm">
@@ -445,14 +444,13 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12 mb-12 sm:mb-16">
             <div className="col-span-2 md:col-span-1">
-              <div className="flex items-center space-x-2 sm:space-x-3 mb-4 sm:mb-6">
-                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-(--color-brand-green) flex items-center justify-center">
-                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                </div>
-                <span className="text-lg sm:text-xl font-bold">INTOWORK</span>
-              </div>
+              <Link href="/" className="inline-block mb-4 sm:mb-6">
+                <img 
+                  src="/logo-intowork.png" 
+                  alt="INTOWORK" 
+                  className="h-8 sm:h-9 w-auto brightness-0 invert"
+                />
+              </Link>
               <p className="text-slate-400 text-xs sm:text-sm leading-relaxed">
                 Plateforme B2B2C de recrutement par IA
               </p>
