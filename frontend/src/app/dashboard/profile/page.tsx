@@ -43,10 +43,10 @@ const skillLevelToNumber = (level: string): number => {
 
 const getSkillColor = (category: string) => {
   switch (category) {
-    case 'technical': return { bg: 'var(--navy-100)', text: 'var(--navy-700)' };
+    case 'technical': return { bg: '#F1F5F9', text: '#334155' };
     case 'soft': return { bg: 'var(--sage-100)', text: 'var(--sage-700)' };
     case 'language': return { bg: '#EDE9FE', text: '#6B21A8' };
-    default: return { bg: 'var(--navy-50)', text: 'var(--navy-600)' };
+    default: return { bg: '#F8FAFC', text: '#475569' };
   }
 };
 
@@ -235,9 +235,9 @@ export default function ProfilePage() {
 
       {/* En-tête avec progression */}
       <div className="rounded-2xl p-6 mb-8 animate-elegant-fade-in" style={{
-        background: 'var(--surface)',
-        border: '1px solid var(--border-subtle)',
-        boxShadow: 'var(--shadow-md)',
+        background: '#FFFFFF',
+        border: '1px solid #E2E8F0',
+        boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
       }}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-4">
@@ -248,24 +248,24 @@ export default function ProfilePage() {
             </div>
             <div>
               <h2 className="text-2xl font-bold" style={{
-                color: 'var(--navy-900)',
+                color: '#0F172A',
                 fontFamily: 'var(--font-display)',
               }}>
                 {user?.firstName} {user?.lastName}
               </h2>
-              <p style={{ color: 'var(--navy-600)' }}>
+              <p style={{ color: '#475569' }}>
                 {profile.title || 'Aucun titre défini'}
               </p>
             </div>
           </div>
           <div className="text-right">
             <p className="text-3xl font-bold mb-1" style={{
-              color: 'var(--navy-900)',
+              color: '#0F172A',
               fontFamily: 'var(--font-display)',
             }}>
               {completionPercentage}%
             </p>
-            <p className="text-sm" style={{ color: 'var(--navy-600)' }}>
+            <p className="text-sm" style={{ color: '#475569' }}>
               Profil complété
             </p>
           </div>
@@ -273,7 +273,7 @@ export default function ProfilePage() {
 
         {/* Barre de progression */}
         <div className="w-full h-3 rounded-full overflow-hidden" style={{
-          background: 'var(--navy-100)',
+          background: '#F1F5F9',
         }}>
           <div
             className="h-full transition-all duration-500"
@@ -289,9 +289,9 @@ export default function ProfilePage() {
         {/* Navigation latérale */}
         <div className="lg:col-span-1 animate-elegant-fade-in" style={{ animationDelay: '100ms' }}>
           <div className="rounded-2xl p-4 space-y-2" style={{
-            background: 'var(--surface)',
-            border: '1px solid var(--border-subtle)',
-            boxShadow: 'var(--shadow-md)',
+            background: '#FFFFFF',
+            border: '1px solid #E2E8F0',
+            boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
           }}>
             {[
               { id: 'personal', label: 'Informations', icon: UserIcon },
@@ -308,10 +308,10 @@ export default function ProfilePage() {
                   onClick={() => setActiveSection(section.id)}
                   className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-300"
                   style={{
-                    background: isActive ? 'var(--navy-900)' : 'transparent',
-                    color: isActive ? 'white' : 'var(--navy-700)',
+                    background: isActive ? '#0F172A' : 'transparent',
+                    color: isActive ? 'white' : '#334155',
                   }}
-                  onMouseEnter={(e) => !isActive && (e.currentTarget.style.background = 'var(--navy-50)')}
+                  onMouseEnter={(e) => !isActive && (e.currentTarget.style.background = '#F8FAFC')}
                   onMouseLeave={(e) => !isActive && (e.currentTarget.style.background = 'transparent')}
                 >
                   <Icon className="w-5 h-5" />
@@ -325,17 +325,17 @@ export default function ProfilePage() {
         {/* Contenu principal */}
         <div className="lg:col-span-3 animate-elegant-fade-in" style={{ animationDelay: '200ms' }}>
           <div className="rounded-2xl" style={{
-            background: 'var(--surface)',
-            border: '1px solid var(--border-subtle)',
-            boxShadow: 'var(--shadow-md)',
+            background: '#FFFFFF',
+            border: '1px solid #E2E8F0',
+            boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
           }}>
             {/* En-tête de section */}
             <div className="p-6 flex justify-between items-center" style={{
-              borderBottom: '1px solid var(--border-subtle)',
+              borderBottom: '1px solid #E2E8F0',
             }}>
               <div>
                 <h3 className="text-xl font-bold" style={{
-                  color: 'var(--navy-900)',
+                  color: '#0F172A',
                   fontFamily: 'var(--font-display)',
                 }}>
                   {activeSection === 'personal' && 'Informations personnelles'}
@@ -380,11 +380,11 @@ export default function ProfilePage() {
                       onClick={() => setIsEditing(false)}
                       className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-300"
                       style={{
-                        background: 'var(--navy-100)',
-                        color: 'var(--navy-700)',
+                        background: '#F1F5F9',
+                        color: '#334155',
                       }}
-                      onMouseEnter={(e) => e.currentTarget.style.background = 'var(--navy-200)'}
-                      onMouseLeave={(e) => e.currentTarget.style.background = 'var(--navy-100)'}
+                      onMouseEnter={(e) => e.currentTarget.style.background = '#E2E8F0'}
+                      onMouseLeave={(e) => e.currentTarget.style.background = '#F1F5F9'}
                     >
                       <XMarkIcon className="w-4 h-4" />
                       <span>Annuler</span>
@@ -402,7 +402,7 @@ export default function ProfilePage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Téléphone */}
                     <div>
-                      <label className="block mb-2 font-medium" style={{ color: 'var(--navy-900)' }}>
+                      <label className="block mb-2 font-medium" style={{ color: '#0F172A' }}>
                         <PhoneIcon className="w-4 h-4 inline mr-2" />
                         Téléphone
                       </label>
@@ -413,22 +413,22 @@ export default function ProfilePage() {
                           onChange={(e) => updateProfile({ phone: e.target.value })}
                           className="w-full px-4 py-3 rounded-xl transition-all duration-300 focus:outline-none"
                           style={{
-                            background: 'var(--navy-50)',
-                            border: '1px solid var(--border-subtle)',
-                            color: 'var(--navy-900)',
+                            background: '#F8FAFC',
+                            border: '1px solid #E2E8F0',
+                            color: '#0F172A',
                           }}
                           onFocus={(e) => {
                             e.currentTarget.style.borderColor = 'var(--gold-600)';
                             e.currentTarget.style.boxShadow = '0 0 0 3px rgba(217, 119, 6, 0.1)';
                           }}
                           onBlur={(e) => {
-                            e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                            e.currentTarget.style.borderColor = '#E2E8F0';
                             e.currentTarget.style.boxShadow = 'none';
                           }}
                           placeholder="+33 6 12 34 56 78"
                         />
                       ) : (
-                        <p style={{ color: 'var(--navy-700)' }}>
+                        <p style={{ color: '#334155' }}>
                           {profile.phone || 'Non renseigné'}
                         </p>
                       )}
@@ -436,7 +436,7 @@ export default function ProfilePage() {
 
                     {/* Localisation */}
                     <div>
-                      <label className="block mb-2 font-medium" style={{ color: 'var(--navy-900)' }}>
+                      <label className="block mb-2 font-medium" style={{ color: '#0F172A' }}>
                         <MapPinIcon className="w-4 h-4 inline mr-2" />
                         Localisation
                       </label>
@@ -447,22 +447,22 @@ export default function ProfilePage() {
                           onChange={(e) => updateProfile({ location: e.target.value })}
                           className="w-full px-4 py-3 rounded-xl transition-all duration-300 focus:outline-none"
                           style={{
-                            background: 'var(--navy-50)',
-                            border: '1px solid var(--border-subtle)',
-                            color: 'var(--navy-900)',
+                            background: '#F8FAFC',
+                            border: '1px solid #E2E8F0',
+                            color: '#0F172A',
                           }}
                           onFocus={(e) => {
                             e.currentTarget.style.borderColor = 'var(--gold-600)';
                             e.currentTarget.style.boxShadow = '0 0 0 3px rgba(217, 119, 6, 0.1)';
                           }}
                           onBlur={(e) => {
-                            e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                            e.currentTarget.style.borderColor = '#E2E8F0';
                             e.currentTarget.style.boxShadow = 'none';
                           }}
                           placeholder="Paris, France"
                         />
                       ) : (
-                        <p style={{ color: 'var(--navy-700)' }}>
+                        <p style={{ color: '#334155' }}>
                           {profile.location || 'Non renseigné'}
                         </p>
                       )}
@@ -471,7 +471,7 @@ export default function ProfilePage() {
 
                   {/* Titre */}
                   <div>
-                    <label className="block mb-2 font-medium" style={{ color: 'var(--navy-900)' }}>
+                    <label className="block mb-2 font-medium" style={{ color: '#0F172A' }}>
                       <BriefcaseIcon className="w-4 h-4 inline mr-2" />
                       Titre professionnel
                     </label>
@@ -482,22 +482,22 @@ export default function ProfilePage() {
                         onChange={(e) => updateProfile({ title: e.target.value })}
                         className="w-full px-4 py-3 rounded-xl transition-all duration-300 focus:outline-none"
                         style={{
-                          background: 'var(--navy-50)',
-                          border: '1px solid var(--border-subtle)',
-                          color: 'var(--navy-900)',
+                          background: '#F8FAFC',
+                          border: '1px solid #E2E8F0',
+                          color: '#0F172A',
                         }}
                         onFocus={(e) => {
                           e.currentTarget.style.borderColor = 'var(--gold-600)';
                           e.currentTarget.style.boxShadow = '0 0 0 3px rgba(217, 119, 6, 0.1)';
                         }}
                         onBlur={(e) => {
-                          e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                          e.currentTarget.style.borderColor = '#E2E8F0';
                           e.currentTarget.style.boxShadow = 'none';
                         }}
                         placeholder="ex: Développeur Full Stack"
                       />
                     ) : (
-                      <p style={{ color: 'var(--navy-700)' }}>
+                      <p style={{ color: '#334155' }}>
                         {profile.title || 'Non renseigné'}
                       </p>
                     )}
@@ -505,7 +505,7 @@ export default function ProfilePage() {
 
                   {/* Résumé */}
                   <div>
-                    <label className="block mb-2 font-medium" style={{ color: 'var(--navy-900)' }}>
+                    <label className="block mb-2 font-medium" style={{ color: '#0F172A' }}>
                       Résumé professionnel
                     </label>
                     {isEditing ? (
@@ -515,22 +515,22 @@ export default function ProfilePage() {
                         rows={5}
                         className="w-full px-4 py-3 rounded-xl transition-all duration-300 focus:outline-none resize-none"
                         style={{
-                          background: 'var(--navy-50)',
-                          border: '1px solid var(--border-subtle)',
-                          color: 'var(--navy-900)',
+                          background: '#F8FAFC',
+                          border: '1px solid #E2E8F0',
+                          color: '#0F172A',
                         }}
                         onFocus={(e) => {
                           e.currentTarget.style.borderColor = 'var(--gold-600)';
                           e.currentTarget.style.boxShadow = '0 0 0 3px rgba(217, 119, 6, 0.1)';
                         }}
                         onBlur={(e) => {
-                          e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                          e.currentTarget.style.borderColor = '#E2E8F0';
                           e.currentTarget.style.boxShadow = 'none';
                         }}
                         placeholder="Décrivez votre parcours et vos objectifs..."
                       />
                     ) : (
-                      <p className="whitespace-pre-wrap" style={{ color: 'var(--navy-700)' }}>
+                      <p className="whitespace-pre-wrap" style={{ color: '#334155' }}>
                         {profile.summary || 'Non renseigné'}
                       </p>
                     )}
@@ -539,7 +539,7 @@ export default function ProfilePage() {
                   {/* Liens */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block mb-2 font-medium" style={{ color: 'var(--navy-900)' }}>
+                      <label className="block mb-2 font-medium" style={{ color: '#0F172A' }}>
                         <LinkIcon className="w-4 h-4 inline mr-2" />
                         LinkedIn
                       </label>
@@ -550,22 +550,22 @@ export default function ProfilePage() {
                           onChange={(e) => updateProfile({ linkedin_url: e.target.value })}
                           className="w-full px-4 py-3 rounded-xl transition-all duration-300 focus:outline-none"
                           style={{
-                            background: 'var(--navy-50)',
-                            border: '1px solid var(--border-subtle)',
-                            color: 'var(--navy-900)',
+                            background: '#F8FAFC',
+                            border: '1px solid #E2E8F0',
+                            color: '#0F172A',
                           }}
                           onFocus={(e) => {
                             e.currentTarget.style.borderColor = 'var(--gold-600)';
                             e.currentTarget.style.boxShadow = '0 0 0 3px rgba(217, 119, 6, 0.1)';
                           }}
                           onBlur={(e) => {
-                            e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                            e.currentTarget.style.borderColor = '#E2E8F0';
                             e.currentTarget.style.boxShadow = 'none';
                           }}
                           placeholder="https://linkedin.com/in/..."
                         />
                       ) : (
-                        <p style={{ color: 'var(--navy-700)' }}>
+                        <p style={{ color: '#334155' }}>
                           {profile.linkedin_url ? (
                             <a
                               href={profile.linkedin_url}
@@ -584,7 +584,7 @@ export default function ProfilePage() {
                     </div>
 
                     <div>
-                      <label className="block mb-2 font-medium" style={{ color: 'var(--navy-900)' }}>
+                      <label className="block mb-2 font-medium" style={{ color: '#0F172A' }}>
                         <GlobeAltIcon className="w-4 h-4 inline mr-2" />
                         Site web / Portfolio
                       </label>
@@ -595,22 +595,22 @@ export default function ProfilePage() {
                           onChange={(e) => updateProfile({ website: e.target.value })}
                           className="w-full px-4 py-3 rounded-xl transition-all duration-300 focus:outline-none"
                           style={{
-                            background: 'var(--navy-50)',
-                            border: '1px solid var(--border-subtle)',
-                            color: 'var(--navy-900)',
+                            background: '#F8FAFC',
+                            border: '1px solid #E2E8F0',
+                            color: '#0F172A',
                           }}
                           onFocus={(e) => {
                             e.currentTarget.style.borderColor = 'var(--gold-600)';
                             e.currentTarget.style.boxShadow = '0 0 0 3px rgba(217, 119, 6, 0.1)';
                           }}
                           onBlur={(e) => {
-                            e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                            e.currentTarget.style.borderColor = '#E2E8F0';
                             e.currentTarget.style.boxShadow = 'none';
                           }}
                           placeholder="https://..."
                         />
                       ) : (
-                        <p style={{ color: 'var(--navy-700)' }}>
+                        <p style={{ color: '#334155' }}>
                           {profile.website ? (
                             <a
                               href={profile.website}
@@ -640,22 +640,22 @@ export default function ProfilePage() {
                         key={exp.id || index}
                         className="p-4 rounded-xl"
                         style={{
-                          background: 'var(--navy-50)',
-                          border: '1px solid var(--border-subtle)',
+                          background: '#F8FAFC',
+                          border: '1px solid #E2E8F0',
                         }}
                       >
-                        <h4 className="font-bold mb-1" style={{ color: 'var(--navy-900)' }}>
+                        <h4 className="font-bold mb-1" style={{ color: '#0F172A' }}>
                           {exp.title}
                         </h4>
-                        <p className="text-sm mb-2" style={{ color: 'var(--navy-600)' }}>
+                        <p className="text-sm mb-2" style={{ color: '#475569' }}>
                           {exp.company} • {exp.location}
                         </p>
-                        <p className="text-sm mb-2" style={{ color: 'var(--navy-500)' }}>
+                        <p className="text-sm mb-2" style={{ color: '#64748B' }}>
                           {new Date(exp.start_date).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })} -
                           {exp.end_date ? new Date(exp.end_date).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }) : 'Présent'}
                         </p>
                         {exp.description && (
-                          <p className="text-sm whitespace-pre-wrap" style={{ color: 'var(--navy-700)' }}>
+                          <p className="text-sm whitespace-pre-wrap" style={{ color: '#334155' }}>
                             {exp.description}
                           </p>
                         )}
@@ -663,8 +663,8 @@ export default function ProfilePage() {
                     ))
                   ) : (
                     <div className="text-center py-12">
-                      <BriefcaseIcon className="w-12 h-12 mx-auto mb-3" style={{ color: 'var(--navy-300)' }} />
-                      <p style={{ color: 'var(--navy-600)' }}>Aucune expérience ajoutée</p>
+                      <BriefcaseIcon className="w-12 h-12 mx-auto mb-3" style={{ color: '#CBD5E1' }} />
+                      <p style={{ color: '#475569' }}>Aucune expérience ajoutée</p>
                     </div>
                   )}
 
@@ -694,7 +694,7 @@ export default function ProfilePage() {
                         className="p-4 rounded-xl"
                         style={{
                           background: 'var(--sage-50)',
-                          border: '1px solid var(--border-subtle)',
+                          border: '1px solid #E2E8F0',
                         }}
                       >
                         <h4 className="font-bold mb-1" style={{ color: 'var(--sage-900)' }}>
@@ -755,8 +755,8 @@ export default function ProfilePage() {
                     </div>
                   ) : (
                     <div className="text-center py-12">
-                      <SparklesIcon className="w-12 h-12 mx-auto mb-3" style={{ color: 'var(--navy-300)' }} />
-                      <p style={{ color: 'var(--navy-600)' }}>Aucune compétence ajoutée</p>
+                      <SparklesIcon className="w-12 h-12 mx-auto mb-3" style={{ color: '#CBD5E1' }} />
+                      <p style={{ color: '#475569' }}>Aucune compétence ajoutée</p>
                     </div>
                   )}
 
@@ -786,15 +786,15 @@ export default function ProfilePage() {
           background: 'rgba(15, 23, 42, 0.5)',
         }}>
           <div className="rounded-2xl p-6 max-w-2xl w-full" style={{
-            background: 'var(--surface)',
+            background: '#FFFFFF',
             boxShadow: 'var(--shadow-xl)',
           }}>
-            <p style={{ color: 'var(--navy-700)' }}>Modal Expérience à implémenter</p>
+            <p style={{ color: '#334155' }}>Modal Expérience à implémenter</p>
             <button
               onClick={() => setShowExperienceModal(false)}
               className="mt-4 px-4 py-2 rounded-lg"
               style={{
-                background: 'var(--navy-900)',
+                background: '#0F172A',
                 color: 'white',
               }}
             >
@@ -809,15 +809,15 @@ export default function ProfilePage() {
           background: 'rgba(15, 23, 42, 0.5)',
         }}>
           <div className="rounded-2xl p-6 max-w-2xl w-full" style={{
-            background: 'var(--surface)',
+            background: '#FFFFFF',
             boxShadow: 'var(--shadow-xl)',
           }}>
-            <p style={{ color: 'var(--navy-700)' }}>Modal Formation à implémenter</p>
+            <p style={{ color: '#334155' }}>Modal Formation à implémenter</p>
             <button
               onClick={() => setShowEducationModal(false)}
               className="mt-4 px-4 py-2 rounded-lg"
               style={{
-                background: 'var(--navy-900)',
+                background: '#0F172A',
                 color: 'white',
               }}
             >
@@ -832,15 +832,15 @@ export default function ProfilePage() {
           background: 'rgba(15, 23, 42, 0.5)',
         }}>
           <div className="rounded-2xl p-6 max-w-2xl w-full" style={{
-            background: 'var(--surface)',
+            background: '#FFFFFF',
             boxShadow: 'var(--shadow-xl)',
           }}>
-            <p style={{ color: 'var(--navy-700)' }}>Modal Compétence à implémenter</p>
+            <p style={{ color: '#334155' }}>Modal Compétence à implémenter</p>
             <button
               onClick={() => setShowSkillModal(false)}
               className="mt-4 px-4 py-2 rounded-lg"
               style={{
-                background: 'var(--navy-900)',
+                background: '#0F172A',
                 color: 'white',
               }}
             >

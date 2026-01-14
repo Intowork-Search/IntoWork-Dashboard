@@ -308,20 +308,20 @@ export default function MesCVPage() {
         {/* Statistiques */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="rounded-2xl p-6 animate-elegant-fade-in" style={{
-            background: 'var(--surface)',
-            border: '1px solid var(--border-subtle)',
-            boxShadow: 'var(--shadow-md)',
+            background: '#FFFFFF',
+            border: '1px solid #E2E8F0',
+            boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
           }}>
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{
-                background: 'var(--navy-100)',
+                background: '#F1F5F9',
               }}>
-                <DocumentTextIcon className="w-6 h-6" style={{ color: 'var(--navy-600)' }} />
+                <DocumentTextIcon className="w-6 h-6" style={{ color: '#475569' }} />
               </div>
               <div>
-                <p className="text-sm font-medium mb-1" style={{ color: 'var(--navy-600)' }}>CV téléchargés</p>
+                <p className="text-sm font-medium mb-1" style={{ color: '#475569' }}>CV téléchargés</p>
                 <p className="text-2xl font-bold" style={{
-                  color: 'var(--navy-900)',
+                  color: '#0F172A',
                   fontFamily: 'var(--font-display)',
                 }}>{cvs.length}</p>
               </div>
@@ -329,9 +329,9 @@ export default function MesCVPage() {
           </div>
 
           <div className="rounded-2xl p-6 animate-elegant-fade-in" style={{
-            background: 'var(--surface)',
-            border: '1px solid var(--border-subtle)',
-            boxShadow: 'var(--shadow-md)',
+            background: '#FFFFFF',
+            border: '1px solid #E2E8F0',
+            boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
             animationDelay: '100ms',
           }}>
             <div className="flex items-center gap-4">
@@ -351,9 +351,9 @@ export default function MesCVPage() {
           </div>
 
           <div className="rounded-2xl p-6 animate-elegant-fade-in" style={{
-            background: 'var(--surface)',
-            border: '1px solid var(--border-subtle)',
-            boxShadow: 'var(--shadow-md)',
+            background: '#FFFFFF',
+            border: '1px solid #E2E8F0',
+            boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
             animationDelay: '200ms',
           }}>
             <div className="flex items-center gap-4">
@@ -374,20 +374,20 @@ export default function MesCVPage() {
 
         {/* Liste des CV */}
         <div className="rounded-2xl animate-elegant-fade-in" style={{
-          background: 'var(--surface)',
-          border: '1px solid var(--border-subtle)',
-          boxShadow: 'var(--shadow-md)',
+          background: '#FFFFFF',
+          border: '1px solid #E2E8F0',
+          boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
           animationDelay: '300ms',
         }}>
           <div className="p-6 flex justify-between items-center" style={{
-            borderBottom: '1px solid var(--border-subtle)',
+            borderBottom: '1px solid #E2E8F0',
           }}>
             <div>
               <h2 className="text-lg font-bold mb-1" style={{
-                color: 'var(--navy-900)',
+                color: '#0F172A',
                 fontFamily: 'var(--font-display)',
               }}>Mes CV</h2>
-              <p className="text-sm" style={{ color: 'var(--navy-600)' }}>
+              <p className="text-sm" style={{ color: '#475569' }}>
                 Gérez vos CV téléchargés et suivez leur utilisation
               </p>
             </div>
@@ -398,7 +398,7 @@ export default function MesCVPage() {
               style={{
                 background: 'var(--gold-600)',
                 color: 'white',
-                boxShadow: 'var(--shadow-md)',
+                boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
               }}
               onMouseEnter={(e) => !isUploadingCV && (e.currentTarget.style.background = 'var(--gold-700)')}
               onMouseLeave={(e) => e.currentTarget.style.background = 'var(--gold-600)'}
@@ -411,12 +411,12 @@ export default function MesCVPage() {
 
           {cvs.length === 0 ? (
             <div className="p-12 text-center">
-              <CloudArrowUpIcon className="w-16 h-16 mx-auto mb-4" style={{ color: 'var(--navy-300)' }} />
+              <CloudArrowUpIcon className="w-16 h-16 mx-auto mb-4" style={{ color: '#CBD5E1' }} />
               <h3 className="text-lg font-bold mb-2" style={{
-                color: 'var(--navy-900)',
+                color: '#0F172A',
                 fontFamily: 'var(--font-display)',
               }}>Aucun CV téléchargé</h3>
-              <p className="mb-6" style={{ color: 'var(--navy-600)' }}>
+              <p className="mb-6" style={{ color: '#475569' }}>
                 Téléchargez votre premier CV pour commencer à postuler aux offres d'emploi.
               </p>
               <button
@@ -426,7 +426,7 @@ export default function MesCVPage() {
                 style={{
                   background: 'var(--gold-600)',
                   color: 'white',
-                  boxShadow: 'var(--shadow-md)',
+                  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
                 }}
                 onMouseEnter={(e) => !isUploadingCV && (e.currentTarget.style.background = 'var(--gold-700)')}
                 onMouseLeave={(e) => e.currentTarget.style.background = 'var(--gold-600)'}
@@ -441,21 +441,21 @@ export default function MesCVPage() {
                   key={cv.id || cv.filename}
                   className="p-6 flex items-center justify-between animate-elegant-fade-in"
                   style={{
-                    borderBottom: index < cvs.length - 1 ? '1px solid var(--border-subtle)' : 'none',
+                    borderBottom: index < cvs.length - 1 ? '1px solid #E2E8F0' : 'none',
                     animationDelay: `${index * 50}ms`,
                   }}
                 >
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{
-                      background: 'var(--navy-100)',
+                      background: '#F1F5F9',
                     }}>
-                      <DocumentTextIcon className="w-6 h-6" style={{ color: 'var(--navy-600)' }} />
+                      <DocumentTextIcon className="w-6 h-6" style={{ color: '#475569' }} />
                     </div>
                     <div>
-                      <h3 className="font-semibold mb-1" style={{ color: 'var(--navy-900)' }}>
+                      <h3 className="font-semibold mb-1" style={{ color: '#0F172A' }}>
                         {cv.filename}
                       </h3>
-                      <p className="text-sm" style={{ color: 'var(--navy-600)' }}>
+                      <p className="text-sm" style={{ color: '#475569' }}>
                         Téléchargé le {formatDate(cv.created_at)}
                       </p>
                     </div>
@@ -466,14 +466,14 @@ export default function MesCVPage() {
                       title="Prévisualiser le CV"
                       onClick={() => handleViewCV(cv)}
                       className="p-2 rounded-lg transition-all duration-300"
-                      style={{ color: 'var(--navy-500)' }}
+                      style={{ color: '#64748B' }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.background = 'var(--navy-100)';
-                        e.currentTarget.style.color = 'var(--navy-700)';
+                        e.currentTarget.style.background = '#F1F5F9';
+                        e.currentTarget.style.color = '#334155';
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.background = 'transparent';
-                        e.currentTarget.style.color = 'var(--navy-500)';
+                        e.currentTarget.style.color = '#64748B';
                       }}
                     >
                       <EyeIcon className="w-5 h-5" />
@@ -498,14 +498,14 @@ export default function MesCVPage() {
                       title="Supprimer le CV"
                       onClick={() => handleDeleteCV(cv)}
                       className="p-2 rounded-lg transition-all duration-300"
-                      style={{ color: 'var(--navy-500)' }}
+                      style={{ color: '#64748B' }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.background = '#FEE2E2';
                         e.currentTarget.style.color = '#DC2626';
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.background = 'transparent';
-                        e.currentTarget.style.color = 'var(--navy-500)';
+                        e.currentTarget.style.color = '#64748B';
                       }}
                     >
                       <TrashIcon className="w-5 h-5" />

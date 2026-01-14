@@ -228,34 +228,6 @@ export default function Sidebar({ userRole }: SidebarProps) {
           </div>
         </div>
 
-        {/* Profil utilisateur */}
-        <div className="p-4 border-b border-gray-200 shrink-0">
-          <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'}`}>
-            <div className="relative">
-              {/* Avatar */}
-              <div className="w-10 h-10 rounded-full bg-linear-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white font-semibold">
-                {user?.firstName?.[0]}{user?.lastName?.[0]}
-              </div>
-              <div className={`absolute -bottom-1 -right-1 w-4 h-4 ${roleColor} rounded-full border-2 border-white flex items-center justify-center`}>
-                <span className="text-xs text-white font-bold">
-                  {getRoleBadgeLetter()}
-                </span>
-              </div>
-            </div>
-            
-            {!isCollapsed && (
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">
-                  {user?.firstName} {user?.lastName}
-                </p>
-                <p className="text-xs text-gray-500 truncate">
-                  {roleLabel}
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-
         {/* Navigation */}
         <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
           {navigation.map((item) => {
@@ -302,25 +274,56 @@ export default function Sidebar({ userRole }: SidebarProps) {
           })}
         </nav>
 
-        {/* Footer avec bouton déconnexion */}
-        <div className="p-4 border-t border-gray-200 shrink-0 mt-auto">
-          <button
-            onClick={() => signOut({ callbackUrl: '/signin' })}
-            className={`w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 text-red-600 hover:bg-red-50 ${
-              isCollapsed ? 'justify-center' : 'gap-3'
-            }`}
-            title={isCollapsed ? 'Se déconnecter' : ''}
-          >
-            <ArrowRightOnRectangleIcon className={`shrink-0 ${isCollapsed ? 'w-6 h-6' : 'w-5 h-5'}`} />
-            {!isCollapsed && <span>Se déconnecter</span>}
-            
-            {/* Tooltip pour mode collapsed */}
-            {isCollapsed && (
-              <div className="absolute left-16 bg-gray-900 text-white px-2 py-1 rounded-lg text-xs opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
-                Se déconnecter
+        {/* Footer avec profil et déconnexion */}
+        <div className="border-t border-gray-200 shrink-0 mt-auto">
+          {/* Profil utilisateur */}
+          <div className="p-4 border-b border-gray-200">
+            <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'}`}>
+              <div className="relative">
+                {/* Avatar */}
+                <div className="w-10 h-10 rounded-full bg-linear-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white font-semibold">
+                  {user?.firstName?.[0]}{user?.lastName?.[0]}
+                </div>
+                <div className={`absolute -bottom-1 -right-1 w-4 h-4 ${roleColor} rounded-full border-2 border-white flex items-center justify-center`}>
+                  <span className="text-xs text-white font-bold">
+                    {getRoleBadgeLetter()}
+                  </span>
+                </div>
               </div>
-            )}
-          </button>
+              
+              {!isCollapsed && (
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 truncate">
+                    {user?.firstName} {user?.lastName}
+                  </p>
+                  <p className="text-xs text-gray-500 truncate">
+                    {roleLabel}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Bouton déconnexion */}
+          <div className="p-4">
+            <button
+              onClick={() => signOut({ callbackUrl: '/signin' })}
+              className={`w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 text-red-600 hover:bg-red-50 ${
+                isCollapsed ? 'justify-center' : 'gap-3'
+              }`}
+              title={isCollapsed ? 'Se déconnecter' : ''}
+            >
+              <ArrowRightOnRectangleIcon className={`shrink-0 ${isCollapsed ? 'w-6 h-6' : 'w-5 h-5'}`} />
+              {!isCollapsed && <span>Se déconnecter</span>}
+              
+              {/* Tooltip pour mode collapsed */}
+              {isCollapsed && (
+                <div className="absolute left-16 bg-gray-900 text-white px-2 py-1 rounded-lg text-xs opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+                  Se déconnecter
+                </div>
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </>
