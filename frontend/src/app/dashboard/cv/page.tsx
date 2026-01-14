@@ -75,7 +75,7 @@ export default function MesCVPage() {
     if (user) {
       loadProfile();
     }
-  }, [user?.id, getToken]);
+  }, [user?.id]); // ✅ Retiré getToken pour éviter les recharges excessives
 
   // Recharger les données
   const reloadData = async () => {

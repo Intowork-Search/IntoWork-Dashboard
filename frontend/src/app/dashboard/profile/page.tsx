@@ -117,7 +117,7 @@ export default function ProfilePage() {
     if (user && !profile) {
       loadProfile();
     }
-  }, [user?.id, getToken, profile]);
+  }, [user?.id]); // ✅ Retiré getToken et profile pour éviter la boucle
 
   // Calculer le pourcentage de complétion
   const completionPercentage = React.useMemo(() => {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/DashboardLayout';
@@ -74,16 +74,16 @@ export default function AdminDashboard() {
     }
 
     loadData();
-  }, [session, status, router, activeTab]);
+  }, [session, status, router, activeTab, loadData]); // ✅ Ajout de loadData
 
   // Recharger quand la pagination change
   useEffect(() => {
     if (session && (activeTab === 'employers' || activeTab === 'jobs')) {
       loadData();
     }
-  }, [employersPage, jobsPage]);
+  }, [employersPage, jobsPage, session, activeTab, loadData]); // ✅ Ajout de loadData
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     if (!session?.accessToken) return;
 
     try {
@@ -130,7 +130,7 @@ export default function AdminDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [session?.accessToken, activeTab, userSearch, userRoleFilter, employersPage, jobsPage]); // ✅ useCallback avec dépendances
 
   const handleToggleUserStatus = async (userId: number, currentStatus: boolean) => {
     if (!session?.accessToken) return;
