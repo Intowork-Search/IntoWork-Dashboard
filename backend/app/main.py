@@ -67,10 +67,7 @@ app = FastAPI(
     description="Plateforme de recrutement B2B2C - API Backend",
     version="1.0.0",
     lifespan=lifespan,
-    # Disable redirect_slashes to prevent HTTP redirects when behind HTTPS proxy
-    # Without this, FastAPI/Starlette redirects /api/jobs to /api/jobs/ using HTTP
-    # instead of HTTPS, causing Mixed Content errors in browsers
-    redirect_slashes=False
+    # Re-enabled: redirect_slashes works correctly with ProxyHeadersMiddleware
 )
 
 # Security: Add rate limiter state and exception handler

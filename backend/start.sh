@@ -30,5 +30,6 @@ mkdir -p uploads/cv
 
 echo "🎯 Démarrage du serveur FastAPI sur le port ${PORT:-8000}"
 
-# Démarrer l'application avec python -m uvicorn (comme en local)
-exec python -m uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers 1
+# Démarrer l'application avec python -m uvicorn
+# --proxy-headers: Trust X-Forwarded-Proto from Railway proxy for HTTPS redirects
+exec python -m uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers 1 --proxy-headers --forwarded-allow-ips="*"
