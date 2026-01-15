@@ -92,8 +92,8 @@ export default function AdminDashboardPage() {
            (jobsByStatus as any)[statusCapital] || 0;
   };
 
-  // If jobs_by_status is empty, use total_jobs as fallback for "active"
-  const activeJobs = getJobStatusValue('active') || (stats?.total_jobs || 0);
+  // Map des statuts réels de la BD: draft, published, closed, archived
+  const activeJobs = getJobStatusValue('published');
 
   // Chart data
   const userDistribution = [
@@ -102,12 +102,12 @@ export default function AdminDashboardPage() {
     { name: 'Actifs', value: stats?.active_users || 0, fill: BRAND_COLORS.accent },
   ].filter(item => item.value > 0);
 
-  // If we have jobs_by_status, use it, otherwise create fallback data
+  // Utiliser les vrais statuts de la BD: draft, published, closed, archived
   let jobStatusData = [
-    { name: 'Actives', value: getJobStatusValue('active'), fill: BRAND_COLORS.primary },
-    { name: 'Pourvues', value: getJobStatusValue('filled'), fill: BRAND_COLORS.blue },
-    { name: 'Expirées', value: getJobStatusValue('expired') + getJobStatusValue('closed'), fill: '#EF4444' },
+    { name: 'Publiées', value: getJobStatusValue('published'), fill: BRAND_COLORS.primary },
     { name: 'Brouillons', value: getJobStatusValue('draft'), fill: BRAND_COLORS.accent },
+    { name: 'Fermées', value: getJobStatusValue('closed'), fill: '#EF4444' },
+    { name: 'Archivées', value: getJobStatusValue('archived'), fill: '#6B7280' },
   ].filter(item => item.value > 0);
 
   // If no data, use total_jobs as fallback
@@ -157,7 +157,7 @@ export default function AdminDashboardPage() {
       color: 'from-[#6B9B5F] to-[#5a8a4f]',
       bgColor: 'bg-[#6B9B5F]/10',
       textColor: 'text-[#6B9B5F]',
-      subtitle: `${activeJobs} actives`,
+      subtitle: `${activeJobs} publiées`,
       trend: '+8%',
       trendUp: true
     },
