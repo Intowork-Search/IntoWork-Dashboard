@@ -79,19 +79,19 @@ function getAdminNavigation(): NavItem[] {
     },
     { 
       name: 'Utilisateurs', 
-      href: '/dashboard/admin?tab=users', 
+      href: '/dashboard/admin/users', 
       icon: UserIcon, 
       description: "Gestion des utilisateurs"
     },
     { 
       name: 'Entreprises', 
-      href: '/dashboard/admin?tab=employers', 
+      href: '/dashboard/admin/employers', 
       icon: BuildingOfficeIcon, 
       description: "Gestion des entreprises"
     },
     { 
       name: 'Offres', 
-      href: '/dashboard/admin?tab=jobs', 
+      href: '/dashboard/admin/jobs', 
       icon: BriefcaseIcon, 
       description: "Gestion des offres d'emploi"
     },
