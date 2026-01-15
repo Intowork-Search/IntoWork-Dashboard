@@ -9,9 +9,11 @@ import {
   BellIcon,
   ShieldCheckIcon,
   KeyIcon,
-  TrashIcon,
   BuildingOfficeIcon,
-  PhotoIcon
+  PhotoIcon,
+  Cog6ToothIcon,
+  SparklesIcon,
+  ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
 import { useAuthenticatedAPI } from '@/hooks/useAuthenticatedAPI';
 import { companiesAPI, authAPI } from '@/lib/api';
@@ -59,8 +61,7 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('profile');
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [userRole, setUserRole] = useState<'candidate' | 'employer' | 'admin' | null>(null);
-  
-  // États pour les différentes sections
+
   const [profileData, setProfileData] = useState({
     first_name: user?.firstName || '',
     last_name: user?.lastName || '',
@@ -99,39 +100,29 @@ export default function SettingsPage() {
     allow_recruiter_contact: true
   });
 
-  // États pour les modals
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showEmailModal, setShowEmailModal] = useState(false);
 
-  // Charger le profil utilisateur ou les données de l'entreprise selon le rôle
   useEffect(() => {
     const fetchData = async () => {
-      console.log('🔄 Settings: fetchData démarré', { user: !!user });
       if (!user) {
-        console.log('⚠️ Settings: Pas d\'utilisateur, loading=false');
         setLoading(false);
         return;
       }
-      
+
       try {
-        console.log('⏳ Settings: setLoading(true)');
         setLoading(true);
         const token = await getToken();
         if (!token) {
-          console.log('❌ Pas de token disponible');
           setLoading(false);
           return;
         }
 
-        console.log('✅ Settings: Token obtenu, chargement du profil...');
-        // D'abord, détecter le rôle utilisateur en appelant l'API
         try {
           const response = await candidateAPI.getProfile();
-          console.log('✅ Settings: Profil candidat chargé');
           setUserRole('candidate');
           setProfile(response.data);
-          
-          // Remplir les formulaires avec les données existantes (ou données Clerk comme fallback)
+
           setProfileData({
             first_name: response.data.first_name || user?.firstName || '',
             last_name: response.data.last_name || user?.lastName || '',
@@ -156,13 +147,11 @@ export default function SettingsPage() {
             show_phone: false,
             allow_recruiter_contact: true
           });
-        } catch (candidateError) {
-          // Si l'appel candidat échoue, essayer de charger les données de l'entreprise
-          console.log('Not a candidate, trying employer data...', candidateError);
+        } catch {
           try {
             const companyResponse = await companiesAPI.getMyCompany(token);
             setUserRole('employer');
-            
+
             setCompanyData({
               name: companyResponse.name || '',
               description: companyResponse.description || '',
@@ -175,12 +164,9 @@ export default function SettingsPage() {
               country: companyResponse.country || '',
               logo_url: companyResponse.logo_url || ''
             });
-          } catch (employerError) {
-            // Si ni candidat ni employeur, c'est probablement un admin
-            console.log('Not an employer either, checking if admin...', employerError);
+          } catch {
             if (user?.role === 'admin') {
               setUserRole('admin');
-              // Pour un admin, on charge juste les données de base
               setProfileData({
                 first_name: user?.firstName || '',
                 last_name: user?.lastName || '',
@@ -192,7 +178,6 @@ export default function SettingsPage() {
                 github_url: ''
               });
             } else {
-              console.error('Erreur lors du chargement des données:', employerError);
               toast.error('Erreur lors du chargement de vos informations');
             }
           }
@@ -200,8 +185,7 @@ export default function SettingsPage() {
       } catch (error) {
         console.error('Erreur lors du chargement du profil:', error);
         toast.error('Erreur lors du chargement du profil');
-        
-        // En cas d'erreur, utiliser au moins les données Clerk disponibles
+
         setProfileData({
           first_name: user?.firstName || '',
           last_name: user?.lastName || '',
@@ -213,22 +197,18 @@ export default function SettingsPage() {
           github_url: ''
         });
       } finally {
-        console.log('✅ Settings: fetchData terminé, setLoading(false)');
         setLoading(false);
       }
     };
 
     if (user) {
-      console.log('👤 Settings: Utilisateur détecté, appel fetchData()');
       fetchData();
     } else {
-      console.log('⏳ En attente de l\'utilisateur...');
       setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]); // Seulement user.id pour éviter la boucle infinie
+  }, [user?.id]);
 
-  // Ajuster l'onglet actif selon le rôle
   useEffect(() => {
     if (userRole === 'employer' && activeTab === 'profile') {
       setActiveTab('company');
@@ -256,12 +236,12 @@ export default function SettingsPage() {
       setLoading(true);
       const token = await getToken();
       if (!token) return;
-      
+
       await companiesAPI.updateMyCompany(token, companyData);
-      toast.success('✅ Informations de l\'entreprise mises à jour avec succès !');
+      toast.success('Informations de l\'entreprise mises à jour avec succès !');
     } catch (error) {
       console.error('Erreur lors de la mise à jour:', error);
-      toast.error('❌ Erreur lors de la mise à jour des informations');
+      toast.error('Erreur lors de la mise à jour des informations');
     } finally {
       setLoading(false);
     }
@@ -270,7 +250,6 @@ export default function SettingsPage() {
   const updateNotifications = async () => {
     try {
       setLoading(true);
-      // API call pour mettre à jour les notifications
       toast.success('Préférences de notification mises à jour !');
     } catch (error) {
       console.error('Erreur lors de la mise à jour:', error);
@@ -296,18 +275,17 @@ export default function SettingsPage() {
   const handleChangePassword = async (currentPassword: string, newPassword: string) => {
     const token = await getToken();
     if (!token) throw new Error('Non authentifié');
-    
+
     await authAPI.changePassword(token, currentPassword, newPassword);
-    toast.success('✅ Mot de passe changé avec succès !');
+    toast.success('Mot de passe changé avec succès !');
   };
 
   const handleChangeEmail = async (newEmail: string, password: string) => {
     const token = await getToken();
     if (!token) throw new Error('Non authentifié');
-    
+
     await authAPI.changeEmail(token, newEmail, password);
-    toast.success('✅ Email changé avec succès !');
-    // Recharger pour mettre à jour l'email affiché
+    toast.success('Email changé avec succès !');
     globalThis.location?.reload();
   };
 
@@ -315,23 +293,16 @@ export default function SettingsPage() {
     if (globalThis.confirm?.('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.')) {
       try {
         setLoading(true);
-        
-        // Obtenir le token
+
         const token = await getToken();
         if (!token) {
           toast.error('Non authentifié');
           return;
         }
-        
-        // API call pour supprimer le compte
+
         await authAPI.deleteAccount(token);
-        
         toast.success('Compte supprimé avec succès');
-        
-        // Déconnecter l'utilisateur
         await signOut({ redirect: false });
-        
-        // Rediriger vers la page de connexion
         globalThis.location.href = '/signin';
       } catch (error) {
         console.error('Erreur lors de la suppression:', error);
@@ -343,619 +314,753 @@ export default function SettingsPage() {
   };
 
   const tabs = userRole === 'admin' ? [
-    { id: 'profile', name: 'Profil', icon: UserIcon },
-    { id: 'account', name: 'Compte', icon: KeyIcon }
+    { id: 'profile', name: 'Profil', icon: UserIcon, color: '#6B9B5F' },
+    { id: 'account', name: 'Compte', icon: KeyIcon, color: '#6B46C1' }
   ] : userRole === 'employer' ? [
-    { id: 'company', name: 'Entreprise', icon: BuildingOfficeIcon },
-    { id: 'notifications', name: 'Notifications', icon: BellIcon },
-    { id: 'account', name: 'Compte', icon: KeyIcon }
+    { id: 'company', name: 'Entreprise', icon: BuildingOfficeIcon, color: '#F7C700' },
+    { id: 'notifications', name: 'Notifications', icon: BellIcon, color: '#3B82F6' },
+    { id: 'account', name: 'Compte', icon: KeyIcon, color: '#6B46C1' }
   ] : [
-    { id: 'profile', name: 'Profil', icon: UserIcon },
-    { id: 'notifications', name: 'Notifications', icon: BellIcon },
-    { id: 'privacy', name: 'Confidentialité', icon: ShieldCheckIcon },
-    { id: 'account', name: 'Compte', icon: KeyIcon }
+    { id: 'profile', name: 'Profil', icon: UserIcon, color: '#6B9B5F' },
+    { id: 'notifications', name: 'Notifications', icon: BellIcon, color: '#3B82F6' },
+    { id: 'privacy', name: 'Confidentialité', icon: ShieldCheckIcon, color: '#F7C700' },
+    { id: 'account', name: 'Compte', icon: KeyIcon, color: '#6B46C1' }
   ];
 
   if (loading && !profile) {
     return (
       <DashboardLayout title="Paramètres" subtitle="Gérez votre profil et vos préférences">
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <div className="text-center">
+            <div className="relative">
+              <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#6B9B5F]/20 border-t-[#6B9B5F] mx-auto"></div>
+              <Cog6ToothIcon className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-6 h-6 text-[#6B9B5F]" />
+            </div>
+            <p className="mt-4 text-gray-600 font-medium">Chargement des paramètres...</p>
+          </div>
         </div>
       </DashboardLayout>
     );
   }
 
   return (
-    <DashboardLayout title="Paramètres" subtitle="Gérez votre profil et vos préférences">
-      <div className="space-y-8">
-
-      {/* Tabs avec design amélioré */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <nav className="flex space-x-0">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 py-4 px-6 font-medium text-sm flex items-center justify-center space-x-2 transition-all duration-200 ${
-                activeTab === tab.id
-                  ? 'bg-blue-50 border-b-2 border-blue-500 text-blue-600'
-                  : 'bg-white border-b-2 border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50'
-              }`}
-            >
-              <tab.icon className="w-5 h-5" />
-              <span className="hidden sm:block">{tab.name}</span>
-            </button>
-          ))}
-        </nav>
-      </div>
-
-      {/* Contenu des tabs avec design amélioré */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        {/* Onglet Profil */}
-        {activeTab === 'profile' && (
-          <div className="p-6 space-y-8">
-            <div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Informations personnelles</h3>
-              <p className="text-gray-600 mb-6">Mettez à jour vos informations de profil pour améliorer votre visibilité auprès des recruteurs.</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label htmlFor="first_name" className="block text-sm font-semibold text-gray-800 mb-2">
-                    Prénom
-                  </label>
-                  <input
-                    id="first_name"
-                    type="text"
-                    value={profileData.first_name}
-                    onChange={(e) => setProfileData(prev => ({ ...prev, first_name: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-gray-900 placeholder-gray-500"
-                    placeholder="Votre prénom"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="last_name" className="block text-sm font-semibold text-gray-800 mb-2">
-                    Nom
-                  </label>
-                  <input
-                    id="last_name"
-                    type="text"
-                    value={profileData.last_name}
-                    onChange={(e) => setProfileData(prev => ({ ...prev, last_name: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-gray-900 placeholder-gray-500"
-                    placeholder="Votre nom"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="phone" className="block text-sm font-semibold text-gray-800 mb-2">
-                    Téléphone
-                  </label>
-                  <input
-                    id="phone"
-                    type="tel"
-                    value={profileData.phone}
-                    onChange={(e) => setProfileData(prev => ({ ...prev, phone: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-gray-900 placeholder-gray-500"
-                    placeholder="Votre numéro de téléphone"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="location" className="block text-sm font-semibold text-gray-800 mb-2">
-                    Localisation
-                  </label>
-                  <input
-                    id="location"
-                    type="text"
-                    value={profileData.location}
-                    onChange={(e) => setProfileData(prev => ({ ...prev, location: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-gray-900 placeholder-gray-500"
-                    placeholder="Votre ville ou région"
-                  />
-                </div>
-
-                <div className="md:col-span-2">
-                  <label htmlFor="bio" className="block text-sm font-semibold text-gray-800 mb-2">
-                    Bio professionnelle
-                  </label>
-                  <textarea
-                    id="bio"
-                    rows={4}
-                    value={profileData.bio}
-                    onChange={(e) => setProfileData(prev => ({ ...prev, bio: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white resize-none text-gray-900 placeholder-gray-500"
-                    placeholder="Décrivez votre profil professionnel, vos compétences et vos objectifs de carrière..."
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="website" className="block text-sm font-semibold text-gray-800 mb-2">
-                    Site web personnel
-                  </label>
-                  <input
-                    id="website"
-                    type="url"
-                    value={profileData.website}
-                    onChange={(e) => setProfileData(prev => ({ ...prev, website: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-gray-900 placeholder-gray-500"
-                    placeholder="https://monsite.com"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="linkedin" className="block text-sm font-semibold text-gray-800 mb-2">
-                    Profil LinkedIn
-                  </label>
-                  <input
-                    id="linkedin"
-                    type="url"
-                    value={profileData.linkedin_url}
-                    onChange={(e) => setProfileData(prev => ({ ...prev, linkedin_url: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-gray-900 placeholder-gray-500"
-                    placeholder="https://linkedin.com/in/monprofil"
-                  />
-                </div>
-
-                <div className="md:col-span-2">
-                  <label htmlFor="github" className="block text-sm font-semibold text-gray-800 mb-2">
-                    Profil GitHub
-                  </label>
-                  <input
-                    id="github"
-                    type="url"
-                    value={profileData.github_url}
-                    onChange={(e) => setProfileData(prev => ({ ...prev, github_url: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-gray-900 placeholder-gray-500"
-                    placeholder="https://github.com/monprofil"
-                  />
-                </div>
-              </div>
-
-              <div className="mt-8 flex justify-end border-t border-gray-200 pt-6">
-                <button
-                  onClick={updateProfile}
-                  disabled={loading}
-                  className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-sm"
-                >
-                  {loading ? 'Enregistrement...' : 'Enregistrer les modifications'}
-                </button>
-              </div>
-            </div>
+    <DashboardLayout>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
+        {/* Hero Section */}
+        <div className="relative overflow-hidden bg-gradient-to-br from-[#6B9B5F] via-[#5a8a4f] to-[#6B46C1] rounded-b-[3rem] px-6 py-10 mb-8">
+          {/* Decorative patterns */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-10 left-10 w-32 h-32 rounded-full bg-white"></div>
+            <div className="absolute bottom-10 right-20 w-48 h-48 rounded-full bg-white"></div>
+            <div className="absolute top-1/2 left-1/3 w-24 h-24 rounded-full bg-white"></div>
           </div>
-        )}
 
-        {/* Onglet Entreprise (pour employeurs) */}
-        {activeTab === 'company' && userRole === 'employer' && (
-          <div className="p-6 space-y-8">
-            <div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Informations de l'entreprise</h3>
-              <p className="text-gray-600 mb-6">Mettez à jour les informations de votre entreprise pour attirer les meilleurs talents.</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="md:col-span-2">
-                  <label htmlFor="company_name" className="block text-sm font-semibold text-gray-800 mb-2">
-                    Nom de l'entreprise *
-                  </label>
-                  <input
-                    id="company_name"
-                    type="text"
-                    value={companyData.name}
-                    onChange={(e) => setCompanyData(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-gray-900 placeholder-gray-500"
-                    placeholder="Nom de votre entreprise"
-                  />
+          <div className="relative z-10 max-w-4xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="bg-white/20 backdrop-blur-sm p-3 rounded-2xl">
+                <Cog6ToothIcon className="w-8 h-8 text-white" />
+              </div>
+              <span className="bg-white/20 backdrop-blur-sm text-white px-4 py-1.5 rounded-full text-sm font-medium">
+                Paramètres
+              </span>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+              Gérez votre compte
+            </h1>
+            <p className="text-xl text-white/80 max-w-2xl">
+              Personnalisez votre profil et vos préférences pour une expérience optimale
+            </p>
+          </div>
+        </div>
+
+        <div className="px-6 pb-10 animate-fadeIn">
+          {/* Tabs */}
+          <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-2 mb-8 border border-gray-100">
+            <nav className="flex gap-2">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex-1 py-4 px-6 font-semibold text-sm flex items-center justify-center gap-2 rounded-2xl transition-all duration-300 ${
+                    activeTab === tab.id
+                      ? 'bg-gradient-to-r from-[#6B9B5F] to-[#6B46C1] text-white shadow-lg shadow-[#6B9B5F]/30'
+                      : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <tab.icon className="w-5 h-5" />
+                  <span className="hidden sm:block">{tab.name}</span>
+                </button>
+              ))}
+            </nav>
+          </div>
+
+          {/* Content */}
+          <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 overflow-hidden border border-gray-100">
+            {/* Profile Tab */}
+            {activeTab === 'profile' && (
+              <div className="p-8 space-y-8">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="bg-[#6B9B5F]/10 p-4 rounded-2xl">
+                    <UserIcon className="w-8 h-8 text-[#6B9B5F]" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900">Informations personnelles</h3>
+                    <p className="text-gray-600">Mettez à jour vos informations de profil pour améliorer votre visibilité</p>
+                  </div>
                 </div>
 
-                <div className="md:col-span-2">
-                  <label htmlFor="company_description" className="block text-sm font-semibold text-gray-800 mb-2">
-                    Description
-                  </label>
-                  <textarea
-                    id="company_description"
-                    value={companyData.description}
-                    onChange={(e) => setCompanyData(prev => ({ ...prev, description: e.target.value }))}
-                    rows={4}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-gray-900 placeholder-gray-500"
-                    placeholder="Décrivez votre entreprise, votre mission et votre culture..."
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="industry" className="block text-sm font-semibold text-gray-800 mb-2">
-                    Secteur d'activité
-                  </label>
-                  <input
-                    id="industry"
-                    type="text"
-                    value={companyData.industry}
-                    onChange={(e) => setCompanyData(prev => ({ ...prev, industry: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-gray-900 placeholder-gray-500"
-                    placeholder="ex: Technologie, Finance, Santé..."
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="size" className="block text-sm font-semibold text-gray-800 mb-2">
-                    Taille de l'entreprise
-                  </label>
-                  <select
-                    id="size"
-                    value={companyData.size}
-                    onChange={(e) => setCompanyData(prev => ({ ...prev, size: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-gray-900"
-                  >
-                    <option value="">Sélectionnez une taille</option>
-                    <option value="1-10">1-10 employés</option>
-                    <option value="11-50">11-50 employés</option>
-                    <option value="51-200">51-200 employés</option>
-                    <option value="201-500">201-500 employés</option>
-                    <option value="501-1000">501-1000 employés</option>
-                    <option value="1000+">1000+ employés</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label htmlFor="website_url" className="block text-sm font-semibold text-gray-800 mb-2">
-                    Site web
-                  </label>
-                  <input
-                    id="website_url"
-                    type="url"
-                    value={companyData.website_url}
-                    onChange={(e) => setCompanyData(prev => ({ ...prev, website_url: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-gray-900 placeholder-gray-500"
-                    placeholder="https://www.votresite.com"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="company_linkedin" className="block text-sm font-semibold text-gray-800 mb-2">
-                    LinkedIn
-                  </label>
-                  <input
-                    id="company_linkedin"
-                    type="url"
-                    value={companyData.linkedin_url}
-                    onChange={(e) => setCompanyData(prev => ({ ...prev, linkedin_url: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-gray-900 placeholder-gray-500"
-                    placeholder="https://linkedin.com/company/..."
-                  />
-                </div>
-
-                <div className="md:col-span-2">
-                  <label htmlFor="address" className="block text-sm font-semibold text-gray-800 mb-2">
-                    Adresse
-                  </label>
-                  <input
-                    id="address"
-                    type="text"
-                    value={companyData.address}
-                    onChange={(e) => setCompanyData(prev => ({ ...prev, address: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-gray-900 placeholder-gray-500"
-                    placeholder="Adresse complète"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="city" className="block text-sm font-semibold text-gray-800 mb-2">
-                    Ville
-                  </label>
-                  <input
-                    id="city"
-                    type="text"
-                    value={companyData.city}
-                    onChange={(e) => setCompanyData(prev => ({ ...prev, city: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-gray-900 placeholder-gray-500"
-                    placeholder="Ville"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="country" className="block text-sm font-semibold text-gray-800 mb-2">
-                    Pays
-                  </label>
-                  <input
-                    id="country"
-                    type="text"
-                    value={companyData.country}
-                    onChange={(e) => setCompanyData(prev => ({ ...prev, country: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-gray-900 placeholder-gray-500"
-                    placeholder="Pays"
-                  />
-                </div>
-
-                <div className="md:col-span-2">
-                  <label htmlFor="logo_url" className="block text-sm font-semibold text-gray-800 mb-2">
-                    Logo (URL)
-                  </label>
-                  <div className="flex items-center gap-4">
-                    {companyData.logo_url && (
-                      <img 
-                        src={companyData.logo_url} 
-                        alt="Logo" 
-                        className="w-16 h-16 object-cover rounded-lg border border-gray-200"
-                      />
-                    )}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label htmlFor="first_name" className="block text-sm font-bold text-gray-800 mb-2">
+                      Prénom
+                    </label>
                     <input
-                      id="logo_url"
-                      type="url"
-                      value={companyData.logo_url}
-                      onChange={(e) => setCompanyData(prev => ({ ...prev, logo_url: e.target.value }))}
-                      className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-gray-900 placeholder-gray-500"
-                      placeholder="https://exemple.com/logo.png"
+                      id="first_name"
+                      type="text"
+                      value={profileData.first_name}
+                      onChange={(e) => setProfileData(prev => ({ ...prev, first_name: e.target.value }))}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      placeholder="Votre prénom"
                     />
                   </div>
-                  <p className="text-sm text-gray-500 mt-2">
-                    <PhotoIcon className="w-4 h-4 inline mr-1" />
-                    Recommandé: 200x200px, format PNG ou JPG
-                  </p>
-                </div>
-              </div>
 
-              <div className="mt-8 flex justify-end">
-                <button
-                  onClick={updateCompany}
-                  disabled={loading}
-                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium"
-                >
-                  {loading ? 'Enregistrement...' : 'Enregistrer les modifications'}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Onglet Notifications */}
-        {activeTab === 'notifications' && (
-          <div className="p-6 space-y-8">
-            <div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Préférences de notification</h3>
-              <p className="text-gray-600 mb-6">Choisissez comment vous souhaitez être informé des nouvelles opportunités.</p>
-              <div className="space-y-6">
-                <div className="bg-gray-50 rounded-lg p-4 flex items-center justify-between">
                   <div>
-                    <h4 className="text-base font-semibold text-gray-900">Notifications par email</h4>
-                    <p className="text-sm text-gray-600 mt-1">Recevez des notifications importantes par email</p>
+                    <label htmlFor="last_name" className="block text-sm font-bold text-gray-800 mb-2">
+                      Nom
+                    </label>
+                    <input
+                      id="last_name"
+                      type="text"
+                      value={profileData.last_name}
+                      onChange={(e) => setProfileData(prev => ({ ...prev, last_name: e.target.value }))}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      placeholder="Votre nom"
+                    />
                   </div>
-                  <ToggleButton
-                    checked={notifications.email_notifications}
-                    onChange={() => setNotifications(prev => ({ ...prev, email_notifications: !prev.email_notifications }))}
-                    label={`${notifications.email_notifications ? 'Désactiver' : 'Activer'} les notifications par email`}
-                  />
-                </div>
 
-                <div className="bg-gray-50 rounded-lg p-4 flex items-center justify-between">
                   <div>
-                    <h4 className="text-base font-semibold text-gray-900">Alertes d&apos;emploi</h4>
-                    <p className="text-sm text-gray-600 mt-1">Soyez notifié des nouveaux emplois correspondant à vos critères</p>
+                    <label htmlFor="phone" className="block text-sm font-bold text-gray-800 mb-2">
+                      Téléphone
+                    </label>
+                    <input
+                      id="phone"
+                      type="tel"
+                      value={profileData.phone}
+                      onChange={(e) => setProfileData(prev => ({ ...prev, phone: e.target.value }))}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      placeholder="Votre numéro de téléphone"
+                    />
                   </div>
-                  <ToggleButton
-                    checked={notifications.job_alerts}
-                    onChange={() => setNotifications(prev => ({ ...prev, job_alerts: !prev.job_alerts }))}
-                    label={`${notifications.job_alerts ? 'Désactiver' : 'Activer'} les alertes d'emploi`}
-                  />
-                </div>
 
-                <div className="bg-gray-50 rounded-lg p-4 flex items-center justify-between">
                   <div>
-                    <h4 className="text-base font-semibold text-gray-900">Emails marketing</h4>
-                    <p className="text-sm text-gray-600 mt-1">Recevez des conseils carrière et des mises à jour du service</p>
+                    <label htmlFor="location" className="block text-sm font-bold text-gray-800 mb-2">
+                      Localisation
+                    </label>
+                    <input
+                      id="location"
+                      type="text"
+                      value={profileData.location}
+                      onChange={(e) => setProfileData(prev => ({ ...prev, location: e.target.value }))}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      placeholder="Votre ville ou région"
+                    />
                   </div>
-                  <ToggleButton
-                    checked={notifications.marketing_emails}
-                    onChange={() => setNotifications(prev => ({ ...prev, marketing_emails: !prev.marketing_emails }))}
-                    label={`${notifications.marketing_emails ? 'Désactiver' : 'Activer'} les emails marketing`}
-                  />
-                </div>
 
-                <div className="bg-gray-50 rounded-lg p-4 flex items-center justify-between">
+                  <div className="md:col-span-2">
+                    <label htmlFor="bio" className="block text-sm font-bold text-gray-800 mb-2">
+                      Bio professionnelle
+                    </label>
+                    <textarea
+                      id="bio"
+                      rows={4}
+                      value={profileData.bio}
+                      onChange={(e) => setProfileData(prev => ({ ...prev, bio: e.target.value }))}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 resize-none text-gray-900 placeholder-gray-400"
+                      placeholder="Décrivez votre profil professionnel, vos compétences et vos objectifs..."
+                    />
+                  </div>
+
                   <div>
-                    <h4 className="text-base font-semibold text-gray-900">Notifications push</h4>
-                    <p className="text-sm text-gray-600 mt-1">Recevez des notifications dans votre navigateur</p>
+                    <label htmlFor="website" className="block text-sm font-bold text-gray-800 mb-2">
+                      Site web personnel
+                    </label>
+                    <input
+                      id="website"
+                      type="url"
+                      value={profileData.website}
+                      onChange={(e) => setProfileData(prev => ({ ...prev, website: e.target.value }))}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      placeholder="https://monsite.com"
+                    />
                   </div>
-                  <ToggleButton
-                    checked={notifications.push_notifications}
-                    onChange={() => setNotifications(prev => ({ ...prev, push_notifications: !prev.push_notifications }))}
-                    label={`${notifications.push_notifications ? 'Désactiver' : 'Activer'} les notifications push`}
-                  />
+
+                  <div>
+                    <label htmlFor="linkedin" className="block text-sm font-bold text-gray-800 mb-2">
+                      Profil LinkedIn
+                    </label>
+                    <input
+                      id="linkedin"
+                      type="url"
+                      value={profileData.linkedin_url}
+                      onChange={(e) => setProfileData(prev => ({ ...prev, linkedin_url: e.target.value }))}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      placeholder="https://linkedin.com/in/monprofil"
+                    />
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label htmlFor="github" className="block text-sm font-bold text-gray-800 mb-2">
+                      Profil GitHub
+                    </label>
+                    <input
+                      id="github"
+                      type="url"
+                      value={profileData.github_url}
+                      onChange={(e) => setProfileData(prev => ({ ...prev, github_url: e.target.value }))}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      placeholder="https://github.com/monprofil"
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-6 border-t border-gray-100 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={updateProfile}
+                    disabled={loading}
+                    className="px-8 py-3 bg-gradient-to-r from-[#6B9B5F] to-[#5a8a4f] text-white rounded-2xl hover:shadow-lg hover:shadow-[#6B9B5F]/30 transition-all duration-300 font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loading ? 'Enregistrement...' : 'Enregistrer les modifications'}
+                  </button>
                 </div>
               </div>
+            )}
 
-              <div className="mt-8 flex justify-end border-t border-gray-200 pt-6">
-                <button
-                  onClick={updateNotifications}
-                  disabled={loading}
-                  className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-sm"
-                >
-                  {loading ? 'Enregistrement...' : 'Enregistrer les préférences'}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Onglet Confidentialité */}
-        {activeTab === 'privacy' && (
-          <div className="p-6 space-y-8">
-            <div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Paramètres de confidentialité</h3>
-              <p className="text-gray-600 mb-6">Contrôlez la visibilité de vos informations personnelles auprès des recruteurs.</p>
-              
-              <div className="space-y-6">
-                <div className="bg-gray-50 rounded-lg p-4 flex items-start justify-between">
-                  <div className="flex-1">
-                    <h4 className="text-base font-semibold text-gray-900">Profil public</h4>
-                    <p className="text-sm text-gray-600 mt-1">Rendez votre profil visible aux recruteurs</p>
+            {/* Company Tab */}
+            {activeTab === 'company' && userRole === 'employer' && (
+              <div className="p-8 space-y-8">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="bg-[#F7C700]/10 p-4 rounded-2xl">
+                    <BuildingOfficeIcon className="w-8 h-8 text-[#F7C700]" />
                   </div>
-                  <ToggleButton
-                    checked={privacy.is_profile_public}
-                    onChange={() => setPrivacy(prev => ({ ...prev, is_profile_public: !prev.is_profile_public }))}
-                    label={`${privacy.is_profile_public ? 'Rendre' : 'Garder'} le profil ${privacy.is_profile_public ? 'privé' : 'public'}`}
-                  />
-                </div>
-
-                <div className="bg-gray-50 rounded-lg p-4 flex items-start justify-between">
-                  <div className="flex-1">
-                    <h4 className="text-base font-semibold text-gray-900">Afficher l&apos;email</h4>
-                    <p className="text-sm text-gray-600 mt-1">Permettre aux recruteurs de voir votre adresse email</p>
-                  </div>
-                  <ToggleButton
-                    checked={privacy.show_email}
-                    onChange={() => setPrivacy(prev => ({ ...prev, show_email: !prev.show_email }))}
-                    label={`${privacy.show_email ? 'Masquer' : 'Afficher'} l'adresse email`}
-                  />
-                </div>
-
-                <div className="bg-gray-50 rounded-lg p-4 flex items-start justify-between">
-                  <div className="flex-1">
-                    <h4 className="text-base font-semibold text-gray-900">Afficher le téléphone</h4>
-                    <p className="text-sm text-gray-600 mt-1">Permettre aux recruteurs de voir votre numéro de téléphone</p>
-                  </div>
-                  <ToggleButton
-                    checked={privacy.show_phone}
-                    onChange={() => setPrivacy(prev => ({ ...prev, show_phone: !prev.show_phone }))}
-                    label={`${privacy.show_phone ? 'Masquer' : 'Afficher'} le numéro de téléphone`}
-                  />
-                </div>
-
-                <div className="bg-gray-50 rounded-lg p-4 flex items-start justify-between">
-                  <div className="flex-1">
-                    <h4 className="text-base font-semibold text-gray-900">Contact par les recruteurs</h4>
-                    <p className="text-sm text-gray-600 mt-1">Autoriser les recruteurs à vous contacter directement</p>
-                  </div>
-                  <ToggleButton
-                    checked={privacy.allow_recruiter_contact}
-                    onChange={() => setPrivacy(prev => ({ ...prev, allow_recruiter_contact: !prev.allow_recruiter_contact }))}
-                    label={`${privacy.allow_recruiter_contact ? 'Interdire' : 'Autoriser'} le contact par les recruteurs`}
-                  />
-                </div>
-              </div>
-
-              <div className="mt-8 flex justify-end border-t border-gray-200 pt-6">
-                <button
-                  onClick={updatePrivacy}
-                  disabled={loading}
-                  className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-sm"
-                >
-                  {loading ? 'Enregistrement...' : 'Enregistrer les paramètres'}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Onglet Compte */}
-        {activeTab === 'account' && (
-          <div className="p-6 space-y-8">
-            <div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Gestion du compte</h3>
-              <p className="text-gray-600 mb-6">Consultez les informations de votre compte et gérez ses paramètres.</p>
-              
-              <div className="bg-gray-50 p-6 rounded-lg mb-8">
-                <h4 className="text-lg font-semibold text-gray-900 mb-4">Informations du compte</h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="bg-white p-4 rounded-lg border border-gray-200">
-                    <p className="text-sm font-medium text-gray-500 mb-1">Adresse email</p>
-                    <p className="text-sm font-semibold text-gray-900">{user?.email}</p>
-                  </div>
-                  <div className="bg-white p-4 rounded-lg border border-gray-200">
-                    <p className="text-sm font-medium text-gray-500 mb-1">Nom complet</p>
-                    <p className="text-sm font-semibold text-gray-900">{user?.fullName || 'N/A'}</p>
-                  </div>
-                  <div className="bg-white p-4 rounded-lg border border-gray-200">
-                    <p className="text-sm font-medium text-gray-500 mb-1">Rôle</p>
-                    <p className="text-sm font-semibold text-gray-900">{user?.role === 'candidate' ? 'Candidat' : 'Employeur'}</p>
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900">Informations de l'entreprise</h3>
+                    <p className="text-gray-600">Mettez à jour les informations pour attirer les meilleurs talents</p>
                   </div>
                 </div>
-              </div>
 
-              {/* Section Sécurité */}
-              <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8">
-                <h4 className="text-lg font-semibold text-gray-900 mb-4">Sécurité</h4>
-                <p className="text-sm text-gray-600 mb-6">
-                  Gérez votre mot de passe et les paramètres de sécurité de votre compte.
-                </p>
-                
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between py-4 border-b border-gray-200">
-                    <div>
-                      <h5 className="text-base font-medium text-gray-900">Mot de passe</h5>
-                      <p className="text-sm text-gray-500 mt-1">Dernière modification: Il y a 30 jours</p>
-                    </div>
-                    <button
-                      onClick={() => setShowPasswordModal(true)}
-                      className="px-4 py-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors text-sm font-medium"
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="md:col-span-2">
+                    <label htmlFor="company_name" className="block text-sm font-bold text-gray-800 mb-2">
+                      Nom de l'entreprise *
+                    </label>
+                    <input
+                      id="company_name"
+                      type="text"
+                      value={companyData.name}
+                      onChange={(e) => setCompanyData(prev => ({ ...prev, name: e.target.value }))}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      placeholder="Nom de votre entreprise"
+                    />
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label htmlFor="company_description" className="block text-sm font-bold text-gray-800 mb-2">
+                      Description
+                    </label>
+                    <textarea
+                      id="company_description"
+                      value={companyData.description}
+                      onChange={(e) => setCompanyData(prev => ({ ...prev, description: e.target.value }))}
+                      rows={4}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      placeholder="Décrivez votre entreprise, votre mission et votre culture..."
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="industry" className="block text-sm font-bold text-gray-800 mb-2">
+                      Secteur d'activité
+                    </label>
+                    <input
+                      id="industry"
+                      type="text"
+                      value={companyData.industry}
+                      onChange={(e) => setCompanyData(prev => ({ ...prev, industry: e.target.value }))}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      placeholder="ex: Technologie, Finance, Santé..."
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="size" className="block text-sm font-bold text-gray-800 mb-2">
+                      Taille de l'entreprise
+                    </label>
+                    <select
+                      id="size"
+                      value={companyData.size}
+                      onChange={(e) => setCompanyData(prev => ({ ...prev, size: e.target.value }))}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900"
                     >
-                      Changer le mot de passe
-                    </button>
-                  </div>
-                  
-                  <div className="flex items-center justify-between py-4 border-b border-gray-200">
-                    <div>
-                      <h5 className="text-base font-medium text-gray-900">Adresse email</h5>
-                      <p className="text-sm text-gray-500 mt-1">Actuellement: {user?.email}</p>
-                    </div>
-                    <button
-                      onClick={() => setShowEmailModal(true)}
-                      className="px-4 py-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors text-sm font-medium"
-                    >
-                      Modifier l&apos;email
-                    </button>
+                      <option value="">Sélectionnez une taille</option>
+                      <option value="1-10">1-10 employés</option>
+                      <option value="11-50">11-50 employés</option>
+                      <option value="51-200">51-200 employés</option>
+                      <option value="201-500">201-500 employés</option>
+                      <option value="501-1000">501-1000 employés</option>
+                      <option value="1000+">1000+ employés</option>
+                    </select>
                   </div>
 
-                  <div className="flex items-center justify-between py-4">
-                    <div>
-                      <h5 className="text-base font-medium text-gray-900">Authentification à deux facteurs</h5>
-                      <p className="text-sm text-gray-500 mt-1">Ajoutez une couche de sécurité supplémentaire</p>
-                    </div>
-                    <button
-                      onClick={() => toast('Fonctionnalité 2FA à venir')}
-                      className="px-4 py-2 text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors text-sm font-medium"
-                    >
-                      Activer la 2FA
-                    </button>
+                  <div>
+                    <label htmlFor="website_url" className="block text-sm font-bold text-gray-800 mb-2">
+                      Site web
+                    </label>
+                    <input
+                      id="website_url"
+                      type="url"
+                      value={companyData.website_url}
+                      onChange={(e) => setCompanyData(prev => ({ ...prev, website_url: e.target.value }))}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      placeholder="https://www.votresite.com"
+                    />
                   </div>
-                </div>
-              </div>
 
-              <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-                <div className="flex items-start space-x-4">
-                  <TrashIcon className="w-6 h-6 text-red-500 mt-1 shrink-0" />
-                  <div className="flex-1">
-                    <h4 className="text-lg font-semibold text-red-900 mb-2">Zone de danger</h4>
-                    <p className="text-sm text-red-700 mb-4">
-                      Une fois votre compte supprimé, toutes vos données seront définitivement supprimées. 
-                      Cette action ne peut pas être annulée.
+                  <div>
+                    <label htmlFor="company_linkedin" className="block text-sm font-bold text-gray-800 mb-2">
+                      LinkedIn
+                    </label>
+                    <input
+                      id="company_linkedin"
+                      type="url"
+                      value={companyData.linkedin_url}
+                      onChange={(e) => setCompanyData(prev => ({ ...prev, linkedin_url: e.target.value }))}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      placeholder="https://linkedin.com/company/..."
+                    />
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label htmlFor="address" className="block text-sm font-bold text-gray-800 mb-2">
+                      Adresse
+                    </label>
+                    <input
+                      id="address"
+                      type="text"
+                      value={companyData.address}
+                      onChange={(e) => setCompanyData(prev => ({ ...prev, address: e.target.value }))}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      placeholder="Adresse complète"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="city" className="block text-sm font-bold text-gray-800 mb-2">
+                      Ville
+                    </label>
+                    <input
+                      id="city"
+                      type="text"
+                      value={companyData.city}
+                      onChange={(e) => setCompanyData(prev => ({ ...prev, city: e.target.value }))}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      placeholder="Ville"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="country" className="block text-sm font-bold text-gray-800 mb-2">
+                      Pays
+                    </label>
+                    <input
+                      id="country"
+                      type="text"
+                      value={companyData.country}
+                      onChange={(e) => setCompanyData(prev => ({ ...prev, country: e.target.value }))}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      placeholder="Pays"
+                    />
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label htmlFor="logo_url" className="block text-sm font-bold text-gray-800 mb-2">
+                      Logo (URL)
+                    </label>
+                    <div className="flex items-center gap-4">
+                      {companyData.logo_url && (
+                        <img
+                          src={companyData.logo_url}
+                          alt="Logo"
+                          className="w-16 h-16 object-cover rounded-2xl border-2 border-gray-200"
+                        />
+                      )}
+                      <input
+                        id="logo_url"
+                        type="url"
+                        value={companyData.logo_url}
+                        onChange={(e) => setCompanyData(prev => ({ ...prev, logo_url: e.target.value }))}
+                        className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                        placeholder="https://exemple.com/logo.png"
+                      />
+                    </div>
+                    <p className="text-sm text-gray-500 mt-2 flex items-center gap-1">
+                      <PhotoIcon className="w-4 h-4" />
+                      Recommandé: 200x200px, format PNG ou JPG
                     </p>
-                    <button
-                      onClick={deleteAccount}
-                      disabled={loading}
-                      className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium transition-all duration-200 shadow-sm"
-                    >
-                      {loading ? 'Suppression en cours...' : 'Supprimer définitivement mon compte'}
-                    </button>
+                  </div>
+                </div>
+
+                <div className="pt-6 border-t border-gray-100 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={updateCompany}
+                    disabled={loading}
+                    className="px-8 py-3 bg-gradient-to-r from-[#F7C700] to-[#e0b400] text-gray-900 rounded-2xl hover:shadow-lg hover:shadow-[#F7C700]/30 transition-all duration-300 font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loading ? 'Enregistrement...' : 'Enregistrer les modifications'}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Notifications Tab */}
+            {activeTab === 'notifications' && (
+              <div className="p-8 space-y-8">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="bg-[#3B82F6]/10 p-4 rounded-2xl">
+                    <BellIcon className="w-8 h-8 text-[#3B82F6]" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900">Préférences de notification</h3>
+                    <p className="text-gray-600">Choisissez comment vous souhaitez être informé</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 hover:shadow-md transition-all duration-300">
+                    <div className="flex items-center gap-4">
+                      <div className="bg-[#6B9B5F]/10 p-3 rounded-xl">
+                        <BellIcon className="w-6 h-6 text-[#6B9B5F]" />
+                      </div>
+                      <div>
+                        <h4 className="text-base font-bold text-gray-900">Notifications par email</h4>
+                        <p className="text-sm text-gray-600 mt-1">Recevez des notifications importantes par email</p>
+                      </div>
+                    </div>
+                    <ToggleButton
+                      checked={notifications.email_notifications}
+                      onChange={() => setNotifications(prev => ({ ...prev, email_notifications: !prev.email_notifications }))}
+                      label={`${notifications.email_notifications ? 'Désactiver' : 'Activer'} les notifications par email`}
+                    />
+                  </div>
+
+                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 hover:shadow-md transition-all duration-300">
+                    <div className="flex items-center gap-4">
+                      <div className="bg-[#6B46C1]/10 p-3 rounded-xl">
+                        <SparklesIcon className="w-6 h-6 text-[#6B46C1]" />
+                      </div>
+                      <div>
+                        <h4 className="text-base font-bold text-gray-900">Alertes d&apos;emploi</h4>
+                        <p className="text-sm text-gray-600 mt-1">Soyez notifié des nouveaux emplois correspondant à vos critères</p>
+                      </div>
+                    </div>
+                    <ToggleButton
+                      checked={notifications.job_alerts}
+                      onChange={() => setNotifications(prev => ({ ...prev, job_alerts: !prev.job_alerts }))}
+                      label={`${notifications.job_alerts ? 'Désactiver' : 'Activer'} les alertes d'emploi`}
+                    />
+                  </div>
+
+                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 hover:shadow-md transition-all duration-300">
+                    <div className="flex items-center gap-4">
+                      <div className="bg-[#F7C700]/10 p-3 rounded-xl">
+                        <BellIcon className="w-6 h-6 text-[#F7C700]" />
+                      </div>
+                      <div>
+                        <h4 className="text-base font-bold text-gray-900">Emails marketing</h4>
+                        <p className="text-sm text-gray-600 mt-1">Recevez des conseils carrière et des mises à jour</p>
+                      </div>
+                    </div>
+                    <ToggleButton
+                      checked={notifications.marketing_emails}
+                      onChange={() => setNotifications(prev => ({ ...prev, marketing_emails: !prev.marketing_emails }))}
+                      label={`${notifications.marketing_emails ? 'Désactiver' : 'Activer'} les emails marketing`}
+                    />
+                  </div>
+
+                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 hover:shadow-md transition-all duration-300">
+                    <div className="flex items-center gap-4">
+                      <div className="bg-[#3B82F6]/10 p-3 rounded-xl">
+                        <BellIcon className="w-6 h-6 text-[#3B82F6]" />
+                      </div>
+                      <div>
+                        <h4 className="text-base font-bold text-gray-900">Notifications push</h4>
+                        <p className="text-sm text-gray-600 mt-1">Recevez des notifications dans votre navigateur</p>
+                      </div>
+                    </div>
+                    <ToggleButton
+                      checked={notifications.push_notifications}
+                      onChange={() => setNotifications(prev => ({ ...prev, push_notifications: !prev.push_notifications }))}
+                      label={`${notifications.push_notifications ? 'Désactiver' : 'Activer'} les notifications push`}
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-6 border-t border-gray-100 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={updateNotifications}
+                    disabled={loading}
+                    className="px-8 py-3 bg-gradient-to-r from-[#3B82F6] to-[#2563eb] text-white rounded-2xl hover:shadow-lg hover:shadow-[#3B82F6]/30 transition-all duration-300 font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loading ? 'Enregistrement...' : 'Enregistrer les préférences'}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Privacy Tab */}
+            {activeTab === 'privacy' && (
+              <div className="p-8 space-y-8">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="bg-[#F7C700]/10 p-4 rounded-2xl">
+                    <ShieldCheckIcon className="w-8 h-8 text-[#F7C700]" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900">Paramètres de confidentialité</h3>
+                    <p className="text-gray-600">Contrôlez la visibilité de vos informations personnelles</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 hover:shadow-md transition-all duration-300">
+                    <div className="flex items-center gap-4">
+                      <div className="bg-[#6B9B5F]/10 p-3 rounded-xl">
+                        <UserIcon className="w-6 h-6 text-[#6B9B5F]" />
+                      </div>
+                      <div>
+                        <h4 className="text-base font-bold text-gray-900">Profil public</h4>
+                        <p className="text-sm text-gray-600 mt-1">Rendez votre profil visible aux recruteurs</p>
+                      </div>
+                    </div>
+                    <ToggleButton
+                      checked={privacy.is_profile_public}
+                      onChange={() => setPrivacy(prev => ({ ...prev, is_profile_public: !prev.is_profile_public }))}
+                      label={`${privacy.is_profile_public ? 'Rendre' : 'Garder'} le profil ${privacy.is_profile_public ? 'privé' : 'public'}`}
+                    />
+                  </div>
+
+                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 hover:shadow-md transition-all duration-300">
+                    <div className="flex items-center gap-4">
+                      <div className="bg-[#6B46C1]/10 p-3 rounded-xl">
+                        <BellIcon className="w-6 h-6 text-[#6B46C1]" />
+                      </div>
+                      <div>
+                        <h4 className="text-base font-bold text-gray-900">Afficher l&apos;email</h4>
+                        <p className="text-sm text-gray-600 mt-1">Permettre aux recruteurs de voir votre adresse email</p>
+                      </div>
+                    </div>
+                    <ToggleButton
+                      checked={privacy.show_email}
+                      onChange={() => setPrivacy(prev => ({ ...prev, show_email: !prev.show_email }))}
+                      label={`${privacy.show_email ? 'Masquer' : 'Afficher'} l'adresse email`}
+                    />
+                  </div>
+
+                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 hover:shadow-md transition-all duration-300">
+                    <div className="flex items-center gap-4">
+                      <div className="bg-[#F7C700]/10 p-3 rounded-xl">
+                        <BellIcon className="w-6 h-6 text-[#F7C700]" />
+                      </div>
+                      <div>
+                        <h4 className="text-base font-bold text-gray-900">Afficher le téléphone</h4>
+                        <p className="text-sm text-gray-600 mt-1">Permettre aux recruteurs de voir votre numéro</p>
+                      </div>
+                    </div>
+                    <ToggleButton
+                      checked={privacy.show_phone}
+                      onChange={() => setPrivacy(prev => ({ ...prev, show_phone: !prev.show_phone }))}
+                      label={`${privacy.show_phone ? 'Masquer' : 'Afficher'} le numéro de téléphone`}
+                    />
+                  </div>
+
+                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 hover:shadow-md transition-all duration-300">
+                    <div className="flex items-center gap-4">
+                      <div className="bg-[#3B82F6]/10 p-3 rounded-xl">
+                        <ShieldCheckIcon className="w-6 h-6 text-[#3B82F6]" />
+                      </div>
+                      <div>
+                        <h4 className="text-base font-bold text-gray-900">Contact par les recruteurs</h4>
+                        <p className="text-sm text-gray-600 mt-1">Autoriser les recruteurs à vous contacter directement</p>
+                      </div>
+                    </div>
+                    <ToggleButton
+                      checked={privacy.allow_recruiter_contact}
+                      onChange={() => setPrivacy(prev => ({ ...prev, allow_recruiter_contact: !prev.allow_recruiter_contact }))}
+                      label={`${privacy.allow_recruiter_contact ? 'Interdire' : 'Autoriser'} le contact par les recruteurs`}
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-6 border-t border-gray-100 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={updatePrivacy}
+                    disabled={loading}
+                    className="px-8 py-3 bg-gradient-to-r from-[#F7C700] to-[#e0b400] text-gray-900 rounded-2xl hover:shadow-lg hover:shadow-[#F7C700]/30 transition-all duration-300 font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loading ? 'Enregistrement...' : 'Enregistrer les paramètres'}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Account Tab */}
+            {activeTab === 'account' && (
+              <div className="p-8 space-y-8">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="bg-[#6B46C1]/10 p-4 rounded-2xl">
+                    <KeyIcon className="w-8 h-8 text-[#6B46C1]" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900">Gestion du compte</h3>
+                    <p className="text-gray-600">Consultez et gérez les paramètres de votre compte</p>
+                  </div>
+                </div>
+
+                {/* Account Info */}
+                <div className="bg-gradient-to-r from-[#6B9B5F]/5 to-[#6B46C1]/5 p-6 rounded-2xl border border-gray-100">
+                  <h4 className="text-lg font-bold text-gray-900 mb-4">Informations du compte</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                      <p className="text-sm font-medium text-gray-500 mb-1">Adresse email</p>
+                      <p className="text-sm font-bold text-gray-900">{user?.email}</p>
+                    </div>
+                    <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                      <p className="text-sm font-medium text-gray-500 mb-1">Nom complet</p>
+                      <p className="text-sm font-bold text-gray-900">{user?.fullName || 'N/A'}</p>
+                    </div>
+                    <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                      <p className="text-sm font-medium text-gray-500 mb-1">Rôle</p>
+                      <span className={`inline-flex px-3 py-1 text-xs font-bold rounded-full ${
+                        user?.role === 'admin' ? 'bg-[#6B46C1]/10 text-[#6B46C1]' :
+                        user?.role === 'candidate' ? 'bg-[#3B82F6]/10 text-[#3B82F6]' :
+                        'bg-[#6B9B5F]/10 text-[#6B9B5F]'
+                      }`}>
+                        {user?.role === 'candidate' ? 'Candidat' : user?.role === 'admin' ? 'Admin' : 'Employeur'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Security Section */}
+                <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+                  <h4 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <ShieldCheckIcon className="w-5 h-5 text-[#6B9B5F]" />
+                    Sécurité
+                  </h4>
+                  <p className="text-sm text-gray-600 mb-6">
+                    Gérez votre mot de passe et les paramètres de sécurité de votre compte.
+                  </p>
+
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between py-4 border-b border-gray-100">
+                      <div>
+                        <h5 className="text-base font-bold text-gray-900">Mot de passe</h5>
+                        <p className="text-sm text-gray-500 mt-1">Dernière modification: Il y a 30 jours</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setShowPasswordModal(true)}
+                        className="px-5 py-2.5 text-[#6B46C1] bg-[#6B46C1]/10 hover:bg-[#6B46C1]/20 rounded-xl transition-all duration-200 text-sm font-bold"
+                      >
+                        Changer le mot de passe
+                      </button>
+                    </div>
+
+                    <div className="flex items-center justify-between py-4 border-b border-gray-100">
+                      <div>
+                        <h5 className="text-base font-bold text-gray-900">Adresse email</h5>
+                        <p className="text-sm text-gray-500 mt-1">Actuellement: {user?.email}</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setShowEmailModal(true)}
+                        className="px-5 py-2.5 text-[#3B82F6] bg-[#3B82F6]/10 hover:bg-[#3B82F6]/20 rounded-xl transition-all duration-200 text-sm font-bold"
+                      >
+                        Modifier l&apos;email
+                      </button>
+                    </div>
+
+                    <div className="flex items-center justify-between py-4">
+                      <div>
+                        <h5 className="text-base font-bold text-gray-900">Authentification à deux facteurs</h5>
+                        <p className="text-sm text-gray-500 mt-1">Ajoutez une couche de sécurité supplémentaire</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => toast('Fonctionnalité 2FA à venir')}
+                        className="px-5 py-2.5 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all duration-200 text-sm font-bold"
+                      >
+                        Activer la 2FA
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Danger Zone */}
+                <div className="bg-gradient-to-r from-red-50 to-red-100/50 border-2 border-red-200 rounded-2xl p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="bg-red-100 p-3 rounded-xl shrink-0">
+                      <ExclamationTriangleIcon className="w-6 h-6 text-red-600" />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-lg font-bold text-red-900 mb-2">Zone de danger</h4>
+                      <p className="text-sm text-red-700 mb-4">
+                        Une fois votre compte supprimé, toutes vos données seront définitivement supprimées.
+                        Cette action ne peut pas être annulée.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={deleteAccount}
+                        disabled={loading}
+                        className="bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-3 rounded-xl hover:shadow-lg hover:shadow-red-500/30 transition-all duration-300 text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {loading ? 'Suppression en cours...' : 'Supprimer définitivement mon compte'}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
-        )}
-      </div>
+        </div>
       </div>
 
       {/* Modals */}
-      <ChangePasswordModal 
+      <ChangePasswordModal
         isOpen={showPasswordModal}
         onClose={() => setShowPasswordModal(false)}
         onSubmit={handleChangePassword}
       />
-      
+
       <ChangeEmailModal
         isOpen={showEmailModal}
         onClose={() => setShowEmailModal(false)}
         onSubmit={handleChangeEmail}
         currentEmail={user?.email || ''}
       />
+
+      <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.4s ease-out;
+        }
+      `}</style>
     </DashboardLayout>
   );
 }
