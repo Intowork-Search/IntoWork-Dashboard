@@ -77,7 +77,14 @@ export default function AdminDashboardPage() {
     );
   }
 
-  const activeJobs = stats?.jobs_by_status?.active || 0;
+  // Helper function to get job status value (handles case insensitivity)
+  const getJobStatusValue = (status: string): number => {
+    if (!stats?.jobs_by_status) return 0;
+    const jobsByStatus = stats.jobs_by_status as Record<string, number>;
+    return jobsByStatus[status] || jobsByStatus[status.toUpperCase()] || jobsByStatus[status.toLowerCase()] || 0;
+  };
+
+  const activeJobs = getJobStatusValue('active');
 
   // Chart data
   const userDistribution = [
@@ -87,11 +94,11 @@ export default function AdminDashboardPage() {
   ];
 
   const jobStatusData = [
-    { name: 'Actives', value: (stats?.jobs_by_status?.active || 0), color: BRAND_COLORS.primary },
-    { name: 'Pourvues', value: (stats?.jobs_by_status?.filled || 0), color: BRAND_COLORS.blue },
-    { name: 'Expirées', value: (stats?.jobs_by_status?.expired || stats?.jobs_by_status?.closed || 0), color: '#EF4444' },
-    { name: 'Brouillons', value: (stats?.jobs_by_status?.draft || 0), color: BRAND_COLORS.accent },
-  ];
+    { name: 'Actives', value: getJobStatusValue('active'), color: BRAND_COLORS.primary },
+    { name: 'Pourvues', value: getJobStatusValue('filled'), color: BRAND_COLORS.blue },
+    { name: 'Expirées', value: getJobStatusValue('expired') + getJobStatusValue('closed'), color: '#EF4444' },
+    { name: 'Brouillons', value: getJobStatusValue('draft'), color: BRAND_COLORS.accent },
+  ].filter(item => item.value > 0); // Remove entries with 0 value
 
   const monthlyData = [
     {
@@ -285,21 +292,30 @@ export default function AdminDashboardPage() {
                     outerRadius={100}
                     fill="#8884d8"
                     dataKey="value"
+                    style={{ fontSize: '14px', fontWeight: 600, fill: '#1F2937' }}
                   >
                     {userDistribution.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
+                      <Cell key={`cell-user-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
                   <Tooltip 
                     contentStyle={{
                       backgroundColor: 'white',
-                      border: '1px solid #E5E7EB',
+                      border: '2px solid #E5E7EB',
                       borderRadius: '12px',
-                      padding: '12px',
-                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                      padding: '12px 16px',
+                      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: '#1F2937'
                     }}
+                    labelStyle={{ color: '#1F2937', fontWeight: 600 }}
+                    itemStyle={{ color: '#1F2937', fontWeight: 600 }}
                   />
-                  <Legend wrapperStyle={{ fontSize: '13px', fontWeight: 500 }} iconType="circle" />
+                  <Legend 
+                    wrapperStyle={{ fontSize: '14px', fontWeight: 600, color: '#1F2937' }} 
+                    iconType="circle" 
+                  />
                 </PieChart>
               </ResponsiveContainer>
             )}
@@ -336,21 +352,30 @@ export default function AdminDashboardPage() {
                     outerRadius={100}
                     fill="#8884d8"
                     dataKey="value"
+                    style={{ fontSize: '14px', fontWeight: 600, fill: '#1F2937' }}
                   >
                     {jobStatusData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
+                      <Cell key={`cell-job-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
                   <Tooltip 
                     contentStyle={{
                       backgroundColor: 'white',
-                      border: '1px solid #E5E7EB',
+                      border: '2px solid #E5E7EB',
                       borderRadius: '12px',
-                      padding: '12px',
-                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                      padding: '12px 16px',
+                      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: '#1F2937'
                     }}
+                    labelStyle={{ color: '#1F2937', fontWeight: 600 }}
+                    itemStyle={{ color: '#1F2937', fontWeight: 600 }}
                   />
-                  <Legend wrapperStyle={{ fontSize: '13px', fontWeight: 500 }} iconType="circle" />
+                  <Legend 
+                    wrapperStyle={{ fontSize: '14px', fontWeight: 600, color: '#1F2937' }} 
+                    iconType="circle" 
+                  />
                 </PieChart>
               </ResponsiveContainer>
             )}
@@ -382,29 +407,33 @@ export default function AdminDashboardPage() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                 <XAxis 
                   dataKey="name" 
-                  stroke="#374151" 
-                  style={{ fontSize: '14px', fontWeight: 500 }} 
-                  tick={{ fill: '#374151' }} 
+                  stroke="#1F2937" 
+                  style={{ fontSize: '14px', fontWeight: 600, fill: '#1F2937' }} 
+                  tick={{ fill: '#1F2937' }} 
                 />
                 <YAxis 
-                  stroke="#374151" 
-                  style={{ fontSize: '14px', fontWeight: 500 }} 
-                  tick={{ fill: '#374151' }} 
+                  stroke="#1F2937" 
+                  style={{ fontSize: '14px', fontWeight: 600, fill: '#1F2937' }} 
+                  tick={{ fill: '#1F2937' }} 
                 />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: 'white',
-                    border: '1px solid #E5E7EB',
+                    border: '2px solid #E5E7EB',
                     borderRadius: '12px',
-                    padding: '12px',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                    padding: '12px 16px',
+                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
                     fontSize: '14px',
-                    fontWeight: 500
+                    fontWeight: 600,
+                    color: '#1F2937'
                   }}
+                  labelStyle={{ color: '#1F2937', fontWeight: 600, fontSize: '14px' }}
+                  itemStyle={{ color: '#1F2937', fontWeight: 600, fontSize: '14px' }}
+                  cursor={{ fill: 'rgba(107, 155, 95, 0.1)' }}
                 />
                 <Bar dataKey="value" radius={[8, 8, 0, 0]}>
                   {monthlyData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
+                    <Cell key={`cell-bar-${index}`} fill={entry.color} />
                   ))}
                 </Bar>
               </BarChart>
