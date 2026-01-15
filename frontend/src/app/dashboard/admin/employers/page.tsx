@@ -5,7 +5,6 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/DashboardLayout';
 import { adminAPI, type AdminEmployer } from '@/lib/api';
-import toast from 'react-hot-toast';
 import {
   BuildingOfficeIcon,
   MagnifyingGlassIcon,
@@ -50,7 +49,6 @@ export default function AdminEmployersPage() {
       setEmployers(filtered);
     } catch (error) {
       console.error('Erreur chargement employeurs:', error);
-      toast.error('Erreur lors du chargement des employeurs');
     } finally {
       setLoading(false);
     }
@@ -61,43 +59,6 @@ export default function AdminEmployersPage() {
       loadEmployers();
     }
   }, [session?.accessToken, search]);
-
-  const handleToggleEmployerStatus = async (employerId: number, currentStatus: boolean) => {
-    if (!session?.accessToken) return;
-    
-    try {
-      // NOTE: Le backend n'a pas encore de route /admin/employers/{id}/activate
-      // On doit activer/désactiver l'utilisateur associé via /admin/users/{user_id}/activate
-      // Pour l'instant, on affiche juste un message
-      toast('⚠️ Action non disponible - Route backend manquante', { icon: 'ℹ️' });
-      
-      // TODO Backend: Créer la route PUT /admin/employers/{id}/activate
-      // Ou utiliser PUT /admin/users/{user_id}/activate avec l'user_id de l'employeur
-      
-    } catch (error) {
-      console.error('Erreur toggle status:', error);
-      toast.error('Erreur lors de la modification du statut');
-    }
-  };
-
-  const handleDeleteEmployer = async (employerId: number, companyName: string) => {
-    if (!confirm(`⚠️ ATTENTION ⚠️\n\nÊtes-vous sûr de vouloir supprimer l'entreprise ${companyName} ?\n\nCette action supprimera l'employeur et potentiellement ses offres d'emploi.`)) return;
-    if (!session?.accessToken) return;
-
-    try {
-      // NOTE: Le backend n'a pas de route DELETE /admin/employers/{id}
-      // On peut supprimer l'utilisateur associé via DELETE /admin/users/{user_id}
-      // Pour l'instant, on affiche juste un message
-      toast('⚠️ Action non disponible - Route backend manquante', { icon: 'ℹ️' });
-      
-      // TODO Backend: Créer la route DELETE /admin/employers/{id}
-      // Ou utiliser DELETE /admin/users/{user_id} avec l'user_id de l'employeur
-      
-    } catch (error) {
-      console.error('Erreur suppression:', error);
-      toast.error('Erreur lors de la suppression');
-    }
-  };
 
   if (status === 'loading' || loading) {
     return (
@@ -196,26 +157,6 @@ export default function AdminEmployersPage() {
                 <span className="text-sm text-gray-500 font-medium">
                   Inscrit le {new Date(employer.created_at).toLocaleDateString('fr-FR')}
                 </span>
-              </div>
-
-              {/* Actions */}
-              <div className="flex gap-3">
-                <button
-                  onClick={() => handleToggleEmployerStatus(employer.id, employer.is_active)}
-                  className={`flex-1 px-5 py-3 text-sm font-bold rounded-xl transition-all duration-200 ${
-                    employer.is_active
-                      ? 'bg-[#F7C700]/10 text-[#b39200] hover:bg-[#F7C700]/20 hover:shadow-md hover:shadow-[#F7C700]/20'
-                      : 'bg-[#6B9B5F]/10 text-[#6B9B5F] hover:bg-[#6B9B5F]/20 hover:shadow-md hover:shadow-[#6B9B5F]/20'
-                  }`}
-                >
-                  {employer.is_active ? 'Désactiver' : 'Activer'}
-                </button>
-                <button
-                  onClick={() => handleDeleteEmployer(employer.id, employer.company_name || 'cette entreprise')}
-                  className="flex-1 px-5 py-3 text-sm font-bold bg-red-100 text-red-700 hover:bg-red-200 hover:shadow-md hover:shadow-red-200/50 rounded-xl transition-all duration-200"
-                >
-                  Supprimer
-                </button>
               </div>
             </div>
           ))}

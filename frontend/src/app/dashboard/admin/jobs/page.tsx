@@ -5,7 +5,6 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/DashboardLayout';
 import { adminAPI, type AdminJob } from '@/lib/api';
-import toast from 'react-hot-toast';
 import {
   BriefcaseIcon,
   MagnifyingGlassIcon,
@@ -47,7 +46,6 @@ export default function AdminJobsPage() {
       setJobs(jobsData);
     } catch (error) {
       console.error('Erreur chargement offres:', error);
-      toast.error('Erreur lors du chargement des offres');
     } finally {
       setLoading(false);
     }
@@ -58,41 +56,6 @@ export default function AdminJobsPage() {
       loadJobs();
     }
   }, [session?.accessToken, search, currentPage]);
-
-  const handleToggleJobStatus = async (jobId: number, currentStatus: string) => {
-    if (!session?.accessToken) return;
-    
-    try {
-      // NOTE: Le backend n'a pas de route /admin/jobs/{id}/toggle-status
-      // Il faudrait créer cette route pour permettre à l'admin de changer le statut
-      toast('⚠️ Action non disponible - Route backend manquante', { icon: 'ℹ️' });
-      
-      // TODO Backend: Créer la route PATCH /admin/jobs/{id}/status
-      // Body: { status: 'active' | 'closed' | 'draft' | 'expired' | 'filled' }
-      
-    } catch (error) {
-      console.error('Erreur toggle status:', error);
-      toast.error('Erreur lors de la modification du statut');
-    }
-  };
-
-  const handleDeleteJob = async (jobId: number, jobTitle: string) => {
-    if (!confirm(`⚠️ ATTENTION ⚠️\n\nÊtes-vous sûr de vouloir supprimer l'offre "${jobTitle}" ?\n\nCette action supprimera également toutes les candidatures associées.`)) return;
-    if (!session?.accessToken) return;
-
-    try {
-      // NOTE: Le backend n'a pas de route DELETE /admin/jobs/{id}
-      // Il existe DELETE /jobs/{id} mais elle est pour l'employeur propriétaire uniquement
-      toast('⚠️ Action non disponible - Route backend manquante', { icon: 'ℹ️' });
-      
-      // TODO Backend: Créer la route DELETE /admin/jobs/{id}
-      // Permet à l'admin de supprimer n'importe quelle offre
-      
-    } catch (error) {
-      console.error('Erreur suppression:', error);
-      toast.error('Erreur lors de la suppression');
-    }
-  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -213,8 +176,8 @@ export default function AdminJobsPage() {
                     {getStatusBadge(job.status)}
                   </div>
 
-                  {/* Statistiques et actions */}
-                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pt-4 border-t border-gray-100">
+                  {/* Statistiques */}
+                  <div className="flex flex-col gap-4 pt-4 border-t border-gray-100">
                     <div className="flex items-center gap-6 text-sm">
                       <div className="flex items-center gap-2">
                         <UsersIcon className="w-5 h-5 text-gray-400" />
@@ -225,25 +188,6 @@ export default function AdminJobsPage() {
                       <span className="text-gray-500">
                         Publié le {new Date(job.created_at).toLocaleDateString('fr-FR')}
                       </span>
-                    </div>
-
-                    <div className="flex gap-3">
-                      <button
-                        onClick={() => handleToggleJobStatus(job.id, job.status)}
-                        className={`px-5 py-2.5 text-sm font-bold rounded-xl transition-all duration-200 ${
-                          job.status === 'active'
-                            ? 'bg-[#F7C700]/10 text-[#b39200] hover:bg-[#F7C700]/20 hover:shadow-md hover:shadow-[#F7C700]/20'
-                            : 'bg-[#6B9B5F]/10 text-[#6B9B5F] hover:bg-[#6B9B5F]/20 hover:shadow-md hover:shadow-[#6B9B5F]/20'
-                        }`}
-                      >
-                        {job.status === 'active' ? 'Désactiver' : 'Activer'}
-                      </button>
-                      <button
-                        onClick={() => handleDeleteJob(job.id, job.title)}
-                        className="px-5 py-2.5 text-sm font-bold bg-red-100 text-red-700 hover:bg-red-200 hover:shadow-md hover:shadow-red-200/50 rounded-xl transition-all duration-200"
-                      >
-                        Supprimer
-                      </button>
                     </div>
                   </div>
                 </div>
