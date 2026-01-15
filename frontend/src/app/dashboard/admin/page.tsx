@@ -80,41 +80,58 @@ export default function AdminDashboardPage() {
   // Helper function to get job status value (handles case insensitivity)
   const getJobStatusValue = (status: string): number => {
     if (!stats?.jobs_by_status) return 0;
-    const jobsByStatus = stats.jobs_by_status as Record<string, number>;
-    return jobsByStatus[status] || jobsByStatus[status.toUpperCase()] || jobsByStatus[status.toLowerCase()] || 0;
+    const jobsByStatus = stats.jobs_by_status;
+    // Try all possible case variations
+    const statusLower = status.toLowerCase();
+    const statusUpper = status.toUpperCase();
+    const statusCapital = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+    
+    return (jobsByStatus as any)[status] || 
+           (jobsByStatus as any)[statusLower] || 
+           (jobsByStatus as any)[statusUpper] || 
+           (jobsByStatus as any)[statusCapital] || 0;
   };
 
-  const activeJobs = getJobStatusValue('active');
+  // If jobs_by_status is empty, use total_jobs as fallback for "active"
+  const activeJobs = getJobStatusValue('active') || (stats?.total_jobs || 0);
 
   // Chart data
   const userDistribution = [
-    { name: 'Candidats', value: stats?.total_candidates || 0, color: BRAND_COLORS.blue },
-    { name: 'Employeurs', value: stats?.total_employers || 0, color: BRAND_COLORS.primary },
-    { name: 'Actifs', value: stats?.active_users || 0, color: BRAND_COLORS.accent },
-  ];
+    { name: 'Candidats', value: stats?.total_candidates || 0, fill: BRAND_COLORS.blue },
+    { name: 'Employeurs', value: stats?.total_employers || 0, fill: BRAND_COLORS.primary },
+    { name: 'Actifs', value: stats?.active_users || 0, fill: BRAND_COLORS.accent },
+  ].filter(item => item.value > 0);
 
-  const jobStatusData = [
-    { name: 'Actives', value: getJobStatusValue('active'), color: BRAND_COLORS.primary },
-    { name: 'Pourvues', value: getJobStatusValue('filled'), color: BRAND_COLORS.blue },
-    { name: 'Expirées', value: getJobStatusValue('expired') + getJobStatusValue('closed'), color: '#EF4444' },
-    { name: 'Brouillons', value: getJobStatusValue('draft'), color: BRAND_COLORS.accent },
-  ].filter(item => item.value > 0); // Remove entries with 0 value
+  // If we have jobs_by_status, use it, otherwise create fallback data
+  let jobStatusData = [
+    { name: 'Actives', value: getJobStatusValue('active'), fill: BRAND_COLORS.primary },
+    { name: 'Pourvues', value: getJobStatusValue('filled'), fill: BRAND_COLORS.blue },
+    { name: 'Expirées', value: getJobStatusValue('expired') + getJobStatusValue('closed'), fill: '#EF4444' },
+    { name: 'Brouillons', value: getJobStatusValue('draft'), fill: BRAND_COLORS.accent },
+  ].filter(item => item.value > 0);
+
+  // If no data, use total_jobs as fallback
+  if (jobStatusData.length === 0 && stats?.total_jobs && stats.total_jobs > 0) {
+    jobStatusData = [
+      { name: 'Total', value: stats.total_jobs, fill: BRAND_COLORS.primary }
+    ];
+  }
 
   const monthlyData = [
     {
       name: 'Utilisateurs',
       value: stats?.total_users || 0,
-      color: BRAND_COLORS.secondary
+      fill: BRAND_COLORS.secondary
     },
     {
       name: 'Offres',
       value: stats?.total_jobs || 0,
-      color: BRAND_COLORS.primary
+      fill: BRAND_COLORS.primary
     },
     {
       name: 'Candidatures',
       value: stats?.total_applications || 0,
-      color: BRAND_COLORS.blue
+      fill: BRAND_COLORS.blue
     }
   ];
 
@@ -290,12 +307,11 @@ export default function AdminDashboardPage() {
                     labelLine={true}
                     label={({ name, value }) => `${name}: ${value}`}
                     outerRadius={100}
-                    fill="#8884d8"
                     dataKey="value"
-                    style={{ fontSize: '14px', fontWeight: 600, fill: '#1F2937' }}
+                    style={{ fontSize: '14px', fontWeight: 600 }}
                   >
                     {userDistribution.map((entry, index) => (
-                      <Cell key={`cell-user-${index}`} fill={entry.color} />
+                      <Cell key={`cell-user-${entry.name}-${index}`} fill={entry.fill} />
                     ))}
                   </Pie>
                   <Tooltip 
@@ -350,12 +366,11 @@ export default function AdminDashboardPage() {
                     labelLine={true}
                     label={({ name, value }) => `${name}: ${value}`}
                     outerRadius={100}
-                    fill="#8884d8"
                     dataKey="value"
-                    style={{ fontSize: '14px', fontWeight: 600, fill: '#1F2937' }}
+                    style={{ fontSize: '14px', fontWeight: 600 }}
                   >
                     {jobStatusData.map((entry, index) => (
-                      <Cell key={`cell-job-${index}`} fill={entry.color} />
+                      <Cell key={`cell-job-${entry.name}-${index}`} fill={entry.fill} />
                     ))}
                   </Pie>
                   <Tooltip 
@@ -433,7 +448,7 @@ export default function AdminDashboardPage() {
                 />
                 <Bar dataKey="value" radius={[8, 8, 0, 0]}>
                   {monthlyData.map((entry, index) => (
-                    <Cell key={`cell-bar-${index}`} fill={entry.color} />
+                    <Cell key={`cell-bar-${entry.name}-${index}`} fill={entry.fill} />
                   ))}
                 </Bar>
               </BarChart>
