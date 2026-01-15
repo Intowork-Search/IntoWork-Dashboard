@@ -8,11 +8,13 @@ import { adminAPI, type AdminJob } from '@/lib/api';
 import toast from 'react-hot-toast';
 import {
   BriefcaseIcon,
-  BuildingOfficeIcon,
+  MagnifyingGlassIcon,
   MapPinIcon,
-  CurrencyEuroIcon,
+  BuildingOfficeIcon,
+  UsersIcon,
   CheckCircleIcon,
   XCircleIcon,
+  ArrowPathIcon,
   ChevronLeftIcon,
   ChevronRightIcon
 } from '@heroicons/react/24/outline';
@@ -24,8 +26,8 @@ export default function AdminJobsPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [jobs, setJobs] = useState<AdminJob[]>([]);
+  const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalJobs, setTotalJobs] = useState(0);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -33,37 +35,112 @@ export default function AdminJobsPage() {
     }
   }, [status, router]);
 
+  const loadJobs = async () => {
+    if (!session?.accessToken) return;
+
+    try {
+      setLoading(true);
+      const jobsData = await adminAPI.getJobs(session.accessToken, {
+        limit: ITEMS_PER_PAGE,
+        skip: (currentPage - 1) * ITEMS_PER_PAGE
+      });
+      setJobs(jobsData);
+    } catch (error) {
+      console.error('Erreur chargement offres:', error);
+      toast.error('Erreur lors du chargement des offres');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const loadJobs = async () => {
-      if (!session?.accessToken) return;
-
-      try {
-        setLoading(true);
-        const jobsData = await adminAPI.getJobs(session.accessToken, {
-          limit: ITEMS_PER_PAGE,
-          skip: (currentPage - 1) * ITEMS_PER_PAGE
-        });
-        setJobs(jobsData);
-        // Vous pouvez ajouter un appel pour récupérer le total si l'API le supporte
-        setTotalJobs(jobsData.length);
-      } catch (error) {
-        console.error('Erreur chargement offres:', error);
-        toast.error('Erreur lors du chargement des offres');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     if (session?.accessToken) {
       loadJobs();
     }
-  }, [session?.accessToken, currentPage]);
+  }, [session?.accessToken, search, currentPage]);
 
-  const totalPages = Math.ceil(totalJobs / ITEMS_PER_PAGE);
-
-  const formatSalary = (job: AdminJob) => {
-    return 'Salaire non spécifié';
+  const handleToggleJobStatus = async (jobId: number, currentStatus: string) => {
+    if (!session?.accessToken) return;
+    
+    try {
+      // NOTE: Le backend n'a pas de route /admin/jobs/{id}/toggle-status
+      // Il faudrait créer cette route pour permettre à l'admin de changer le statut
+      toast('⚠️ Action non disponible - Route backend manquante', { icon: 'ℹ️' });
+      
+      // TODO Backend: Créer la route PATCH /admin/jobs/{id}/status
+      // Body: { status: 'active' | 'closed' | 'draft' | 'expired' | 'filled' }
+      
+    } catch (error) {
+      console.error('Erreur toggle status:', error);
+      toast.error('Erreur lors de la modification du statut');
+    }
   };
+
+  const handleDeleteJob = async (jobId: number, jobTitle: string) => {
+    if (!confirm(`⚠️ ATTENTION ⚠️\n\nÊtes-vous sûr de vouloir supprimer l'offre "${jobTitle}" ?\n\nCette action supprimera également toutes les candidatures associées.`)) return;
+    if (!session?.accessToken) return;
+
+    try {
+      // NOTE: Le backend n'a pas de route DELETE /admin/jobs/{id}
+      // Il existe DELETE /jobs/{id} mais elle est pour l'employeur propriétaire uniquement
+      toast('⚠️ Action non disponible - Route backend manquante', { icon: 'ℹ️' });
+      
+      // TODO Backend: Créer la route DELETE /admin/jobs/{id}
+      // Permet à l'admin de supprimer n'importe quelle offre
+      
+    } catch (error) {
+      console.error('Erreur suppression:', error);
+      toast.error('Erreur lors de la suppression');
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'active':
+        return (
+          <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold bg-[#6B9B5F]/10 text-[#6B9B5F]">
+            <CheckCircleIcon className="w-5 h-5" />
+            Active
+          </span>
+        );
+      case 'filled':
+        return (
+          <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold bg-blue-100 text-blue-700">
+            <CheckCircleIcon className="w-5 h-5" />
+            Pourvue
+          </span>
+        );
+      case 'draft':
+        return (
+          <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold bg-[#F7C700]/10 text-[#b39200]">
+            <XCircleIcon className="w-5 h-5" />
+            Brouillon
+          </span>
+        );
+      case 'expired':
+        return (
+          <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold bg-red-100 text-red-700">
+            <XCircleIcon className="w-5 h-5" />
+            Expirée
+          </span>
+        );
+      case 'closed':
+        return (
+          <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold bg-gray-100 text-gray-700">
+            <XCircleIcon className="w-5 h-5" />
+            Fermée
+          </span>
+        );
+      default:
+        return (
+          <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold bg-gray-100 text-gray-700">
+            {status}
+          </span>
+        );
+    }
+  };
+
+  const totalPages = Math.ceil(jobs.length / ITEMS_PER_PAGE);
 
   if (status === 'loading' || loading) {
     return (
@@ -78,108 +155,137 @@ export default function AdminJobsPage() {
   return (
     <DashboardLayout 
       title="Gestion des offres d'emploi" 
-      subtitle={`${totalJobs} offre${totalJobs > 1 ? 's' : ''} publiée${totalJobs > 1 ? 's' : ''}`}
+      subtitle={`${jobs.length} offre${jobs.length > 1 ? 's' : ''} publiée${jobs.length > 1 ? 's' : ''}`}
     >
-      {/* Liste des offres */}
-      <div className="space-y-4">
-        {jobs.map((job) => (
-          <div
-            key={job.id}
-            className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-lg transition-all"
-          >
-            <div className="flex items-start justify-between gap-4">
-              {/* Contenu principal */}
-              <div className="flex-1">
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#F7C700] to-[#e5b800] flex items-center justify-center flex-shrink-0">
-                    <BriefcaseIcon className="w-6 h-6 text-white" />
+      <div className="space-y-6">
+        {/* En-tête avec recherche */}
+        <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-6 border border-gray-100">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1 relative">
+              <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Rechercher une offre..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] text-gray-900 placeholder:text-gray-400 transition-all duration-200"
+              />
+            </div>
+            <button
+              onClick={loadJobs}
+              className="px-6 py-3 bg-gradient-to-r from-[#F7C700] to-[#e0b400] text-white rounded-2xl hover:shadow-lg hover:shadow-[#F7C700]/30 transition-all duration-300 flex items-center gap-2 font-medium"
+            >
+              <ArrowPathIcon className="w-5 h-5" />
+              Actualiser
+            </button>
+          </div>
+        </div>
+
+        {/* Liste des offres */}
+        <div className="space-y-4">
+          {jobs.map((job) => (
+            <div 
+              key={job.id} 
+              className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-8 border border-gray-100 hover:shadow-2xl hover:shadow-gray-300/50 transition-all duration-300"
+            >
+              <div className="flex flex-col lg:flex-row gap-6">
+                {/* Icône */}
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#6B9B5F] to-[#5a8a4f] flex items-center justify-center text-white font-bold shadow-lg shadow-[#6B9B5F]/20 flex-shrink-0">
+                  <BriefcaseIcon className="w-7 h-7" />
+                </div>
+
+                {/* Contenu */}
+                <div className="flex-1">
+                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-4">
+                    <div>
+                      <h3 className="font-bold text-xl text-gray-900 mb-2">{job.title}</h3>
+                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                        <div className="flex items-center gap-2">
+                          <BuildingOfficeIcon className="w-5 h-5 text-[#6B9B5F]" />
+                          <span className="font-medium">{job.company_name}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <MapPinIcon className="w-5 h-5 text-[#6B9B5F]" />
+                          <span>{job.location}</span>
+                        </div>
+                      </div>
+                    </div>
+                    {getStatusBadge(job.status)}
                   </div>
-                  <div className="flex-1">
-                    <h3 className="font-bold text-gray-900 text-lg mb-1">
-                      {job.title}
-                    </h3>
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <BuildingOfficeIcon className="w-4 h-4" />
-                      <span className="font-medium">{job.company_name}</span>
+
+                  {/* Statistiques et actions */}
+                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pt-4 border-t border-gray-100">
+                    <div className="flex items-center gap-6 text-sm">
+                      <div className="flex items-center gap-2">
+                        <UsersIcon className="w-5 h-5 text-gray-400" />
+                        <span className="text-gray-600 font-medium">
+                          {job.applications_count} candidature{job.applications_count > 1 ? 's' : ''}
+                        </span>
+                      </div>
+                      <span className="text-gray-500">
+                        Publié le {new Date(job.created_at).toLocaleDateString('fr-FR')}
+                      </span>
+                    </div>
+
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => handleToggleJobStatus(job.id, job.status)}
+                        className={`px-5 py-2.5 text-sm font-bold rounded-xl transition-all duration-200 ${
+                          job.status === 'active'
+                            ? 'bg-[#F7C700]/10 text-[#b39200] hover:bg-[#F7C700]/20 hover:shadow-md hover:shadow-[#F7C700]/20'
+                            : 'bg-[#6B9B5F]/10 text-[#6B9B5F] hover:bg-[#6B9B5F]/20 hover:shadow-md hover:shadow-[#6B9B5F]/20'
+                        }`}
+                      >
+                        {job.status === 'active' ? 'Désactiver' : 'Activer'}
+                      </button>
+                      <button
+                        onClick={() => handleDeleteJob(job.id, job.title)}
+                        className="px-5 py-2.5 text-sm font-bold bg-red-100 text-red-700 hover:bg-red-200 hover:shadow-md hover:shadow-red-200/50 rounded-xl transition-all duration-200"
+                      >
+                        Supprimer
+                      </button>
                     </div>
                   </div>
                 </div>
-
-                {/* Détails */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <MapPinIcon className="w-4 h-4 text-gray-400" />
-                    <span>{job.location || 'Non spécifié'}</span>
-                  </div>
-
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <CurrencyEuroIcon className="w-4 h-4 text-gray-400" />
-                    <span>{formatSalary(job)}</span>
-                  </div>
-
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <BriefcaseIcon className="w-4 h-4 text-gray-400" />
-                    <span>{job.status || 'Statut non spécifié'}</span>
-                  </div>
-                </div>
-
-                {/* Stats */}
-                <div className="flex items-center gap-6 text-sm text-gray-500">
-                  <span>{job.applications_count || 0} candidatures</span>
-                  <span>Publié le {new Date(job.created_at).toLocaleDateString('fr-FR')}</span>
-                </div>
-              </div>
-
-              {/* Statut */}
-              <div>
-                {job.status === 'active' ? (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    <CheckCircleIcon className="w-4 h-4" />
-                    Active
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                    <XCircleIcon className="w-4 h-4" />
-                    {job.status || 'Inactive'}
-                  </span>
-                )}
               </div>
             </div>
+          ))}
+        </div>
+
+        {jobs.length === 0 && (
+          <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-12 text-center border border-gray-100">
+            <BriefcaseIcon className="w-20 h-20 text-gray-300 mx-auto mb-4" />
+            <p className="text-gray-500 text-lg">Aucune offre trouvée</p>
           </div>
-        ))}
+        )}
+
+        {/* Pagination */}
+        {jobs.length > 0 && totalPages > 1 && (
+          <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-6 border border-gray-100">
+            <div className="flex items-center justify-between">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className="px-5 py-2.5 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-medium"
+              >
+                <ChevronLeftIcon className="w-5 h-5" />
+                Précédent
+              </button>
+              <span className="text-gray-600 font-medium">
+                Page {currentPage} sur {totalPages}
+              </span>
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+                className="px-5 py-2.5 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-medium"
+              >
+                Suivant
+                <ChevronRightIcon className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
-
-      {jobs.length === 0 && (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
-          <BriefcaseIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500">Aucune offre d'emploi trouvée</p>
-        </div>
-      )}
-
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 mt-8">
-          <button
-            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-            disabled={currentPage === 1}
-            className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            <ChevronLeftIcon className="w-5 h-5" />
-          </button>
-
-          <span className="px-4 py-2 text-sm text-gray-700">
-            Page {currentPage} sur {totalPages}
-          </span>
-
-          <button
-            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-            disabled={currentPage === totalPages}
-            className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            <ChevronRightIcon className="w-5 h-5" />
-          </button>
-        </div>
-      )}
     </DashboardLayout>
   );
 }
