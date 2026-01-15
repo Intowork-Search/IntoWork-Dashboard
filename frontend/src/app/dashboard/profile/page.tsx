@@ -13,7 +13,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth, useUser } from '@/hooks/useNextAuth';
 import DashboardLayout from '@/components/DashboardLayout';
-import { candidatesAPI, CandidateProfile, Experience, Education, Skill } from '@/lib/api';
+import { candidatesAPI, CandidateProfile } from '@/lib/api';
 import {
   UserIcon,
   BriefcaseIcon,
@@ -31,7 +31,6 @@ import {
   TrashIcon,
   CalendarIcon,
   BuildingOfficeIcon,
-  StarIcon,
 } from '@heroicons/react/24/outline';
 import { CheckCircleIcon as CheckCircleSolid } from '@heroicons/react/24/solid';
 
@@ -58,8 +57,6 @@ export default function ProfilePage() {
   const [showExperienceModal, setShowExperienceModal] = useState(false);
   const [showEducationModal, setShowEducationModal] = useState(false);
   const [showSkillModal, setShowSkillModal] = useState(false);
-  const [editingExperience, setEditingExperience] = useState<Experience | null>(null);
-  const [editingEducation, setEditingEducation] = useState<Education | null>(null);
 
   // État pour le profil complet
   const [profile, setProfile] = useState<CandidateProfile | null>(null);
