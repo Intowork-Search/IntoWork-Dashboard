@@ -66,8 +66,7 @@ app = FastAPI(
     title="INTOWORK Search - Backend",
     description="Plateforme de recrutement B2B2C - API Backend",
     version="1.0.0",
-    lifespan=lifespan,
-    # Re-enabled: redirect_slashes works correctly with ProxyHeadersMiddleware
+    lifespan=lifespan
 )
 
 # Security: Add rate limiter state and exception handler

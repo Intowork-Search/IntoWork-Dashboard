@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/DashboardLayout';
-import { adminAPI, type AdminUser } from '@/lib/api';
+import { adminAPI } from '@/lib/api';
+import { useAdminUsers } from '@/hooks/useAdminData';
 import toast from 'react-hot-toast';
 import {
   UsersIcon,
@@ -17,41 +18,16 @@ import {
 export default function AdminUsersPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [users, setUsers] = useState<AdminUser[]>([]);
   const [userSearch, setUserSearch] = useState('');
   const [userRoleFilter, setUserRoleFilter] = useState('');
 
-  useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/signin');
-    }
-  }, [status, router]);
+  // Utilise SWR pour le cache automatique
+  const { users, isLoading, refresh } = useAdminUsers(userSearch, userRoleFilter);
 
-  const loadUsers = async () => {
-    if (!session?.accessToken) return;
-
-    try {
-      setLoading(true);
-      const usersData = await adminAPI.getUsers(session.accessToken, {
-        search: userSearch || undefined,
-        role: userRoleFilter || undefined,
-        limit: 100
-      });
-      setUsers(usersData);
-    } catch (error) {
-      console.error('Erreur chargement utilisateurs:', error);
-      toast.error('Erreur lors du chargement des utilisateurs');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (session?.accessToken) {
-      loadUsers();
-    }
-  }, [session?.accessToken, userSearch, userRoleFilter]);
+  if (status === 'unauthenticated') {
+    router.push('/signin');
+    return null;
+  }
 
   const handleToggleUserStatus = async (userId: number, currentStatus: boolean) => {
     if (!session?.accessToken) return;
@@ -59,7 +35,7 @@ export default function AdminUsersPage() {
     try {
       await adminAPI.toggleUserActivation(session.accessToken, userId, !currentStatus);
       toast.success(currentStatus ? 'Utilisateur désactivé avec succès' : 'Utilisateur activé avec succès');
-      loadUsers();
+      refresh(); // Rafraîchit le cache SWR
     } catch (error) {
       console.error('Erreur toggle status:', error);
       toast.error('Erreur lors de la modification du statut');
@@ -73,7 +49,7 @@ export default function AdminUsersPage() {
     try {
       await adminAPI.deleteUser(session.accessToken, userId);
       toast.success('Utilisateur supprimé avec succès');
-      loadUsers();
+      refresh(); // Rafraîchit le cache SWR
     } catch (error: any) {
       console.error('Erreur suppression:', error);
       const errorMessage = error.response?.data?.detail || 'Erreur lors de la suppression';
@@ -81,7 +57,7 @@ export default function AdminUsersPage() {
     }
   };
 
-  if (status === 'loading' || loading) {
+  if (status === 'loading' || isLoading) {
     return (
       <DashboardLayout title="Utilisateurs" subtitle="Chargement...">
         <div className="flex items-center justify-center h-64">
@@ -122,7 +98,7 @@ export default function AdminUsersPage() {
               <option value="admin">Admins</option>
             </select>
             <button
-              onClick={loadUsers}
+              onClick={() => refresh()}
               className="px-6 py-3 bg-gradient-to-r from-[#6B9B5F] to-[#5a8a4f] text-white rounded-2xl hover:shadow-lg hover:shadow-[#6B9B5F]/30 transition-all duration-300 flex items-center gap-2 font-medium"
             >
               <ArrowPathIcon className="w-5 h-5" />
