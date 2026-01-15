@@ -145,9 +145,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Add Request ID middleware for distributed tracing
-app.add_middleware(RequestIDMiddleware)
-
 # Inclure les routers
 app.include_router(ping_router, prefix="/api")
 app.include_router(users_router, prefix="/api")

@@ -41,9 +41,12 @@ def serialize_record(record):
     return json.dumps(subset)
 
 
-def json_formatter(record):
-    """Custom formatter for JSON output"""
-    return serialize_record(record) + "\n"
+def json_sink(message):
+    """Custom sink for JSON output - writes pre-formatted JSON to stdout"""
+    record = message.record
+    output = serialize_record(record)
+    sys.stdout.write(output + "\n")
+    sys.stdout.flush()
 
 
 def configure_logging():
@@ -62,26 +65,30 @@ def configure_logging():
     log_level = os.getenv("LOG_LEVEL", "INFO")
 
     if environment == "production":
-        # Production: JSON format to stdout
+        # Production: JSON format to stdout using custom sink
         logger.add(
-            sys.stdout,
-            format=json_formatter,
+            json_sink,
             level=log_level,
-            serialize=False,  # We handle serialization manually
         )
 
-        # Production: Also write to rotating file
+        # Production: Also write to rotating file with JSON format
         logs_dir = Path(__file__).parent.parent / "logs"
         logs_dir.mkdir(exist_ok=True)
 
+        def json_file_sink(message):
+            """Write JSON logs to file"""
+            record = message.record
+            output = serialize_record(record)
+            return output + "\n"
+
         logger.add(
             logs_dir / "app_{time:YYYY-MM-DD}.log",
-            format=json_formatter,
+            format="{message}",
             level=log_level,
             rotation="500 MB",
             retention="30 days",
             compression="zip",
-            serialize=False,
+            serialize=True,  # Use Loguru's built-in JSON serialization for files
         )
     else:
         # Development: Human-readable colored output
