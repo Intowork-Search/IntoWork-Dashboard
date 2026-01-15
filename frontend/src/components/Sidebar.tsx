@@ -16,6 +16,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   BuildingOfficeIcon,
+  BriefcaseIcon,
   ArrowRightOnRectangleIcon
 } from '@heroicons/react/24/outline';
 
@@ -71,10 +72,28 @@ function getEmployerNavigation(jobsCount: number): NavItem[] {
 function getAdminNavigation(): NavItem[] {
   return [
     { 
-      name: 'Back-office Admin', 
+      name: 'Dashboard', 
       href: '/dashboard/admin', 
       icon: ChartBarIcon, 
-      description: "Gestion de la plateforme"
+      description: "Vue d'ensemble et statistiques"
+    },
+    { 
+      name: 'Utilisateurs', 
+      href: '/dashboard/admin?tab=users', 
+      icon: UserIcon, 
+      description: "Gestion des utilisateurs"
+    },
+    { 
+      name: 'Entreprises', 
+      href: '/dashboard/admin?tab=employers', 
+      icon: BuildingOfficeIcon, 
+      description: "Gestion des entreprises"
+    },
+    { 
+      name: 'Offres', 
+      href: '/dashboard/admin?tab=jobs', 
+      icon: BriefcaseIcon, 
+      description: "Gestion des offres d'emploi"
     },
     { 
       name: 'Paramètres', 
