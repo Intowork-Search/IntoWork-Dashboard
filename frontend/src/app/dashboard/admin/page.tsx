@@ -6,6 +6,19 @@ import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/DashboardLayout';
 import { adminAPI, type AdminStats } from '@/lib/api';
 import {
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer
+} from 'recharts';
+import {
   UsersIcon,
   BriefcaseIcon,
   BuildingOfficeIcon,
@@ -13,6 +26,14 @@ import {
   ArrowTrendingUpIcon,
   ArrowTrendingDownIcon
 } from '@heroicons/react/24/outline';
+
+// INTOWORK Brand Colors
+const BRAND_COLORS = {
+  primary: '#6B9B5F',    // Green
+  secondary: '#6B46C1',  // Violet
+  accent: '#F7C700',     // Gold
+  blue: '#3B82F6',       // Blue
+};
 
 export default function AdminDashboardPage() {
   const { data: session, status } = useSession();
@@ -57,6 +78,42 @@ export default function AdminDashboardPage() {
   }
 
   const activeJobs = stats?.jobs_by_status?.active || 0;
+
+  // Chart data
+  const userDistribution = [
+    { name: 'Candidats', value: stats?.total_candidates || 0, color: BRAND_COLORS.blue },
+    { name: 'Employeurs', value: stats?.total_employers || 0, color: BRAND_COLORS.primary },
+    { name: 'Actifs', value: stats?.active_users || 0, color: BRAND_COLORS.accent },
+  ];
+
+  const jobStatusData = [
+    { name: 'Actives', value: (stats?.jobs_by_status?.active || 0), color: BRAND_COLORS.primary },
+    { name: 'Pourvues', value: (stats?.jobs_by_status?.filled || 0), color: BRAND_COLORS.blue },
+    { name: 'Expirées', value: (stats?.jobs_by_status?.expired || stats?.jobs_by_status?.closed || 0), color: '#EF4444' },
+    { name: 'Brouillons', value: (stats?.jobs_by_status?.draft || 0), color: BRAND_COLORS.accent },
+  ];
+
+  const monthlyData = [
+    {
+      name: 'Utilisateurs',
+      value: stats?.total_users || 0,
+      color: BRAND_COLORS.secondary
+    },
+    {
+      name: 'Offres',
+      value: stats?.total_jobs || 0,
+      color: BRAND_COLORS.primary
+    },
+    {
+      name: 'Candidatures',
+      value: stats?.total_applications || 0,
+      color: BRAND_COLORS.blue
+    }
+  ];
+
+  const hasUserData = userDistribution.some(item => item.value > 0);
+  const hasJobStatusData = jobStatusData.some(item => item.value > 0);
+  const hasMonthlyData = monthlyData.some(item => item.value > 0);
 
   const statCards = [
     {
@@ -193,6 +250,166 @@ export default function AdminDashboardPage() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Graphiques */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Distribution des utilisateurs (Pie Chart) */}
+          <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-8 border border-gray-100">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="p-3 rounded-2xl bg-gradient-to-br from-[#6B46C1] to-[#5a3aaa] shadow-lg">
+                <UsersIcon className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="font-bold text-xl text-gray-900">Distribution des utilisateurs</h3>
+                <p className="text-gray-600 text-sm">Par type de compte</p>
+              </div>
+            </div>
+            
+            {!hasUserData ? (
+              <div className="flex items-center justify-center h-64">
+                <div className="text-center">
+                  <UsersIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-500">Aucune donnée disponible</p>
+                </div>
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={userDistribution}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={true}
+                    label={({ name, value }) => `${name}: ${value}`}
+                    outerRadius={100}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {userDistribution.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{
+                      backgroundColor: 'white',
+                      border: '1px solid #E5E7EB',
+                      borderRadius: '12px',
+                      padding: '12px',
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                    }}
+                  />
+                  <Legend wrapperStyle={{ fontSize: '13px', fontWeight: 500 }} iconType="circle" />
+                </PieChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+
+          {/* Statut des offres (Pie Chart) */}
+          <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-8 border border-gray-100">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="p-3 rounded-2xl bg-gradient-to-br from-[#6B9B5F] to-[#5a8a4f] shadow-lg">
+                <BriefcaseIcon className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="font-bold text-xl text-gray-900">Statut des offres</h3>
+                <p className="text-gray-600 text-sm">Répartition par statut</p>
+              </div>
+            </div>
+            
+            {!hasJobStatusData ? (
+              <div className="flex items-center justify-center h-64">
+                <div className="text-center">
+                  <BriefcaseIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-500">Aucune donnée disponible</p>
+                </div>
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={jobStatusData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={true}
+                    label={({ name, value }) => `${name}: ${value}`}
+                    outerRadius={100}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {jobStatusData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{
+                      backgroundColor: 'white',
+                      border: '1px solid #E5E7EB',
+                      borderRadius: '12px',
+                      padding: '12px',
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                    }}
+                  />
+                  <Legend wrapperStyle={{ fontSize: '13px', fontWeight: 500 }} iconType="circle" />
+                </PieChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+        </div>
+
+        {/* Graphique à barres - Vue d'ensemble */}
+        <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-8 border border-gray-100">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="p-3 rounded-2xl bg-gradient-to-br from-[#3B82F6] to-[#2563EB] shadow-lg">
+              <DocumentTextIcon className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h3 className="font-bold text-xl text-gray-900">Vue d'ensemble de la plateforme</h3>
+              <p className="text-gray-600 text-sm">Totaux globaux</p>
+            </div>
+          </div>
+          
+          {!hasMonthlyData ? (
+            <div className="flex items-center justify-center h-64">
+              <div className="text-center">
+                <DocumentTextIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <p className="text-gray-500">Aucune donnée disponible</p>
+              </div>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={monthlyData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                <XAxis 
+                  dataKey="name" 
+                  stroke="#374151" 
+                  style={{ fontSize: '14px', fontWeight: 500 }} 
+                  tick={{ fill: '#374151' }} 
+                />
+                <YAxis 
+                  stroke="#374151" 
+                  style={{ fontSize: '14px', fontWeight: 500 }} 
+                  tick={{ fill: '#374151' }} 
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: 'white',
+                    border: '1px solid #E5E7EB',
+                    borderRadius: '12px',
+                    padding: '12px',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                    fontSize: '14px',
+                    fontWeight: 500
+                  }}
+                />
+                <Bar dataKey="value" radius={[8, 8, 0, 0]}>
+                  {monthlyData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </div>
     </DashboardLayout>
