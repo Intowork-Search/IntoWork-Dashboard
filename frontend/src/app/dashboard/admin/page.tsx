@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/DashboardLayout';
-import { adminAPI } from '@/lib/api';
+import { adminAPI, type AdminStats } from '@/lib/api';
 import {
   UsersIcon,
   BriefcaseIcon,
@@ -14,27 +14,11 @@ import {
   ArrowTrendingDownIcon
 } from '@heroicons/react/24/outline';
 
-interface AdminStats {
-  total_users: number;
-  total_candidates: number;
-  total_employers: number;
-  total_jobs: number;
-  total_applications: number;
-  active_jobs: number;
-}
-
 export default function AdminDashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState<AdminStats>({
-    total_users: 0,
-    total_candidates: 0,
-    total_employers: 0,
-    total_jobs: 0,
-    total_applications: 0,
-    active_jobs: 0
-  });
+  const [stats, setStats] = useState<AdminStats | null>(null);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -72,10 +56,12 @@ export default function AdminDashboardPage() {
     );
   }
 
+  const activeJobs = stats?.jobs_by_status?.active || 0;
+
   const statCards = [
     {
       title: 'Utilisateurs',
-      value: stats.total_users,
+      value: stats?.total_users || 0,
       icon: UsersIcon,
       color: 'from-[#6B46C1] to-[#5a3aaa]',
       bgColor: 'bg-[#6B46C1]/10',
@@ -85,18 +71,18 @@ export default function AdminDashboardPage() {
     },
     {
       title: 'Offres d\'emploi',
-      value: stats.total_jobs,
+      value: stats?.total_jobs || 0,
       icon: BriefcaseIcon,
       color: 'from-[#6B9B5F] to-[#5a8a4f]',
       bgColor: 'bg-[#6B9B5F]/10',
       textColor: 'text-[#6B9B5F]',
-      subtitle: `${stats.active_jobs} actives`,
+      subtitle: `${activeJobs} actives`,
       trend: '+8%',
       trendUp: true
     },
     {
       title: 'Entreprises',
-      value: stats.total_employers,
+      value: stats?.total_employers || 0,
       icon: BuildingOfficeIcon,
       color: 'from-[#F7C700] to-[#e0b400]',
       bgColor: 'bg-[#F7C700]/10',
@@ -106,7 +92,7 @@ export default function AdminDashboardPage() {
     },
     {
       title: 'Candidatures',
-      value: stats.total_applications,
+      value: stats?.total_applications || 0,
       icon: DocumentTextIcon,
       color: 'from-[#3B82F6] to-[#2563EB]',
       bgColor: 'bg-blue-100',
@@ -124,9 +110,9 @@ export default function AdminDashboardPage() {
       <div className="space-y-6">
         {/* Cartes de statistiques */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {statCards.map((card, index) => (
+          {statCards.map((card) => (
             <div 
-              key={index}
+              key={card.title}
               className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-6 border border-gray-100 hover:shadow-2xl hover:shadow-gray-300/50 transition-all duration-300"
             >
               <div className="flex items-start justify-between mb-4">
@@ -175,11 +161,11 @@ export default function AdminDashboardPage() {
             <div className="space-y-4">
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
                 <span className="text-gray-700 font-medium">Total candidats</span>
-                <span className="text-2xl font-bold text-[#6B46C1]">{stats.total_candidates}</span>
+                <span className="text-2xl font-bold text-[#6B46C1]">{stats?.total_candidates || 0}</span>
               </div>
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
                 <span className="text-gray-700 font-medium">Candidatures envoyées</span>
-                <span className="text-2xl font-bold text-[#6B46C1]">{stats.total_applications}</span>
+                <span className="text-2xl font-bold text-[#6B46C1]">{stats?.total_applications || 0}</span>
               </div>
             </div>
           </div>
@@ -199,11 +185,11 @@ export default function AdminDashboardPage() {
             <div className="space-y-4">
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
                 <span className="text-gray-700 font-medium">Total entreprises</span>
-                <span className="text-2xl font-bold text-[#b39200]">{stats.total_employers}</span>
+                <span className="text-2xl font-bold text-[#b39200]">{stats?.total_employers || 0}</span>
               </div>
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
                 <span className="text-gray-700 font-medium">Offres publiées</span>
-                <span className="text-2xl font-bold text-[#b39200]">{stats.total_jobs}</span>
+                <span className="text-2xl font-bold text-[#b39200]">{stats?.total_jobs || 0}</span>
               </div>
             </div>
           </div>
