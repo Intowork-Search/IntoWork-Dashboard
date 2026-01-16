@@ -292,14 +292,16 @@ export default function OffresPage() {
           ) : (
             <div className="grid gap-6">
               {filteredJobs.map((job) => (
-                <button
+                <div
                   key={job.id}
-                  onClick={() => handleJobClick(job.id)}
-                  className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 hover:border-green-500 hover:shadow-xl transition-all duration-300 cursor-pointer group w-full text-left"
-                  type="button"
+                  className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 hover:border-green-500 hover:shadow-xl transition-all duration-300 group"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                    <div className="flex-1">
+                    <button
+                      onClick={() => handleJobClick(job.id)}
+                      className="flex-1 text-left hover:opacity-80 transition-opacity"
+                      type="button"
+                    >
                       <div className="flex items-start gap-4 mb-4">
                         <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl bg-green-600 flex items-center justify-center shrink-0">
                           <BuildingOfficeIcon className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
@@ -336,16 +338,19 @@ export default function OffresPage() {
                           <span>{formatDate(job.posted_at)}</span>
                         </div>
                       </div>
-                    </div>
+                    </button>
 
                     <div className="flex sm:flex-col items-center sm:items-end gap-3 sm:gap-4">
-                      <button className="flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold transition-all group-hover:shadow-lg" type="button">
+                      <Link 
+                        href="/signin"
+                        className="flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold transition-all hover:shadow-lg"
+                      >
                         <span>Postuler</span>
                         <ArrowRightIcon className="w-5 h-5" />
-                      </button>
+                      </Link>
                     </div>
                   </div>
-                </button>
+                </div>
               ))}
             </div>
           )}
