@@ -668,7 +668,7 @@ export default function Home() {
                 <img 
                   src="/logo-intowork.png" 
                   alt="INTOWORK" 
-                  className="h-10 w-10 object-contain"
+                  className="h-16 w-16 object-contain"
                 />
                 <div>
                   <h3 className="text-lg font-bold text-white">INTOWORK</h3>
