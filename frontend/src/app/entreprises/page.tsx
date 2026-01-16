@@ -12,6 +12,19 @@ import {
   GlobeAltIcon,
 } from '@heroicons/react/24/outline';
 
+interface Company {
+  id: number;
+  name: string;
+  industry?: string;
+  city?: string;
+  country?: string;
+  size?: string;
+  description?: string;
+  website_url?: string | null;
+  total_jobs?: number;
+  logo_url?: string | null;
+}
+
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700', '800'],
@@ -65,10 +78,10 @@ export default function EntreprisesPage() {
           return;
         }
 
-        console.log('🏢 Fetching companies from:', `${apiUrl}/jobs/`); // Debug
+        console.log('🏢 Fetching companies from:', `${apiUrl}/companies/`); // Debug
 
-        // Récupérer les jobs pour extraire les entreprises
-        const response = await fetch(`${apiUrl}/jobs/?page=1&limit=1000`);
+        // Récupérer les entreprises directement depuis l'endpoint dédié
+        const response = await fetch(`${apiUrl}/companies/?limit=100`);
 
         console.log('📊 Response status:', response.status); // Debug
 
@@ -76,33 +89,9 @@ export default function EntreprisesPage() {
           const data = await response.json();
           console.log('✅ Data received:', data); // Debug
 
-          // Extraire les entreprises uniques des jobs
-          const companiesMap = new Map<string, Company>();
-          data.jobs.forEach((job: any) => {
-            if (job.company_name && !companiesMap.has(job.company_name)) {
-              companiesMap.set(job.company_name, {
-                id: companiesMap.size + 1,
-                name: job.company_name,
-                industry: 'Non spécifié',
-                city: job.location?.split('/')[0] || job.location || 'Non spécifié',
-                country: 'Sénégal',
-                size: 'Non spécifié',
-                description: `${job.company_name} recrute sur INTOWORK.`,
-                website_url: null,
-                total_jobs: 0,
-                logo_url: job.company_logo_url
-              });
-            }
-            // Compter les jobs par entreprise
-            const company = companiesMap.get(job.company_name);
-            if (company) {
-              company.total_jobs = (company.total_jobs || 0) + 1;
-            }
-          });
-
-          const companiesArray = Array.from(companiesMap.values());
-          setCompanies(companiesArray);
-          setTotalCompanies(companiesArray.length);
+          // Les entreprises sont déjà dans le bon format
+          setCompanies(data.companies || []);
+          setTotalCompanies(data.total || 0);
         } else {
           setError('Erreur lors du chargement des entreprises. Veuillez réessayer.');
           console.error('Erreur API:', response.status, response.statusText);

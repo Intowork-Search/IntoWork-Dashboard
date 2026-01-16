@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Plus_Jakarta_Sans } from 'next/font/google';
-import { jobsAPI } from '@/lib/api';
-import type { Job } from '@/lib/api';
+import { jobsAPI, companiesAPI } from '@/lib/api';
+import type { Job, Company } from '@/lib/api';
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -22,7 +22,7 @@ export default function Home() {
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [featuredJobs, setFeaturedJobs] = useState<Job[]>([]);
-  const [companies, setCompanies] = useState<Array<{ name: string; count: number }>>([]);
+  const [companies, setCompanies] = useState<Company[]>([]);
   const [loadingJobs, setLoadingJobs] = useState(false);
 
   useEffect(() => {
@@ -38,43 +38,30 @@ export default function Home() {
         setLoadingJobs(true);
         console.log('🚀 Début chargement des données...'); // Debug
         
-        // Récupérer plus d'offres pour avoir plus de données et plus d'entreprises différentes
-        const response = await jobsAPI.getJobs({ 
-          limit: 50  // Augmenté de 10 à 50 pour avoir plus d'entreprises
-        });
+        // Charger les jobs et les entreprises en parallèle
+        const [jobsResponse, companiesResponse] = await Promise.all([
+          jobsAPI.getJobs({ limit: 50 }),
+          companiesAPI.getCompanies(2) // Récupérer 2 entreprises
+        ]);
         
-        console.log('✅ Response from API:', response); // Debug
-        console.log('📊 Total jobs:', response.total); // Debug
-        console.log('📋 Jobs array:', response.jobs); // Debug
+        console.log('✅ Jobs response:', jobsResponse); // Debug
+        console.log('✅ Companies response:', companiesResponse); // Debug
         
-        if (response && response.jobs && Array.isArray(response.jobs) && response.jobs.length > 0) {
-          // Prendre les 2 premières offres pour la section vedette
-          const featured = response.jobs.slice(0, 2);
+        // Traiter les jobs
+        if (jobsResponse && jobsResponse.jobs && Array.isArray(jobsResponse.jobs) && jobsResponse.jobs.length > 0) {
+          const featured = jobsResponse.jobs.slice(0, 2);
           setFeaturedJobs(featured);
           console.log('⭐ Featured jobs set:', featured); // Debug
-          
-          // Extraire les entreprises uniques avec leur nombre d'offres
-          const companyMap = new Map<string, number>();
-          response.jobs.forEach(job => {
-            const companyName = job.company_name || 'Entreprise';
-            companyMap.set(companyName, (companyMap.get(companyName) || 0) + 1);
-          });
-          
-          const companiesList = Array.from(companyMap.entries())
-            .map(([name, count]) => ({ name, count }))
-            .sort((a, b) => b.count - a.count) // Trier par nombre d'offres décroissant
-            .slice(0, 2); // Prendre 2 entreprises avec le plus d'offres
-          
-          setCompanies(companiesList);
-          console.log('🏢 Companies set:', companiesList); // Debug
         } else {
-          console.warn('⚠️ No jobs found in response or invalid format'); // Debug
-          console.warn('Response structure:', {
-            hasResponse: !!response,
-            hasJobs: !!(response && response.jobs),
-            isArray: !!(response && Array.isArray(response.jobs)),
-            length: response?.jobs?.length
-          });
+          console.warn('⚠️ No jobs found in response'); // Debug
+        }
+        
+        // Traiter les entreprises
+        if (companiesResponse && companiesResponse.companies && Array.isArray(companiesResponse.companies)) {
+          setCompanies(companiesResponse.companies);
+          console.log('🏢 Companies set:', companiesResponse.companies); // Debug
+        } else {
+          console.warn('⚠️ No companies found in response'); // Debug
         }
       } catch (error) {
         console.error('❌ Erreur chargement données:', error);
@@ -527,7 +514,7 @@ export default function Home() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 mb-8 max-w-4xl mx-auto">
                   {companies.map((company) => (
                     <Link
-                      key={company.name}
+                      key={company.id}
                       href="/entreprises"
                       className="bg-white rounded-2xl p-6 sm:p-8 border-2 border-slate-200 hover:border-(--color-brand-violet) hover:shadow-xl transition-all duration-300 group text-center"
                     >
@@ -540,7 +527,7 @@ export default function Home() {
                         {company.name}
                       </h3>
                       <p className="text-sm sm:text-base text-slate-600 font-medium mb-3">
-                        {company.count} offre{company.count > 1 ? 's' : ''}
+                        {company.total_jobs || 0} offre{(company.total_jobs || 0) > 1 ? 's' : ''}
                       </p>
                       <span className="inline-flex items-center gap-1.5 text-(--color-brand-violet) font-semibold text-xs sm:text-sm group-hover:translate-x-1 transition-transform">
                         Voir les offres
