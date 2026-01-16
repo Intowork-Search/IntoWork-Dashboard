@@ -63,7 +63,7 @@ export default function Home() {
           const companiesList = Array.from(companyMap.entries())
             .map(([name, count]) => ({ name, count }))
             .sort((a, b) => b.count - a.count) // Trier par nombre d'offres décroissant
-            .slice(0, 4); // Prendre 4 entreprises avec le plus d'offres
+            .slice(0, 2); // Prendre 2 entreprises avec le plus d'offres
           
           setCompanies(companiesList);
           console.log('🏢 Companies set:', companiesList); // Debug
@@ -420,78 +420,78 @@ export default function Home() {
             <div className="flex justify-center py-12">
               <div className="w-12 h-12 border-4 border-(--color-brand-green) border-t-transparent rounded-full animate-spin"></div>
             </div>
-          ) : featuredJobs.length > 0 ? (
-            <div className="grid md:grid-cols-2 gap-6 sm:gap-8 mb-8">
-              {featuredJobs.map((job) => (
-                <Link 
-                  key={job.id} 
-                  href={`/offres`}
-                  className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 border-2 border-slate-200 hover:border-(--color-brand-green) hover:shadow-xl transition-all duration-300 group"
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                      <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2 group-hover:text-(--color-brand-green) transition-colors">
-                        {job.title}
-                      </h3>
-                      <p className="text-base sm:text-lg text-slate-600 font-medium">
-                        {job.company_name}
-                      </p>
-                    </div>
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-(--color-brand-green)/10 flex items-center justify-center flex-shrink-0 ml-4">
-                      <svg className="w-6 h-6 sm:w-7 sm:h-7 text-(--color-brand-green)" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                      </svg>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap gap-3 mb-4">
-                    {job.location && (
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-sm font-medium">
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        {job.location}
-                      </span>
-                    )}
-                    {job.job_type && (
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-(--color-brand-green)/10 text-(--color-brand-green) text-sm font-medium">
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        {job.job_type}
-                      </span>
-                    )}
-                  </div>
-
-                  {job.description && (
-                    <p className="text-sm sm:text-base text-slate-600 line-clamp-2 mb-4">
-                      {job.description}
-                    </p>
-                  )}
-
-                  <div className="flex items-center justify-between pt-4 border-t border-slate-200">
-                    <span className="text-sm text-slate-500">
-                      {job.posted_at ? `Publié le ${new Date(job.posted_at).toLocaleDateString('fr-FR')}` : 'Récent'}
-                    </span>
-                    <span className="text-(--color-brand-green) font-semibold text-sm group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
-                      Voir l'offre
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                      </svg>
-                    </span>
-                  </div>
-                </Link>
-              ))}
-            </div>
           ) : (
-            <div className="text-center py-12 bg-yellow-50 border-2 border-yellow-300 rounded-xl p-8">
-              <p className="text-slate-900 font-bold mb-2">Debug Info:</p>
-              <p className="text-slate-600">Loading: {loadingJobs ? 'true' : 'false'}</p>
-              <p className="text-slate-600">Featured Jobs Count: {featuredJobs.length}</p>
-              <p className="text-slate-600 mt-4">Aucune offre disponible pour le moment</p>
-              <p className="text-slate-500 text-sm mt-2">Vérifiez la console pour plus de détails</p>
-            </div>
+            <>
+              {featuredJobs.length > 0 ? (
+                <div className="grid md:grid-cols-2 gap-6 sm:gap-8 mb-8">
+                  {featuredJobs.map((job) => (
+                    <Link 
+                      key={job.id} 
+                      href={`/offres`}
+                      className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 border-2 border-slate-200 hover:border-(--color-brand-green) hover:shadow-xl transition-all duration-300 group"
+                    >
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex-1">
+                          <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2 group-hover:text-(--color-brand-green) transition-colors">
+                            {job.title}
+                          </h3>
+                          <p className="text-base sm:text-lg text-slate-600 font-medium">
+                            {job.company_name}
+                          </p>
+                        </div>
+                        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-(--color-brand-green)/10 flex items-center justify-center flex-shrink-0 ml-4">
+                          <svg className="w-6 h-6 sm:w-7 sm:h-7 text-(--color-brand-green)" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                          </svg>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-wrap gap-3 mb-4">
+                        {job.location && (
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-sm font-medium">
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            {job.location}
+                          </span>
+                        )}
+                        {job.job_type && (
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-(--color-brand-green)/10 text-(--color-brand-green) text-sm font-medium">
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            {job.job_type}
+                          </span>
+                        )}
+                      </div>
+
+                      {job.description && (
+                        <p className="text-sm sm:text-base text-slate-600 line-clamp-2 mb-4">
+                          {job.description}
+                        </p>
+                      )}
+
+                      <div className="flex items-center justify-between pt-4 border-t border-slate-200">
+                        <span className="text-sm text-slate-500">
+                          {job.posted_at ? `Publié le ${new Date(job.posted_at).toLocaleDateString('fr-FR')}` : 'Récent'}
+                        </span>
+                        <span className="text-(--color-brand-green) font-semibold text-sm group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
+                          Voir l'offre
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                          </svg>
+                        </span>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 bg-slate-100 rounded-xl p-8">
+                  <p className="text-slate-600">Aucune offre disponible pour le moment</p>
+                </div>
+              )}
+            </>
           )}
 
           <div className="text-center">
@@ -521,42 +521,42 @@ export default function Home() {
             <div className="flex justify-center py-12">
               <div className="w-12 h-12 border-4 border-(--color-brand-violet) border-t-transparent rounded-full animate-spin"></div>
             </div>
-          ) : companies.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
-              {companies.map((company) => (
-                <Link
-                  key={company.name}
-                  href="/entreprises"
-                  className="bg-white rounded-2xl p-6 sm:p-8 border-2 border-slate-200 hover:border-(--color-brand-violet) hover:shadow-xl transition-all duration-300 group text-center"
-                >
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-gradient-to-br from-(--color-brand-violet) to-purple-600 flex items-center justify-center mx-auto mb-4 shadow-lg">
-                    <span className="text-2xl sm:text-3xl font-bold text-white">
-                      {company.name.charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-                  <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2 group-hover:text-(--color-brand-violet) transition-colors line-clamp-1">
-                    {company.name}
-                  </h3>
-                  <p className="text-sm sm:text-base text-slate-600 font-medium mb-3">
-                    {company.count} offre{company.count > 1 ? 's' : ''}
-                  </p>
-                  <span className="inline-flex items-center gap-1.5 text-(--color-brand-violet) font-semibold text-xs sm:text-sm group-hover:translate-x-1 transition-transform">
-                    Voir les offres
-                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                    </svg>
-                  </span>
-                </Link>
-              ))}
-            </div>
           ) : (
-            <div className="text-center py-12 bg-purple-50 border-2 border-purple-300 rounded-xl p-8">
-              <p className="text-slate-900 font-bold mb-2">Debug Info:</p>
-              <p className="text-slate-600">Loading: {loadingJobs ? 'true' : 'false'}</p>
-              <p className="text-slate-600">Companies Count: {companies.length}</p>
-              <p className="text-slate-600 mt-4">Aucune entreprise partenaire pour le moment</p>
-              <p className="text-slate-500 text-sm mt-2">Vérifiez la console pour plus de détails</p>
-            </div>
+            <>
+              {companies.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 mb-8 max-w-4xl mx-auto">
+                  {companies.map((company) => (
+                    <Link
+                      key={company.name}
+                      href="/entreprises"
+                      className="bg-white rounded-2xl p-6 sm:p-8 border-2 border-slate-200 hover:border-(--color-brand-violet) hover:shadow-xl transition-all duration-300 group text-center"
+                    >
+                      <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-gradient-to-br from-(--color-brand-violet) to-purple-600 flex items-center justify-center mx-auto mb-4 shadow-lg">
+                        <span className="text-2xl sm:text-3xl font-bold text-white">
+                          {company.name.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                      <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2 group-hover:text-(--color-brand-violet) transition-colors line-clamp-1">
+                        {company.name}
+                      </h3>
+                      <p className="text-sm sm:text-base text-slate-600 font-medium mb-3">
+                        {company.count} offre{company.count > 1 ? 's' : ''}
+                      </p>
+                      <span className="inline-flex items-center gap-1.5 text-(--color-brand-violet) font-semibold text-xs sm:text-sm group-hover:translate-x-1 transition-transform">
+                        Voir les offres
+                        <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 bg-slate-100 rounded-xl p-8 mb-8">
+                  <p className="text-slate-600">Aucune entreprise partenaire pour le moment</p>
+                </div>
+              )}
+            </>
           )}
 
           <div className="text-center">

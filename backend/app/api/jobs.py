@@ -86,7 +86,8 @@ async def get_jobs(
 
     # Construire la requête avec join
     stmt = select(Job, Company).join(Company, Job.company_id == Company.id)
-    stmt = stmt.filter(Job.status == JobStatus.PUBLISHED)
+    # Afficher les jobs publiés ET en draft pour la landing page
+    stmt = stmt.filter(Job.status.in_([JobStatus.PUBLISHED, JobStatus.DRAFT]))
 
     # Filtres - Using parameterized queries to prevent SQL injection
     if search:
