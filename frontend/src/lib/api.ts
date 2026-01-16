@@ -466,7 +466,10 @@ export const jobsAPI = {
       });
     }
     
-    const response = await apiClient.get(`/jobs?${params.toString()}`);
+    // Add trailing slash to avoid 307 redirect from backend
+    const queryString = params.toString();
+    const url = queryString ? `/jobs/?${queryString}` : '/jobs/';
+    const response = await apiClient.get(url);
     return response.data;
   },
 
