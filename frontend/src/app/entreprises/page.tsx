@@ -11,9 +11,6 @@ import {
   CheckBadgeIcon,
   GlobeAltIcon,
 } from '@heroicons/react/24/outline';
-import { getApiUrl } from '@/lib/getApiUrl';
-
-const API_URL = getApiUrl();
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -59,21 +56,25 @@ export default function EntreprisesPage() {
         setLoading(true);
         setError(null);
 
-        // Vérifier si l'API URL est configurée
-        let apiUrl: string;
-        try {
-          apiUrl = API_URL;
-        } catch {
+        // Utiliser l'URL de l'API depuis les variables d'environnement
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+        
+        if (!apiUrl) {
           setError('Configuration API manquante. Veuillez vérifier votre fichier .env.local');
           setLoading(false);
           return;
         }
 
+        console.log('🏢 Fetching companies from:', `${apiUrl}/jobs/`); // Debug
+
         // Récupérer les jobs pour extraire les entreprises
         const response = await fetch(`${apiUrl}/jobs/?page=1&limit=1000`);
 
+        console.log('📊 Response status:', response.status); // Debug
+
         if (response.ok) {
           const data = await response.json();
+          console.log('✅ Data received:', data); // Debug
 
           // Extraire les entreprises uniques des jobs
           const companiesMap = new Map<string, Company>();

@@ -38,9 +38,9 @@ export default function Home() {
         setLoadingJobs(true);
         console.log('🚀 Début chargement des données...'); // Debug
         
-        // Récupérer plus d'offres pour avoir plus de données
+        // Récupérer plus d'offres pour avoir plus de données et plus d'entreprises différentes
         const response = await jobsAPI.getJobs({ 
-          limit: 10
+          limit: 50  // Augmenté de 10 à 50 pour avoir plus d'entreprises
         });
         
         console.log('✅ Response from API:', response); // Debug
@@ -62,7 +62,8 @@ export default function Home() {
           
           const companiesList = Array.from(companyMap.entries())
             .map(([name, count]) => ({ name, count }))
-            .slice(0, 2); // Prendre 2 entreprises
+            .sort((a, b) => b.count - a.count) // Trier par nombre d'offres décroissant
+            .slice(0, 4); // Prendre 4 entreprises avec le plus d'offres
           
           setCompanies(companiesList);
           console.log('🏢 Companies set:', companiesList); // Debug
@@ -521,27 +522,27 @@ export default function Home() {
               <div className="w-12 h-12 border-4 border-(--color-brand-violet) border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : companies.length > 0 ? (
-            <div className="grid md:grid-cols-2 gap-6 sm:gap-8 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
               {companies.map((company) => (
                 <Link
                   key={company.name}
                   href="/entreprises"
-                  className="bg-white rounded-2xl sm:rounded-3xl p-8 sm:p-12 border-2 border-slate-200 hover:border-(--color-brand-violet) hover:shadow-xl transition-all duration-300 group text-center"
+                  className="bg-white rounded-2xl p-6 sm:p-8 border-2 border-slate-200 hover:border-(--color-brand-violet) hover:shadow-xl transition-all duration-300 group text-center"
                 >
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-br from-(--color-brand-violet) to-purple-600 flex items-center justify-center mx-auto mb-6 shadow-lg">
-                    <span className="text-3xl sm:text-4xl font-bold text-white">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-gradient-to-br from-(--color-brand-violet) to-purple-600 flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <span className="text-2xl sm:text-3xl font-bold text-white">
                       {company.name.charAt(0).toUpperCase()}
                     </span>
                   </div>
-                  <h3 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3 group-hover:text-(--color-brand-violet) transition-colors">
+                  <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2 group-hover:text-(--color-brand-violet) transition-colors line-clamp-1">
                     {company.name}
                   </h3>
-                  <p className="text-base sm:text-lg text-slate-600 font-medium mb-4">
-                    {company.count} offre{company.count > 1 ? 's' : ''} disponible{company.count > 1 ? 's' : ''}
+                  <p className="text-sm sm:text-base text-slate-600 font-medium mb-3">
+                    {company.count} offre{company.count > 1 ? 's' : ''}
                   </p>
-                  <span className="inline-flex items-center gap-2 text-(--color-brand-violet) font-semibold text-sm group-hover:translate-x-1 transition-transform">
+                  <span className="inline-flex items-center gap-1.5 text-(--color-brand-violet) font-semibold text-xs sm:text-sm group-hover:translate-x-1 transition-transform">
                     Voir les offres
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                     </svg>
                   </span>
