@@ -409,7 +409,7 @@ export default function EntreprisesPage() {
                 <img 
                   src="/logo-intowork.png" 
                   alt="INTOWORK" 
-                  className="h-16 w-16 object-contain"
+                  className="h-[164px] w-[164px] object-contain"
                 />
                 <div>
                   <h3 className="text-lg font-bold text-white">INTOWORK</h3>
