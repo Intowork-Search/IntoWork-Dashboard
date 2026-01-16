@@ -23,7 +23,7 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [featuredJobs, setFeaturedJobs] = useState<Job[]>([]);
   const [companies, setCompanies] = useState<Array<{ name: string; count: number }>>([]);
-  const [loadingJobs, setLoadingJobs] = useState(true);
+  const [loadingJobs, setLoadingJobs] = useState(false);
 
   useEffect(() => {
     if (isLoaded && isSignedIn) {
@@ -36,13 +36,22 @@ export default function Home() {
     const loadData = async () => {
       try {
         setLoadingJobs(true);
-        // Récupérer 2 offres récentes avec status published
+        console.log('🚀 Début chargement des données...'); // Debug
+        
+        // Récupérer plus d'offres pour avoir plus de données
         const response = await jobsAPI.getJobs({ 
-          limit: 2
+          limit: 10
         });
         
-        if (response.jobs && response.jobs.length > 0) {
-          setFeaturedJobs(response.jobs);
+        console.log('✅ Response from API:', response); // Debug
+        console.log('📊 Total jobs:', response.total); // Debug
+        console.log('📋 Jobs array:', response.jobs); // Debug
+        
+        if (response && response.jobs && Array.isArray(response.jobs) && response.jobs.length > 0) {
+          // Prendre les 2 premières offres pour la section vedette
+          const featured = response.jobs.slice(0, 2);
+          setFeaturedJobs(featured);
+          console.log('⭐ Featured jobs set:', featured); // Debug
           
           // Extraire les entreprises uniques avec leur nombre d'offres
           const companyMap = new Map<string, number>();
@@ -56,11 +65,22 @@ export default function Home() {
             .slice(0, 2); // Prendre 2 entreprises
           
           setCompanies(companiesList);
+          console.log('🏢 Companies set:', companiesList); // Debug
+        } else {
+          console.warn('⚠️ No jobs found in response or invalid format'); // Debug
+          console.warn('Response structure:', {
+            hasResponse: !!response,
+            hasJobs: !!(response && response.jobs),
+            isArray: !!(response && Array.isArray(response.jobs)),
+            length: response?.jobs?.length
+          });
         }
       } catch (error) {
-        console.error('Erreur chargement données:', error);
+        console.error('❌ Erreur chargement données:', error);
+        console.error('Error details:', error instanceof Error ? error.message : error);
       } finally {
         setLoadingJobs(false);
+        console.log('✅ Loading finished'); // Debug
       }
     };
     
@@ -464,8 +484,12 @@ export default function Home() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-12">
-              <p className="text-slate-600">Aucune offre disponible pour le moment</p>
+            <div className="text-center py-12 bg-yellow-50 border-2 border-yellow-300 rounded-xl p-8">
+              <p className="text-slate-900 font-bold mb-2">Debug Info:</p>
+              <p className="text-slate-600">Loading: {loadingJobs ? 'true' : 'false'}</p>
+              <p className="text-slate-600">Featured Jobs Count: {featuredJobs.length}</p>
+              <p className="text-slate-600 mt-4">Aucune offre disponible pour le moment</p>
+              <p className="text-slate-500 text-sm mt-2">Vérifiez la console pour plus de détails</p>
             </div>
           )}
 
@@ -525,8 +549,12 @@ export default function Home() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-12">
-              <p className="text-slate-600">Aucune entreprise partenaire pour le moment</p>
+            <div className="text-center py-12 bg-purple-50 border-2 border-purple-300 rounded-xl p-8">
+              <p className="text-slate-900 font-bold mb-2">Debug Info:</p>
+              <p className="text-slate-600">Loading: {loadingJobs ? 'true' : 'false'}</p>
+              <p className="text-slate-600">Companies Count: {companies.length}</p>
+              <p className="text-slate-600 mt-4">Aucune entreprise partenaire pour le moment</p>
+              <p className="text-slate-500 text-sm mt-2">Vérifiez la console pour plus de détails</p>
             </div>
           )}
 

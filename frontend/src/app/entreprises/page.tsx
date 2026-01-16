@@ -70,7 +70,7 @@ export default function EntreprisesPage() {
         }
 
         // Récupérer les jobs pour extraire les entreprises
-        const response = await fetch(`${apiUrl}/jobs/?page=1&limit=50`);
+        const response = await fetch(`${apiUrl}/jobs/?page=1&limit=1000`);
 
         if (response.ok) {
           const data = await response.json();
