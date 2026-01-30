@@ -11,22 +11,7 @@ from app.auth import require_user
 from app.models.base import User, UserRole, Company, Employer, Job, JobStatus, JobApplication
 
 router = APIRouter()
-
 # ==================== Modèles Pydantic ====================
-
-class CompanyListItem(BaseModel):
-    id: int
-    name: str
-    description: Optional[str] = None
-    industry: Optional[str] = None
-    city: Optional[str] = None
-    country: Optional[str] = None
-    logo_url: Optional[str] = None
-    total_jobs: int = 0
-
-class CompanyListResponse(BaseModel):
-    companies: list[CompanyListItem]
-    total: int
 
 class CompanyResponse(BaseModel):
     id: int
@@ -71,55 +56,7 @@ class CompanyStatsResponse(BaseModel):
     total_applications: int
     total_employers: int
 
-# ==================== Routes publiques ====================
-
-@router.get("/", response_model=CompanyListResponse)
-async def get_companies(
-    limit: int = 10,
-    db: AsyncSession = Depends(get_db)
-):
-    """
-    Récupérer la liste des entreprises inscrites sur la plateforme (endpoint public)
-    """
-    logger.info(f"Récupération liste entreprises, limit={limit}")
-    
-    # Query pour récupérer les entreprises avec le nombre de jobs
-    stmt = select(
-        Company,
-        func.count(Job.id).label('total_jobs')
-    ).outerjoin(
-        Job, Company.id == Job.company_id
-    ).group_by(Company.id).limit(limit)
-    
-    result = await db.execute(stmt)
-    rows = result.all()
-    
-    companies = []
-    for company, job_count in rows:
-        companies.append(CompanyListItem(
-            id=company.id,
-            name=company.name,
-            description=company.description,
-            industry=company.industry,
-            city=company.city,
-            country=company.country,
-            logo_url=company.logo_url,
-            total_jobs=job_count or 0
-        ))
-    
-    # Compter le total
-    count_stmt = select(func.count(Company.id))
-    total_result = await db.execute(count_stmt)
-    total = total_result.scalar()
-    
-    logger.info(f"Retour de {len(companies)} entreprises sur {total} total")
-    
-    return CompanyListResponse(
-        companies=companies,
-        total=total or 0
-    )
-
-# ==================== Routes protégées ====================
+# Routes
 
 @router.post("", response_model=CompanyResponse, status_code=201)
 async def create_company(

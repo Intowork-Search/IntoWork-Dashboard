@@ -20,6 +20,7 @@ prometheus-fastapi-instrumentator==7.0.0
 pytest>=7.4.3
 pytest-asyncio>=0.21.1
 httpx>=0.24.1
+anthropic>=0.18.0
 # CV Builder dependencies
 python-slugify>=8.0.1
 weasyprint>=60.1

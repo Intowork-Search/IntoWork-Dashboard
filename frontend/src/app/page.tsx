@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Plus_Jakarta_Sans } from 'next/font/google';
-import { jobsAPI, companiesAPI } from '@/lib/api';
-import type { Job, Company } from '@/lib/api';
+import { jobsAPI } from '@/lib/api';
+import type { Job } from '@/lib/api';
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -22,7 +22,7 @@ export default function Home() {
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [featuredJobs, setFeaturedJobs] = useState<Job[]>([]);
-  const [companies, setCompanies] = useState<Company[]>([]);
+  const [companies, setCompanies] = useState<Array<{ name: string; count: number }>>([]);
   const [loadingJobs, setLoadingJobs] = useState(false);
 
   useEffect(() => {
@@ -38,30 +38,43 @@ export default function Home() {
         setLoadingJobs(true);
         console.log('🚀 Début chargement des données...'); // Debug
         
-        // Charger les jobs et les entreprises en parallèle
-        const [jobsResponse, companiesResponse] = await Promise.all([
-          jobsAPI.getJobs({ limit: 50 }),
-          companiesAPI.getCompanies(2) // Récupérer 2 entreprises
-        ]);
+        // Récupérer plus d'offres pour avoir plus de données et plus d'entreprises différentes
+        const response = await jobsAPI.getJobs({ 
+          limit: 50  // Augmenté de 10 à 50 pour avoir plus d'entreprises
+        });
         
-        console.log('✅ Jobs response:', jobsResponse); // Debug
-        console.log('✅ Companies response:', companiesResponse); // Debug
+        console.log('✅ Response from API:', response); // Debug
+        console.log('📊 Total jobs:', response.total); // Debug
+        console.log('📋 Jobs array:', response.jobs); // Debug
         
-        // Traiter les jobs
-        if (jobsResponse && jobsResponse.jobs && Array.isArray(jobsResponse.jobs) && jobsResponse.jobs.length > 0) {
-          const featured = jobsResponse.jobs.slice(0, 2);
+        if (response && response.jobs && Array.isArray(response.jobs) && response.jobs.length > 0) {
+          // Prendre les 2 premières offres pour la section vedette
+          const featured = response.jobs.slice(0, 2);
           setFeaturedJobs(featured);
           console.log('⭐ Featured jobs set:', featured); // Debug
+          
+          // Extraire les entreprises uniques avec leur nombre d'offres
+          const companyMap = new Map<string, number>();
+          response.jobs.forEach(job => {
+            const companyName = job.company_name || 'Entreprise';
+            companyMap.set(companyName, (companyMap.get(companyName) || 0) + 1);
+          });
+          
+          const companiesList = Array.from(companyMap.entries())
+            .map(([name, count]) => ({ name, count }))
+            .sort((a, b) => b.count - a.count) // Trier par nombre d'offres décroissant
+            .slice(0, 4); // Prendre 4 entreprises avec le plus d'offres
+          
+          setCompanies(companiesList);
+          console.log('🏢 Companies set:', companiesList); // Debug
         } else {
-          console.warn('⚠️ No jobs found in response'); // Debug
-        }
-        
-        // Traiter les entreprises
-        if (companiesResponse && companiesResponse.companies && Array.isArray(companiesResponse.companies)) {
-          setCompanies(companiesResponse.companies);
-          console.log('🏢 Companies set:', companiesResponse.companies); // Debug
-        } else {
-          console.warn('⚠️ No companies found in response'); // Debug
+          console.warn('⚠️ No jobs found in response or invalid format'); // Debug
+          console.warn('Response structure:', {
+            hasResponse: !!response,
+            hasJobs: !!(response && response.jobs),
+            isArray: !!(response && Array.isArray(response.jobs)),
+            length: response?.jobs?.length
+          });
         }
       } catch (error) {
         console.error('❌ Erreur chargement données:', error);
@@ -407,78 +420,78 @@ export default function Home() {
             <div className="flex justify-center py-12">
               <div className="w-12 h-12 border-4 border-(--color-brand-green) border-t-transparent rounded-full animate-spin"></div>
             </div>
+          ) : featuredJobs.length > 0 ? (
+            <div className="grid md:grid-cols-2 gap-6 sm:gap-8 mb-8">
+              {featuredJobs.map((job) => (
+                <Link 
+                  key={job.id} 
+                  href={`/offres`}
+                  className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 border-2 border-slate-200 hover:border-(--color-brand-green) hover:shadow-xl transition-all duration-300 group"
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2 group-hover:text-(--color-brand-green) transition-colors">
+                        {job.title}
+                      </h3>
+                      <p className="text-base sm:text-lg text-slate-600 font-medium">
+                        {job.company_name}
+                      </p>
+                    </div>
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-(--color-brand-green)/10 flex items-center justify-center flex-shrink-0 ml-4">
+                      <svg className="w-6 h-6 sm:w-7 sm:h-7 text-(--color-brand-green)" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap gap-3 mb-4">
+                    {job.location && (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-sm font-medium">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        {job.location}
+                      </span>
+                    )}
+                    {job.job_type && (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-(--color-brand-green)/10 text-(--color-brand-green) text-sm font-medium">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        {job.job_type}
+                      </span>
+                    )}
+                  </div>
+
+                  {job.description && (
+                    <p className="text-sm sm:text-base text-slate-600 line-clamp-2 mb-4">
+                      {job.description}
+                    </p>
+                  )}
+
+                  <div className="flex items-center justify-between pt-4 border-t border-slate-200">
+                    <span className="text-sm text-slate-500">
+                      {job.posted_at ? `Publié le ${new Date(job.posted_at).toLocaleDateString('fr-FR')}` : 'Récent'}
+                    </span>
+                    <span className="text-(--color-brand-green) font-semibold text-sm group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
+                      Voir l'offre
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
           ) : (
-            <>
-              {featuredJobs.length > 0 ? (
-                <div className="grid md:grid-cols-2 gap-6 sm:gap-8 mb-8">
-                  {featuredJobs.map((job) => (
-                    <Link 
-                      key={job.id} 
-                      href={`/offres`}
-                      className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 border-2 border-slate-200 hover:border-(--color-brand-green) hover:shadow-xl transition-all duration-300 group"
-                    >
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex-1">
-                          <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2 group-hover:text-(--color-brand-green) transition-colors">
-                            {job.title}
-                          </h3>
-                          <p className="text-base sm:text-lg text-slate-600 font-medium">
-                            {job.company_name}
-                          </p>
-                        </div>
-                        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-(--color-brand-green)/10 flex items-center justify-center flex-shrink-0 ml-4">
-                          <svg className="w-6 h-6 sm:w-7 sm:h-7 text-(--color-brand-green)" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                          </svg>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-wrap gap-3 mb-4">
-                        {job.location && (
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-sm font-medium">
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            {job.location}
-                          </span>
-                        )}
-                        {job.job_type && (
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-(--color-brand-green)/10 text-(--color-brand-green) text-sm font-medium">
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            {job.job_type}
-                          </span>
-                        )}
-                      </div>
-
-                      {job.description && (
-                        <p className="text-sm sm:text-base text-slate-600 line-clamp-2 mb-4">
-                          {job.description}
-                        </p>
-                      )}
-
-                      <div className="flex items-center justify-between pt-4 border-t border-slate-200">
-                        <span className="text-sm text-slate-500">
-                          {job.posted_at ? `Publié le ${new Date(job.posted_at).toLocaleDateString('fr-FR')}` : 'Récent'}
-                        </span>
-                        <span className="text-(--color-brand-green) font-semibold text-sm group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
-                          Voir l'offre
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                          </svg>
-                        </span>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-12 bg-slate-100 rounded-xl p-8">
-                  <p className="text-slate-600">Aucune offre disponible pour le moment</p>
-                </div>
-              )}
-            </>
+            <div className="text-center py-12 bg-yellow-50 border-2 border-yellow-300 rounded-xl p-8">
+              <p className="text-slate-900 font-bold mb-2">Debug Info:</p>
+              <p className="text-slate-600">Loading: {loadingJobs ? 'true' : 'false'}</p>
+              <p className="text-slate-600">Featured Jobs Count: {featuredJobs.length}</p>
+              <p className="text-slate-600 mt-4">Aucune offre disponible pour le moment</p>
+              <p className="text-slate-500 text-sm mt-2">Vérifiez la console pour plus de détails</p>
+            </div>
           )}
 
           <div className="text-center">
@@ -508,42 +521,42 @@ export default function Home() {
             <div className="flex justify-center py-12">
               <div className="w-12 h-12 border-4 border-(--color-brand-violet) border-t-transparent rounded-full animate-spin"></div>
             </div>
+          ) : companies.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+              {companies.map((company) => (
+                <Link
+                  key={company.name}
+                  href="/entreprises"
+                  className="bg-white rounded-2xl p-6 sm:p-8 border-2 border-slate-200 hover:border-(--color-brand-violet) hover:shadow-xl transition-all duration-300 group text-center"
+                >
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-gradient-to-br from-(--color-brand-violet) to-purple-600 flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <span className="text-2xl sm:text-3xl font-bold text-white">
+                      {company.name.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                  <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2 group-hover:text-(--color-brand-violet) transition-colors line-clamp-1">
+                    {company.name}
+                  </h3>
+                  <p className="text-sm sm:text-base text-slate-600 font-medium mb-3">
+                    {company.count} offre{company.count > 1 ? 's' : ''}
+                  </p>
+                  <span className="inline-flex items-center gap-1.5 text-(--color-brand-violet) font-semibold text-xs sm:text-sm group-hover:translate-x-1 transition-transform">
+                    Voir les offres
+                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </span>
+                </Link>
+              ))}
+            </div>
           ) : (
-            <>
-              {companies.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 mb-8 max-w-4xl mx-auto">
-                  {companies.map((company) => (
-                    <Link
-                      key={company.id}
-                      href="/entreprises"
-                      className="bg-white rounded-2xl p-6 sm:p-8 border-2 border-slate-200 hover:border-(--color-brand-violet) hover:shadow-xl transition-all duration-300 group text-center"
-                    >
-                      <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-gradient-to-br from-(--color-brand-violet) to-purple-600 flex items-center justify-center mx-auto mb-4 shadow-lg">
-                        <span className="text-2xl sm:text-3xl font-bold text-white">
-                          {company.name.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
-                      <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2 group-hover:text-(--color-brand-violet) transition-colors line-clamp-1">
-                        {company.name}
-                      </h3>
-                      <p className="text-sm sm:text-base text-slate-600 font-medium mb-3">
-                        {company.total_jobs || 0} offre{(company.total_jobs || 0) > 1 ? 's' : ''}
-                      </p>
-                      <span className="inline-flex items-center gap-1.5 text-(--color-brand-violet) font-semibold text-xs sm:text-sm group-hover:translate-x-1 transition-transform">
-                        Voir les offres
-                        <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                        </svg>
-                      </span>
-                    </Link>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-12 bg-slate-100 rounded-xl p-8 mb-8">
-                  <p className="text-slate-600">Aucune entreprise partenaire pour le moment</p>
-                </div>
-              )}
-            </>
+            <div className="text-center py-12 bg-purple-50 border-2 border-purple-300 rounded-xl p-8">
+              <p className="text-slate-900 font-bold mb-2">Debug Info:</p>
+              <p className="text-slate-600">Loading: {loadingJobs ? 'true' : 'false'}</p>
+              <p className="text-slate-600">Companies Count: {companies.length}</p>
+              <p className="text-slate-600 mt-4">Aucune entreprise partenaire pour le moment</p>
+              <p className="text-slate-500 text-sm mt-2">Vérifiez la console pour plus de détails</p>
+            </div>
           )}
 
           <div className="text-center">
@@ -659,161 +672,72 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="bg-slate-900 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
-          {/* Top Section */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 mb-12">
-            {/* Logo et description */}
-            <div className="lg:col-span-1">
-              <div className="flex items-center gap-3 mb-4">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12 mb-12 sm:mb-16">
+            <div className="col-span-2 md:col-span-1">
+              <Link href="/" className="inline-block mb-4 sm:mb-6">
                 <img 
                   src="/logo-intowork.png" 
                   alt="INTOWORK" 
-                  className="h-[164px] w-[164px] object-contain"
+                  className="h-32 sm:h-40 md:h-48 w-auto"
                 />
-                <div>
-                  <h3 className="text-lg font-bold text-white">INTOWORK</h3>
-                  <p className="text-xs text-slate-400">Executive Search by H&C</p>
-                </div>
-              </div>
-              <p className="text-sm text-slate-400 leading-relaxed mb-6">
-                Votre partenaire de confiance pour le recrutement de cadres dirigeants en Afrique francophone, au Maghreb et au Moyen-Orient.
+              </Link>
+              <p className="text-slate-400 text-xs sm:text-sm leading-relaxed">
+                Plateforme B2B2C de recrutement par IA
               </p>
-              {/* Social Links */}
-              <div className="flex items-center gap-4">
-                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-green-400 transition-colors" aria-label="LinkedIn">
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                  </svg>
-                </a>
-                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-green-400 transition-colors" aria-label="Twitter">
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
-                  </svg>
-                </a>
-                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-green-400 transition-colors" aria-label="Facebook">
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                  </svg>
-                </a>
-              </div>
             </div>
 
-            {/* Entreprises */}
             <div>
-              <h4 className="text-base font-bold text-white mb-4">Entreprises</h4>
-              <ul className="space-y-3 text-sm">
-                <li>
-                  <Link href="/signup" className="text-slate-400 hover:text-green-400 transition-colors">
-                    Compte Entreprise
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/dashboard" className="text-slate-400 hover:text-green-400 transition-colors">
-                    Publier une offre
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/entreprises" className="text-slate-400 hover:text-green-400 transition-colors">
-                    Recherche de talents
-                  </Link>
-                </li>
-                <li>
-                  <a href="#premium" className="text-slate-400 hover:text-green-400 transition-colors">
-                    Solutions Premium
-                  </a>
-                </li>
-                <li>
-                  <a href="#ressources" className="text-slate-400 hover:text-green-400 transition-colors">
-                    Ressources employeurs
-                  </a>
-                </li>
+              <h4 className="font-bold mb-3 sm:mb-4 text-white text-sm sm:text-base">Produit</h4>
+              <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
+                <li><a href="#features" className="text-slate-400 hover:text-(--color-brand-green) transition-colors">Fonctionnalités</a></li>
+                <li><a href="#how-it-works" className="text-slate-400 hover:text-(--color-brand-green) transition-colors">Comment ça marche</a></li>
+                <li><Link href="/cv-builder" className="text-slate-400 hover:text-(--color-brand-green) transition-colors">Créateur de CV</Link></li>
+                <li><a href="#" className="text-slate-400 hover:text-(--color-brand-green) transition-colors">Tarifs</a></li>
               </ul>
             </div>
 
-            {/* Candidats */}
             <div>
-              <h4 className="text-base font-bold text-white mb-4">Candidats</h4>
-              <ul className="space-y-3 text-sm">
-                <li>
-                  <Link href="/signup" className="text-slate-400 hover:text-green-400 transition-colors">
-                    Compte Candidat
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/offres" className="text-slate-400 hover:text-green-400 transition-colors">
-                    Rechercher un emploi
-                  </Link>
-                </li>
-                <li>
-                  <a href="#conseils" className="text-slate-400 hover:text-green-400 transition-colors">
-                    Conseils carrière
-                  </a>
-                </li>
-                <li>
-                  <a href="#premium" className="text-slate-400 hover:text-green-400 transition-colors">
-                    Devenir Premium
-                  </a>
-                </li>
-                <li>
-                  <Link href="/cv-builder" className="text-slate-400 hover:text-green-400 transition-colors">
-                    Créateur de CV
-                  </Link>
-                </li>
+              <h4 className="font-bold mb-3 sm:mb-4 text-white text-sm sm:text-base">Entreprise</h4>
+              <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
+                <li><a href="#" className="text-slate-400 hover:text-(--color-brand-green) transition-colors">À propos</a></li>
+                <li><a href="#" className="text-slate-400 hover:text-(--color-brand-green) transition-colors">Blog</a></li>
+                <li><a href="#" className="text-slate-400 hover:text-(--color-brand-green) transition-colors">Carrières</a></li>
+                <li><a href="#" className="text-slate-400 hover:text-(--color-brand-green) transition-colors">Contact</a></li>
               </ul>
             </div>
 
-            {/* Contact & Support */}
             <div>
-              <h4 className="text-base font-bold text-white mb-4">Contact & Support</h4>
-              <ul className="space-y-3 text-sm">
-                <li>
-                  <a href="#apropos" className="text-slate-400 hover:text-green-400 transition-colors">
-                    À propos de nous
-                  </a>
-                </li>
-                <li>
-                  <a href="#contact" className="text-slate-400 hover:text-green-400 transition-colors">
-                    Contactez-nous
-                  </a>
-                </li>
-                <li>
-                  <a href="mailto:support@intowork.com" className="text-slate-400 hover:text-green-400 transition-colors">
-                    support@intowork.com
-                  </a>
-                </li>
-                <li>
-                  <a href="tel:+33123456789" className="text-slate-400 hover:text-green-400 transition-colors">
-                    +33 1 23 45 67 89
-                  </a>
-                </li>
-                <li className="text-slate-400 text-xs leading-relaxed pt-2">
-                  123 Avenue des Champs-Élysées<br />
-                  75008 Paris, France
-                </li>
+              <h4 className="font-bold mb-3 sm:mb-4 text-white text-sm sm:text-base">Légal</h4>
+              <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
+                <li><a href="#" className="text-slate-400 hover:text-(--color-brand-green) transition-colors">Conditions</a></li>
+                <li><a href="#" className="text-slate-400 hover:text-(--color-brand-green) transition-colors">Confidentialité</a></li>
+                <li><a href="#" className="text-slate-400 hover:text-(--color-brand-green) transition-colors">Mentions légales</a></li>
+                <li><a href="#" className="text-slate-400 hover:text-(--color-brand-green) transition-colors">Cookies</a></li>
               </ul>
             </div>
           </div>
 
-          {/* Bottom Section */}
-          <div className="border-t border-slate-800 pt-8">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <p className="text-sm text-slate-400 text-center md:text-left">
-                © 2025 INTOWORK Executive Search by H&C. Tous droits réservés.
-              </p>
-              <div className="flex flex-wrap justify-center gap-6 text-sm">
-                <a href="#confidentialite" className="text-slate-400 hover:text-green-400 transition-colors">
-                  Politique de confidentialité
-                </a>
-                <a href="#conditions" className="text-slate-400 hover:text-green-400 transition-colors">
-                  Conditions d'utilisation
-                </a>
-                <a href="#cookies" className="text-slate-400 hover:text-green-400 transition-colors">
-                  Politique des cookies
-                </a>
-                <a href="#sitemap" className="text-slate-400 hover:text-green-400 transition-colors">
-                  Plan du site
-                </a>
-              </div>
+          <div className="border-t border-slate-800 pt-6 sm:pt-8 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+            <p className="text-xs sm:text-sm text-slate-400 text-center md:text-left">
+              © 2026 INTOWORK. Tous droits réservés.
+            </p>
+            <div className="flex items-center space-x-4 sm:space-x-6">
+              <a href="#" className="text-slate-400 hover:text-(--color-brand-green) transition-colors" aria-label="Twitter">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
+                </svg>
+              </a>
+              <a href="#" className="text-slate-400 hover:text-(--color-brand-green) transition-colors" aria-label="LinkedIn">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                </svg>
+              </a>
+              <a href="#" className="text-slate-400 hover:text-(--color-brand-green) transition-colors" aria-label="GitHub">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+                </svg>
+              </a>
             </div>
           </div>
         </div>

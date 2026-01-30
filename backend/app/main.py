@@ -20,6 +20,7 @@ from app.api.companies import router as companies_router
 from app.api.notifications import router as notifications_router
 from app.api.admin import router as admin_router
 from app.api.cv_builder import router as cv_builder_router
+from app.api.ai_scoring import router as ai_scoring_router
 from dotenv import load_dotenv
 import os
 from pathlib import Path
@@ -158,6 +159,7 @@ app.include_router(companies_router, prefix="/api/companies", tags=["companies"]
 app.include_router(notifications_router, prefix="/api/notifications", tags=["notifications"])
 app.include_router(admin_router, prefix="/api/admin", tags=["admin"])
 app.include_router(cv_builder_router, prefix="/api/cv-builder", tags=["cv-builder"])
+app.include_router(ai_scoring_router, prefix="/api/ai-scoring", tags=["ai-scoring"])
 
 # Servir les fichiers uploadés (CV, photos, etc.)
 uploads_path = Path(__file__).parent.parent / "uploads"

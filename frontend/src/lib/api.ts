@@ -591,12 +591,6 @@ export interface Company {
   city?: string;
   country?: string;
   logo_url?: string;
-  total_jobs?: number; // Pour la liste publique
-}
-
-export interface CompanyListResponse {
-  companies: Company[];
-  total: number;
 }
 
 export interface CompanyStats {
@@ -608,12 +602,6 @@ export interface CompanyStats {
 
 // API pour les entreprises
 export const companiesAPI = {
-  // Récupérer la liste des entreprises (endpoint public)
-  getCompanies: async (limit: number = 10): Promise<CompanyListResponse> => {
-    const response = await apiClient.get(`/companies/?limit=${limit}`);
-    return response.data;
-  },
-
   // Récupérer les informations de mon entreprise
   getMyCompany: async (token: string): Promise<Company> => {
     const client = createAuthenticatedClient(token);

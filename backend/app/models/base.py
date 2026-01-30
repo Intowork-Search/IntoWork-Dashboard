@@ -1,6 +1,7 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, ForeignKey, Enum as SQLEnum, LargeBinary
+from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, ForeignKey, Enum as SQLEnum, LargeBinary, Float
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
+from sqlalchemy.dialects.postgresql import JSONB
 from app.database import Base
 import enum
 
@@ -282,6 +283,11 @@ class JobApplication(Base):
     cover_letter_url = Column(String)  # URL du fichier de lettre de motivation
     cv_url = Column(String)  # CV spécifique à cette candidature
     notes = Column(Text)  # Notes de l'employeur sur cette candidature
+    
+    # Scoring IA
+    ai_score = Column(Float)  # Score de 0 à 100
+    ai_score_details = Column(JSONB)  # Détails du scoring (compétences, expérience, etc.)
+    ai_analyzed_at = Column(DateTime(timezone=True))  # Date d'analyse IA
     
     # Suivi
     applied_at = Column(DateTime(timezone=True), server_default=func.now())
