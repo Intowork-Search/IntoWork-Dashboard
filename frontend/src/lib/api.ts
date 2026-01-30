@@ -436,6 +436,7 @@ export interface JobApplication {
 
 export interface CreateApplicationData {
   job_id: number;
+  cv_id?: number;
   cover_letter?: string;
 }
 

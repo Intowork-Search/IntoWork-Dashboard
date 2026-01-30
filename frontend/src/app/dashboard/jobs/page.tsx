@@ -12,10 +12,11 @@
 
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
-import { JobFilters } from '@/lib/api';
-import { useUser } from '@/hooks/useNextAuth';
+import { JobFilters, candidatesAPI } from '@/lib/api';
+import { useUser, useAuth } from '@/hooks/useNextAuth';
 import { useJobs, useMyJobs, useApplyToJob } from '@/hooks';
 import Link from 'next/link';
+import { toast } from 'react-hot-toast';
 import {
   MagnifyingGlassIcon,
   MapPinIcon,
@@ -38,8 +39,17 @@ import {
 } from '@heroicons/react/24/outline';
 import { StarIcon, CheckBadgeIcon } from '@heroicons/react/24/solid';
 
+interface CV {
+  id: number;
+  filename: string;
+  file_size?: number;
+  is_active: boolean;
+  created_at: string;
+}
+
 export default function JobsPage() {
   const { user, isLoaded } = useUser();
+  const { getToken } = useAuth();
   const [filters, setFilters] = useState<JobFilters>({
     page: 1,
     limit: 12
@@ -47,6 +57,9 @@ export default function JobsPage() {
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
   const [showApplicationModal, setShowApplicationModal] = useState(false);
   const [coverLetter, setCoverLetter] = useState('');
+  const [selectedCVId, setSelectedCVId] = useState<number | null>(null);
+  const [cvs, setCvs] = useState<CV[]>([]);
+  const [loadingCVs, setLoadingCVs] = useState(false);
   const [searchInput, setSearchInput] = useState('');
   const [locationInput, setLocationInput] = useState('');
 
@@ -93,19 +106,57 @@ export default function JobsPage() {
   };
 
   // Ouvrir le modal de candidature
-  const handleApply = (jobId: number) => {
+  const handleApply = async (jobId: number) => {
     setSelectedJobId(jobId);
     setCoverLetter('');
+    setSelectedCVId(null);
     setShowApplicationModal(true);
+    
+    // Charger les CVs du candidat
+    if (!isEmployer) {
+      await loadCandidateCVs();
+    }
+  };
+
+  // Charger les CVs du candidat
+  const loadCandidateCVs = async () => {
+    try {
+      setLoadingCVs(true);
+      const token = await getToken();
+      if (!token) return;
+
+      const cvsData = await candidatesAPI.listCVs(token);
+      setCvs(cvsData);
+      
+      // Pré-sélectionner le CV actif
+      const activeCV = cvsData.find(cv => cv.is_active);
+      if (activeCV) {
+        setSelectedCVId(activeCV.id);
+      } else if (cvsData.length > 0) {
+        setSelectedCVId(cvsData[0].id);
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement des CVs:', error);
+      toast.error('Erreur lors du chargement de vos CVs');
+    } finally {
+      setLoadingCVs(false);
+    }
   };
 
   // Soumettre la candidature (avec React Query mutation)
   const handleSubmitApplication = () => {
     if (!selectedJobId) return;
 
+    // Vérifier qu'un CV est sélectionné
+    if (!selectedCVId && cvs.length > 0) {
+      toast.error('Veuillez sélectionner un CV');
+      return;
+    }
+
     applyToJob.mutate(
       {
         job_id: selectedJobId,
+        cv_id: selectedCVId || undefined,
         cover_letter: coverLetter || undefined
       },
       {
@@ -113,6 +164,7 @@ export default function JobsPage() {
           setShowApplicationModal(false);
           setSelectedJobId(null);
           setCoverLetter('');
+          setSelectedCVId(null);
         }
       }
     );
@@ -573,6 +625,67 @@ export default function JobsPage() {
                   <p className="text-sm text-gray-700 font-medium">Votre profil sera automatiquement partagé</p>
                   <p className="text-sm text-gray-500">Les recruteurs verront votre CV et vos informations de profil.</p>
                 </div>
+              </div>
+
+              {/* Sélection du CV */}
+              <div className="mb-6">
+                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                  📄 Sélectionnez un CV
+                </label>
+                
+                {loadingCVs ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="w-8 h-8 border-4 border-[#6B9B5F] border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                ) : cvs.length === 0 ? (
+                  <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-4">
+                    <p className="text-sm text-yellow-800 mb-2">
+                      ⚠️ Aucun CV uploadé. Vous devez d&apos;abord ajouter un CV.
+                    </p>
+                    <Link 
+                      href="/dashboard/cv" 
+                      className="text-sm font-semibold text-[#6B9B5F] hover:text-[#5a8a4f] underline"
+                    >
+                      → Ajouter un CV maintenant
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {cvs.map(cv => (
+                      <label 
+                        key={cv.id}
+                        className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                          selectedCVId === cv.id 
+                            ? 'border-[#6B9B5F] bg-[#6B9B5F]/5 shadow-md' 
+                            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="cv"
+                          checked={selectedCVId === cv.id}
+                          onChange={() => setSelectedCVId(cv.id)}
+                          className="w-5 h-5 text-[#6B9B5F] focus:ring-[#6B9B5F] cursor-pointer"
+                        />
+                        <div className="flex-1">
+                          <p className="font-medium text-gray-900">{cv.filename}</p>
+                          <p className="text-sm text-gray-500">
+                            Uploadé le {new Date(cv.created_at).toLocaleDateString('fr-FR', {
+                              day: 'numeric',
+                              month: 'long',
+                              year: 'numeric'
+                            })}
+                          </p>
+                        </div>
+                        {cv.is_active && (
+                          <span className="px-3 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
+                            ✓ Principal
+                          </span>
+                        )}
+                      </label>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Cover letter */}

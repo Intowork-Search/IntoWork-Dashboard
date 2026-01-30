@@ -16,6 +16,7 @@ router = APIRouter()
 # Schémas Pydantic pour les candidatures
 class JobApplicationCreate(BaseModel):
     job_id: int
+    cv_id: Optional[int] = None  # ID du CV sélectionné
     cover_letter: Optional[str] = None
 
 class JobApplicationResponse(BaseModel):
@@ -169,11 +170,52 @@ async def create_application(
     if existing_application:
         raise HTTPException(status_code=400, detail="Vous avez déjà postulé à cette offre")
 
+    # Gérer la sélection du CV
+    from app.models.base import ApplicationStatus, CandidateCV
+    cv_url = None
+    cv_id = None
+    
+    if application_data.cv_id:
+        # Vérifier que le CV appartient bien au candidat
+        cv_result = await db.execute(
+            select(CandidateCV).filter(
+                CandidateCV.id == application_data.cv_id,
+                CandidateCV.candidate_id == candidate.id
+            )
+        )
+        selected_cv = cv_result.scalar_one_or_none()
+        
+        if not selected_cv:
+            raise HTTPException(status_code=400, detail="CV invalide ou introuvable")
+        
+        cv_id = selected_cv.id
+        cv_url = selected_cv.file_path
+    else:
+        # Fallback : utiliser le CV principal (is_active=True)
+        active_cv_result = await db.execute(
+            select(CandidateCV)
+            .filter(
+                CandidateCV.candidate_id == candidate.id,
+                CandidateCV.is_active == True
+            )
+            .order_by(CandidateCV.created_at.desc())
+            .limit(1)
+        )
+        active_cv = active_cv_result.scalar_one_or_none()
+        
+        if active_cv:
+            cv_id = active_cv.id
+            cv_url = active_cv.file_path
+        elif candidate.cv_url:
+            # Fallback legacy
+            cv_url = candidate.cv_url
+
     # Créer la candidature
-    from app.models.base import ApplicationStatus
     application = JobApplication(
         job_id=application_data.job_id,
         candidate_id=candidate.id,
+        cv_id=cv_id,
+        cv_url=cv_url,  # Pour compatibilité
         status=ApplicationStatus.APPLIED,
         cover_letter=application_data.cover_letter,
         applied_at=datetime.utcnow()

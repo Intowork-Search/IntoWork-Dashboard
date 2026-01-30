@@ -276,12 +276,13 @@ class JobApplication(Base):
     id = Column(Integer, primary_key=True, index=True)
     job_id = Column(Integer, ForeignKey("jobs.id"), nullable=False)
     candidate_id = Column(Integer, ForeignKey("candidates.id"), nullable=False)
+    cv_id = Column(Integer, ForeignKey("candidate_cvs.id"), nullable=True)  # CV sélectionné pour cette candidature
     
     # Candidature
     status = Column(SQLEnum(ApplicationStatus, values_callable=lambda x: [e.value for e in x]), nullable=False, default=ApplicationStatus.APPLIED)
     cover_letter = Column(Text)  # Lettre de motivation en texte
     cover_letter_url = Column(String)  # URL du fichier de lettre de motivation
-    cv_url = Column(String)  # CV spécifique à cette candidature
+    cv_url = Column(String)  # CV spécifique à cette candidature (legacy, deprecated)
     notes = Column(Text)  # Notes de l'employeur sur cette candidature
     
     # Scoring IA
@@ -297,6 +298,7 @@ class JobApplication(Base):
     # Relations
     job = relationship("Job", back_populates="applications")
     candidate = relationship("Candidate")
+    selected_cv = relationship("CandidateCV", foreign_keys=[cv_id])  # CV sélectionné pour cette candidature
 
 
 class NotificationType(enum.Enum):
