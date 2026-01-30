@@ -461,13 +461,20 @@ export default function JobsPage() {
                     )}
 
                     {isEmployer && (
-                      <div className="mt-4">
+                      <div className="mt-4 grid grid-cols-2 gap-2">
                         <Link
                           href={`/dashboard/job-posts`}
-                          className="w-full py-3 rounded-xl font-semibold bg-gradient-to-r from-[#F7C700] to-[#e5b800] text-white shadow-lg shadow-[#F7C700]/20 hover:shadow-xl hover:shadow-[#F7C700]/30 transition-all flex items-center justify-center gap-2"
+                          className="py-3 rounded-xl font-semibold bg-gradient-to-r from-[#F7C700] to-[#e5b800] text-white shadow-lg shadow-[#F7C700]/20 hover:shadow-xl hover:shadow-[#F7C700]/30 transition-all flex items-center justify-center gap-2"
                         >
                           <EyeIcon className="w-5 h-5" />
-                          <span>Gérer l'offre</span>
+                          <span>Gérer</span>
+                        </Link>
+                        <Link
+                          href={`/dashboard/ai-scoring/${job.id}`}
+                          className="py-3 rounded-xl font-semibold bg-gradient-to-r from-[#6B9B5F] to-[#5a8a4f] text-white shadow-lg shadow-[#6B9B5F]/20 hover:shadow-xl hover:shadow-[#6B9B5F]/30 transition-all flex items-center justify-center gap-2"
+                        >
+                          <SparklesIcon className="w-5 h-5" />
+                          <span>IA</span>
                         </Link>
                       </div>
                     )}
