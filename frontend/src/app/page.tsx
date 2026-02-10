@@ -522,27 +522,27 @@ export default function Home() {
               <div className="w-12 h-12 border-4 border-(--color-brand-violet) border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : companies.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
-              {companies.map((company) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-4xl mx-auto mb-8">
+              {companies.slice(0, 2).map((company) => (
                 <Link
                   key={company.name}
                   href="/entreprises"
-                  className="bg-white rounded-2xl p-6 sm:p-8 border-2 border-slate-200 hover:border-(--color-brand-violet) hover:shadow-xl transition-all duration-300 group text-center"
+                  className="bg-white rounded-2xl p-8 border-2 border-slate-200 hover:border-(--color-brand-violet) hover:shadow-xl transition-all duration-300 group text-center"
                 >
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-gradient-to-br from-(--color-brand-violet) to-purple-600 flex items-center justify-center mx-auto mb-4 shadow-lg">
-                    <span className="text-2xl sm:text-3xl font-bold text-white">
+                  <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-(--color-brand-violet) to-purple-600 flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <span className="text-3xl font-bold text-white">
                       {company.name.charAt(0).toUpperCase()}
                     </span>
                   </div>
-                  <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2 group-hover:text-(--color-brand-violet) transition-colors line-clamp-1">
+                  <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-(--color-brand-violet) transition-colors line-clamp-1">
                     {company.name}
                   </h3>
-                  <p className="text-sm sm:text-base text-slate-600 font-medium mb-3">
+                  <p className="text-base text-slate-600 font-medium mb-3">
                     {company.count} offre{company.count > 1 ? 's' : ''}
                   </p>
-                  <span className="inline-flex items-center gap-1.5 text-(--color-brand-violet) font-semibold text-xs sm:text-sm group-hover:translate-x-1 transition-transform">
+                  <span className="inline-flex items-center gap-1.5 text-(--color-brand-violet) font-semibold text-sm group-hover:translate-x-1 transition-transform">
                     Voir les offres
-                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                     </svg>
                   </span>
@@ -550,12 +550,9 @@ export default function Home() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-12 bg-purple-50 border-2 border-purple-300 rounded-xl p-8">
-              <p className="text-slate-900 font-bold mb-2">Debug Info:</p>
-              <p className="text-slate-600">Loading: {loadingJobs ? 'true' : 'false'}</p>
-              <p className="text-slate-600">Companies Count: {companies.length}</p>
-              <p className="text-slate-600 mt-4">Aucune entreprise partenaire pour le moment</p>
-              <p className="text-slate-500 text-sm mt-2">Vérifiez la console pour plus de détails</p>
+            <div className="text-center py-12 bg-purple-50 border-2 border-purple-200 rounded-xl p-8">
+              <p className="text-slate-600 text-lg mb-2">Aucune entreprise partenaire pour le moment</p>
+              <p className="text-slate-500 text-sm">Les entreprises apparaîtront dès qu&apos;elles publieront des offres</p>
             </div>
           )}
 

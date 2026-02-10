@@ -37,7 +37,7 @@ router = APIRouter()
 # ==============================================================================
 
 PageParam = Annotated[int, Query(ge=1, description="Page number")]
-LimitParam = Annotated[int, Query(ge=1, le=50, description="Items per page")]
+LimitParam = Annotated[int, Query(ge=1, le=1000, description="Items per page")]  # Augmenté pour landing page
 SearchParam = Annotated[Optional[str], Query(description="Search term")]
 LocationParam = Annotated[Optional[str], Query(description="Location filter")]
 JobTypeParam = Annotated[Optional[str], Query(description="Job type filter")]
