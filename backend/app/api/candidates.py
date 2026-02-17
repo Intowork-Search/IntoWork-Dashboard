@@ -646,7 +646,7 @@ async def upload_cv(
 
         # Aussi mettre à jour les champs legacy dans candidate pour compatibilité
         candidate.cv_filename = cv.filename
-        candidate.cv_uploaded_at = func.now()
+        candidate.cv_uploaded_at = datetime.utcnow()
         candidate.cv_url = cv_path
 
         logger.info(f"Nouveau CV ajouté - filename: {cv.filename}")
