@@ -365,9 +365,30 @@ async def delete_user(
         raise HTTPException(status_code=400, detail="Cannot delete your own account")
 
     try:
-        # Si c'est un candidat, supprimer les candidatures d'abord
+        # 1. Supprimer d'abord toutes les notifications de l'utilisateur
+        await db.execute(
+            sql_delete(Notification).filter(Notification.user_id == user.id)
+        )
+
+        # Si c'est un candidat, supprimer les candidatures
         if user.role == UserRole.CANDIDATE and user.candidate:
-            # Supprimer toutes les candidatures (ASYNC)
+            # Récupérer les IDs des candidatures pour supprimer les notifications liées
+            result = await db.execute(
+                select(JobApplication.id).filter(
+                    JobApplication.candidate_id == user.candidate.id
+                )
+            )
+            application_ids = [row[0] for row in result.fetchall()]
+            
+            # Supprimer les notifications qui référencent ces candidatures
+            if application_ids:
+                await db.execute(
+                    sql_delete(Notification).filter(
+                        Notification.related_application_id.in_(application_ids)
+                    )
+                )
+            
+            # Supprimer toutes les candidatures
             await db.execute(
                 sql_delete(JobApplication).filter(
                     JobApplication.candidate_id == user.candidate.id
@@ -376,18 +397,46 @@ async def delete_user(
 
         # Si c'est un employeur, supprimer les offres d'emploi et candidatures associées
         if user.role == UserRole.EMPLOYER and user.employer:
-            # Récupérer tous les jobs de l'employeur (ASYNC)
+            # Récupérer tous les jobs de l'employeur
             result = await db.execute(
                 select(Job).filter(Job.employer_id == user.employer.id)
             )
             employer_jobs = result.scalars().all()
+            job_ids = [job.id for job in employer_jobs]
 
-            for job in employer_jobs:
-                # Supprimer les candidatures pour chaque job
+            if job_ids:
+                # Supprimer les notifications liées à ces jobs
                 await db.execute(
-                    sql_delete(JobApplication).filter(JobApplication.job_id == job.id)
+                    sql_delete(Notification).filter(
+                        Notification.related_job_id.in_(job_ids)
+                    )
                 )
-                # Supprimer le job
+
+                # Récupérer les IDs des candidatures liées à ces jobs
+                result = await db.execute(
+                    select(JobApplication.id).filter(
+                        JobApplication.job_id.in_(job_ids)
+                    )
+                )
+                application_ids = [row[0] for row in result.fetchall()]
+                
+                # Supprimer les notifications liées à ces candidatures
+                if application_ids:
+                    await db.execute(
+                        sql_delete(Notification).filter(
+                            Notification.related_application_id.in_(application_ids)
+                        )
+                    )
+                
+                # Supprimer les candidatures
+                await db.execute(
+                    sql_delete(JobApplication).filter(
+                        JobApplication.job_id.in_(job_ids)
+                    )
+                )
+
+            # Supprimer les jobs
+            for job in employer_jobs:
                 await db.delete(job)
 
         # Maintenant supprimer l'utilisateur (cascade supprimera candidate/employer et autres relations)
