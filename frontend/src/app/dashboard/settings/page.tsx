@@ -306,6 +306,9 @@ export default function SettingsPage() {
         toast.success('Logo téléchargé avec succès !');
         // Mettre à jour le logo dans le state
         setCompanyData(prev => ({ ...prev, logo_url: data.logo_url }));
+        
+        // Notifier la Sidebar du changement de logo
+        window.dispatchEvent(new CustomEvent('company-logo-updated', { detail: data.logo_url }));
       } else {
         const errorData = await response.json();
         toast.error(errorData.detail || 'Erreur lors du téléchargement');

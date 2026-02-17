@@ -153,6 +153,20 @@ export default function Sidebar({ userRole }: SidebarProps) {
     }
   }, [userRole, user, getToken]);
 
+  // Écouter les mises à jour du logo depuis la page Settings
+  useEffect(() => {
+    const handleLogoUpdate = (event: CustomEvent) => {
+      const newLogoUrl = event.detail;
+      setCompanyLogoUrl(getUploadUrl(newLogoUrl));
+    };
+
+    window.addEventListener('company-logo-updated', handleLogoUpdate as EventListener);
+    
+    return () => {
+      window.removeEventListener('company-logo-updated', handleLogoUpdate as EventListener);
+    };
+  }, []);
+
   // Créer la navigation candidate avec le badge CV dynamique
   const candidateNavigation: NavItem[] = [
     { 
