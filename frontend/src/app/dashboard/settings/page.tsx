@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useUser, useAuth } from '@/hooks/useNextAuth';
 import { signOut } from 'next-auth/react';
 import { toast } from 'react-hot-toast';
@@ -13,7 +13,8 @@ import {
   PhotoIcon,
   Cog6ToothIcon,
   SparklesIcon,
-  ExclamationTriangleIcon
+  ExclamationTriangleIcon,
+  ArrowUpTrayIcon
 } from '@heroicons/react/24/outline';
 import { useAuthenticatedAPI } from '@/hooks/useAuthenticatedAPI';
 import { companiesAPI, authAPI } from '@/lib/api';
@@ -61,6 +62,11 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('profile');
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [userRole, setUserRole] = useState<'candidate' | 'employer' | 'admin' | null>(null);
+  
+  // États pour upload de logo
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const [isDraggingLogo, setIsDraggingLogo] = useState(false);
+  const logoInputRef = useRef<HTMLInputElement>(null);
 
   const [profileData, setProfileData] = useState({
     first_name: user?.firstName || '',
@@ -239,11 +245,106 @@ export default function SettingsPage() {
 
       await companiesAPI.updateMyCompany(token, companyData);
       toast.success('Informations de l\'entreprise mises à jour avec succès !');
+      
+      // Recharger les données pour avoir le logo mis à jour
+      const updatedCompany = await companiesAPI.getMyCompany(token);
+      setCompanyData({
+        name: updatedCompany.name || '',
+        description: updatedCompany.description || '',
+        industry: updatedCompany.industry || '',
+        size: updatedCompany.size || '',
+        website_url: updatedCompany.website_url || '',
+        linkedin_url: updatedCompany.linkedin_url || '',
+        address: updatedCompany.address || '',
+        city: updatedCompany.city || '',
+        country: updatedCompany.country || '',
+        logo_url: updatedCompany.logo_url || ''
+      });
     } catch (error) {
       console.error('Erreur lors de la mise à jour:', error);
       toast.error('Erreur lors de la mise à jour des informations');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Gestion de l'upload du logo
+  const handleLogoUpload = async (file: File) => {
+    const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      toast.error('Seuls les fichiers PNG, JPG, SVG et WebP sont acceptés');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Le fichier ne peut pas dépasser 5MB');
+      return;
+    }
+
+    try {
+      setIsUploadingLogo(true);
+      const token = await getToken();
+      if (!token) {
+        toast.error('Erreur d\'authentification');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('logo', file);
+
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+      const response = await fetch(`${apiUrl}/companies/my-company/logo`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        toast.success('Logo téléchargé avec succès !');
+        // Mettre à jour le logo dans le state
+        setCompanyData(prev => ({ ...prev, logo_url: data.logo_url }));
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.detail || 'Erreur lors du téléchargement');
+      }
+    } catch (error) {
+      console.error('Erreur lors du téléchargement du logo:', error);
+      toast.error('Erreur lors du téléchargement du logo');
+    } finally {
+      setIsUploadingLogo(false);
+      if (logoInputRef.current) {
+        logoInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDraggingLogo(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDraggingLogo(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDraggingLogo(false);
+
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      handleLogoUpload(files[0]);
+    }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      handleLogoUpload(files[0]);
     }
   };
 
@@ -684,30 +785,67 @@ export default function SettingsPage() {
                   </div>
 
                   <div className="md:col-span-2">
-                    <label htmlFor="logo_url" className="block text-sm font-bold text-gray-800 mb-2">
-                      Logo (URL)
+                    <label className="block text-sm font-bold text-gray-800 mb-2">
+                      Logo de l'entreprise
                     </label>
-                    <div className="flex items-center gap-4">
-                      {companyData.logo_url && (
+                    
+                    {/* Logo actuel */}
+                    {companyData.logo_url && (
+                      <div className="mb-4 flex items-center gap-4">
                         <img
-                          src={companyData.logo_url}
-                          alt="Logo"
-                          className="w-16 h-16 object-cover rounded-2xl border-2 border-gray-200"
+                          src={`${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}${companyData.logo_url}`}
+                          alt="Logo actuel"
+                          className="w-20 h-20 object-contain rounded-lg border-2 border-gray-200"
                         />
-                      )}
+                        <div className="text-sm text-gray-600">
+                          <p className="font-medium">Logo actuel</p>
+                          <p className="text-xs text-gray-500">Téléchargez un nouveau logo pour le remplacer</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Zone d'upload avec drag & drop */}
+                    <div
+                      className={`relative border-2 border-dashed rounded-xl p-6 text-center transition-all cursor-pointer ${
+                        isDraggingLogo
+                          ? 'border-[#F7C700] bg-[#F7C700]/5'
+                          : 'border-gray-300 hover:border-[#F7C700] hover:bg-gray-50'
+                      } ${isUploadingLogo ? 'opacity-50 pointer-events-none' : ''}`}
+                      onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
+                      onDrop={handleDrop}
+                      onClick={() => !isUploadingLogo && logoInputRef.current?.click()}
+                    >
                       <input
-                        id="logo_url"
-                        type="url"
-                        value={companyData.logo_url}
-                        onChange={(e) => setCompanyData(prev => ({ ...prev, logo_url: e.target.value }))}
-                        className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400"
-                        placeholder="https://exemple.com/logo.png"
+                        ref={logoInputRef}
+                        type="file"
+                        accept="image/png,image/jpeg,image/jpg,image/svg+xml,image/webp"
+                        onChange={handleFileSelect}
+                        className="hidden"
+                        disabled={isUploadingLogo}
                       />
+                      
+                      <div className="flex flex-col items-center gap-3">
+                        <div className={`w-14 h-14 rounded-full flex items-center justify-center ${
+                          isDraggingLogo ? 'bg-[#F7C700]' : 'bg-gray-100'
+                        } transition-colors`}>
+                          {isUploadingLogo ? (
+                            <div className="w-7 h-7 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+                          ) : (
+                            <ArrowUpTrayIcon className={`w-7 h-7 ${isDraggingLogo ? 'text-white' : 'text-gray-400'}`} />
+                          )}
+                        </div>
+                        
+                        <div>
+                          <p className="text-gray-700 font-medium mb-1">
+                            {isUploadingLogo ? 'Téléchargement...' : isDraggingLogo ? 'Déposez le logo ici' : 'Cliquez ou déposez un logo'}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            PNG, JPG, SVG, WebP (max 5MB)
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                    <p className="text-sm text-gray-500 mt-2 flex items-center gap-1">
-                      <PhotoIcon className="w-4 h-4" />
-                      Recommandé: 200x200px, format PNG ou JPG
-                    </p>
                   </div>
                 </div>
 

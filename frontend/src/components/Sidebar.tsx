@@ -5,7 +5,7 @@ import { useUser, useAuth } from '@/hooks/useNextAuth';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
-import { candidatesAPI, jobsAPI, applicationsAPI } from '@/lib/api';
+import { candidatesAPI, jobsAPI, applicationsAPI, companiesAPI } from '@/lib/api';
 import { 
   HomeIcon, 
   UserIcon, 
@@ -112,6 +112,7 @@ export default function Sidebar({ userRole }: SidebarProps) {
   const [cvCount, setCvCount] = useState(0);
   const [jobsCount, setJobsCount] = useState(0);
   const [applicationsCount, setApplicationsCount] = useState(0);
+  const [companyLogoUrl, setCompanyLogoUrl] = useState<string | null>(null);
 
   // Récupérer le nombre de CV pour les candidats, le nombre d'emplois et de candidatures
   useEffect(() => {
@@ -131,6 +132,13 @@ export default function Sidebar({ userRole }: SidebarProps) {
         } else if (userRole === 'employer' && user && token) {
           // Récupérer le nombre d'offres actives de l'employeur
           const response = await jobsAPI.getMyJobs(token);
+          // Récupérer le logo de l'entreprise
+          try {
+            const companyData = await companiesAPI.getMyCompany(token);
+            setCompanyLogoUrl(companyData.logo_url || null);
+          } catch (error) {
+            console.log('Logo entreprise non disponible');
+          }
           setJobsCount(response.jobs ? response.jobs.length : 0);
         }
         // Pour les admins, on ne charge aucune donnée ici
@@ -292,10 +300,20 @@ export default function Sidebar({ userRole }: SidebarProps) {
             );
           })}
         </nav>
-
-        {/* Footer avec profil et déconnexion */}
-        <div className="border-t border-gray-200 shrink-0 mt-auto">
-          {/* Profil utilisateur */}
+ou Logo entreprise */}
+                {userRole === 'employer' && companyLogoUrl ? (
+                  <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-200 bg-white flex items-center justify-center">
+                    <img
+                      src={`${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}${companyLogoUrl}`}
+                      alt="Logo entreprise"
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-linear-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white font-semibold">
+                    {user?.firstName?.[0]}{user?.lastName?.[0]}
+                  </div>
+                )}tilisateur */}
           <div className="p-4 border-b border-gray-200">
             <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'}`}>
               <div className="relative">
