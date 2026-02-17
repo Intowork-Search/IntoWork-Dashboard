@@ -10,7 +10,7 @@
  * - Bleu: #3B82F6 (complémentaire)
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useNextAuth';
 import { companiesAPI, Company, CompanyStats } from '@/lib/api';
 import { toast } from 'react-hot-toast';
@@ -30,7 +30,6 @@ import {
   PhotoIcon,
   InformationCircleIcon,
   ArrowTrendingUpIcon,
-  ArrowUpTrayIcon,
 } from '@heroicons/react/24/outline';
 
 export default function CompanyPage(): React.JSX.Element {
@@ -41,11 +40,6 @@ export default function CompanyPage(): React.JSX.Element {
   const [stats, setStats] = useState<CompanyStats | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<Partial<Company>>({});
-  
-  // États pour upload de logo
-  const [isUploading, setIsUploading] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const logoInputRef = useRef<HTMLInputElement>(null);
 
   // Charger les données de l'entreprise
   useEffect(() => {
@@ -105,89 +99,6 @@ export default function CompanyPage(): React.JSX.Element {
   const handleCancel = () => {
     setFormData(company || {});
     setIsEditing(false);
-  };
-
-  // Gestion de l'upload du logo
-  const handleLogoUpload = async (file: File) => {
-    // Validation du type de fichier
-    const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml', 'image/webp'];
-    if (!validTypes.includes(file.type)) {
-      toast.error('Seuls les fichiers PNG, JPG, SVG et WebP sont acceptés');
-      return;
-    }
-
-    // Validation de la taille (5MB max)
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('Le fichier ne peut pas dépasser 5MB');
-      return;
-    }
-
-    try {
-      setIsUploading(true);
-      const token = await getToken();
-      if (!token) {
-        toast.error('Erreur d\'authentification');
-        return;
-      }
-
-      const formData = new FormData();
-      formData.append('logo', file);
-
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-      const response = await fetch(`${apiUrl}/companies/my-company/logo`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-        body: formData,
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        toast.success('Logo téléchargé avec succès !');
-        // Recharger les données de l'entreprise
-        await loadCompanyData();
-      } else {
-        const errorData = await response.json();
-        toast.error(errorData.detail || 'Erreur lors du téléchargement');
-      }
-    } catch (error) {
-      console.error('Erreur lors du téléchargement du logo:', error);
-      toast.error('Erreur lors du téléchargement du logo');
-    } finally {
-      setIsUploading(false);
-      if (logoInputRef.current) {
-        logoInputRef.current.value = '';
-      }
-    }
-  };
-
-  // Drag & drop handlers
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-
-    const files = e.dataTransfer.files;
-    if (files.length > 0) {
-      handleLogoUpload(files[0]);
-    }
-  };
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      handleLogoUpload(files[0]);
-    }
   };
 
   // Loading state
@@ -443,7 +354,7 @@ export default function CompanyPage(): React.JSX.Element {
                 )}
               </div>
 
-              {/* Logo Upload */}
+              {/* Logo de l'entreprise */}
               <div className="lg:col-span-2">
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   <span className="inline-flex items-center gap-2">
@@ -452,63 +363,29 @@ export default function CompanyPage(): React.JSX.Element {
                   </span>
                 </label>
                 
-                {/* Logo actuel */}
-                {company?.logo_url && (
-                  <div className="mb-4 flex items-center gap-4">
+                {company?.logo_url ? (
+                  <div className="flex items-center gap-4">
                     <img
                       src={`${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}${company.logo_url}`}
-                      alt="Logo actuel"
-                      className="w-24 h-24 object-contain rounded-lg border-2 border-gray-200"
+                      alt={company.name}
+                      className="w-32 h-32 object-contain rounded-xl border-2 border-gray-200 bg-white p-2"
                     />
                     <div className="text-sm text-gray-600">
-                      <p className="font-medium">Logo actuel</p>
-                      <p className="text-xs text-gray-500">Téléchargez un nouveau logo pour le remplacer</p>
+                      <p className="font-medium text-gray-900 mb-1">{company.name}</p>
+                      <p className="text-xs text-gray-500">Pour modifier le logo, allez dans Paramètres → Entreprise</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-4 p-6 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
+                    <div className="w-32 h-32 rounded-xl bg-gray-200 flex items-center justify-center">
+                      <PhotoIcon className="w-16 h-16 text-gray-400" />
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      <p className="font-medium text-gray-900 mb-1">Aucun logo</p>
+                      <p className="text-xs text-gray-500">Ajoutez votre logo dans Paramètres → Entreprise</p>
                     </div>
                   </div>
                 )}
-
-                {/* Zone d'upload avec drag & drop */}
-                <div
-                  className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-all cursor-pointer ${
-                    isDragging
-                      ? 'border-[#6B9B5F] bg-[#6B9B5F]/5'
-                      : 'border-gray-300 hover:border-[#6B9B5F] hover:bg-gray-50'
-                  } ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onDrop={handleDrop}
-                  onClick={() => !isUploading && logoInputRef.current?.click()}
-                >
-                  <input
-                    ref={logoInputRef}
-                    type="file"
-                    accept="image/png,image/jpeg,image/jpg,image/svg+xml,image/webp"
-                    onChange={handleFileSelect}
-                    className="hidden"
-                    disabled={isUploading}
-                  />
-                  
-                  <div className="flex flex-col items-center gap-3">
-                    <div className={`w-16 h-16 rounded-full flex items-center justify-center ${
-                      isDragging ? 'bg-[#6B9B5F]' : 'bg-gray-100'
-                    } transition-colors`}>
-                      {isUploading ? (
-                        <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-                      ) : (
-                        <ArrowUpTrayIcon className={`w-8 h-8 ${isDragging ? 'text-white' : 'text-gray-400'}`} />
-                      )}
-                    </div>
-                    
-                    <div>
-                      <p className="text-gray-700 font-medium mb-1">
-                        {isUploading ? 'Téléchargement...' : isDragging ? 'Déposez le logo ici' : 'Cliquez ou déposez un logo'}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        PNG, JPG, SVG, WebP (max 5MB)
-                      </p>
-                    </div>
-                  </div>
-                </div>
               </div>
 
               {/* Description */}
