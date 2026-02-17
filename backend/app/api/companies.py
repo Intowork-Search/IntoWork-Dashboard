@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, status
 from app.rate_limiter import limiter
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
@@ -6,6 +6,11 @@ from sqlalchemy.orm import selectinload
 from pydantic import BaseModel
 from typing import Optional
 from loguru import logger
+from datetime import datetime
+import os
+import re
+import uuid
+import aiofiles
 from app.database import get_db
 from app.auth import require_user
 from app.models.base import User, UserRole, Company, Employer, Job, JobStatus, JobApplication
@@ -276,3 +281,114 @@ async def get_company_stats(
         total_applications=total_applications,
         total_employers=total_employers
     )
+
+
+@router.post("/my-company/logo")
+async def upload_company_logo(
+    logo: UploadFile = File(...),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_user)
+):
+    """
+    Télécharger un logo pour l'entreprise
+    Formats acceptés: PNG, JPG, JPEG, SVG, WebP
+    Taille max: 5MB
+    """
+    try:
+        if current_user.role != UserRole.EMPLOYER:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Accès réservé aux employeurs"
+            )
+
+        # Vérifier le type de fichier
+        allowed_types = ["image/png", "image/jpeg", "image/jpg", "image/svg+xml", "image/webp"]
+        if logo.content_type not in allowed_types:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Seuls les fichiers PNG, JPG, SVG et WebP sont acceptés"
+            )
+
+        # Récupérer l'employeur et son entreprise
+        result = await db.execute(
+            select(Employer).options(selectinload(Employer.company)).filter(Employer.user_id == current_user.id)
+        )
+        employer = result.scalar_one_or_none()
+        if not employer:
+            raise HTTPException(status_code=404, detail="Employeur introuvable")
+
+        company = employer.company
+        if not company:
+            raise HTTPException(status_code=404, detail="Entreprise introuvable")
+
+        # Lire le contenu du fichier
+        logo_content = await logo.read()
+
+        # Vérifier la taille (max 5MB)
+        file_size = len(logo_content)
+        MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
+        if file_size > MAX_FILE_SIZE:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Le fichier ne peut pas dépasser 5MB (taille actuelle: {file_size / (1024*1024):.2f}MB)"
+            )
+
+        logger.info(f"Début upload logo pour company_id={company.id}")
+        logger.info(f"Nom fichier: {logo.filename}, taille: {file_size} bytes")
+
+        # Créer le répertoire de stockage
+        logo_dir = os.path.abspath("uploads/company_logos")
+        os.makedirs(logo_dir, exist_ok=True)
+
+        # Sécuriser le nom de fichier
+        original_filename = os.path.basename(logo.filename or "logo")
+        safe_filename = re.sub(r'[^a-zA-Z0-9_.-]', '_', original_filename)
+
+        if safe_filename.startswith('.'):
+            safe_filename = 'logo' + safe_filename
+
+        name_part, ext = os.path.splitext(safe_filename)
+        if len(name_part) > 100:
+            name_part = name_part[:100]
+        safe_filename = name_part + ext
+
+        # Nom unique avec ID entreprise
+        unique_filename = f"company_{company.id}_{uuid.uuid4().hex}{ext}"
+        logo_path = os.path.join(logo_dir, unique_filename)
+
+        # Valider le chemin
+        logo_path_resolved = os.path.abspath(logo_path)
+        if not logo_path_resolved.startswith(logo_dir):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid file path detected"
+            )
+
+        # Sauvegarder le fichier
+        async with aiofiles.open(logo_path, "wb") as f:
+            await f.write(logo_content)
+
+        # Mettre à jour l'URL du logo dans la base de données
+        # On stocke le chemin relatif pour servir via l'API
+        company.logo_url = f"/uploads/company_logos/{unique_filename}"
+
+        await db.commit()
+        await db.refresh(company)
+
+        logger.info(f"Logo sauvegardé: {logo_path}")
+
+        return {
+            "message": "Logo téléchargé avec succès",
+            "logo_url": company.logo_url,
+            "filename": unique_filename,
+            "size": file_size
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erreur lors de l'upload du logo: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Erreur interne du serveur"
+        )
