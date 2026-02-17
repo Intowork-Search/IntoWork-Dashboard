@@ -299,7 +299,6 @@ export default function Sidebar({ userRole }: SidebarProps) {
               </Link>
             );
           })}
-          })}
         </nav>
 
         {/* Badge utilisateur */}
