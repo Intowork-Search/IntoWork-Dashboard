@@ -348,7 +348,13 @@ async def delete_user(
     """
     Supprimer un utilisateur (DANGER: cascade delete)
     """
-    result = await db.execute(select(User).filter(User.id == user_id))
+    from sqlalchemy import delete as sql_delete
+    
+    result = await db.execute(
+        select(User)
+        .options(selectinload(User.candidate), selectinload(User.employer))
+        .filter(User.id == user_id)
+    )
     user = result.scalar_one_or_none()
 
     if not user:
@@ -358,10 +364,45 @@ async def delete_user(
     if user.id == current_user.id:
         raise HTTPException(status_code=400, detail="Cannot delete your own account")
 
-    await db.delete(user)
-    await db.commit()
+    try:
+        # Si c'est un candidat, supprimer les candidatures d'abord
+        if user.role == UserRole.CANDIDATE and user.candidate:
+            # Supprimer toutes les candidatures (ASYNC)
+            await db.execute(
+                sql_delete(JobApplication).filter(
+                    JobApplication.candidate_id == user.candidate.id
+                )
+            )
 
-    return {"message": f"User {user.email} deleted successfully"}
+        # Si c'est un employeur, supprimer les offres d'emploi et candidatures associées
+        if user.role == UserRole.EMPLOYER and user.employer:
+            # Récupérer tous les jobs de l'employeur (ASYNC)
+            result = await db.execute(
+                select(Job).filter(Job.employer_id == user.employer.id)
+            )
+            employer_jobs = result.scalars().all()
+
+            for job in employer_jobs:
+                # Supprimer les candidatures pour chaque job
+                await db.execute(
+                    sql_delete(JobApplication).filter(JobApplication.job_id == job.id)
+                )
+                # Supprimer le job
+                await db.delete(job)
+
+        # Maintenant supprimer l'utilisateur (cascade supprimera candidate/employer et autres relations)
+        await db.delete(user)
+        await db.commit()
+
+        return {"message": f"User {user.email} deleted successfully"}
+    
+    except Exception as e:
+        await db.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error deleting user: {str(e)}"
+        )
+
 
 
 @router.get("/me")
