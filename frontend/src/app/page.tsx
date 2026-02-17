@@ -199,46 +199,88 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="pt-24 pb-16 sm:pt-32 sm:pb-24 lg:pt-48 lg:pb-32 bg-white">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center space-x-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-(--green-100) mb-6 sm:mb-8 animate-fade-in">
-            <span className="w-2 h-2 bg-(--color-brand-green) rounded-full"></span>
-            <span className="text-xs sm:text-sm font-semibold text-(--color-brand-green)">IA de recrutement nouvelle génération</span>
-          </div>
+      {/* Hero Section - Moderne avec image de fond */}
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Image de fond */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1920&q=80" 
+            alt="Professional background" 
+            className="w-full h-full object-cover"
+          />
+          {/* Overlay gradient sombre */}
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-900/80 to-slate-900/70"></div>
+        </div>
 
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl xl:text-8xl font-bold text-slate-900 mb-6 sm:mb-8 leading-[1.15] sm:leading-[1.1] tracking-tight animate-fade-in animation-delay-100">
-            Trouvez votre talent idéal.{' '}
-            <span className="text-(--color-brand-green)">Trouvez votre emploi parfait.</span>
-          </h1>
-
-          <p className="text-base sm:text-lg lg:text-xl xl:text-2xl text-slate-600 mb-8 sm:mb-12 max-w-3xl mx-auto leading-relaxed animate-fade-in animation-delay-200">
-            La plateforme B2B2C qui connecte candidats et entreprises grâce à l'intelligence artificielle pour un matching précis et des résultats concrets.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-12 sm:mb-16 animate-fade-in animation-delay-300 px-4 sm:px-0">
-            <Link href="/signup" className="btn btn-primary btn-md sm:btn-lg rounded-full px-8 sm:px-10 normal-case font-semibold text-sm sm:text-base">
-              Commencer gratuitement
-            </Link>
-            <button type="button" className="btn bg-white border-2 border-slate-300 text-slate-900 hover:bg-slate-50 hover:border-slate-400 btn-md sm:btn-lg rounded-full px-8 sm:px-10 normal-case font-semibold text-sm sm:text-base transition-all duration-300">
-              Voir une démo
-            </button>
-          </div>
-
-          <div className="grid grid-cols-3 gap-4 sm:gap-8 lg:gap-16 max-w-2xl mx-auto animate-fade-in animation-delay-400">
-            <div>
-              <div className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-(--color-brand-green) mb-1 sm:mb-2">10K+</div>
-              <div className="text-xs sm:text-sm text-slate-600">Candidats</div>
+        {/* Contenu */}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32">
+          <div className="max-w-4xl">
+            {/* Badge */}
+            <div className="inline-flex items-center space-x-2 px-6 py-3 rounded-full border-2 border-teal-400/50 bg-teal-400/10 backdrop-blur-sm mb-8 animate-fade-in">
+              <span className="text-sm sm:text-base font-medium text-white">Notre vision pour les résultats</span>
             </div>
-            <div>
-              <div className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-(--color-brand-violet) mb-1 sm:mb-2">500+</div>
-              <div className="text-xs sm:text-sm text-slate-600">Entreprises</div>
+
+            {/* Titre principal */}
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-white mb-6 leading-tight tracking-tight animate-fade-in animation-delay-100">
+              INTOWORK
+              <br />
+              <span className="text-teal-400">#1</span> plateforme de recrutement !
+              <br />
+              <span className="block mt-2 text-3xl sm:text-4xl md:text-5xl lg:text-6xl">
+                Le Profil Parfait.
+                <br />
+                L'employeur idéal !
+              </span>
+            </h1>
+
+            {/* Sous-titre */}
+            <p className="text-lg sm:text-xl lg:text-2xl text-white/90 mb-10 leading-relaxed max-w-3xl animate-fade-in animation-delay-200">
+              Une organisation n'atteint ses objectifs que lorsqu'elle est structurée pour y parvenir. 
+              <br />
+              INTOWORK vous aide à calibrer votre organisation à 360° en vue de la performance !
+            </p>
+
+            {/* Bouton CTA */}
+            <div className="flex flex-col sm:flex-row gap-4 animate-fade-in animation-delay-300">
+              <Link 
+                href="/signup" 
+                className="inline-flex items-center justify-center px-8 py-4 text-base sm:text-lg font-semibold text-white bg-teal-500 hover:bg-teal-600 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+              >
+                En savoir +
+              </Link>
+              <Link 
+                href="/offres" 
+                className="inline-flex items-center justify-center px-8 py-4 text-base sm:text-lg font-semibold text-white border-2 border-white/30 hover:border-white hover:bg-white/10 rounded-lg transition-all duration-300 backdrop-blur-sm"
+              >
+                Voir les offres
+              </Link>
             </div>
-            <div>
-              <div className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-(--color-brand-gold) mb-1 sm:mb-2">95%</div>
-              <div className="text-xs sm:text-sm text-slate-600">Satisfaction</div>
+
+            {/* Stats */}
+            <div className="grid grid-cols-3 gap-8 mt-16 pt-8 border-t border-white/20 animate-fade-in animation-delay-400">
+              <div>
+                <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-teal-400 mb-2">10K+</div>
+                <div className="text-sm sm:text-base text-white/80">Candidats qualifiés</div>
+              </div>
+              <div>
+                <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-teal-400 mb-2">500+</div>
+                <div className="text-sm sm:text-base text-white/80">Entreprises partenaires</div>
+              </div>
+              <div>
+                <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-teal-400 mb-2">95%</div>
+                <div className="text-sm sm:text-base text-white/80">Taux de satisfaction</div>
+              </div>
             </div>
           </div>
+        </div>
+
+        {/* Flèche scroll down */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10 animate-bounce">
+          <a href="#how-it-works" className="text-white/70 hover:text-white transition-colors">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
+          </a>
         </div>
       </section>
 
