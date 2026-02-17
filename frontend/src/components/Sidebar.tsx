@@ -339,26 +339,25 @@ export default function Sidebar({ userRole }: SidebarProps) {
             </div>
           </div>
 
-          {/* Bouton déconnexion */}
-          <div className="p-4">
-            <button
-              onClick={() => signOut({ callbackUrl: '/signin' })}
-              className={`w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 text-red-600 hover:bg-red-50 ${
-                isCollapsed ? 'justify-center' : 'gap-3'
-              }`}
-              title={isCollapsed ? 'Se déconnecter' : ''}
-            >
-              <ArrowRightOnRectangleIcon className={`shrink-0 ${isCollapsed ? 'w-6 h-6' : 'w-5 h-5'}`} />
-              {!isCollapsed && <span>Se déconnecter</span>}
-              
-              {/* Tooltip pour mode collapsed */}
-              {isCollapsed && (
-                <div className="absolute left-16 bg-gray-900 text-white px-2 py-1 rounded-lg text-xs opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
-                  Se déconnecter
-                </div>
-              )}
-            </button>
-          </div>
+        {/* Bouton déconnexion */}
+        <div className="p-4">
+          <button
+            onClick={() => signOut({ callbackUrl: '/signin' })}
+            className={`w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 text-red-600 hover:bg-red-50 ${
+              isCollapsed ? 'justify-center' : 'gap-3'
+            }`}
+            title={isCollapsed ? 'Se déconnecter' : ''}
+          >
+            <ArrowRightOnRectangleIcon className={`shrink-0 ${isCollapsed ? 'w-6 h-6' : 'w-5 h-5'}`} />
+            {!isCollapsed && <span>Se déconnecter</span>}
+            
+            {/* Tooltip pour mode collapsed */}
+            {isCollapsed && (
+              <div className="absolute left-16 bg-gray-900 text-white px-2 py-1 rounded-lg text-xs opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+                Se déconnecter
+              </div>
+            )}
+          </button>
         </div>
       </div>
     </>
