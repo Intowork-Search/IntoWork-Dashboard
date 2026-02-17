@@ -7,7 +7,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, case
 from sqlalchemy.orm import selectinload
 from app.database import get_db
-from app.models.base import User, UserRole, Candidate, Employer, Company, Job, JobApplication, Notification
+from app.models.base import (
+    User, UserRole, Candidate, Employer, Company, Job, JobApplication, 
+    Notification, PasswordResetToken, CVDocument
+)
 from app.auth import require_admin
 from pydantic import BaseModel
 from typing import List, Optional
@@ -368,6 +371,16 @@ async def delete_user(
         # 1. Supprimer d'abord toutes les notifications de l'utilisateur
         await db.execute(
             sql_delete(Notification).filter(Notification.user_id == user.id)
+        )
+        
+        # 2. Supprimer les tokens de réinitialisation de mot de passe
+        await db.execute(
+            sql_delete(PasswordResetToken).filter(PasswordResetToken.user_id == user.id)
+        )
+        
+        # 3. Supprimer les CV documents (CV Builder)
+        await db.execute(
+            sql_delete(CVDocument).filter(CVDocument.user_id == user.id)
         )
 
         # Si c'est un candidat, supprimer les candidatures
