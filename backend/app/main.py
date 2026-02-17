@@ -161,9 +161,26 @@ app.include_router(admin_router, prefix="/api/admin", tags=["admin"])
 app.include_router(cv_builder_router, prefix="/api/cv-builder", tags=["cv-builder"])
 app.include_router(ai_scoring_router, prefix="/api/ai-scoring", tags=["ai-scoring"])
 
-# Servir les fichiers uploadés (CV, photos, etc.)
+# Servir les fichiers uploadés (CV, photos, etc.) avec CORS
 uploads_path = Path(__file__).parent.parent / "uploads"
 uploads_path.mkdir(exist_ok=True)
+
+# Custom StaticFiles middleware pour ajouter les headers CORS
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request as StarletteRequest
+from starlette.responses import Response
+
+class CORSStaticFilesMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: StarletteRequest, call_next):
+        response = await call_next(request)
+        if request.url.path.startswith("/uploads"):
+            response.headers["Access-Control-Allow-Origin"] = "*"
+            response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
+            response.headers["Access-Control-Allow-Headers"] = "*"
+            response.headers["Cross-Origin-Resource-Policy"] = "cross-origin"
+        return response
+
+app.add_middleware(CORSStaticFilesMiddleware)
 app.mount("/uploads", StaticFiles(directory=str(uploads_path)), name="uploads")
 
 @app.get("/")

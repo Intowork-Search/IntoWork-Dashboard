@@ -200,7 +200,7 @@ export default function Home() {
       </nav>
 
       {/* Hero Section - Moderne avec image de fond */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-screen flex items-center overflow-hidden">
         {/* Image de fond */}
         <div className="absolute inset-0 z-0">
           <img 
@@ -209,11 +209,11 @@ export default function Home() {
             className="w-full h-full object-cover"
           />
           {/* Overlay gradient sombre */}
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-900/80 to-slate-900/70"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-900/95 via-slate-900/85 to-slate-900/60"></div>
         </div>
 
         {/* Contenu */}
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32 w-full">
           <div className="max-w-4xl">
             {/* Badge */}
             <div className="inline-flex items-center space-x-2 px-6 py-3 rounded-full border-2 border-teal-400/50 bg-teal-400/10 backdrop-blur-sm mb-8 animate-fade-in">
@@ -233,8 +233,9 @@ export default function Home() {
             </p>
 
             <p className="text-base sm:text-lg lg:text-xl text-white/80 mb-10 leading-relaxed max-w-2xl animate-fade-in animation-delay-300">
-              Une organisation n'atteint ses objectifs que lorsqu'elle est structurée pour y parvenir. 
-              INTOWORK vous aide à calibrer votre organisation à 360° en vue de la performance !
+              Connectez talents et opportunités grâce à notre technologie de matching intelligent. 
+              INTOWORK facilite les rencontres entre candidats qualifiés et entreprises qui recrutent 
+              pour des collaborations réussies et durables.
             </p>
 
             {/* Bouton CTA */}
