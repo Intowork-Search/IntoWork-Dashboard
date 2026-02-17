@@ -66,10 +66,10 @@ export default function EntreprisesPage() {
           return;
         }
 
-        console.log('🏢 Fetching companies from:', `${apiUrl}/jobs/`); // Debug
+        console.log('🏢 Fetching companies from:', `${apiUrl}/companies/all`); // Debug
 
-        // Récupérer les jobs pour extraire les entreprises
-        const response = await fetch(`${apiUrl}/jobs/?page=1&limit=1000`);
+        // Récupérer TOUTES les entreprises inscrites (avec ou sans jobs)
+        const response = await fetch(`${apiUrl}/companies/all?page=1&limit=1000`);
 
         console.log('📊 Response status:', response.status); // Debug
 
@@ -77,33 +77,22 @@ export default function EntreprisesPage() {
           const data = await response.json();
           console.log('✅ Data received:', data); // Debug
 
-          // Extraire les entreprises uniques des jobs
-          const companiesMap = new Map<string, Company>();
-          data.jobs.forEach((job: any) => {
-            if (job.company_name && !companiesMap.has(job.company_name)) {
-              companiesMap.set(job.company_name, {
-                id: companiesMap.size + 1,
-                name: job.company_name,
-                industry: 'Non spécifié',
-                city: job.location?.split('/')[0] || job.location || 'Non spécifié',
-                country: 'Sénégal',
-                size: 'Non spécifié',
-                description: `${job.company_name} recrute sur INTOWORK.`,
-                website_url: null,
-                total_jobs: 0,
-                logo_url: job.company_logo_url
-              });
-            }
-            // Compter les jobs par entreprise
-            const company = companiesMap.get(job.company_name);
-            if (company) {
-              company.total_jobs = (company.total_jobs || 0) + 1;
-            }
-          });
+          // Les données viennent directement de la table Company
+          const companiesArray = data.companies.map((company: any) => ({
+            id: company.id,
+            name: company.name,
+            industry: company.industry || 'Non spécifié',
+            city: company.city || 'Non spécifié',
+            country: company.country || 'Sénégal',
+            size: company.size || 'Non spécifié',
+            description: company.description || `${company.name} est inscrit sur INTOWORK.`,
+            website_url: company.website_url,
+            total_jobs: company.total_jobs || 0,
+            logo_url: company.logo_url
+          }));
 
-          const companiesArray = Array.from(companiesMap.values());
           setCompanies(companiesArray);
-          setTotalCompanies(companiesArray.length);
+          setTotalCompanies(data.total);
         } else {
           setError('Erreur lors du chargement des entreprises. Veuillez réessayer.');
           console.error('Erreur API:', response.status, response.statusText);

@@ -392,3 +392,73 @@ async def upload_company_logo(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Erreur interne du serveur"
         )
+
+
+# ==================== Endpoint Public: Toutes les Entreprises ====================
+
+@router.get("/all", response_model=dict)
+async def get_all_companies(
+    db: AsyncSession = Depends(get_db),
+    page: int = 1,
+    limit: int = 100
+):
+    """
+    Récupérer toutes les entreprises inscrites sur la plateforme.
+    Accessible publiquement (pas d'authentification requise).
+    """
+    try:
+        offset = (page - 1) * limit
+
+        # Compter le total
+        count_result = await db.execute(
+            select(func.count()).select_from(Company)
+        )
+        total = count_result.scalar() or 0
+
+        # Récupérer les entreprises avec le compte de jobs
+        result = await db.execute(
+            select(
+                Company,
+                func.count(Job.id).label('total_jobs')
+            )
+            .outerjoin(Job, Company.id == Job.company_id)
+            .group_by(Company.id)
+            .offset(offset)
+            .limit(limit)
+            .order_by(Company.created_at.desc())
+        )
+        
+        companies_data = result.all()
+
+        companies_list = []
+        for company, job_count in companies_data:
+            companies_list.append({
+                "id": company.id,
+                "name": company.name,
+                "description": company.description,
+                "industry": company.industry,
+                "size": company.size,
+                "website_url": company.website_url,
+                "linkedin_url": company.linkedin_url,
+                "address": company.address,
+                "city": company.city,
+                "country": company.country,
+                "logo_url": company.logo_url,
+                "total_jobs": job_count or 0,
+                "created_at": company.created_at.isoformat() if company.created_at else None
+            })
+
+        return {
+            "companies": companies_list,
+            "total": total,
+            "page": page,
+            "limit": limit,
+            "total_pages": (total + limit - 1) // limit
+        }
+
+    except Exception as e:
+        logger.error(f"Erreur lors de la récupération des entreprises: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Erreur lors de la récupération des entreprises"
+        )
