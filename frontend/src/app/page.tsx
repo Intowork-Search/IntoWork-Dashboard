@@ -221,22 +221,19 @@ export default function Home() {
             </div>
 
             {/* Titre principal */}
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-white mb-6 leading-tight tracking-tight animate-fade-in animation-delay-100">
-              INTOWORK
-              <br />
-              <span className="text-teal-400">#1</span> plateforme de recrutement !
-              <br />
-              <span className="block mt-2 text-3xl sm:text-4xl md:text-5xl lg:text-6xl">
-                Le Profil Parfait.
-                <br />
-                L'employeur idéal !
-              </span>
+            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold text-white mb-8 leading-[1.1] tracking-tight animate-fade-in animation-delay-100">
+              INTOWORK <span className="text-teal-400">#1</span><br />
+              Plateforme de<br />
+              recrutement !
             </h1>
 
             {/* Sous-titre */}
-            <p className="text-lg sm:text-xl lg:text-2xl text-white/90 mb-10 leading-relaxed max-w-3xl animate-fade-in animation-delay-200">
+            <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-6 leading-tight animate-fade-in animation-delay-200">
+              Le Profil Parfait. L'employeur idéal !
+            </p>
+
+            <p className="text-base sm:text-lg lg:text-xl text-white/80 mb-10 leading-relaxed max-w-2xl animate-fade-in animation-delay-300">
               Une organisation n'atteint ses objectifs que lorsqu'elle est structurée pour y parvenir. 
-              <br />
               INTOWORK vous aide à calibrer votre organisation à 360° en vue de la performance !
             </p>
 

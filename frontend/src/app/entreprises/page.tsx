@@ -78,18 +78,23 @@ export default function EntreprisesPage() {
           console.log('✅ Data received:', data); // Debug
 
           // Les données viennent directement de la table Company
-          const companiesArray = data.companies.map((company: any) => ({
-            id: company.id,
-            name: company.name,
-            industry: company.industry || 'Non spécifié',
-            city: company.city || 'Non spécifié',
-            country: company.country || 'Sénégal',
-            size: company.size || 'Non spécifié',
-            description: company.description || `${company.name} est inscrit sur INTOWORK.`,
-            website_url: company.website_url,
-            total_jobs: company.total_jobs || 0,
-            logo_url: company.logo_url
-          }));
+          const companiesArray = data.companies.map((company: any) => {
+            const logoUrl = company.logo_url;
+            console.log('🏢 Company:', company.name, '| Logo URL:', logoUrl, '| Full URL:', logoUrl ? getUploadUrl(logoUrl) : 'none');
+            
+            return {
+              id: company.id,
+              name: company.name,
+              industry: company.industry || 'Non spécifié',
+              city: company.city || 'Non spécifié',
+              country: company.country || 'Sénégal',
+              size: company.size || 'Non spécifié',
+              description: company.description || `${company.name} est inscrit sur INTOWORK.`,
+              website_url: company.website_url,
+              total_jobs: company.total_jobs || 0,
+              logo_url: logoUrl
+            };
+          });
 
           setCompanies(companiesArray);
           setTotalCompanies(data.total);
@@ -308,7 +313,25 @@ export default function EntreprisesPage() {
                 {/* Header */}
                 <div className="flex items-start gap-4 mb-6">
                   {company.logo_url ? (
-                    <img src={getUploadUrl(company.logo_url)} alt={company.name} className="w-16 h-16 rounded-2xl object-cover shrink-0" />
+                    <>
+                      <img 
+                        src={getUploadUrl(company.logo_url)} 
+                        alt={company.name} 
+                        className="w-16 h-16 rounded-2xl object-cover shrink-0 bg-slate-100" 
+                        onError={(e) => {
+                          console.log('❌ Image error for:', company.name, company.logo_url);
+                          e.currentTarget.style.display = 'none';
+                          const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                          if (fallback) fallback.style.display = 'flex';
+                        }}
+                      />
+                      <div 
+                        className="w-16 h-16 rounded-2xl bg-green-600 flex items-center justify-center text-white text-xl font-bold shrink-0"
+                        style={{ display: 'none' }}
+                      >
+                        {getCompanyInitials(company.name)}
+                      </div>
+                    </>
                   ) : (
                     <div className="w-16 h-16 rounded-2xl bg-green-600 flex items-center justify-center text-white text-xl font-bold shrink-0">
                       {getCompanyInitials(company.name)}
