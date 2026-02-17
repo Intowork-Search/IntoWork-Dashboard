@@ -17,7 +17,7 @@ import {
   ArrowUpTrayIcon
 } from '@heroicons/react/24/outline';
 import { useAuthenticatedAPI } from '@/hooks/useAuthenticatedAPI';
-import { companiesAPI, authAPI } from '@/lib/api';
+import { companiesAPI, authAPI, getUploadUrl } from '@/lib/api';
 import ToggleButton from '@/components/ToggleButton';
 import DashboardLayout from '@/components/DashboardLayout';
 import ChangePasswordModal from '@/components/settings/ChangePasswordModal';
@@ -793,7 +793,7 @@ export default function SettingsPage() {
                     {companyData.logo_url && (
                       <div className="mb-4 flex items-center gap-4">
                         <img
-                          src={`${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}${companyData.logo_url}`}
+                          src={getUploadUrl(companyData.logo_url)}
                           alt="Logo actuel"
                           className="w-20 h-20 object-contain rounded-lg border-2 border-gray-200"
                         />

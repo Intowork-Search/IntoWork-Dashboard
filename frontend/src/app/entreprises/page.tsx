@@ -11,6 +11,7 @@ import {
   CheckBadgeIcon,
   GlobeAltIcon,
 } from '@heroicons/react/24/outline';
+import { getUploadUrl } from '@/lib/api';
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -318,7 +319,7 @@ export default function EntreprisesPage() {
                 {/* Header */}
                 <div className="flex items-start gap-4 mb-6">
                   {company.logo_url ? (
-                    <img src={company.logo_url} alt={company.name} className="w-16 h-16 rounded-2xl object-cover shrink-0" />
+                    <img src={getUploadUrl(company.logo_url)} alt={company.name} className="w-16 h-16 rounded-2xl object-cover shrink-0" />
                   ) : (
                     <div className="w-16 h-16 rounded-2xl bg-green-600 flex items-center justify-center text-white text-xl font-bold shrink-0">
                       {getCompanyInitials(company.name)}

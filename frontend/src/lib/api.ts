@@ -782,4 +782,26 @@ export const adminAPI = {
   }
 };
 
+/**
+ * Construire l'URL complète pour un fichier uploadé (logo, CV, etc.)
+ * @param path - Chemin relatif commençant par /uploads/...
+ * @returns URL complète vers le fichier sur le backend
+ */
+export const getUploadUrl = (path: string | null | undefined): string => {
+  if (!path) return '';
+  
+  // Force HTTPS en production avec l'URL Railway complète
+  const baseUrl = process.env.NODE_ENV === 'production'
+    ? 'https://intowork-dashboard-production-1ede.up.railway.app'
+    : (process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:8001');
+    
+  // Si le path commence déjà par http, le retourner tel quel
+  if (path.startsWith('http://') || path.startsWith('https://')) {
+    return path;
+  }
+  
+  // Sinon, construire l'URL complète
+  return `${baseUrl}${path}`;
+};
+
 export default apiClient;

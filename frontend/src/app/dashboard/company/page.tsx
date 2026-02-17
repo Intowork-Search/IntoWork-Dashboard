@@ -12,7 +12,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useNextAuth';
-import { companiesAPI, Company, CompanyStats } from '@/lib/api';
+import { companiesAPI, Company, CompanyStats, getUploadUrl } from '@/lib/api';
 import { toast } from 'react-hot-toast';
 import DashboardLayout from '@/components/DashboardLayout';
 import {
@@ -134,7 +134,7 @@ export default function CompanyPage(): React.JSX.Element {
                 <div className="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg border border-white/30 overflow-hidden">
                   {company?.logo_url ? (
                     <img
-                      src={company.logo_url}
+                      src={getUploadUrl(company.logo_url)}
                       alt={company.name}
                       className="w-full h-full object-cover"
                     />
@@ -366,7 +366,7 @@ export default function CompanyPage(): React.JSX.Element {
                 {company?.logo_url ? (
                   <div className="flex items-center gap-4">
                     <img
-                      src={`${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}${company.logo_url}`}
+                      src={getUploadUrl(company.logo_url)}
                       alt={company.name}
                       className="w-32 h-32 object-contain rounded-xl border-2 border-gray-200 bg-white p-2"
                     />
