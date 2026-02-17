@@ -6,7 +6,7 @@
  * This prevents Mixed Content errors while allowing local development.
  */
 export const getApiUrl = (): string => {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  let apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   if (!apiUrl) {
     throw new Error(
@@ -17,15 +17,13 @@ export const getApiUrl = (): string => {
 
   // Validation: In production (HTTPS site), enforce HTTPS API
   if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
-    if (!apiUrl.startsWith('https://')) {
-      console.error('Mixed Content Warning: API URL must use HTTPS in production');
-      console.error('Current API URL:', apiUrl);
-      throw new Error(
-        'Security Error: Cannot use HTTP API URL on HTTPS site (Mixed Content blocked by browser)'
-      );
+    if (apiUrl.startsWith('http://')) {
+      // Auto-correct HTTP to HTTPS in production to prevent Mixed Content errors
+      console.warn('⚠️ Auto-correcting API URL from HTTP to HTTPS for production');
+      apiUrl = apiUrl.replace('http://', 'https://');
     }
   }
 
   return apiUrl;
 };
-// Force rebuild 1768483870
+// Force rebuild 1768483871
