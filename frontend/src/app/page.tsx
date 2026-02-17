@@ -204,8 +204,8 @@ export default function Home() {
         {/* Image de fond */}
         <div className="absolute inset-0 z-0">
           <img 
-            src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1920&q=80" 
-            alt="Professional background" 
+            src="https://images.unsplash.com/photo-1573497620053-ea5300f94f21?w=1920&q=80" 
+            alt="Professional interview" 
             className="w-full h-full object-cover"
           />
           {/* Overlay gradient sombre */}
