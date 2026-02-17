@@ -238,8 +238,6 @@ export default function OnboardingPage() {
 
                 {role === 'employer' && (
                   <div className="space-y-6 bg-gradient-to-br from-purple-50 to-white p-8 rounded-2xl border-2 border-purple-100 shadow-lg">
-                {role === 'employer' && (
-                  <div className="space-y-6 bg-gradient-to-br from-purple-50 to-white p-8 rounded-2xl border-2 border-purple-100 shadow-lg">
                     <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
                       <div className="w-10 h-10 bg-gradient-to-br from-[#6B46C1] to-[#5B36B1] rounded-xl flex items-center justify-center">
                         <span className="text-xl">🏢</span>
