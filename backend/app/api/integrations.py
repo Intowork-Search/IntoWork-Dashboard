@@ -535,6 +535,31 @@ async def get_integrations_status(
     db: Annotated[AsyncSession, Depends(get_db)]
 ):
     """Récupérer le statut de toutes les intégrations"""
+    
+    # Vérifier que l'employeur a une entreprise
+    if not employer.company_id:
+        # Retourner un statut par défaut si pas d'entreprise
+        return {
+            "linkedin": IntegrationStatusResponse(
+                provider="linkedin",
+                is_connected=False,
+                connected_at=None,
+                last_used_at=None
+            ),
+            "google_calendar": IntegrationStatusResponse(
+                provider="google_calendar",
+                is_connected=False,
+                connected_at=None,
+                last_used_at=None
+            ),
+            "outlook_calendar": IntegrationStatusResponse(
+                provider="outlook_calendar",
+                is_connected=False,
+                connected_at=None,
+                last_used_at=None
+            )
+        }
+    
     result = await db.execute(
         select(IntegrationCredential).where(
             IntegrationCredential.company_id == employer.company_id
