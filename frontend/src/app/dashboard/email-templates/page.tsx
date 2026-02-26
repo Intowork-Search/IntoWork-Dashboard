@@ -85,23 +85,38 @@ export default function EmailTemplatesPage() {
       }
 
       const apiUrl = getApiUrl();
+      console.log('🔍 Fetching templates from:', `${apiUrl}/email-templates`);
+      
       const response = await fetch(`${apiUrl}/email-templates`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
       });
       
+      console.log('📡 Response status:', response.status, response.statusText);
+      
       if (response.ok) {
         const data = await response.json();
+        console.log('✅ Templates loaded:', data.length, 'templates');
         setTemplates(data);
+        if (data.length === 0) {
+          console.log('⚠️ Liste vide - Vérifiez que votre entreprise est créée');
+        }
       } else if (response.status === 401) {
+        console.error('❌ 401 Unauthorized - Token invalide');
         router.push('/auth/signin');
+      } else {
+        const errorData = await response.json().catch(() => ({ detail: 'Unknown error' }));
+        console.error('❌ Erreur backend:', response.status, errorData);
+        toast.error(`Erreur ${response.status}: ${errorData.detail || 'Erreur lors du chargement des templates'}`);
+      }
+    } catch (error) {
+      console.error('❌ Error fetching templates:', error);
+      if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+        toast.error('Erreur réseau - Vérifiez votre connexion');
       } else {
         toast.error('Erreur lors du chargement des templates');
       }
-    } catch (error) {
-      console.error('Error fetching templates:', error);
-      toast.error('Erreur lors du chargement des templates');
     } finally {
       setLoading(false);
     }
@@ -113,18 +128,26 @@ export default function EmailTemplatesPage() {
       if (!token) return;
 
       const apiUrl = getApiUrl();
+      console.log('🔍 Fetching variables from:', `${apiUrl}/email-templates/variables`);
+      
       const response = await fetch(`${apiUrl}/email-templates/variables`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
       });
       
+      console.log('📡 Variables response:', response.status);
+      
       if (response.ok) {
         const data = await response.json();
+        console.log('✅ Variables loaded:', data.variables?.length || 0, 'variables');
         setVariables(data.variables || []);
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('❌ Erreur variables:', response.status, errorData);
       }
     } catch (error) {
-      console.error('Error fetching variables:', error);
+      console.error('❌ Error fetching variables:', error);
     }
   };
 
