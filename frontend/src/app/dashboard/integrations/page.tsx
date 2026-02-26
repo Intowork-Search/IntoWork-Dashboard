@@ -1,5 +1,15 @@
 'use client';
 
+/**
+ * Page des Intégrations (Employeur) - INTOWORK Brand Design
+ *
+ * Design conforme à la charte graphique INTOWORK:
+ * - Vert: #6B9B5F (couleur principale)
+ * - Or: #F7C700 (accent)
+ * - Violet: #6B46C1 (secondaire)
+ * - Bleu: #3B82F6 (complémentaire)
+ */
+
 import React, { useState, useEffect } from 'react';
 import { useUser, useAuth } from '@/hooks/useNextAuth';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -13,7 +23,10 @@ import {
   CheckCircleIcon,
   XCircleIcon,
   ArrowPathIcon,
-  InformationCircleIcon
+  InformationCircleIcon,
+  SparklesIcon,
+  RocketLaunchIcon,
+  BoltIcon
 } from '@heroicons/react/24/outline';
 import { CheckCircleIcon as CheckCircleSolid } from '@heroicons/react/24/solid';
 
@@ -132,42 +145,121 @@ export default function IntegrationsPage() {
 
   if (isLoading) {
     return (
-      <DashboardLayout>
-        <div className="flex items-center justify-center h-64">
-          <div className="loading loading-spinner loading-lg text-primary"></div>
+      <DashboardLayout title="Intégrations" subtitle="Chargement...">
+        <div className="flex items-center justify-center py-20">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-[#F7C700] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-500">Chargement des intégrations...</p>
+          </div>
         </div>
       </DashboardLayout>
     );
   }
 
   return (
-    <DashboardLayout>
-      <div className="space-y-6">
-        {/* En-tête */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-base-content">Intégrations</h1>
-            <p className="mt-1 text-base-content/60">
-              Connectez vos outils pour automatiser vos workflows
-            </p>
+    <DashboardLayout title="Intégrations" subtitle="Automatisez vos workflows RH">
+      <div className="space-y-8">
+        {/* Hero Section */}
+        <div
+          className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#6B46C1] via-[#5732a8] to-[#4a2890] p-8 shadow-xl shadow-[#6B46C1]/20"
+          style={{ animation: 'fadeIn 0.6s ease-out' }}
+        >
+          {/* Motifs décoratifs */}
+          <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+          
+          <div className="relative z-10">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+              {/* Icône et titre */}
+              <div className="flex items-center gap-5">
+                <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg border border-white/30">
+                  <BoltIcon className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-1.5 mb-2">
+                    <SparklesIcon className="w-4 h-4 text-white" />
+                    <span className="text-white/90 text-sm font-medium">Intégrations Tierces</span>
+                  </div>
+                  <h2 className="text-2xl lg:text-3xl font-bold text-white">
+                    Connectez Vos Outils
+                  </h2>
+                  <p className="text-white/80 mt-1">
+                    Automatisez la publication d'offres et la planification d'entretiens
+                  </p>
+                </div>
+              </div>
+
+              {/* Bouton rafraîchir */}
+              <button
+                onClick={loadIntegrations}
+                className="btn bg-white/20 hover:bg-white/30 border-white/30 text-white backdrop-blur-sm shadow-lg"
+                title="Rafraîchir"
+              >
+                <ArrowPathIcon className="h-5 w-5" />
+                Actualiser
+              </button>
+            </div>
+
+            {/* Barre de stats */}
+            <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                    <LinkIcon className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-white/70 text-sm">LinkedIn</p>
+                    <p className="text-white font-semibold">
+                      {integrations?.linkedin?.is_connected ? 'Connecté' : 'Non connecté'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                    <CalendarIcon className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-white/70 text-sm">Google Calendar</p>
+                    <p className="text-white font-semibold">
+                      {integrations?.google_calendar?.is_connected ? 'Connecté' : 'Non connecté'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                    <VideoCameraIcon className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-white/70 text-sm">Microsoft Teams</p>
+                    <p className="text-white font-semibold">
+                      {integrations?.outlook_calendar?.is_connected ? 'Connecté' : 'Non connecté'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <button
-            onClick={loadIntegrations}
-            className="btn btn-ghost btn-circle"
-            title="Rafraîchir"
-          >
-            <ArrowPathIcon className="h-5 w-5" />
-          </button>
         </div>
 
         {/* Alerte informative */}
-        <div className="alert bg-info/10 border-info/20">
-          <InformationCircleIcon className="h-6 w-6 text-info shrink-0" />
-          <div>
-            <h3 className="font-semibold text-base-content">Pourquoi connecter vos intégrations ?</h3>
-            <p className="text-sm text-base-content/60 mt-1">
-              Publiez automatiquement vos offres d'emploi sur LinkedIn, planifiez des entretiens avec Google Calendar ou Microsoft Teams, et gagnez du temps.
-            </p>
+        <div className="bg-gradient-to-r from-[#3B82F6]/10 to-[#6B46C1]/10 rounded-2xl p-6 border border-[#3B82F6]/20">
+          <div className="flex gap-4">
+            <div className="flex-shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-[#3B82F6]/20 flex items-center justify-center">
+                <RocketLaunchIcon className="h-5 w-5 text-[#3B82F6]" />
+              </div>
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-800 mb-1">Gagnez du temps avec les intégrations</h3>
+              <p className="text-sm text-gray-600">
+                Publiez automatiquement vos offres d'emploi sur LinkedIn, planifiez des entretiens avec Google Calendar ou Microsoft Teams. 
+                Toutes vos actions synchronisées en un clic.
+              </p>
+            </div>
           </div>
         </div>
 
@@ -235,19 +327,49 @@ export default function IntegrationsPage() {
         </div>
 
         {/* Section d'aide */}
-        <div className="card bg-base-200 shadow-sm">
-          <div className="card-body">
-            <h3 className="card-title text-lg">Besoin d'aide ?</h3>
-            <div className="prose prose-sm max-w-none">
-              <p className="text-base-content/70">
-                Les intégrations utilisent OAuth 2.0 pour sécuriser la connexion à vos comptes.
-                Vous pouvez révoquer l'accès à tout moment depuis cette page.
-              </p>
-              <ul className="text-base-content/70">
-                <li><strong>LinkedIn :</strong> Assurez-vous d'avoir les permissions administrateur sur votre page entreprise</li>
-                <li><strong>Google Calendar :</strong> Vous aurez besoin d'un compte Google avec accès à Calendar</li>
-                <li><strong>Outlook / Teams :</strong> Nécessite un compte Microsoft 365 avec Teams activé</li>
-              </ul>
+        <div className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
+          <div className="bg-gradient-to-r from-[#6B9B5F]/10 to-[#F7C700]/10 p-6 border-b border-gray-100">
+            <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+              <InformationCircleIcon className="w-5 h-5 text-[#6B9B5F]" />
+              Besoin d'aide ?
+            </h3>
+          </div>
+          <div className="p-6">
+            <p className="text-gray-600 mb-4">
+              Les intégrations utilisent OAuth 2.0 pour sécuriser la connexion à vos comptes.
+              Vous pouvez révoquer l'accès à tout moment depuis cette page.
+            </p>
+            <div className="space-y-3">
+              <div className="flex gap-3 p-3 bg-[#0A66C2]/5 rounded-xl border border-[#0A66C2]/10">
+                <LinkIcon className="w-5 h-5 text-[#0A66C2] flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-gray-800 text-sm">LinkedIn</p>
+                  <p className="text-sm text-gray-600">
+                    Assurez-vous d'avoir les permissions administrateur sur votre page entreprise
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-3 p-3 bg-[#4285F4]/5 rounded-xl border border-[#4285F4]/10">
+                <CalendarIcon className="w-5 h-5 text-[#4285F4] flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-gray-800 text-sm">Google Calendar</p>
+                  <p className="text-sm text-gray-600">
+                    Vous aurez besoin d'un compte Google avec accès à Calendar
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-3 p-3 bg-[#0078D4]/5 rounded-xl border border-[#0078D4]/10">
+                <VideoCameraIcon className="w-5 h-5 text-[#0078D4] flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-gray-800 text-sm">Outlook / Teams</p>
+                  <p className="text-sm text-gray-600">
+                    Nécessite un compte Microsoft 365 avec Teams activé
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
             </div>
           </div>
         </div>
@@ -256,7 +378,7 @@ export default function IntegrationsPage() {
   );
 }
 
-// Composant de carte d'intégration
+// Composant de carte d'intégration - Design moderne INTOWORK
 interface IntegrationCardProps {
   title: string;
   description: string;
@@ -289,32 +411,40 @@ function IntegrationCard({
   const isConnected = integration?.is_connected || false;
 
   return (
-    <div className="card bg-base-100 border border-base-300 shadow-sm hover:shadow-md transition-shadow">
-      <div className="card-body">
-        {/* Icône et titre */}
-        <div className="flex items-start justify-between mb-4">
-          <div className={`p-3 rounded-xl ${bgColor}`}>
+    <div
+      className="group relative bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100"
+      style={{ animation: 'fadeIn 0.6s ease-out' }}
+    >
+      {/* Gradient de fond subtil */}
+      <div className={`absolute inset-0 ${bgColor} opacity-0 group-hover:opacity-5 transition-opacity duration-300`} />
+      
+      <div className="relative p-6">
+        {/* En-tête avec icône et badge */}
+        <div className="flex items-start justify-between mb-5">
+          <div className={`p-4 rounded-2xl ${bgColor} shadow-md`}>
             <div className={iconColor}>
               {icon}
             </div>
           </div>
           {isConnected && (
-            <div className="badge badge-success gap-1">
-              <CheckCircleSolid className="h-3 w-3" />
+            <div className="flex items-center gap-1.5 bg-gradient-to-r from-[#6B9B5F] to-[#5a8450] text-white px-3 py-1.5 rounded-full text-sm font-medium shadow-md">
+              <CheckCircleSolid className="h-4 w-4" />
               Connecté
             </div>
           )}
         </div>
 
-        {/* Informations */}
-        <h3 className="card-title text-xl mb-2">{title}</h3>
-        <p className="text-base-content/60 text-sm mb-4">{description}</p>
+        {/* Titre et description */}
+        <h3 className="text-xl font-bold text-gray-800 mb-2">{title}</h3>
+        <p className="text-sm text-gray-600 mb-5 leading-relaxed">{description}</p>
 
         {/* Fonctionnalités */}
-        <div className="space-y-2 mb-4">
+        <div className="space-y-2.5 mb-5">
           {features.map((feature, index) => (
-            <div key={index} className="flex items-start gap-2 text-sm text-base-content/70">
-              <CheckCircleIcon className="h-4 w-4 text-success shrink-0 mt-0.5" />
+            <div key={index} className="flex items-start gap-2.5 text-sm text-gray-700">
+              <div className="flex-shrink-0 mt-0.5">
+                <CheckCircleIcon className="h-4 w-4 text-[#6B9B5F]" />
+              </div>
               <span>{feature}</span>
             </div>
           ))}
@@ -322,36 +452,46 @@ function IntegrationCard({
 
         {/* Statut et dates */}
         {isConnected && (
-          <div className="space-y-1 mb-4 text-xs text-base-content/50">
-            <div>Connecté le : {formatDate(integration?.connected_at)}</div>
-            <div>Dernière utilisation : {formatDate(integration?.last_used_at)}</div>
+          <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-4 mb-5 border border-gray-200">
+            <div className="space-y-2 text-xs text-gray-600">
+              <div className="flex items-center gap-2">
+                <CheckCircleSolid className="h-3.5 w-3.5 text-[#6B9B5F]" />
+                <span className="font-medium">Connecté le :</span>
+                <span>{formatDate(integration?.connected_at)}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CalendarIcon className="h-3.5 w-3.5 text-gray-500" />
+                <span className="font-medium">Dernière utilisation :</span>
+                <span>{formatDate(integration?.last_used_at)}</span>
+              </div>
+            </div>
           </div>
         )}
 
         {/* Actions */}
-        <div className="card-actions justify-end mt-auto pt-4 border-t border-base-300">
+        <div className="pt-4 border-t border-gray-100">
           {isConnected ? (
             <button
               onClick={onDisconnect}
-              className="btn btn-ghost btn-sm text-error hover:bg-error/10"
+              className="w-full px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl font-medium transition-colors duration-200 flex items-center justify-center gap-2 border border-red-200"
             >
-              <XCircleIcon className="h-4 w-4" />
+              <XCircleIcon className="h-5 w-5" />
               Déconnecter
             </button>
           ) : (
             <button
               onClick={onConnect}
-              className="btn btn-primary btn-sm"
               disabled={isConnecting}
+              className="w-full px-4 py-2.5 bg-gradient-to-r from-[#6B9B5F] to-[#5a8450] hover:from-[#5a8450] hover:to-[#4a6e42] text-white rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isConnecting ? (
                 <>
-                  <span className="loading loading-spinner loading-xs"></span>
-                  Connexion...
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Connexion en cours...
                 </>
               ) : (
                 <>
-                  <LinkIcon className="h-4 w-4" />
+                  <LinkIcon className="h-5 w-5" />
                   Connecter
                 </>
               )}
