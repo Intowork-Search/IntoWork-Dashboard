@@ -105,6 +105,12 @@ async def linkedin_oauth_callback(
     
     Reçoit le code d'autorisation et l'échange contre un access token
     """
+    if not employer.company_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You must create a company profile before connecting integrations"
+        )
+    
     if not linkedin_service.enabled:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -173,6 +179,12 @@ async def publish_job_to_linkedin(
     
     Nécessite une intégration LinkedIn active
     """
+    if not employer.company_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You must create a company profile before publishing jobs"
+        )
+    
     # Récupérer le job
     job_result = await db.execute(
         select(Job).where(
@@ -279,6 +291,12 @@ async def google_calendar_oauth_callback(
     db: Annotated[AsyncSession, Depends(get_db)]
 ):
     """Callback OAuth Google Calendar"""
+    if not employer.company_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You must create a company profile before connecting integrations"
+        )
+    
     if not google_calendar_service.enabled:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -332,6 +350,12 @@ async def create_google_calendar_event(
     db: Annotated[AsyncSession, Depends(get_db)]
 ):
     """Créer un événement d'entretien dans Google Calendar"""
+    if not employer.company_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You must create a company profile before creating calendar events"
+        )
+    
     # Récupérer les credentials
     cred_result = await db.execute(
         select(IntegrationCredential).where(
@@ -419,6 +443,12 @@ async def outlook_oauth_callback(
     db: Annotated[AsyncSession, Depends(get_db)]
 ):
     """Callback OAuth Outlook Calendar"""
+    if not employer.company_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You must create a company profile before connecting integrations"
+        )
+    
     if not outlook_calendar_service.enabled:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -472,6 +502,12 @@ async def create_outlook_event(
     db: Annotated[AsyncSession, Depends(get_db)]
 ):
     """Créer un événement d'entretien dans Outlook Calendar"""
+    if not employer.company_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You must create a company profile before creating calendar events"
+        )
+    
     # Récupérer les credentials
     cred_result = await db.execute(
         select(IntegrationCredential).where(
@@ -602,6 +638,12 @@ async def disconnect_integration(
     db: Annotated[AsyncSession, Depends(get_db)]
 ):
     """Déconnecter une intégration"""
+    if not employer.company_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You must create a company profile before managing integrations"
+        )
+    
     # Mapper le provider string vers l'enum
     provider_map = {
         "linkedin": IntegrationProvider.LINKEDIN,
