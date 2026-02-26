@@ -130,8 +130,13 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         
-        # CSP - Autoriser Swagger UI pour /docs et /redoc
-        if request.url.path in ["/docs", "/redoc", "/openapi.json"]:
+        # CSP - NE PAS appliquer aux routes API (JSON only, pas de contenu HTML)
+        if request.url.path.startswith("/api/"):
+            # Pour les API JSON, pas besoin de CSP
+            # Ça évite les conflits Mixed Content avec le frontend
+            pass
+        elif request.url.path in ["/docs", "/redoc", "/openapi.json"]:
+            # CSP permissive pour Swagger UI
             response.headers["Content-Security-Policy"] = (
                 "default-src 'self'; "
                 "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
@@ -140,7 +145,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
                 "font-src 'self' https://cdn.jsdelivr.net"
             )
         else:
-            # CSP stricte pour les autres routes
+            # CSP stricte pour les autres routes (root, health, etc.)
             response.headers["Content-Security-Policy"] = "default-src 'self'"
         
         return response
