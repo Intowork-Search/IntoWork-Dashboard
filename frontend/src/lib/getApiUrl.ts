@@ -28,4 +28,4 @@ export const getApiUrl = (): string => {
 
   return apiUrl;
 };
-// Force rebuild 1768497482
+// Force rebuild timestamp: 2026-02-26-18:45 - Fix Mixed Content définitif
