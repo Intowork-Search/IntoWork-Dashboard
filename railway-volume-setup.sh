@@ -1,0 +1,52 @@
+#!/bin/bash
+# Railway Volume Setup - Quick Guide
+
+echo "🚂 Configuration Railway Volume pour /app/uploads"
+echo "=================================================="
+echo ""
+
+echo "📋 Étape 1 : Login Railway CLI"
+echo "------------------------------"
+echo "1. Exécutez cette commande :"
+echo ""
+echo "   railway login --browserless"
+echo ""
+echo "2. Ouvrez le lien affiché dans votre navigateur"
+echo "3. Autorisez l'accès Railway CLI"
+echo "4. Attendez confirmation dans le terminal"
+echo ""
+
+echo "📦 Étape 2 : Lier le projet"
+echo "------------------------------"
+echo "   cd backend"
+echo "   railway link"
+echo ""
+echo "   Sélectionnez votre projet 'intowork-dashboard-production'"
+echo ""
+
+echo "💾 Étape 3 : Créer le volume"
+echo "------------------------------"
+echo "   railway volume add"
+echo ""
+echo "   - Name: uploads"
+echo "   - Mount Path: /app/uploads"
+echo "   - Size: 1GB (gratuit)"
+echo ""
+
+echo "✅ Étape 4 : Vérifier"
+echo "------------------------------"
+echo "   railway volumes"
+echo ""
+echo "   Devrait afficher : uploads -> /app/uploads"
+echo ""
+
+echo "🔄 Étape 5 : Redéployer"
+echo "------------------------------"
+echo "   railway up"
+echo ""
+echo "   Ou pusher vers GitHub (auto-deploy)"
+echo ""
+
+echo "=================================================="
+echo "📚 Documentation : https://docs.railway.app/guides/volumes"
+echo ""
