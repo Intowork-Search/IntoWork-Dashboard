@@ -33,8 +33,10 @@ import {
   HomeIcon,
   CalendarDaysIcon,
   ChartBarIcon,
+  LinkIcon,
 } from '@heroicons/react/24/outline';
 import { StarIcon } from '@heroicons/react/24/solid';
+import PublishToLinkedInModal from '@/components/PublishToLinkedInModal';
 
 export default function JobPostsPage(): React.JSX.Element {
   const { getToken } = useAuth();
@@ -46,6 +48,10 @@ export default function JobPostsPage(): React.JSX.Element {
   const [isCreating, setIsCreating] = useState(false);
   const [formData, setFormData] = useState<Partial<Job>>({});
   const [saving, setSaving] = useState(false);
+  
+  // LinkedIn modal state
+  const [linkedInModalOpen, setLinkedInModalOpen] = useState(false);
+  const [selectedJobForLinkedIn, setSelectedJobForLinkedIn] = useState<{ id: number; title: string } | null>(null);
 
   // Helper functions
   const getJobTypeInfo = (type: string) => {
@@ -401,6 +407,19 @@ export default function JobPostsPage(): React.JSX.Element {
                         >
                           <EyeIcon className="w-5 h-5" />
                         </button>
+                        {job.status === 'active' && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedJobForLinkedIn({ id: job.id, title: job.title });
+                              setLinkedInModalOpen(true);
+                            }}
+                            className="p-3 rounded-xl text-[#0A66C2] bg-[#0A66C2]/10 hover:bg-[#0A66C2]/20 transition-all"
+                            title="Publier sur LinkedIn"
+                          >
+                            <LinkIcon className="w-5 h-5" />
+                          </button>
+                        )}
                         <button
                           type="button"
                           onClick={() => handleEdit(job)}
@@ -779,6 +798,20 @@ export default function JobPostsPage(): React.JSX.Element {
           }
         }
       `}</style>
+
+      {/* LinkedIn Modal */}
+      {selectedJobForLinkedIn && (
+        <PublishToLinkedInModal
+          isOpen={linkedInModalOpen}
+          onClose={() => {
+            setLinkedInModalOpen(false);
+            setSelectedJobForLinkedIn(null);
+          }}
+          jobId={selectedJobForLinkedIn.id}
+          jobTitle={selectedJobForLinkedIn.title}
+          getToken={getToken}
+        />
+      )}
     </DashboardLayout>
   );
 }

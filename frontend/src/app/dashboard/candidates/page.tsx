@@ -17,6 +17,7 @@ import {
   useUpdateApplicationStatus,
   useUpdateApplicationNotes
 } from '@/hooks';
+import { useAuth } from '@/hooks/useNextAuth';
 import { 
   UserGroupIcon, 
   EnvelopeIcon, 
@@ -24,9 +25,11 @@ import {
   DocumentTextIcon,
   EyeIcon,
   FunnelIcon,
-  MagnifyingGlassIcon
+  MagnifyingGlassIcon,
+  CalendarIcon
 } from '@heroicons/react/24/outline';
 import { CheckCircleIcon, XCircleIcon, ClockIcon } from '@heroicons/react/24/solid';
+import ScheduleInterviewModal from '@/components/ScheduleInterviewModal';
 
 interface CandidateApplication {
   id: number;
@@ -52,11 +55,16 @@ interface ApplicationsResponse {
 }
 
 export default function CandidatesPage(): React.JSX.Element {
+  const { getToken } = useAuth();
   const [page, setPage] = useState(1);
   const limit = 20;
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState('');
   const [viewingApplication, setViewingApplication] = useState<CandidateApplication | null>(null);
+  
+  // Interview modal state
+  const [interviewModalOpen, setInterviewModalOpen] = useState(false);
+  const [selectedCandidate, setSelectedCandidate] = useState<{ name: string; email: string; jobTitle: string } | null>(null);
 
   // Utiliser React Query hooks
   const {
@@ -476,11 +484,25 @@ export default function CandidatesPage(): React.JSX.Element {
                 <h4 className="text-lg font-semibold text-gray-900 mb-3">⚡ Actions rapides</h4>
                 <div className="grid grid-cols-2 gap-3">
                   <button
+                    onClick={() => {
+                      setSelectedCandidate({
+                        name: viewingApplication.candidate_name,
+                        email: viewingApplication.candidate_email,
+                        jobTitle: viewingApplication.job_title
+                      });
+                      setInterviewModalOpen(true);
+                    }}
+                    className="px-4 py-2 bg-[#6B9B5F] text-white rounded-lg hover:bg-[#5a8a4f] transition flex items-center justify-center gap-2"
+                  >
+                    <CalendarIcon className="w-5 h-5" />
+                    Planifier un entretien
+                  </button>
+                  <button
                     onClick={() => handleStatusChange(viewingApplication.id, 'interview')}
                     disabled={updatingStatus}
                     className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Convoquer en entretien
+                    Marquer en entretien
                   </button>
                   <button
                     onClick={() => handleStatusChange(viewingApplication.id, 'accepted')}
@@ -522,6 +544,21 @@ export default function CandidatesPage(): React.JSX.Element {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Interview Modal */}
+      {selectedCandidate && (
+        <ScheduleInterviewModal
+          isOpen={interviewModalOpen}
+          onClose={() => {
+            setInterviewModalOpen(false);
+            setSelectedCandidate(null);
+          }}
+          candidateName={selectedCandidate.name}
+          candidateEmail={selectedCandidate.email}
+          jobTitle={selectedCandidate.jobTitle}
+          getToken={getToken}
+        />
       )}
     </DashboardLayout>
   );
