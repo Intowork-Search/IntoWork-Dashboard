@@ -2,22 +2,37 @@ import axios from 'axios';
 import { getApiUrl } from './getApiUrl';
 
 // Configuration de l'API client
+// NOTE: Ne PAS appeler getApiUrl() ici car c'est évalué UNE FOIS au chargement du module
+// Utiliser un intercepteur pour évaluer l'URL à chaque requête
 const apiClient = axios.create({
-  baseURL: getApiUrl(),
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
+// Intercepteur pour injecter baseURL dynamiquement à CHAQUE requête
+apiClient.interceptors.request.use((config) => {
+  // Évaluer getApiUrl() à CHAQUE requête, pas au chargement du module
+  config.baseURL = getApiUrl();
+  return config;
+});
+
 // Function to create authenticated axios instance
 export const createAuthenticatedClient = (token: string) => {
-  return axios.create({
-    baseURL: getApiUrl(),
+  const client = axios.create({
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
     },
   });
+  
+  // Intercepteur pour baseURL dynamique
+  client.interceptors.request.use((config) => {
+    config.baseURL = getApiUrl();
+    return config;
+  });
+  
+  return client;
 };
 
 // Intercepteur pour gérer les erreurs
