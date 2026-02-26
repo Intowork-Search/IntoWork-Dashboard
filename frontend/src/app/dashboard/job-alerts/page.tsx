@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
+import { getApiUrl } from '@/lib/getApiUrl';
 
 interface JobAlert {
   id: number;
@@ -67,7 +68,7 @@ export default function JobAlertsPage() {
 
   const fetchAlerts = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/job-alerts`, {
+      const response = await fetch(`${getApiUrl()}/job-alerts`, {
         credentials: 'include',
       });
       
@@ -103,8 +104,8 @@ export default function JobAlertsPage() {
     
     try {
       const url = editingAlert
-        ? `${process.env.NEXT_PUBLIC_API_URL}/job-alerts/${editingAlert.id}`
-        : `${process.env.NEXT_PUBLIC_API_URL}/job-alerts/`;
+        ? `${getApiUrl()}/job-alerts/${editingAlert.id}`
+        : `${getApiUrl()}/job-alerts/`;
       
       const method = editingAlert ? 'PATCH' : 'POST';
       
@@ -129,7 +130,7 @@ export default function JobAlertsPage() {
 
   const handleToggle = async (id: number) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/job-alerts/${id}/toggle`, {
+      const response = await fetch(`${getApiUrl()}/job-alerts/${id}/toggle`, {
         method: 'POST',
         credentials: 'include',
       });
@@ -147,7 +148,7 @@ export default function JobAlertsPage() {
     if (!confirm('Voulez-vous vraiment supprimer cette alerte ?')) return;
     
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/job-alerts/${id}`, {
+      const response = await fetch(`${getApiUrl()}/job-alerts/${id}`, {
         method: 'DELETE',
         credentials: 'include',
       });
@@ -164,7 +165,7 @@ export default function JobAlertsPage() {
   const handlePreview = async (alert: JobAlert) => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/job-alerts/${alert.id}/preview?limit=10`,
+        `${getApiUrl()}/job-alerts/${alert.id}/preview?limit=10`,
         { credentials: 'include' }
       );
       
