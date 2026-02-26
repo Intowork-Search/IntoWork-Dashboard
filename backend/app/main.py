@@ -84,14 +84,39 @@ instrumentator = setup_monitoring(app)
 create_metrics_endpoint(app)
 instrumentator.expose(app, endpoint="/metrics", include_in_schema=False)
 
+# Define allowed origins for CORS early (used in exception handler)
+allowed_origins = [
+    "http://localhost:3000",  # Next.js dev server
+    "https://intowork.co",  # Production frontend
+    "https://www.intowork.co",  # Production frontend with www
+    "https://intowork-dashboard.vercel.app",  # Production Vercel deployment
+]
+
+# Get additional allowed origins from environment
+env_origins = os.getenv("ALLOWED_ORIGINS", "")
+if env_origins:
+    allowed_origins.extend([origin.strip() for origin in env_origins.split(",") if origin.strip()])
+
 # Global exception handler for unhandled exceptions
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     logger.error(f"Unhandled exception: {exc}", exc_info=True)
-    return JSONResponse(
+    
+    # Create error response
+    response = JSONResponse(
         status_code=500,
         content={"detail": "Internal server error"}
     )
+    
+    # Add CORS headers manually to ensure they're present on error responses
+    origin = request.headers.get("origin")
+    if origin in allowed_origins:
+        response.headers["Access-Control-Allow-Origin"] = origin
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = "*"
+    
+    return response
 
 
 # Security Headers Middleware
@@ -131,18 +156,7 @@ app.add_middleware(RequestIDMiddleware)
 # NOTE: register CORS early so headers are applied even on error responses
 # Note: Wildcard origins with credentials not supported by CORS spec
 # For dynamic Vercel preview URLs, validate origin in middleware
-allowed_origins = [
-    "http://localhost:3000",  # Next.js dev server
-    "https://intowork.co",  # Production frontend
-    "https://www.intowork.co",  # Production frontend with www
-    "https://intowork-dashboard.vercel.app",  # Production Vercel deployment
-]
-
-# Get additional allowed origins from environment
-env_origins = os.getenv("ALLOWED_ORIGINS", "")
-if env_origins:
-    allowed_origins.extend([origin.strip() for origin in env_origins.split(",") if origin.strip()])
-
+# (allowed_origins defined earlier, before global exception handler)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,

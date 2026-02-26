@@ -581,19 +581,19 @@ async def get_integrations_status(
                 is_connected=False,
                 connected_at=None,
                 last_used_at=None
-            ),
+            ).model_dump(),
             "google_calendar": IntegrationStatusResponse(
                 provider="google_calendar",
                 is_connected=False,
                 connected_at=None,
                 last_used_at=None
-            ),
+            ).model_dump(),
             "outlook_calendar": IntegrationStatusResponse(
                 provider="outlook_calendar",
                 is_connected=False,
                 connected_at=None,
                 last_used_at=None
-            )
+            ).model_dump()
         }
     
     result = await db.execute(
@@ -616,7 +616,7 @@ async def get_integrations_status(
             is_connected=integration.is_active,
             connected_at=integration.created_at,
             last_used_at=integration.last_used_at
-        )
+        ).model_dump()
     
     # Remplir les non-connectés
     for provider in status_map:
@@ -626,7 +626,7 @@ async def get_integrations_status(
                 is_connected=False,
                 connected_at=None,
                 last_used_at=None
-            )
+            ).model_dump()
     
     return status_map
 
