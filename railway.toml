@@ -1,29 +1,11 @@
 # Railway configuration for IntoWork Backend
-# Reference: https://docs.railway.app/deploy/railway-toml
+# Reference: https://docs.railway.app/guides/config-as-code
 
 [build]
-builder = "dockerfile"
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
 
 [deploy]
-# startCommand is defined in Dockerfile.railway CMD
-restartPolicyType = "always"
-restartPolicyMaxRetries = 5
-numReplicas = 1
-sleepApplication = false
-
-[deploy.healthchecks]
-[deploy.healthchecks.http]
-path = "/health"
-port = "$PORT"
-interval = 30000  # 30 seconds
-timeout = 5000    # 5 seconds
-
-[env]
-PORT = "8000"
-PYTHONUNBUFFERED = "1"
-PYTHONDONTWRITEBYTECODE = "1"
-
-# Persistent storage for uploaded files (logos, CVs, etc.)
-[[mounts]]
-name = "uploads"
-mountPath = "/app/uploads"
+startCommand = "sh start.sh"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
