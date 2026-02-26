@@ -22,3 +22,8 @@ timeout = 5000    # 5 seconds
 PORT = "8000"
 PYTHONUNBUFFERED = "1"
 PYTHONDONTWRITEBYTECODE = "1"
+
+# Persistent storage for uploaded files (logos, CVs, etc.)
+[[mounts]]
+name = "uploads"
+mountPath = "/app/uploads"
