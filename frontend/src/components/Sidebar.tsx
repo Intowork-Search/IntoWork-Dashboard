@@ -19,7 +19,8 @@ import {
   BriefcaseIcon,
   ArrowRightOnRectangleIcon,
   EnvelopeIcon,
-  BellAlertIcon
+  BellAlertIcon,
+  Square3Stack3DIcon
 } from '@heroicons/react/24/outline';
 
 interface SidebarProps {
@@ -67,6 +68,12 @@ function getEmployerNavigation(jobsCount: number): NavItem[] {
       href: '/dashboard/email-templates', 
       icon: EnvelopeIcon, 
       description: 'Gérer vos templates de communication'
+    },
+    { 
+      name: 'Intégrations', 
+      href: '/dashboard/integrations', 
+      icon: Square3Stack3DIcon, 
+      description: 'Connecter LinkedIn, Google Calendar, Teams'
     },
     { 
       name: 'Paramètres', 

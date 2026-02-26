@@ -103,6 +103,19 @@ export interface CV {
   created_at: string;
 }
 
+export interface Integration {
+  provider: 'linkedin' | 'google_calendar' | 'outlook_calendar';
+  is_connected: boolean;
+  connected_at?: string;
+  last_used_at?: string;
+}
+
+export interface IntegrationStatus {
+  linkedin: Integration;
+  google_calendar: Integration;
+  outlook_calendar: Integration;
+}
+
 export interface CandidateProfile {
   id?: number;
   user_id: number;
@@ -778,6 +791,81 @@ export const adminAPI = {
   getMe: async (token: string): Promise<AdminUser> => {
     const client = createAuthenticatedClient(token);
     const response = await client.get('/admin/me');
+    return response.data;
+  }
+};
+
+// ============================================
+// INTEGRATIONS API
+// ============================================
+export const integrationsAPI = {
+  // Récupérer le statut de toutes les intégrations
+  getStatus: async (token: string): Promise<IntegrationStatus> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.get('/integrations/status');
+    return response.data;
+  },
+
+  // Obtenir l'URL d'autorisation LinkedIn
+  getLinkedInAuthUrl: async (token: string): Promise<{ auth_url: string }> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.get('/integrations/linkedin/auth-url');
+    return response.data;
+  },
+
+  // Obtenir l'URL d'autorisation Google Calendar
+  getGoogleCalendarAuthUrl: async (token: string): Promise<{ auth_url: string }> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.get('/integrations/google-calendar/auth-url');
+    return response.data;
+  },
+
+  // Obtenir l'URL d'autorisation Outlook
+  getOutlookAuthUrl: async (token: string): Promise<{ auth_url: string }> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.get('/integrations/outlook/auth-url');
+    return response.data;
+  },
+
+  // Déconnecter une intégration
+  disconnect: async (token: string, provider: 'linkedin' | 'google-calendar' | 'outlook'): Promise<{ message: string }> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.delete(`/integrations/${provider}/disconnect`);
+    return response.data;
+  },
+
+  // Publier une offre sur LinkedIn
+  publishJobToLinkedIn: async (token: string, jobId: number, message?: string): Promise<{ post_id: string; post_url: string }> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.post('/integrations/linkedin/publish-job', { job_id: jobId, message });
+    return response.data;
+  },
+
+  // Créer un événement Google Calendar
+  createGoogleCalendarEvent: async (token: string, eventData: {
+    summary: string;
+    description?: string;
+    start_time: string;
+    end_time: string;
+    attendees?: string[];
+    timezone?: string;
+  }): Promise<{ event_id: string; event_url: string; meet_link?: string }> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.post('/integrations/google-calendar/create-event', eventData);
+    return response.data;
+  },
+
+  // Créer un événement Outlook
+  createOutlookEvent: async (token: string, eventData: {
+    subject: string;
+    body?: string;
+    start_time: string;
+    end_time: string;
+    attendees?: string[];
+    timezone?: string;
+  }): Promise<{ event_id: string; event_url: string; teams_link?: string }> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.post('/integrations/outlook/create-event', eventData);
     return response.data;
   }
 };
