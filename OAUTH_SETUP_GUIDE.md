@@ -471,34 +471,6 @@ MICROSOFT_TENANT_ID=common
 2. L'écran de consentement OAuth est configuré
 3. Les redirect URIs sont corrects
 
-### Google : "Impossible d'utiliser l'email de l'entreprise pour le support"
-**Problème** : L'email de l'entreprise (ex: `software@hcexecutive.net`) ne fonctionne pas dans le formulaire OAuth consent screen.
-
-**Solutions** :
-
-**Option 1 - Utiliser un email Gmail personnel** (Recommandé) :
-1. Utiliser votre email Gmail personnel (ex: `votremail@gmail.com`)
-2. Cet email sera visible uniquement dans la console Google Cloud, pas pour les utilisateurs
-3. C'est parfaitement valide pour les applications en production
-
-**Option 2 - Créer un email Gmail dédié** :
-1. Créer un nouveau compte Gmail : `intowork.ats@gmail.com`
-2. Utiliser cet email pour toutes les configurations OAuth
-3. Stocker les credentials dans votre gestionnaire de mots de passe
-
-**Option 3 - Google Workspace** (si disponible) :
-1. Si votre entreprise utilise Google Workspace (G Suite)
-2. Utiliser n'importe quel email @votredomaine.com
-3. Le domaine doit être vérifié dans Google Workspace
-
-**Ce qui apparaît aux utilisateurs** :
-- ✅ App name: "IntoWork ATS"
-- ✅ Logo de votre entreprise
-- ✅ Links vers votre site web
-- ❌ L'email de support n'est PAS visible aux utilisateurs finaux lors de l'OAuth
-
-**Recommandation** : Utiliser votre email Gmail personnel pour la rapidité. Vous pourrez toujours le changer plus tard dans Google Cloud Console.
-
 ### Microsoft : "AADSTS50011: The reply URL specified in the request does not match"
 **Solution** : Vérifier dans Azure Portal → Authentication → Redirect URIs que l'URL est exactement celle utilisée.
 
