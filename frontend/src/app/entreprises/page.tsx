@@ -12,6 +12,7 @@ import {
   GlobeAltIcon,
 } from '@heroicons/react/24/outline';
 import { getUploadUrl } from '@/lib/api';
+import { getApiUrl } from '@/lib/getApiUrl';
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -57,14 +58,8 @@ export default function EntreprisesPage() {
         setLoading(true);
         setError(null);
 
-        // Utiliser l'URL de l'API depuis les variables d'environnement
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-        
-        if (!apiUrl) {
-          setError('Configuration API manquante. Veuillez vérifier votre fichier .env.local');
-          setLoading(false);
-          return;
-        }
+        // Use getApiUrl() to enforce HTTPS in production
+        const apiUrl = getApiUrl();
 
         console.log('🏢 Fetching companies from:', `${apiUrl}/companies/all`); // Debug
 

@@ -340,10 +340,8 @@ export const candidatesAPI = {
   
   // Obtenir l'URL du CV pour prévisualisation
   getCVUrl: (token: string): string => {
-    // Force HTTPS en production
-    const apiUrl = process.env.NODE_ENV === 'production'
-      ? 'https://intowork-dashboard-production-1ede.up.railway.app/api'
-      : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api');
+    // Use getApiUrl() to enforce HTTPS in production
+    const apiUrl = getApiUrl();
     return `${apiUrl}/candidates/cv/download?token=${token}`;
   },
   
@@ -879,10 +877,8 @@ export const integrationsAPI = {
 export const getUploadUrl = (path: string | null | undefined): string => {
   if (!path) return '';
   
-  // Force HTTPS en production avec l'URL Railway complète
-  const baseUrl = process.env.NODE_ENV === 'production'
-    ? 'https://intowork-dashboard-production-1ede.up.railway.app'
-    : (process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:8001');
+  // Use getApiUrl() and remove /api suffix to get base URL
+  const baseUrl = getApiUrl().replace('/api', '');
     
   // Si le path commence déjà par http, le retourner tel quel
   if (path.startsWith('http://') || path.startsWith('https://')) {

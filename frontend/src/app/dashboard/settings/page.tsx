@@ -18,6 +18,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { useAuthenticatedAPI } from '@/hooks/useAuthenticatedAPI';
 import { companiesAPI, authAPI, getUploadUrl } from '@/lib/api';
+import { getApiUrl } from '@/lib/getApiUrl';
 import ToggleButton from '@/components/ToggleButton';
 import DashboardLayout from '@/components/DashboardLayout';
 import ChangePasswordModal from '@/components/settings/ChangePasswordModal';
@@ -292,7 +293,7 @@ export default function SettingsPage() {
       const formData = new FormData();
       formData.append('logo', file);
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+      const apiUrl = getApiUrl();
       const response = await fetch(`${apiUrl}/companies/my-company/logo`, {
         method: 'POST',
         headers: {
