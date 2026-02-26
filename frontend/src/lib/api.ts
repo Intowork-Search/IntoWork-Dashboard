@@ -397,6 +397,7 @@ export interface Job {
   salary_min?: number;
   salary_max?: number;
   currency: string;
+  status: string;
   posted_at?: string;
   is_featured: boolean;
   views_count: number;
