@@ -14,6 +14,7 @@ import aiofiles
 from app.database import get_db
 from app.auth import require_user
 from app.models.base import User, UserRole, Company, Employer, Job, JobStatus, JobApplication
+from app.services.cloudinary_service import CloudinaryService
 
 router = APIRouter()
 # ==================== Modèles Pydantic ====================
@@ -321,7 +322,7 @@ async def upload_company_logo(
         if not company:
             raise HTTPException(status_code=404, detail="Entreprise introuvable")
 
-        # Lire le contenu du fichier
+        # Lire le contenu du fichier pour validation
         logo_content = await logo.read()
 
         # Vérifier la taille (max 5MB)
@@ -333,55 +334,38 @@ async def upload_company_logo(
                 detail=f"Le fichier ne peut pas dépasser 5MB (taille actuelle: {file_size / (1024*1024):.2f}MB)"
             )
 
-        logger.info(f"Début upload logo pour company_id={company.id}")
+        logger.info(f"Début upload logo vers Cloudinary pour company_id={company.id}")
         logger.info(f"Nom fichier: {logo.filename}, taille: {file_size} bytes")
 
-        # Créer le répertoire de stockage
-        logo_dir = os.path.abspath("uploads/company_logos")
-        os.makedirs(logo_dir, exist_ok=True)
+        # Rembobiner le fichier pour Cloudinary
+        await logo.seek(0)
 
-        # Sécuriser le nom de fichier
-        original_filename = os.path.basename(logo.filename or "logo")
-        safe_filename = re.sub(r'[^a-zA-Z0-9_.-]', '_', original_filename)
+        # Supprimer l'ancien logo de Cloudinary si présent
+        if company.cloudinary_id:
+            logger.info(f"Suppression ancien logo: {company.cloudinary_id}")
+            await CloudinaryService.delete_image(company.cloudinary_id)
 
-        if safe_filename.startswith('.'):
-            safe_filename = 'logo' + safe_filename
+        # Upload vers Cloudinary avec transformations optimisées
+        cloudinary_result = await CloudinaryService.upload_company_logo(
+            file=logo,
+            company_id=company.id
+        )
 
-        name_part, ext = os.path.splitext(safe_filename)
-        if len(name_part) > 100:
-            name_part = name_part[:100]
-        safe_filename = name_part + ext
-
-        # Nom unique avec ID entreprise
-        unique_filename = f"company_{company.id}_{uuid.uuid4().hex}{ext}"
-        logo_path = os.path.join(logo_dir, unique_filename)
-
-        # Valider le chemin
-        logo_path_resolved = os.path.abspath(logo_path)
-        if not logo_path_resolved.startswith(logo_dir):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invalid file path detected"
-            )
-
-        # Sauvegarder le fichier
-        async with aiofiles.open(logo_path, "wb") as f:
-            await f.write(logo_content)
-
-        # Mettre à jour l'URL du logo dans la base de données
-        # On stocke le chemin relatif pour servir via l'API
-        company.logo_url = f"/uploads/company_logos/{unique_filename}"
+        # Mettre à jour la base de données avec l'URL Cloudinary
+        company.logo_url = cloudinary_result['url']
+        company.cloudinary_id = cloudinary_result['public_id']
 
         await db.commit()
         await db.refresh(company)
 
-        logger.info(f"Logo sauvegardé: {logo_path}")
+        logger.info(f"Logo Cloudinary sauvegardé: {cloudinary_result['public_id']}")
 
         return {
             "message": "Logo téléchargé avec succès",
             "logo_url": company.logo_url,
-            "filename": unique_filename,
-            "size": file_size
+            "cloudinary_id": company.cloudinary_id,
+            "size": file_size,
+            "cdn_optimized": True
         }
 
     except HTTPException:

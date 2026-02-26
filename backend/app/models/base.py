@@ -173,6 +173,7 @@ class Company(Base):
     
     # Branding
     logo_url = Column(String)
+    cloudinary_id = Column(String)  # Cloudinary public_id pour gestion optimisée des images
     
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
