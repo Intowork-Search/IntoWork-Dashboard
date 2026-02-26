@@ -285,6 +285,12 @@ class JobApplication(Base):
     cv_url = Column(String)  # CV spécifique à cette candidature (legacy, deprecated)
     notes = Column(Text)  # Notes de l'employeur sur cette candidature
     
+    # 🆕 Collaboration recruteurs (Phase 2)
+    recruiter_notes = Column(JSONB)  # Notes collaboratives multiples [{user_id, note, created_at}]
+    rating = Column(Integer)  # Note de 1 à 5 étoiles
+    tags = Column(JSONB)  # Tags pour catégorisation ["bon profil", "senior", etc.]
+    scorecard = Column(JSONB)  # Scorecard structurée {technical: 5, soft_skills: 4, culture_fit: 5}
+    
     # Scoring IA
     ai_score = Column(Float)  # Score de 0 à 100
     ai_score_details = Column(JSONB)  # Détails du scoring (compétences, expérience, etc.)
@@ -494,3 +500,189 @@ class CVAnalytics(Base):
 
     # Relations
     cv_document = relationship("CVDocument", back_populates="analytics")
+
+
+# ========================================
+# 🆕 PHASE 2 - ATS FEATURES (Feb 2026)
+# ========================================
+
+class EmailTemplateType(enum.Enum):
+    """Types de templates d'emails pour recruteurs"""
+    WELCOME_CANDIDATE = "welcome_candidate"
+    APPLICATION_RECEIVED = "application_received"
+    APPLICATION_REJECTED = "application_rejected"
+    INTERVIEW_INVITATION = "interview_invitation"
+    INTERVIEW_CONFIRMATION = "interview_confirmation"
+    INTERVIEW_REMINDER = "interview_reminder"
+    OFFER_LETTER = "offer_letter"
+    ONBOARDING = "onboarding"
+    CUSTOM = "custom"
+
+
+class EmailTemplate(Base):
+    """Templates d'emails personnalisables pour les recruteurs"""
+    __tablename__ = "email_templates"
+
+    id = Column(Integer, primary_key=True, index=True)
+    company_id = Column(Integer, ForeignKey("companies.id"), nullable=False, index=True)
+    created_by_user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+
+    # Template info
+    name = Column(String, nullable=False)  # Nom du template (ex: "Invitation entretien - Tech")
+    type = Column(SQLEnum(EmailTemplateType), nullable=False, index=True)
+    subject = Column(String, nullable=False)  # Sujet de l'email
+    body = Column(Text, nullable=False)  # Corps de l'email (HTML supporté)
+
+    # Variables disponibles: {candidate_name}, {job_title}, {company_name}, {recruiter_name}, etc.
+    # Métadonnées
+    is_active = Column(Boolean, default=True, index=True)
+    is_default = Column(Boolean, default=False)  # Template par défaut pour ce type
+    usage_count = Column(Integer, default=0)  # Nombre d'utilisations
+
+    # Timestamps
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    last_used_at = Column(DateTime(timezone=True), nullable=True)
+
+    # Relations
+    company = relationship("Company")
+    created_by = relationship("User")
+
+
+class JobAlertFrequency(enum.Enum):
+    """Fréquence d'envoi des alertes emploi"""
+    INSTANT = "instant"  # Dès qu'un nouveau job correspond
+    DAILY = "daily"  # Résumé quotidien
+    WEEKLY = "weekly"  # Résumé hebdomadaire
+
+
+class JobAlert(Base):
+    """Alertes emploi personnalisées pour les candidats"""
+    __tablename__ = "job_alerts"
+
+    id = Column(Integer, primary_key=True, index=True)
+    candidate_id = Column(Integer, ForeignKey("candidates.id"), nullable=False, index=True)
+
+    # Nom de l'alerte
+    name = Column(String, nullable=False)  # Ex: "Jobs Senior Python à Paris"
+
+    # Critères de recherche (format JSON pour flexibilité)
+    criteria = Column(JSONB, nullable=False)
+    # Exemple: {
+    #   "keywords": ["python", "backend"],
+    #   "location": "Paris",
+    #   "job_type": ["full_time"],
+    #   "location_type": ["remote", "hybrid"],
+    #   "salary_min": 50000
+    # }
+
+    # Configuration
+    frequency = Column(SQLEnum(JobAlertFrequency), nullable=False, default=JobAlertFrequency.DAILY)
+    is_active = Column(Boolean, default=True, index=True)
+
+    # Statistiques
+    jobs_sent_count = Column(Integer, default=0)  # Nombre de jobs envoyés
+    last_sent_at = Column(DateTime(timezone=True), nullable=True)  # Dernier envoi
+    last_matching_job_id = Column(Integer, nullable=True)  # ID du dernier job envoyé
+
+    # Timestamps
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    # Relations
+    candidate = relationship("Candidate")
+
+
+class InterviewScheduleStatus(enum.Enum):
+    """Statut des entretiens planifiés"""
+    SCHEDULED = "scheduled"
+    CONFIRMED = "confirmed"
+    CANCELED = "canceled"
+    COMPLETED = "completed"
+    RESCHEDULED = "rescheduled"
+
+
+class InterviewSchedule(Base):
+    """Planification d'entretiens avec intégration calendrier"""
+    __tablename__ = "interview_schedules"
+
+    id = Column(Integer, primary_key=True, index=True)
+    application_id = Column(Integer, ForeignKey("job_applications.id"), nullable=False, index=True)
+    created_by_user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+
+    # Détails de l'entretien
+    title = Column(String, nullable=False)  # Ex: "Entretien technique - Python"
+    description = Column(Text, nullable=True)
+    location = Column(String, nullable=True)  # Adresse physique ou "Remote"
+    meeting_link = Column(String, nullable=True)  # Lien Google Meet/Zoom/Teams
+
+    # Date et heure
+    scheduled_at = Column(DateTime(timezone=True), nullable=False, index=True)
+    duration_minutes = Column(Integer, default=60)  # Durée en minutes
+    timezone = Column(String, default="Europe/Paris")
+
+    # Participants
+    interviewers = Column(JSONB)  # Liste des recruteurs [{user_id, name, email}]
+    candidate_email = Column(String, nullable=False)
+
+    # Statut
+    status = Column(SQLEnum(InterviewScheduleStatus), nullable=False, default=InterviewScheduleStatus.SCHEDULED)
+
+    # Intégrations calendrier
+    google_event_id = Column(String, nullable=True)  # ID de l'événement Google Calendar
+    outlook_event_id = Column(String, nullable=True)  # ID de l'événement Outlook
+
+    # Notifications
+    reminder_sent = Column(Boolean, default=False)
+    confirmation_received = Column(Boolean, default=False)
+
+    # Timestamps
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    # Relations
+    application = relationship("JobApplication")
+    created_by = relationship("User")
+
+
+class JobPostingChannel(enum.Enum):
+    """Canaux de publication d'offres"""
+    INTOWORK = "intowork"  # Site principal
+    LINKEDIN = "linkedin"
+    JOBBERMAN = "jobberman"  # Job board africain
+    BRIGHTERMONDAY = "brightermonday"  # Job board africain
+    FACEBOOK = "facebook"
+    TWITTER = "twitter"
+    CUSTOM = "custom"
+
+
+class JobPosting(Base):
+    """Publication multi-canaux d'offres d'emploi"""
+    __tablename__ = "job_postings"
+
+    id = Column(Integer, primary_key=True, index=True)
+    job_id = Column(Integer, ForeignKey("jobs.id"), nullable=False, index=True)
+
+    # Canal de publication
+    channel = Column(SQLEnum(JobPostingChannel), nullable=False, index=True)
+    external_id = Column(String, nullable=True)  # ID sur la plateforme externe
+
+    # Statut
+    is_active = Column(Boolean, default=True)
+    posted_at = Column(DateTime(timezone=True), nullable=True)
+    expires_at = Column(DateTime(timezone=True), nullable=True)
+
+    # Statistiques
+    views_count = Column(Integer, default=0)
+    clicks_count = Column(Integer, default=0)
+    applications_count = Column(Integer, default=0)
+
+    # Métadonnées
+    posting_data = Column(JSONB)  # Données spécifiques au canal
+
+    # Timestamps
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    # Relations
+    job = relationship("Job")

@@ -17,7 +17,9 @@ import {
   ChevronRightIcon,
   BuildingOfficeIcon,
   BriefcaseIcon,
-  ArrowRightOnRectangleIcon
+  ArrowRightOnRectangleIcon,
+  EnvelopeIcon,
+  BellAlertIcon
 } from '@heroicons/react/24/outline';
 
 interface SidebarProps {
@@ -59,6 +61,12 @@ function getEmployerNavigation(jobsCount: number): NavItem[] {
       icon: UserIcon, 
       badge: undefined, // À rendre dynamique si besoin
       description: 'Voir toutes les candidatures reçues'
+    },
+    { 
+      name: "Templates d'emails", 
+      href: '/dashboard/email-templates', 
+      icon: EnvelopeIcon, 
+      description: 'Gérer vos templates de communication'
     },
     { 
       name: 'Paramètres', 
@@ -201,6 +209,12 @@ export default function Sidebar({ userRole }: SidebarProps) {
       icon: ChartBarIcon, 
       badge: applicationsCount,
       description: 'Suivre vos candidatures en cours'
+    },
+    { 
+      name: 'Alertes emploi', 
+      href: '/dashboard/job-alerts', 
+      icon: BellAlertIcon, 
+      description: 'Gérer vos alertes de nouvelles offres'
     },
     { 
       name: 'Paramètres', 

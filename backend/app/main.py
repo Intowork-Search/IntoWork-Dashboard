@@ -21,6 +21,10 @@ from app.api.notifications import router as notifications_router
 from app.api.admin import router as admin_router
 from app.api.cv_builder import router as cv_builder_router
 from app.api.ai_scoring import router as ai_scoring_router
+# 🆕 ATS Phase 2 - February 2026
+from app.api.email_templates import router as email_templates_router
+from app.api.job_alerts import router as job_alerts_router
+from app.api.collaboration import router as collaboration_router
 from dotenv import load_dotenv
 import os
 from pathlib import Path
@@ -160,6 +164,10 @@ app.include_router(notifications_router, prefix="/api/notifications", tags=["not
 app.include_router(admin_router, prefix="/api/admin", tags=["admin"])
 app.include_router(cv_builder_router, prefix="/api/cv-builder", tags=["cv-builder"])
 app.include_router(ai_scoring_router, prefix="/api/ai-scoring", tags=["ai-scoring"])
+# 🆕 ATS Phase 2 routers
+app.include_router(email_templates_router, prefix="/api", tags=["ats-email-templates"])
+app.include_router(job_alerts_router, prefix="/api", tags=["ats-job-alerts"])
+app.include_router(collaboration_router, prefix="/api", tags=["ats-collaboration"])
 
 # Servir les fichiers uploadés (CV, photos, etc.) avec CORS
 uploads_path = Path(__file__).parent.parent / "uploads"
