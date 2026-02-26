@@ -178,20 +178,25 @@ uploads_path.mkdir(exist_ok=True)
 # Custom StaticFiles middleware pour ajouter les headers CORS
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request as StarletteRequest
-from starlette.responses import Response
+from starlette.responses import Response, FileResponse
+from starlette.staticfiles import StaticFiles as BaseStaticFiles
 
-class CORSStaticFilesMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: StarletteRequest, call_next):
-        response = await call_next(request)
-        if request.url.path.startswith("/uploads"):
+class CORSStaticFiles(BaseStaticFiles):
+    """Custom StaticFiles with CORS headers for images"""
+    async def get_response(self, path: str, scope) -> Response:
+        response = await super().get_response(path, scope)
+        
+        # Add CORS headers to allow cross-origin image loading
+        if isinstance(response, FileResponse):
             response.headers["Access-Control-Allow-Origin"] = "*"
-            response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
+            response.headers["Access-Control-Allow-Methods"] = "GET, HEAD, OPTIONS"
             response.headers["Access-Control-Allow-Headers"] = "*"
             response.headers["Cross-Origin-Resource-Policy"] = "cross-origin"
+            response.headers["Cache-Control"] = "public, max-age=31536000"
+        
         return response
 
-app.add_middleware(CORSStaticFilesMiddleware)
-app.mount("/uploads", StaticFiles(directory=str(uploads_path)), name="uploads")
+app.mount("/uploads", CORSStaticFiles(directory=str(uploads_path)), name="uploads")
 
 @app.get("/")
 async def root():
