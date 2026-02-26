@@ -83,6 +83,13 @@ async def create_email_template(
     {interview_date}, {interview_time}, {interview_location}, {application_status}
     """
     
+    # Vérifier que l'employeur a une entreprise
+    if not employer.company_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You must create a company profile before creating email templates"
+        )
+    
     # Si c'est un template par défaut, désactiver les autres par défaut du même type
     if template_data.is_default:
         await db.execute(
@@ -126,6 +133,10 @@ async def list_email_templates(
     - type : Filtrer par type de template
     - is_active : Filtrer par statut actif/inactif
     """
+    
+    # Vérifier que l'employeur a une entreprise
+    if not employer.company_id:
+        return []  # Retourner liste vide si pas d'entreprise
     
     query = select(EmailTemplate).where(EmailTemplate.company_id == employer.company_id)
     
