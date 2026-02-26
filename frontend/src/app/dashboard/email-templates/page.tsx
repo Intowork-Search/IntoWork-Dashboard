@@ -461,112 +461,148 @@ export default function EmailTemplatesPage() {
               </div>
             </div>
             
-            <form onSubmit={handleSubmit} className="p-8 space-y-6">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Nom du template
+            <form onSubmit={handleSubmit} className="p-8 space-y-8">
+              {/* Nom du template */}
+              <div className="space-y-3">
+                <label className="block text-base font-bold text-gray-800 mb-3">
+                  Nom du template *
                 </label>
                 <input
                   type="text"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#6B9B5F] focus:border-transparent transition-all"
+                  className="w-full px-5 py-4 text-base text-gray-900 font-medium rounded-xl border-2 border-gray-300 bg-white shadow-sm focus:ring-4 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] hover:border-gray-400 transition-all placeholder:text-gray-400 placeholder:font-normal"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="Ex: Bienvenue nouveau candidat"
                   required
                 />
+                <p className="text-sm text-gray-500 italic">
+                  Donnez un nom descriptif pour identifier facilement ce template
+                </p>
               </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Type de template
+              {/* Type de template */}
+              <div className="space-y-3">
+                <label className="block text-base font-bold text-gray-800 mb-3">
+                  Type de template *
                 </label>
-                <select
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#6B9B5F] focus:border-transparent transition-all"
-                  value={formData.type}
-                  onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                >
-                  {TEMPLATE_TYPES.map((type) => (
-                    <option key={type.value} value={type.value}>
-                      {type.label}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <select
+                    className="w-full appearance-none px-5 py-4 text-base text-gray-900 font-medium rounded-xl border-2 border-gray-300 bg-white shadow-sm focus:ring-4 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] hover:border-gray-400 transition-all cursor-pointer"
+                    value={formData.type}
+                    onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                  >
+                    {TEMPLATE_TYPES.map((type) => (
+                      <option key={type.value} value={type.value} className="text-gray-900 font-medium py-2">
+                        {type.label}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center">
+                    <svg className="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                </div>
+                <p className="text-sm text-gray-500 italic">
+                  Choisissez le type d'email correspondant à votre besoin
+                </p>
               </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Sujet de l'email
+              {/* Sujet de l'email */}
+              <div className="space-y-3">
+                <label className="block text-base font-bold text-gray-800 mb-3">
+                  Sujet de l'email *
                 </label>
                 <input
                   type="text"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#6B9B5F] focus:border-transparent transition-all"
+                  className="w-full px-5 py-4 text-base text-gray-900 font-medium rounded-xl border-2 border-gray-300 bg-white shadow-sm focus:ring-4 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] hover:border-gray-400 transition-all placeholder:text-gray-400 placeholder:font-normal"
                   value={formData.subject}
                   onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                  placeholder="Ex: Bienvenue chez {{company_name}}"
+                  placeholder="Ex: Bienvenue chez {company_name} !"
                   required
                 />
+                <p className="text-sm text-gray-500 italic">
+                  Le sujet qui apparaîtra dans la boîte mail du destinataire
+                </p>
               </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Corps du message
+              {/* Corps du message */}
+              <div className="space-y-3">
+                <label className="block text-base font-bold text-gray-800 mb-3">
+                  Corps du message *
                 </label>
                 <textarea
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#6B9B5F] focus:border-transparent transition-all resize-none"
-                  rows={10}
+                  className="w-full px-5 py-4 text-base text-gray-900 font-medium rounded-xl border-2 border-gray-300 bg-white shadow-sm focus:ring-4 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] hover:border-gray-400 transition-all resize-y min-h-[240px] placeholder:text-gray-400 placeholder:font-normal leading-relaxed"
+                  rows={12}
                   value={formData.body}
                   onChange={(e) => setFormData({ ...formData, body: e.target.value })}
-                  placeholder="Écrivez votre message ici... Utilisez les variables ci-dessous pour personnaliser."
+                  placeholder="Écrivez votre message ici...&#10;&#10;Bonjour {candidate_name},&#10;&#10;Merci pour votre candidature au poste de {job_title}.&#10;&#10;Utilisez les variables ci-dessous pour personnaliser automatiquement vos emails."
                   required
                 />
                 
+                {/* Variables disponibles */}
                 {variables.length > 0 && (
-                  <div className="mt-3">
-                    <p className="text-sm font-medium text-gray-700 mb-2">
-                      Variables disponibles (cliquez pour insérer):
-                    </p>
+                  <div className="mt-4 p-5 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border-2 border-blue-100">
+                    <div className="flex items-center gap-2 mb-3">
+                      <SparklesIcon className="w-5 h-5 text-[#3B82F6]" />
+                      <p className="text-base font-bold text-gray-800">
+                        Variables disponibles (cliquez pour insérer)
+                      </p>
+                    </div>
                     <div className="flex flex-wrap gap-2">
                       {variables.map((variable) => (
                         <button
                           key={variable}
                           type="button"
-                          className="px-3 py-1.5 rounded-lg text-sm font-medium text-[#3B82F6] bg-[#3B82F6]/10 hover:bg-[#3B82F6]/20 transition-colors"
+                          className="px-4 py-2.5 rounded-lg text-sm font-semibold text-[#3B82F6] bg-white border-2 border-[#3B82F6]/20 hover:bg-[#3B82F6] hover:text-white hover:border-[#3B82F6] shadow-sm hover:shadow-md transition-all transform hover:scale-105"
                           onClick={() => insertVariable(variable)}
                         >
                           {variable}
                         </button>
                       ))}
                     </div>
+                    <p className="text-sm text-gray-600 mt-3 italic">
+                      💡 Ces variables seront automatiquement remplacées par les vraies valeurs lors de l'envoi
+                    </p>
                   </div>
                 )}
               </div>
 
-              <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl">
-                <input
-                  type="checkbox"
-                  id="is_default"
-                  className="w-5 h-5 rounded border-gray-300 text-[#6B9B5F] focus:ring-[#6B9B5F]"
-                  checked={formData.is_default}
-                  onChange={(e) => setFormData({ ...formData, is_default: e.target.checked })}
-                />
-                <label htmlFor="is_default" className="text-sm font-medium text-gray-700 cursor-pointer">
-                  Définir comme template par défaut pour ce type
-                </label>
+              {/* Template par défaut */}
+              <div className="p-6 bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl border-2 border-amber-200 space-y-3">
+                <div className="flex items-start gap-4">
+                  <input
+                    type="checkbox"
+                    id="is_default"
+                    className="mt-1 w-6 h-6 rounded-lg border-2 border-gray-300 text-[#F7C700] focus:ring-4 focus:ring-[#F7C700]/20 cursor-pointer"
+                    checked={formData.is_default}
+                    onChange={(e) => setFormData({ ...formData, is_default: e.target.checked })}
+                  />
+                  <div>
+                    <label htmlFor="is_default" className="text-base font-bold text-gray-800 cursor-pointer block mb-1">
+                      Définir comme template par défaut
+                    </label>
+                    <p className="text-sm text-gray-600">
+                      Ce template sera automatiquement sélectionné lors de l'envoi d'un email de ce type
+                    </p>
+                  </div>
+                </div>
               </div>
 
-              <div className="flex gap-3 pt-6 border-t border-gray-200">
+              {/* Boutons d'action */}
+              <div className="flex gap-4 pt-8 border-t-2 border-gray-200">
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="flex-1 px-6 py-3 rounded-xl font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
+                  className="flex-1 px-8 py-4 rounded-xl text-base font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 border-2 border-gray-300 hover:border-gray-400 shadow-sm hover:shadow-md transition-all"
                 >
                   Annuler
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-6 py-3 rounded-xl font-medium text-white bg-linear-to-r from-[#6B9B5F] to-[#5a8450] hover:from-[#5a8450] hover:to-[#4a6e42] shadow-md hover:shadow-lg transition-all"
+                  className="flex-1 px-8 py-4 rounded-xl text-base font-bold text-white bg-gradient-to-r from-[#6B9B5F] to-[#5a8450] hover:from-[#5a8450] hover:to-[#4a6e42] shadow-lg hover:shadow-xl transition-all transform hover:scale-[1.02]"
                 >
-                  {editingTemplate ? 'Mettre à jour' : 'Créer le template'}
+                  {editingTemplate ? '✓ Mettre à jour le template' : '+ Créer le template'}
                 </button>
               </div>
             </form>
