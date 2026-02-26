@@ -25,6 +25,7 @@ from app.api.ai_scoring import router as ai_scoring_router
 from app.api.email_templates import router as email_templates_router
 from app.api.job_alerts import router as job_alerts_router
 from app.api.collaboration import router as collaboration_router
+from app.api.integrations import router as integrations_router
 from dotenv import load_dotenv
 import os
 from pathlib import Path
@@ -168,6 +169,7 @@ app.include_router(ai_scoring_router, prefix="/api/ai-scoring", tags=["ai-scorin
 app.include_router(email_templates_router, prefix="/api", tags=["ats-email-templates"])
 app.include_router(job_alerts_router, prefix="/api", tags=["ats-job-alerts"])
 app.include_router(collaboration_router, prefix="/api", tags=["ats-collaboration"])
+app.include_router(integrations_router, prefix="/api", tags=["ats-integrations"])
 
 # Servir les fichiers uploadés (CV, photos, etc.) avec CORS
 uploads_path = Path(__file__).parent.parent / "uploads"

@@ -686,3 +686,45 @@ class JobPosting(Base):
 
     # Relations
     job = relationship("Job")
+
+
+class IntegrationProvider(enum.Enum):
+    """Providers d'intégrations externes"""
+    LINKEDIN = "linkedin"
+    GOOGLE_CALENDAR = "google_calendar"
+    OUTLOOK_CALENDAR = "outlook_calendar"
+    JOBBERMAN = "jobberman"
+    BRIGHTERMONDAY = "brightermonday"
+
+
+class IntegrationCredential(Base):
+    """Credentials OAuth pour intégrations externes"""
+    __tablename__ = "integration_credentials"
+
+    id = Column(Integer, primary_key=True, index=True)
+    company_id = Column(Integer, ForeignKey("companies.id"), nullable=False, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)  # Utilisateur qui a autorisé
+
+    # Provider
+    provider = Column(SQLEnum(IntegrationProvider), nullable=False, index=True)
+
+    # OAuth tokens (encryptés en production)
+    access_token = Column(Text, nullable=False)
+    refresh_token = Column(Text, nullable=True)
+    token_expires_at = Column(DateTime(timezone=True), nullable=True)
+
+    # Métadonnées provider-specific
+    provider_data = Column(JSONB)  # Ex: organization_id pour LinkedIn
+
+    # Status
+    is_active = Column(Boolean, default=True, index=True)
+    last_used_at = Column(DateTime(timezone=True), nullable=True)
+
+    # Timestamps
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    # Relations
+    company = relationship("Company")
+    user = relationship("User")
+
