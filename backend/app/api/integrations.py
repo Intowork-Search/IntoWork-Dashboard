@@ -53,7 +53,7 @@ async def get_employer_profile(
 
 class IntegrationAuthURLResponse(BaseModel):
     """URL d'autorisation OAuth"""
-    authorization_url: str
+    auth_url: str
     state: str
     provider: str
 
@@ -113,7 +113,7 @@ async def get_linkedin_auth_url(
     auth_url = linkedin_service.get_authorization_url(state)
     
     return IntegrationAuthURLResponse(
-        authorization_url=auth_url,
+        auth_url=auth_url,
         state=state,
         provider="linkedin"
     )
@@ -303,7 +303,7 @@ async def get_google_calendar_auth_url(
     auth_url = google_calendar_service.get_authorization_url(state)
     
     return IntegrationAuthURLResponse(
-        authorization_url=auth_url,
+        auth_url=auth_url,
         state=state,
         provider="google_calendar"
     )
@@ -455,7 +455,7 @@ async def get_outlook_auth_url(
     auth_url = outlook_calendar_service.get_authorization_url(state)
     
     return IntegrationAuthURLResponse(
-        authorization_url=auth_url,
+        auth_url=auth_url,
         state=state,
         provider="outlook_calendar"
     )
