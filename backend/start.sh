@@ -14,16 +14,16 @@ if [ -z "$NEXTAUTH_SECRET" ]; then
     exit 1
 fi
 
-# Exécuter les migrations de base de données
-echo "📊 Exécution des migrations de base de données..."
-alembic upgrade head
+# Créer les tables de base de données (alternative temporaire à Alembic)
+echo "📊 Initialisation de la base de données..."
+python create_all_tables.py
 
 if [ $? -ne 0 ]; then
-    echo "❌ Erreur lors des migrations"
+    echo "❌ Erreur lors de l'initialisation de la base de données"
     exit 1
 fi
 
-echo "✅ Migrations terminées"
+echo "✅ Base de données initialisée"
 
 # Créer le répertoire uploads s'il n'existe pas
 mkdir -p uploads/cv
