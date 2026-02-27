@@ -14,7 +14,7 @@ export const candidateDashboardTour: OnboardingStep[] = [
   {
     target: '[data-tour="profile-completion"]',
     title: '👤 Complétez votre profil',
-    content: 'Commencez par compléter votre profil à 100% pour maximiser vos chances. Les recruteurs voient votre taux de complétion !',
+    content: 'Complétez votre profil à 100% pour maximiser vos chances. Les recruteurs voient votre taux de complétion !',
     position: 'bottom'
   },
   {
@@ -38,7 +38,7 @@ export const candidateDashboardTour: OnboardingStep[] = [
   {
     target: '[data-tour="notifications"]',
     title: '🔔 Restez informé',
-    content: 'Vous recevrez des notifications quand un recruteur consulte votre profil, vous présélectionne ou vous convoque en entretien.',
+    content: 'Recevez des notifications pour chaque action : consultation profil, présélection, invitation entretien.',
     position: 'bottom'
   }
 ];
@@ -119,19 +119,19 @@ export const employerDashboardTour: OnboardingStep[] = [
   {
     target: '[data-tour="view-applications"]',
     title: '👥 Gérez les candidatures',
-    content: 'Consultez toutes les candidatures reçues et gérez leur statut (vue, présélection, entretien, etc.).',
+    content: 'Consultez toutes les candidatures et changez leur statut en un clic.',
     position: 'left'
   },
   {
     target: '[data-tour="manage-interviews"]',
     title: '📅 Planifiez les entretiens',
-    content: 'Organisez vos entretiens et synchronisez-les avec Google Calendar ou Outlook.',
+    content: 'Organisez vos entretiens et synchronisez avec votre calendrier.',
     position: 'left'
   },
   {
     target: '[data-tour="stats"]',
     title: '📊 Suivez vos statistiques',
-    content: 'Consultez le nombre de vues, candidatures et le taux de conversion de vos offres.',
+    content: 'Consultez le nombre de vues, candidatures et taux de conversion de vos offres.',
     position: 'top'
   }
 ];
@@ -224,7 +224,7 @@ export const employerEmailTemplatesTour: OnboardingStep[] = [
   {
     target: '[data-tour="default-template"]',
     title: '⭐ Template par défaut',
-    content: 'Marquez un template comme "par défaut" pour qu\'il s\'envoie automatiquement lors des changements de statut.',
+    content: 'Marquez un template par défaut pour automatiser vos réponses aux candidats.',
     position: 'top'
   }
 ];

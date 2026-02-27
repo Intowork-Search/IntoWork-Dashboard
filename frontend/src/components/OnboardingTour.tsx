@@ -71,7 +71,7 @@ export default function OnboardingTour({
     }
   }, [autoStart, hasCompletedTour]);
 
-  // Calculer la position du tooltip
+  // Calculer la position du tooltip avec contraintes de viewport
   useEffect(() => {
     if (!isActive || steps.length === 0) return;
 
@@ -82,6 +82,14 @@ export default function OnboardingTour({
       const rect = element.getBoundingClientRect();
       const scrollY = window.scrollY;
       const scrollX = window.scrollX;
+      
+      // Dimensions du tooltip (approximatives)
+      const tooltipWidth = 380; // maxWidth: 400px - padding
+      const tooltipHeight = 300; // hauteur estimée
+      
+      // Dimensions du viewport
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
 
       // Calculer la position selon l'option
       let top = 0;
@@ -89,7 +97,7 @@ export default function OnboardingTour({
 
       switch (step.position || 'bottom') {
         case 'top':
-          top = rect.top + scrollY - 20;
+          top = rect.top + scrollY - tooltipHeight - 30;
           left = rect.left + scrollX + rect.width / 2;
           break;
         case 'bottom':
@@ -98,13 +106,23 @@ export default function OnboardingTour({
           break;
         case 'left':
           top = rect.top + scrollY + rect.height / 2;
-          left = rect.left + scrollX - 20;
+          left = rect.left + scrollX - tooltipWidth - 30;
           break;
         case 'right':
           top = rect.top + scrollY + rect.height / 2;
-          left = rect.right + scrollX + 20;
+          left = rect.right + scrollX + 30;
           break;
       }
+
+      // Contraintes horizontales (garder dans le viewport)
+      const minLeft = scrollX + 20;
+      const maxLeft = scrollX + viewportWidth - tooltipWidth - 20;
+      left = Math.max(minLeft, Math.min(left, maxLeft));
+
+      // Contraintes verticales
+      const minTop = scrollY + 20;
+      const maxTop = scrollY + viewportHeight - tooltipHeight - 20;
+      top = Math.max(minTop, Math.min(top, maxTop));
 
       setTooltipPosition({ top, left });
 
@@ -195,12 +213,12 @@ export default function OnboardingTour({
         style={{
           top: `${tooltipPosition.top}px`,
           left: `${tooltipPosition.left}px`,
-          transform: 'translate(-50%, 0)',
           maxWidth: '400px',
-          minWidth: '320px'
+          minWidth: '320px',
+          width: 'calc(100vw - 40px)', // Responsive sur mobile
         }}
       >
-        <div className="bg-white rounded-2xl shadow-2xl border-2 border-[#6B9B5F]/20 overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-2xl border-2 border-[#6B9B5F]/20 overflow-hidden max-h-[calc(100vh-100px)] flex flex-col">
           {/* Header */}
           <div className="bg-gradient-to-r from-[#6B9B5F] to-[#6B9B5F]/80 px-6 py-4">
             <div className="flex items-start justify-between">
@@ -234,8 +252,8 @@ export default function OnboardingTour({
           </div>
 
           {/* Contenu */}
-          <div className="px-6 py-5">
-            <p className="text-gray-700 text-base leading-relaxed">{step.content}</p>
+          <div className="px-6 py-5 overflow-y-auto max-h-[50vh]">
+            <p className="text-gray-700 text-base leading-relaxed whitespace-pre-wrap">{step.content}</p>
           </div>
 
           {/* Footer avec navigation */}
