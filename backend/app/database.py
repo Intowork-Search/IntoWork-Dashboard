@@ -50,20 +50,20 @@ engine_kwargs = {
 
 # Ajouter connect_args pour SSL sur Railway (asyncpg)
 if is_railway:
-    # Pour Railway: créer un SSLContext permissif
-    # Même pour les connexions internes, Railway peut requérir SSL
-    ssl_context = ssl.create_default_context()
-    ssl_context.check_hostname = False
-    ssl_context.verify_mode = ssl.CERT_NONE
+    # HYPOTHÈSE: Le proxy Railway (interchange.proxy.rlwy.net) gère déjà SSL
+    # La connexion backend vers le proxy ne devrait peut-être PAS utiliser SSL
+    # car le proxy fait la terminaison SSL
     
+    # TEST: Essayer SANS SSL d'abord
     engine_kwargs["connect_args"] = {
-        "ssl": ssl_context,  # SSLContext permissif pour tous types de connexions Railway
+        "ssl": False,  # Désactiver SSL - le proxy Railway le gère peut-être
         "server_settings": {
             "application_name": "intowork-backend"
         },
         "timeout": 30,  # Timeout de connexion
         "command_timeout": 60  # Timeout des commandes
     }
+    print(f"🔒 Configuration SSL: DÉSACTIVÉ (test - le proxy Railway gère peut-être SSL)")
 
 # Créer l'engine SQLAlchemy async avec pool optimisé
 engine = create_async_engine(DATABASE_URL_ASYNC, **engine_kwargs)
