@@ -53,8 +53,10 @@ class LinkedInService:
         if not self.enabled:
             raise ValueError("LinkedIn integration is not enabled")
         
-        # Scopes LinkedIn Sign In API (disponibles sans approbation)
-        scopes = "profile email w_member_social"
+        # Scope minimal qui fonctionne sans approbation spéciale
+        # Note: profile et email nécessitent "Sign In with LinkedIn using OpenID Connect"
+        # qui requiert une approbation. On utilise uniquement w_member_social.
+        scopes = "w_member_social"
         
         params = {
             "response_type": "code",

@@ -96,7 +96,7 @@ class TemplateVariablesResponse(BaseModel):
 # API Routes
 # ========================================
 
-@router.post("/", response_model=EmailTemplateResponse, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=EmailTemplateResponse, status_code=status.HTTP_201_CREATED)
 async def create_email_template(
     template_data: EmailTemplateCreate,
     employer: Annotated[Employer, Depends(get_employer_profile)],
