@@ -592,7 +592,7 @@ export default function Dashboard() {
 
                 {/* Voir les candidats */}
                 <button
-                  onClick={() => router.push('/dashboard/applications')}
+                  onClick={() => router.push('/dashboard/candidates')}
                   className="group w-full flex items-center justify-between p-4 text-left bg-gradient-to-r from-[#F7C700]/10 to-[#F7C700]/5 hover:from-[#F7C700]/20 hover:to-[#F7C700]/10 rounded-2xl transition-all duration-300 border border-[#F7C700]/20"
                 >
                   <div className="flex items-center gap-3">
@@ -609,7 +609,7 @@ export default function Dashboard() {
 
                 {/* Gérer les entretiens */}
                 <button
-                  onClick={() => router.push('/dashboard/interviews')}
+                  onClick={() => router.push('/dashboard/candidates?status=interview')}
                   className="group w-full flex items-center justify-between p-4 text-left bg-gradient-to-r from-[#6B46C1]/10 to-[#6B46C1]/5 hover:from-[#6B46C1]/20 hover:to-[#6B46C1]/10 rounded-2xl transition-all duration-300 border border-[#6B46C1]/20"
                 >
                   <div className="flex items-center gap-3">
