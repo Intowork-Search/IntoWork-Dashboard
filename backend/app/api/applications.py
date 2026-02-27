@@ -8,8 +8,13 @@ from app.database import get_db
 from app.models.base import JobApplication, Job, User, Employer, NotificationType, Candidate
 from app.auth import require_user
 from app.api.notifications import create_notification
+from app.services.email_service import email_service
 from pydantic import BaseModel
 from datetime import datetime
+import logging
+
+# Logger pour les emails
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -245,6 +250,60 @@ async def create_application(
     except Exception as e:
         print(f"Erreur lors de la création de la notification: {e}")
         # Ne pas bloquer si la notification échoue
+    
+    # Envoyer un email de confirmation au candidat (si template configuré)
+    try:
+        from app.models.base import EmailTemplate, EmailTemplateType, Company
+        
+        # Récupérer le job avec la company
+        job_company_result = await db.execute(
+            select(Job).options(selectinload(Job.company)).filter(Job.id == application_data.job_id)
+        )
+        job_with_company = job_company_result.scalar_one_or_none()
+        
+        if job_with_company and job_with_company.company:
+            # Récupérer le template par défaut "application_received"
+            template_result = await db.execute(
+                select(EmailTemplate).where(
+                    EmailTemplate.company_id == job_with_company.company_id,
+                    EmailTemplate.type == EmailTemplateType.APPLICATION_RECEIVED,
+                    EmailTemplate.is_default == True,
+                    EmailTemplate.is_active == True
+                )
+            )
+            template = template_result.scalar_one_or_none()
+            
+            if template:
+                # Préparer les variables pour le template
+                variables = {
+                    "candidate_name": f"{current_user.first_name} {current_user.last_name}",
+                    "candidate_first_name": current_user.first_name,
+                    "candidate_last_name": current_user.last_name,
+                    "candidate_email": current_user.email,
+                    "job_title": job.title,
+                    "job_location": job.location or "Non spécifiée",
+                    "company_name": job_with_company.company.name,
+                    "application_date": datetime.utcnow().strftime("%d/%m/%Y"),
+                    "application_status": "Candidature reçue"
+                }
+                
+                # Envoyer l'email
+                email_sent = await email_service.send_from_template(
+                    template_id=template.id,
+                    to_email=current_user.email,
+                    variables=variables,
+                    db=db
+                )
+                
+                if email_sent:
+                    logger.info(f"✅ Application confirmation email sent to {current_user.email}")
+                else:
+                    logger.warning(f"⚠️ Failed to send application confirmation email to {current_user.email}")
+            else:
+                logger.debug(f"No default 'application_received' template found for company {job_with_company.company_id}")
+    except Exception as e:
+        logger.error(f"❌ Error sending application confirmation email: {e}")
+        # Ne pas bloquer si l'envoi d'email échoue
 
     # Récupérer avec les données du job et de la company
     from app.models.base import Company
@@ -563,6 +622,79 @@ async def update_application_status(
             except Exception as e:
                 print(f"Erreur lors de la création de la notification: {e}")
                 # Ne pas bloquer si la notification échoue
+            
+            # Envoyer un email selon le nouveau statut
+            try:
+                from app.models.base import EmailTemplate, EmailTemplateType, Company
+                
+                # Mapping des statuts vers les types de templates
+                status_to_template_type = {
+                    ApplicationStatus.INTERVIEW: EmailTemplateType.INTERVIEW_INVITATION,
+                    ApplicationStatus.ACCEPTED: EmailTemplateType.OFFER,
+                    ApplicationStatus.REJECTED: EmailTemplateType.REJECTION
+                }
+                
+                template_type = status_to_template_type.get(new_status)
+                
+                if template_type:
+                    # Récupérer le job avec la company
+                    job_company_result = await db.execute(
+                        select(Job).options(selectinload(Job.company)).filter(Job.id == application.job_id)
+                    )
+                    job_with_company = job_company_result.scalar_one_or_none()
+                    
+                    if job_with_company and job_with_company.company:
+                        # Récupérer le template par défaut pour ce type
+                        template_result = await db.execute(
+                            select(EmailTemplate).where(
+                                EmailTemplate.company_id == job_with_company.company_id,
+                                EmailTemplate.type == template_type,
+                                EmailTemplate.is_default == True,
+                                EmailTemplate.is_active == True
+                            )
+                        )
+                        template = template_result.scalar_one_or_none()
+                        
+                        if template:
+                            # Récupérer les infos du candidat
+                            candidate_user_result = await db.execute(
+                                select(User).filter(User.id == application.candidate.user_id)
+                            )
+                            candidate_user = candidate_user_result.scalar_one_or_none()
+                            
+                            if candidate_user:
+                                # Préparer les variables pour le template
+                                variables = {
+                                    "candidate_name": f"{candidate_user.first_name} {candidate_user.last_name}",
+                                    "candidate_first_name": candidate_user.first_name,
+                                    "candidate_last_name": candidate_user.last_name,
+                                    "candidate_email": candidate_user.email,
+                                    "job_title": application.job.title,
+                                    "job_location": application.job.location or "Non spécifiée",
+                                    "company_name": job_with_company.company.name,
+                                    "application_status": new_status.value,
+                                    "application_date": application.applied_at.strftime("%d/%m/%Y") if application.applied_at else "",
+                                    "recruiter_name": current_user.name or current_user.email,
+                                    "recruiter_email": current_user.email
+                                }
+                                
+                                # Envoyer l'email
+                                email_sent = await email_service.send_from_template(
+                                    template_id=template.id,
+                                    to_email=candidate_user.email,
+                                    variables=variables,
+                                    db=db
+                                )
+                                
+                                if email_sent:
+                                    logger.info(f"✅ Status change email ({template_type.value}) sent to {candidate_user.email}")
+                                else:
+                                    logger.warning(f"⚠️ Failed to send status change email to {candidate_user.email}")
+                        else:
+                            logger.debug(f"No default template of type '{template_type.value}' found for company {job_with_company.company_id}")
+            except Exception as e:
+                logger.error(f"❌ Error sending status change email: {e}")
+                # Ne pas bloquer si l'envoi d'email échoue
         
         return {
             "message": "Statut mis à jour avec succès",
