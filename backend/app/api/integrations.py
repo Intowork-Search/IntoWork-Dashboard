@@ -28,6 +28,44 @@ router = APIRouter(prefix="/integrations", tags=["integrations"])
 
 
 # ========================================
+# Debug Endpoint (à supprimer en production)
+# ========================================
+
+@router.get("/debug/config")
+async def debug_oauth_config():
+    """Endpoint de debug pour vérifier la configuration OAuth"""
+    from app.services.google_calendar_service import (
+        GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI
+    )
+    from app.services.outlook_calendar_service import (
+        MICROSOFT_CLIENT_ID, MICROSOFT_CLIENT_SECRET, MICROSOFT_REDIRECT_URI, MICROSOFT_TENANT
+    )
+    from app.services.linkedin_service import (
+        LINKEDIN_CLIENT_ID, LINKEDIN_CLIENT_SECRET
+    )
+    
+    return {
+        "google": {
+            "client_id": f"{GOOGLE_CLIENT_ID[:20]}..." if GOOGLE_CLIENT_ID else "NOT SET",
+            "client_secret_set": bool(GOOGLE_CLIENT_SECRET),
+            "redirect_uri": GOOGLE_REDIRECT_URI,
+            "redirect_uri_is_localhost": "localhost" in (GOOGLE_REDIRECT_URI or "")
+        },
+        "microsoft": {
+            "client_id": f"{MICROSOFT_CLIENT_ID[:20]}..." if MICROSOFT_CLIENT_ID else "NOT SET",
+            "client_secret_set": bool(MICROSOFT_CLIENT_SECRET),
+            "redirect_uri": MICROSOFT_REDIRECT_URI,
+            "redirect_uri_is_localhost": "localhost" in (MICROSOFT_REDIRECT_URI or ""),
+            "tenant": MICROSOFT_TENANT
+        },
+        "linkedin": {
+            "client_id": f"{LINKEDIN_CLIENT_ID[:20]}..." if LINKEDIN_CLIENT_ID else "NOT SET",
+            "client_secret_set": bool(LINKEDIN_CLIENT_SECRET)
+        }
+    }
+
+
+# ========================================
 # Helper Functions
 # ========================================
 
