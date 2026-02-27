@@ -82,14 +82,54 @@ def run_migrations_online() -> None:
 
     async def run_async_migrations() -> None:
         """Create async engine and run migrations."""
+        import ssl
+        
         # Get the database URL and ensure it uses asyncpg
         database_url = config.get_main_option("sqlalchemy.url")
         if database_url and database_url.startswith("postgresql://"):
             database_url = database_url.replace("postgresql://", "postgresql+asyncpg://", 1)
             config.set_main_option("sqlalchemy.url", database_url)
         
+        # Détection Railway pour configuration SSL
+        is_railway_internal = "railway.internal" in (database_url or "").lower()
+        is_railway_external = "proxy.rlwy.net" in (database_url or "").lower() or ".railway.app" in (database_url or "").lower()
+        is_railway = is_railway_internal or is_railway_external
+        
+        # Configuration connect_args pour Railway
+        connect_args = {}
+        if is_railway:
+            print(f"🔧 Alembic: Connexion Railway détectée")
+            if is_railway_internal:
+                # Connexion interne: pas de SSL
+                connect_args = {
+                    "ssl": False,
+                    "timeout": 60,
+                    "command_timeout": 120
+                }
+                print(f"   Type: INTERNE - SSL DÉSACTIVÉ")
+            else:
+                # Connexion externe: SSL avec SSLContext permissif
+                try:
+                    ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS)
+                except AttributeError:
+                    ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+                ssl_context.check_hostname = False
+                ssl_context.verify_mode = ssl.CERT_NONE
+                ssl_context.set_ciphers('DEFAULT@SECLEVEL=1')
+                
+                connect_args = {
+                    "ssl": ssl_context,
+                    "timeout": 60,
+                    "command_timeout": 120
+                }
+                print(f"   Type: EXTERNE - SSL avec SSLContext permissif")
+        
+        # Créer l'engine avec connect_args
+        configuration = config.get_section(config.config_ini_section, {})
+        configuration["connect_args"] = connect_args
+        
         connectable = async_engine_from_config(
-            config.get_section(config.config_ini_section, {}),
+            configuration,
             prefix="sqlalchemy.",
             poolclass=pool.NullPool,
         )
