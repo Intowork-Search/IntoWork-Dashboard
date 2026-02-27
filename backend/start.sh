@@ -40,4 +40,5 @@ mkdir -p uploads/cv
 echo "🎯 Démarrage du serveur FastAPI sur le port ${PORT:-8000}"
 
 # Démarrer l'application avec python -m uvicorn (comme en local)
-exec python -m uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers 1
+# --proxy-headers : Respecter X-Forwarded-Proto pour HTTPS (Railway fait du TLS termination)
+exec python -m uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers 1 --proxy-headers
