@@ -13,12 +13,38 @@ import secrets
 
 from app.database import get_db
 from app.auth import require_employer
-from app.models.base import IntegrationCredential, IntegrationProvider, Employer, Job, Company
+from app.models.base import IntegrationCredential, IntegrationProvider, Employer, Job, Company, User
 from app.services.linkedin_service import linkedin_service
 from app.services.google_calendar_service import google_calendar_service
 from app.services.outlook_calendar_service import outlook_calendar_service
 
 router = APIRouter(prefix="/integrations", tags=["integrations"])
+
+
+# ========================================
+# Helper Functions
+# ========================================
+
+async def get_employer_profile(
+    user: Annotated[User, Depends(require_employer)],
+    db: Annotated[AsyncSession, Depends(get_db)]
+) -> Employer:
+    """
+    Récupérer le profil Employer à partir du User
+    Utilisé comme dépendance dans les endpoints
+    """
+    result = await db.execute(
+        select(Employer).where(Employer.user_id == user.id)
+    )
+    employer = result.scalar_one_or_none()
+    
+    if not employer:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Employer profile not found. Please complete your profile setup."
+        )
+    
+    return employer
 
 
 # ========================================
@@ -65,7 +91,7 @@ class CalendarEventRequest(BaseModel):
 
 @router.get("/linkedin/auth-url", response_model=IntegrationAuthURLResponse)
 async def get_linkedin_auth_url(
-    employer: Annotated[Employer, Depends(require_employer)]
+    employer: Annotated[Employer, Depends(get_employer_profile)]
 ):
     """
     Générer l'URL d'autorisation LinkedIn OAuth
@@ -97,7 +123,7 @@ async def get_linkedin_auth_url(
 async def linkedin_oauth_callback(
     code: str,
     state: str,
-    employer: Annotated[Employer, Depends(require_employer)],
+    employer: Annotated[Employer, Depends(get_employer_profile)],
     db: Annotated[AsyncSession, Depends(get_db)]
 ):
     """
@@ -171,7 +197,7 @@ async def linkedin_oauth_callback(
 @router.post("/linkedin/publish-job")
 async def publish_job_to_linkedin(
     request: LinkedInPublishRequest,
-    employer: Annotated[Employer, Depends(require_employer)],
+    employer: Annotated[Employer, Depends(get_employer_profile)],
     db: Annotated[AsyncSession, Depends(get_db)]
 ):
     """
@@ -264,7 +290,7 @@ async def publish_job_to_linkedin(
 
 @router.get("/google-calendar/auth-url", response_model=IntegrationAuthURLResponse)
 async def get_google_calendar_auth_url(
-    employer: Annotated[Employer, Depends(require_employer)]
+    employer: Annotated[Employer, Depends(get_employer_profile)]
 ):
     """Générer l'URL d'autorisation Google Calendar OAuth"""
     if not google_calendar_service.enabled:
@@ -287,7 +313,7 @@ async def get_google_calendar_auth_url(
 async def google_calendar_oauth_callback(
     code: str,
     state: str,
-    employer: Annotated[Employer, Depends(require_employer)],
+    employer: Annotated[Employer, Depends(get_employer_profile)],
     db: Annotated[AsyncSession, Depends(get_db)]
 ):
     """Callback OAuth Google Calendar"""
@@ -346,7 +372,7 @@ async def google_calendar_oauth_callback(
 @router.post("/google-calendar/create-event")
 async def create_google_calendar_event(
     request: CalendarEventRequest,
-    employer: Annotated[Employer, Depends(require_employer)],
+    employer: Annotated[Employer, Depends(get_employer_profile)],
     db: Annotated[AsyncSession, Depends(get_db)]
 ):
     """Créer un événement d'entretien dans Google Calendar"""
@@ -416,7 +442,7 @@ async def create_google_calendar_event(
 
 @router.get("/outlook/auth-url", response_model=IntegrationAuthURLResponse)
 async def get_outlook_auth_url(
-    employer: Annotated[Employer, Depends(require_employer)]
+    employer: Annotated[Employer, Depends(get_employer_profile)]
 ):
     """Générer l'URL d'autorisation Outlook Calendar OAuth"""
     if not outlook_calendar_service.enabled:
@@ -439,7 +465,7 @@ async def get_outlook_auth_url(
 async def outlook_oauth_callback(
     code: str,
     state: str,
-    employer: Annotated[Employer, Depends(require_employer)],
+    employer: Annotated[Employer, Depends(get_employer_profile)],
     db: Annotated[AsyncSession, Depends(get_db)]
 ):
     """Callback OAuth Outlook Calendar"""
@@ -498,7 +524,7 @@ async def outlook_oauth_callback(
 @router.post("/outlook/create-event")
 async def create_outlook_event(
     request: CalendarEventRequest,
-    employer: Annotated[Employer, Depends(require_employer)],
+    employer: Annotated[Employer, Depends(get_employer_profile)],
     db: Annotated[AsyncSession, Depends(get_db)]
 ):
     """Créer un événement d'entretien dans Outlook Calendar"""
@@ -567,7 +593,7 @@ async def create_outlook_event(
 
 @router.get("/status")
 async def get_integrations_status(
-    employer: Annotated[Employer, Depends(require_employer)],
+    employer: Annotated[Employer, Depends(get_employer_profile)],
     db: Annotated[AsyncSession, Depends(get_db)]
 ):
     """Récupérer le statut de toutes les intégrations"""
@@ -576,32 +602,55 @@ async def get_integrations_status(
     if not employer.company_id:
         # Retourner un statut par défaut si pas d'entreprise
         return {
-            "linkedin": IntegrationStatusResponse(
-                provider="linkedin",
-                is_connected=False,
-                connected_at=None,
-                last_used_at=None
-            ).model_dump(),
-            "google_calendar": IntegrationStatusResponse(
-                provider="google_calendar",
-                is_connected=False,
-                connected_at=None,
-                last_used_at=None
-            ).model_dump(),
-            "outlook_calendar": IntegrationStatusResponse(
-                provider="outlook_calendar",
-                is_connected=False,
-                connected_at=None,
-                last_used_at=None
-            ).model_dump()
+            "linkedin": {
+                "provider": "linkedin",
+                "is_connected": False,
+                "connected_at": None,
+                "last_used_at": None
+            },
+            "google_calendar": {
+                "provider": "google_calendar",
+                "is_connected": False,
+                "connected_at": None,
+                "last_used_at": None
+            },
+            "outlook_calendar": {
+                "provider": "outlook_calendar",
+                "is_connected": False,
+                "connected_at": None,
+                "last_used_at": None
+            }
         }
     
-    result = await db.execute(
-        select(IntegrationCredential).where(
-            IntegrationCredential.company_id == employer.company_id
+    try:
+        result = await db.execute(
+            select(IntegrationCredential).where(
+                IntegrationCredential.company_id == employer.company_id
+            )
         )
-    )
-    integrations = result.scalars().all()
+        integrations = result.scalars().all()
+    except Exception as e:
+        # En cas d'erreur DB, retourner l'état par défaut
+        return {
+            "linkedin": {
+                "provider": "linkedin",
+                "is_connected": False,
+                "connected_at": None,
+                "last_used_at": None
+            },
+            "google_calendar": {
+                "provider": "google_calendar",
+                "is_connected": False,
+                "connected_at": None,
+                "last_used_at": None
+            },
+            "outlook_calendar": {
+                "provider": "outlook_calendar",
+                "is_connected": False,
+                "connected_at": None,
+                "last_used_at": None
+            }
+        }
     
     status_map = {
         "linkedin": None,
@@ -611,22 +660,22 @@ async def get_integrations_status(
     
     for integration in integrations:
         provider_key = integration.provider.value
-        status_map[provider_key] = IntegrationStatusResponse(
-            provider=provider_key,
-            is_connected=integration.is_active,
-            connected_at=integration.created_at,
-            last_used_at=integration.last_used_at
-        ).model_dump()
+        status_map[provider_key] = {
+            "provider": provider_key,
+            "is_connected": integration.is_active,
+            "connected_at": integration.created_at,
+            "last_used_at": integration.last_used_at
+        }
     
     # Remplir les non-connectés
     for provider in status_map:
         if status_map[provider] is None:
-            status_map[provider] = IntegrationStatusResponse(
-                provider=provider,
-                is_connected=False,
-                connected_at=None,
-                last_used_at=None
-            ).model_dump()
+            status_map[provider] = {
+                "provider": provider,
+                "is_connected": False,
+                "connected_at": None,
+                "last_used_at": None
+            }
     
     return status_map
 
@@ -634,7 +683,7 @@ async def get_integrations_status(
 @router.delete("/{provider}/disconnect")
 async def disconnect_integration(
     provider: str,
-    employer: Annotated[Employer, Depends(require_employer)],
+    employer: Annotated[Employer, Depends(get_employer_profile)],
     db: Annotated[AsyncSession, Depends(get_db)]
 ):
     """Déconnecter une intégration"""

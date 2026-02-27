@@ -18,6 +18,32 @@ router = APIRouter(prefix="/email-templates", tags=["email-templates"])
 
 
 # ========================================
+# Helper Functions
+# ========================================
+
+async def get_employer_profile(
+    user: Annotated[User, Depends(require_employer)],
+    db: Annotated[AsyncSession, Depends(get_db)]
+) -> Employer:
+    """
+    Récupérer le profil Employer à partir du User
+    Utilisé comme dépendance dans les endpoints
+    """
+    result = await db.execute(
+        select(Employer).where(Employer.user_id == user.id)
+    )
+    employer = result.scalar_one_or_none()
+    
+    if not employer:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Employer profile not found. Please complete your profile setup."
+        )
+    
+    return employer
+
+
+# ========================================
 # Pydantic Schemas
 # ========================================
 
@@ -73,7 +99,7 @@ class TemplateVariablesResponse(BaseModel):
 @router.post("/", response_model=EmailTemplateResponse, status_code=status.HTTP_201_CREATED)
 async def create_email_template(
     template_data: EmailTemplateCreate,
-    employer: Annotated[Employer, Depends(require_employer)],
+    employer: Annotated[Employer, Depends(get_employer_profile)],
     db: Annotated[AsyncSession, Depends(get_db)]
 ):
     """
@@ -121,7 +147,7 @@ async def create_email_template(
 
 @router.get("/", response_model=List[EmailTemplateResponse])
 async def list_email_templates(
-    employer: Annotated[Employer, Depends(require_employer)],
+    employer: Annotated[Employer, Depends(get_employer_profile)],
     db: Annotated[AsyncSession, Depends(get_db)],
     type: Optional[EmailTemplateType] = None,
     is_active: Optional[bool] = None
@@ -155,7 +181,7 @@ async def list_email_templates(
 
 @router.get("/variables", response_model=TemplateVariablesResponse)
 async def get_template_variables(
-    employer: Annotated[Employer, Depends(require_employer)]
+    employer: Annotated[Employer, Depends(get_employer_profile)]
 ):
     """
     Liste des variables disponibles pour interpolation dans les templates
@@ -204,7 +230,7 @@ async def get_template_variables(
 @router.get("/{template_id}", response_model=EmailTemplateResponse)
 async def get_email_template(
     template_id: int,
-    employer: Annotated[Employer, Depends(require_employer)],
+    employer: Annotated[Employer, Depends(get_employer_profile)],
     db: Annotated[AsyncSession, Depends(get_db)]
 ):
     """Récupérer un template spécifique"""
@@ -230,7 +256,7 @@ async def get_email_template(
 async def update_email_template(
     template_id: int,
     update_data: EmailTemplateUpdate,
-    employer: Annotated[Employer, Depends(require_employer)],
+    employer: Annotated[Employer, Depends(get_employer_profile)],
     db: Annotated[AsyncSession, Depends(get_db)]
 ):
     """Mettre à jour un template existant"""
@@ -276,7 +302,7 @@ async def update_email_template(
 @router.delete("/{template_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_email_template(
     template_id: int,
-    employer: Annotated[Employer, Depends(require_employer)],
+    employer: Annotated[Employer, Depends(get_employer_profile)],
     db: Annotated[AsyncSession, Depends(get_db)]
 ):
     """Supprimer un template (soft delete - désactive plutôt que supprimer)"""
@@ -305,7 +331,7 @@ async def delete_email_template(
 @router.post("/{template_id}/duplicate", response_model=EmailTemplateResponse)
 async def duplicate_email_template(
     template_id: int,
-    employer: Annotated[Employer, Depends(require_employer)],
+    employer: Annotated[Employer, Depends(get_employer_profile)],
     db: Annotated[AsyncSession, Depends(get_db)]
 ):
     """Dupliquer un template existant"""
@@ -346,7 +372,7 @@ async def duplicate_email_template(
 
 @router.get("/stats/usage", response_model=dict)
 async def get_template_usage_stats(
-    employer: Annotated[Employer, Depends(require_employer)],
+    employer: Annotated[Employer, Depends(get_employer_profile)],
     db: Annotated[AsyncSession, Depends(get_db)]
 ):
     """Statistiques d'utilisation des templates"""
