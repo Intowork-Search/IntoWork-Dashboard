@@ -84,7 +84,8 @@ class GoogleCalendarService:
         
         logger.info(f"🔑 Exchanging Google OAuth code for token")
         logger.info(f"🎯 Redirect URI: {GOOGLE_REDIRECT_URI}")
-        logger.info(f"🆔 Client ID: {GOOGLE_CLIENT_ID[:20]}...")
+        logger.info(f"🆔 Client ID: {GOOGLE_CLIENT_ID[:20] if GOOGLE_CLIENT_ID else 'NOT SET'}...")
+        logger.info(f"🔐 Client Secret configured: {bool(GOOGLE_CLIENT_SECRET)}")
         
         async with httpx.AsyncClient() as client:
             response = await client.post(
@@ -97,6 +98,17 @@ class GoogleCalendarService:
                     "grant_type": "authorization_code"
                 }
             )
+            
+            if response.status_code != 200:
+                error_detail = response.text
+                logger.error(f"❌ Google token exchange failed: {response.status_code}")
+                logger.error(f"📄 Error response: {error_detail}")
+                logger.error(f"🔍 Check: 1) GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET are set correctly")
+                logger.error(f"🔍 Check: 2) Redirect URI matches Google Cloud Console: {GOOGLE_REDIRECT_URI}")
+                logger.error(f"🔍 Check: 3) Authorization code is valid and not expired")
+            
+            response.raise_for_status()
+            return response.json()
             
             if response.status_code != 200:
                 logger.error(f"❌ Google token exchange failed: {response.status_code} - {response.text}")

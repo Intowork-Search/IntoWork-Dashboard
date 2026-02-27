@@ -64,7 +64,7 @@ export default function EmailTemplatesPage() {
   // Form state
   const [formData, setFormData] = useState({
     name: '',
-    type: 'WELCOME_CANDIDATE',
+    type: 'welcome_candidate',
     subject: '',
     body: '',
     is_default: false,

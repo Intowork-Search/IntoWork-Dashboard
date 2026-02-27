@@ -109,6 +109,9 @@ async def create_email_template(
     {interview_date}, {interview_time}, {interview_location}, {application_status}
     """
     
+    # Debug logging
+    print(f"📧 Creating email template - Data received: {template_data.model_dump()}")
+    
     # Vérifier que l'employeur a une entreprise
     if not employer.company_id:
         raise HTTPException(

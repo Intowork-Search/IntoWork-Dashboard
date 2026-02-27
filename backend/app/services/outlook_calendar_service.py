@@ -83,7 +83,8 @@ class OutlookCalendarService:
         
         logger.info(f"🔑 Exchanging Outlook OAuth code for token")
         logger.info(f"🎯 Redirect URI: {MICROSOFT_REDIRECT_URI}")
-        logger.info(f"🆔 Client ID: {MICROSOFT_CLIENT_ID[:20]}...")
+        logger.info(f"🆔 Client ID: {MICROSOFT_CLIENT_ID[:20] if MICROSOFT_CLIENT_ID else 'NOT SET'}...")
+        logger.info(f"🔐 Client Secret configured: {bool(MICROSOFT_CLIENT_SECRET)}")
         
         async with httpx.AsyncClient() as client:
             response = await client.post(
@@ -99,7 +100,12 @@ class OutlookCalendarService:
             )
             
             if response.status_code != 200:
-                logger.error(f"❌ Outlook token exchange failed: {response.status_code} - {response.text}")
+                error_detail = response.text
+                logger.error(f"❌ Outlook token exchange failed: {response.status_code}")
+                logger.error(f"📄 Error response: {error_detail}")
+                logger.error(f"🔍 Check: 1) MICROSOFT_CLIENT_ID and MICROSOFT_CLIENT_SECRET are set correctly")
+                logger.error(f"🔍 Check: 2) Redirect URI matches Azure AD app config: {MICROSOFT_REDIRECT_URI}")
+                logger.error(f"🔍 Check: 3) Authorization code is valid and not expired")
             
             response.raise_for_status()
             return response.json()
