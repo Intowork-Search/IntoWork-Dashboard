@@ -4,6 +4,7 @@ Service d'envoi d'emails avec Resend
 import os
 import logging
 from typing import Optional
+from datetime import datetime
 
 # Configuration du logger
 logger = logging.getLogger(__name__)
@@ -91,6 +92,111 @@ class EmailService:
 
         except Exception as e:
             logger.error(f"❌ Failed to send password reset email to {email}: {str(e)}")
+            logger.error(f"   Exception type: {type(e).__name__}")
+            return False
+
+    async def send_from_template(
+        self,
+        template_id: int,
+        to_email: str,
+        variables: dict,
+        db
+    ) -> bool:
+        """
+        Envoyer un email en utilisant un template de la base de données
+        
+        Args:
+            template_id: ID du template EmailTemplate dans la base de données
+            to_email: Adresse email du destinataire
+            variables: Dictionnaire des variables à remplacer, ex:
+                {
+                    "candidate_name": "Jean Dupont",
+                    "job_title": "Développeur Python",
+                    "company_name": "ACME Corp",
+                    "interview_date": "15 mars 2026",
+                    ...
+                }
+            db: Session de base de données (AsyncSession)
+        
+        Returns:
+            True si l'email a été envoyé avec succès, False sinon
+            
+        Exemple:
+            await email_service.send_from_template(
+                template_id=5,
+                to_email="candidat@example.com",
+                variables={
+                    "candidate_name": "Marie Martin",
+                    "job_title": "Chef de Projet",
+                    "company_name": "TechCorp",
+                    "interview_date": "20 mars 2026",
+                    "interview_time": "14:00",
+                    "interview_location": "Siège social, Paris"
+                },
+                db=db
+            )
+        """
+        if not self.enabled:
+            logger.error(f"❌ Cannot send email to {to_email}: Email service is DISABLED")
+            return False
+        
+        from sqlalchemy import select, update
+        from app.models.base import EmailTemplate
+        
+        try:
+            # Récupérer le template depuis la base de données
+            result = await db.execute(
+                select(EmailTemplate).where(EmailTemplate.id == template_id)
+            )
+            template = result.scalar_one_or_none()
+            
+            if not template:
+                logger.error(f"❌ Template {template_id} not found")
+                return False
+            
+            if not template.is_active:
+                logger.warning(f"⚠️ Template {template_id} is inactive but will be used")
+            
+            # Remplacer les variables dans le sujet et le corps
+            subject = template.subject
+            body = template.body
+            
+            for key, value in variables.items():
+                placeholder = f"{{{key}}}"
+                subject = subject.replace(placeholder, str(value))
+                body = body.replace(placeholder, str(value))
+            
+            # Envoyer l'email
+            params = {
+                "from": FROM_EMAIL,
+                "to": [to_email],
+                "subject": subject,
+                "html": body,
+            }
+            
+            logger.info(f"📧 Sending email from template '{template.name}' (ID: {template_id}) to {to_email}")
+            response = resend.Emails.send(params)
+            
+            if response and 'id' in response:
+                # Incrémenter le compteur d'utilisation du template
+                await db.execute(
+                    update(EmailTemplate)
+                    .where(EmailTemplate.id == template_id)
+                    .values(
+                        usage_count=EmailTemplate.usage_count + 1,
+                        last_used_at=datetime.utcnow()
+                    )
+                )
+                await db.commit()
+                
+                logger.info(f"✅ Email sent successfully from template {template_id}. Resend ID: {response.get('id')}")
+                return True
+            else:
+                logger.error(f"❌ Resend API returned unexpected response: {response}")
+                return False
+                
+        except Exception as e:
+            logger.error(f"❌ Failed to send email from template {template_id}: {str(e)}")
             logger.error(f"   Exception type: {type(e).__name__}")
             return False
 
