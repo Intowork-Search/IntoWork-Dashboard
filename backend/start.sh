@@ -14,20 +14,16 @@ if [ -z "$NEXTAUTH_SECRET" ]; then
     exit 1
 fi
 
-# MIGRATIONS TEMPORAIREMENT DÉSACTIVÉES pour investigation
-echo "⚠️  Migrations DÉSACTIVÉES temporairement"
-echo "   PostgreSQL doit démarrer en premier"
+# Exécuter les migrations de base de données
+echo "📊 Exécution des migrations de base de données..."
+alembic upgrade head
 
-# Exécuter les migrations - COMMENTÉ TEMPORAIREMENT
-# echo "📊 Exécution des migrations de base de données..."
-# alembic upgrade head
-# 
-# if [ $? -ne 0 ]; then
-#     echo "❌ Erreur lors des migrations"
-#     exit 1
-# fi
-# 
-# echo "✅ Migrations terminées"
+if [ $? -ne 0 ]; then
+    echo "❌ Erreur lors des migrations"
+    exit 1
+fi
+
+echo "✅ Migrations terminées"
 
 # Créer le répertoire uploads s'il n'existe pas
 mkdir -p uploads/cv
