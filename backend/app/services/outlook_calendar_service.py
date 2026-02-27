@@ -18,7 +18,8 @@ MICROSOFT_REDIRECT_URI = os.getenv(
     "MICROSOFT_REDIRECT_URI", 
     "https://intowork-dashboard-production-1ede.up.railway.app/api/integrations/outlook/callback"
 )
-MICROSOFT_TENANT = os.getenv("MICROSOFT_TENANT", "common")
+# Support both MICROSOFT_TENANT and MICROSOFT_TENANT_ID (prefer tenant-specific over 'common')
+MICROSOFT_TENANT = os.getenv("MICROSOFT_TENANT_ID") or os.getenv("MICROSOFT_TENANT", "common")
 
 # Microsoft OAuth URLs
 MICROSOFT_AUTH_URL = f"https://login.microsoftonline.com/{MICROSOFT_TENANT}/oauth2/v2.0/authorize"
