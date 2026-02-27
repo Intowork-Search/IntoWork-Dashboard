@@ -41,15 +41,15 @@ interface EmailTemplate {
 }
 
 const TEMPLATE_TYPES = [
-  { value: 'WELCOME_CANDIDATE', label: 'Bienvenue candidat' },
-  { value: 'APPLICATION_RECEIVED', label: 'Candidature reçue' },
-  { value: 'APPLICATION_REJECTED', label: 'Candidature refusée' },
-  { value: 'INTERVIEW_INVITATION', label: 'Invitation entretien' },
-  { value: 'INTERVIEW_CONFIRMATION', label: 'Confirmation entretien' },
-  { value: 'INTERVIEW_REMINDER', label: 'Rappel entretien' },
-  { value: 'OFFER_LETTER', label: 'Lettre d\'offre' },
-  { value: 'ONBOARDING', label: 'Onboarding' },
-  { value: 'CUSTOM', label: 'Personnalisé' },
+  { value: 'welcome_candidate', label: 'Bienvenue candidat' },
+  { value: 'application_received', label: 'Candidature reçue' },
+  { value: 'application_rejected', label: 'Candidature refusée' },
+  { value: 'interview_invitation', label: 'Invitation entretien' },
+  { value: 'interview_confirmation', label: 'Confirmation entretien' },
+  { value: 'interview_reminder', label: 'Rappel entretien' },
+  { value: 'offer_letter', label: 'Lettre d\'offre' },
+  { value: 'onboarding', label: 'Onboarding' },
+  { value: 'custom', label: 'Personnalisé' },
 ];
 
 export default function EmailTemplatesPage() {
