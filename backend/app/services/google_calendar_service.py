@@ -17,7 +17,10 @@ logger = logging.getLogger(__name__)
 # Configuration
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
-GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:8001/api/integrations/google/callback")
+GOOGLE_REDIRECT_URI = os.getenv(
+    "GOOGLE_REDIRECT_URI", 
+    "https://intowork-dashboard-production-1ede.up.railway.app/api/integrations/google-calendar/callback"
+)
 
 # Google OAuth URLs
 GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
@@ -79,6 +82,10 @@ class GoogleCalendarService:
         if not self.enabled:
             raise ValueError("Google Calendar integration is not enabled")
         
+        logger.info(f"🔑 Exchanging Google OAuth code for token")
+        logger.info(f"🎯 Redirect URI: {GOOGLE_REDIRECT_URI}")
+        logger.info(f"🆔 Client ID: {GOOGLE_CLIENT_ID[:20]}...")
+        
         async with httpx.AsyncClient() as client:
             response = await client.post(
                 GOOGLE_TOKEN_URL,
@@ -90,6 +97,9 @@ class GoogleCalendarService:
                     "grant_type": "authorization_code"
                 }
             )
+            
+            if response.status_code != 200:
+                logger.error(f"❌ Google token exchange failed: {response.status_code} - {response.text}")
             
             response.raise_for_status()
             return response.json()

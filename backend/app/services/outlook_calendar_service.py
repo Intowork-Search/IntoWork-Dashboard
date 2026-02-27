@@ -14,7 +14,10 @@ logger = logging.getLogger(__name__)
 # Configuration
 MICROSOFT_CLIENT_ID = os.getenv("MICROSOFT_CLIENT_ID")
 MICROSOFT_CLIENT_SECRET = os.getenv("MICROSOFT_CLIENT_SECRET")
-MICROSOFT_REDIRECT_URI = os.getenv("MICROSOFT_REDIRECT_URI", "http://localhost:8001/api/integrations/microsoft/callback")
+MICROSOFT_REDIRECT_URI = os.getenv(
+    "MICROSOFT_REDIRECT_URI", 
+    "https://intowork-dashboard-production-1ede.up.railway.app/api/integrations/outlook/callback"
+)
 MICROSOFT_TENANT = os.getenv("MICROSOFT_TENANT", "common")
 
 # Microsoft OAuth URLs
@@ -78,6 +81,10 @@ class OutlookCalendarService:
         if not self.enabled:
             raise ValueError("Outlook Calendar integration is not enabled")
         
+        logger.info(f"🔑 Exchanging Outlook OAuth code for token")
+        logger.info(f"🎯 Redirect URI: {MICROSOFT_REDIRECT_URI}")
+        logger.info(f"🆔 Client ID: {MICROSOFT_CLIENT_ID[:20]}...")
+        
         async with httpx.AsyncClient() as client:
             response = await client.post(
                 MICROSOFT_TOKEN_URL,
@@ -90,6 +97,9 @@ class OutlookCalendarService:
                 },
                 headers={"Content-Type": "application/x-www-form-urlencoded"}
             )
+            
+            if response.status_code != 200:
+                logger.error(f"❌ Outlook token exchange failed: {response.status_code} - {response.text}")
             
             response.raise_for_status()
             return response.json()
