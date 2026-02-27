@@ -142,11 +142,9 @@ export default function EmailTemplatesPage() {
       
       if (response.ok) {
         const data = await response.json();
-        console.log('✅ Variables loaded:', data.variables?.length || 0, 'variables');
-        setVariables(data.variables || []);
+        setAvailableVars(data.variables || []);
       } else {
         const errorData = await response.json().catch(() => ({}));
-        console.error('❌ Erreur variables:', response.status, errorData);
       }
     } catch (error) {
       console.error('❌ Error fetching variables:', error);
@@ -327,6 +325,7 @@ export default function EmailTemplatesPage() {
               </div>
 
               <button
+                data-tour="create-template"
                 onClick={() => setShowCreateModal(true)}
                 className="btn bg-white/20 hover:bg-white/30 border-white/30 text-white backdrop-blur-sm shadow-lg"
               >
@@ -634,6 +633,12 @@ export default function EmailTemplatesPage() {
           </div>
         </div>
       )}
+
+      {/* Système d'onboarding */}
+      <OnboardingTour
+        tourId="employer-email-templates"
+        steps={employerEmailTemplatesTour}
+      />
     </DashboardLayout>
   );
 }

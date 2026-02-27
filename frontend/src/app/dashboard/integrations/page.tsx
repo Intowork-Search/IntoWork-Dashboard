@@ -14,6 +14,8 @@ import React, { useState, useEffect } from 'react';
 import { useUser, useAuth } from '@/hooks/useNextAuth';
 import { useRouter, useSearchParams } from 'next/navigation';
 import DashboardLayout from '@/components/DashboardLayout';
+import OnboardingTour from '@/components/OnboardingTour';
+import { integrationsTour } from '@/config/onboardingTours';
 import { integrationsAPI, Integration, IntegrationStatus } from '@/lib/api';
 import toast from 'react-hot-toast';
 import {
@@ -266,7 +268,8 @@ export default function IntegrationsPage() {
         {/* Cartes des intégrations */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* LinkedIn */}
-          <IntegrationCard
+          <div data-tour="connect-linkedin">
+            <IntegrationCard
             title="LinkedIn"
             description="Publiez automatiquement vos offres d'emploi sur votre page LinkedIn"
             icon={<LinkIcon className="h-8 w-8" />}
@@ -284,9 +287,11 @@ export default function IntegrationsPage() {
               'Engagement et statistiques'
             ]}
           />
+          </div>
 
           {/* Google Calendar */}
-          <IntegrationCard
+          <div data-tour="connect-google">
+            <IntegrationCard
             title="Google Calendar"
             description="Planifiez des entretiens avec des liens Google Meet automatiques"
             icon={<CalendarIcon className="h-8 w-8" />}
@@ -304,9 +309,11 @@ export default function IntegrationsPage() {
               'Invitations par email'
             ]}
           />
+          </div>
 
           {/* Microsoft Outlook / Teams */}
-          <IntegrationCard
+          <div data-tour="connect-outlook">
+            <IntegrationCard
             title="Outlook / Teams"
             description="Planifiez des entretiens avec des réunions Microsoft Teams"
             icon={<VideoCameraIcon className="h-8 w-8" />}
@@ -324,6 +331,7 @@ export default function IntegrationsPage() {
               'Synchronisation calendrier'
             ]}
           />
+          </div>
         </div>
 
         {/* Section d'aide */}
@@ -371,6 +379,12 @@ export default function IntegrationsPage() {
           </div>
         </div>
       </div>
+
+      {/* Système d'onboarding */}
+      <OnboardingTour
+        tourId="integrations"
+        steps={integrationsTour}
+      />
     </DashboardLayout>
   );
 }
