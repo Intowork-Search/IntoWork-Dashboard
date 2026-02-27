@@ -7,6 +7,9 @@ import DashboardLayout from '@/components/DashboardLayout';
 import { candidatesAPI, jobsAPI } from '@/lib/api';
 import { getApiUrl } from '@/lib/getApiUrl';
 import { dashboardAPI, DashboardData } from '@/lib/api/dashboard';
+import OnboardingTour from '@/components/OnboardingTour';
+import HelpButton from '@/components/HelpButton';
+import { candidateDashboardTour, employerDashboardTour } from '@/config/onboardingTours';
 import {
   UserIcon,
   DocumentTextIcon,
@@ -463,6 +466,7 @@ export default function Dashboard() {
               <>
                 {/* Compléter mon profil */}
                 <button
+                  data-tour="profile-completion"
                   onClick={() => router.push('/dashboard/profile')}
                   className="group w-full flex items-center justify-between p-4 text-left bg-gradient-to-r from-[#6B9B5F]/10 to-[#6B9B5F]/5 hover:from-[#6B9B5F]/20 hover:to-[#6B9B5F]/10 rounded-2xl transition-all duration-300 border border-[#6B9B5F]/20"
                 >
@@ -488,6 +492,7 @@ export default function Dashboard() {
 
                 {/* Télécharger un CV */}
                 <button
+                  data-tour="upload-cv"
                   onClick={openFileSelector}
                   disabled={isUploadingCV}
                   className="group w-full flex items-center justify-between p-4 text-left bg-gradient-to-r from-[#F7C700]/10 to-[#F7C700]/5 hover:from-[#F7C700]/20 hover:to-[#F7C700]/10 rounded-2xl transition-all duration-300 border border-[#F7C700]/20 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -510,6 +515,7 @@ export default function Dashboard() {
 
                 {/* Rechercher des emplois */}
                 <button
+                  data-tour="search-jobs"
                   onClick={() => router.push('/dashboard/jobs')}
                   className="group w-full flex items-center justify-between p-4 text-left bg-gradient-to-r from-[#6B46C1]/10 to-[#6B46C1]/5 hover:from-[#6B46C1]/20 hover:to-[#6B46C1]/10 rounded-2xl transition-all duration-300 border border-[#6B46C1]/20"
                 >
@@ -539,6 +545,7 @@ export default function Dashboard() {
 
                 {/* Voir tous mes CV */}
                 <button
+                  data-tour="my-applications"
                   onClick={() => router.push('/dashboard/cv')}
                   className="group w-full flex items-center justify-between p-4 text-left bg-gradient-to-r from-gray-100 to-gray-50 hover:from-gray-200 hover:to-gray-100 rounded-2xl transition-all duration-300 border border-gray-200"
                 >
@@ -575,6 +582,7 @@ export default function Dashboard() {
               <>
                 {/* Publier une offre */}
                 <button
+                  data-tour="create-job"
                   onClick={() => router.push('/dashboard/job-posts')}
                   className="group w-full flex items-center justify-between p-4 text-left bg-gradient-to-r from-[#6B9B5F]/10 to-[#6B9B5F]/5 hover:from-[#6B9B5F]/20 hover:to-[#6B9B5F]/10 rounded-2xl transition-all duration-300 border border-[#6B9B5F]/20"
                 >
@@ -592,6 +600,7 @@ export default function Dashboard() {
 
                 {/* Voir les candidats */}
                 <button
+                  data-tour="view-applications"
                   onClick={() => router.push('/dashboard/candidates')}
                   className="group w-full flex items-center justify-between p-4 text-left bg-gradient-to-r from-[#F7C700]/10 to-[#F7C700]/5 hover:from-[#F7C700]/20 hover:to-[#F7C700]/10 rounded-2xl transition-all duration-300 border border-[#F7C700]/20"
                 >
@@ -609,6 +618,7 @@ export default function Dashboard() {
 
                 {/* Gérer les entretiens */}
                 <button
+                  data-tour="manage-interviews"
                   onClick={() => router.push('/dashboard/candidates?status=interview')}
                   className="group w-full flex items-center justify-between p-4 text-left bg-gradient-to-r from-[#6B46C1]/10 to-[#6B46C1]/5 hover:from-[#6B46C1]/20 hover:to-[#6B46C1]/10 rounded-2xl transition-all duration-300 border border-[#6B46C1]/20"
                 >
@@ -638,6 +648,13 @@ export default function Dashboard() {
         className="hidden"
         aria-label="Sélectionner un fichier CV"
       />
+
+      {/* Système d'onboarding */}
+      <OnboardingTour
+        tourId={userRole === 'candidate' ? 'candidate-dashboard' : 'employer-dashboard'}
+        steps={userRole === 'candidate' ? candidateDashboardTour : employerDashboardTour}
+      />
+      <HelpButton />
 
       {/* Styles d'animation */}
       <style jsx>{`

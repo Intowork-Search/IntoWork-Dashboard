@@ -107,6 +107,7 @@ export default function NotificationPanel() {
     <div className="relative" ref={panelRef}>
       {/* Bouton de notification */}
       <button
+        data-tour="notifications"
         onClick={() => setIsOpen(!isOpen)}
         className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors"
         title="Notifications"

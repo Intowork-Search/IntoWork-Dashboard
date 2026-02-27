@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import NotificationPanel from '@/components/NotificationPanel';
+import HelpButton from '@/components/HelpButton';
 import { Bars3Icon } from '@heroicons/react/24/outline';
 
 interface DashboardLayoutProps {
@@ -120,6 +121,9 @@ export default function DashboardLayout({
           </div>
         </main>
       </div>
+
+      {/* Bouton d'aide flottant */}
+      <HelpButton />
     </div>
   );
 }

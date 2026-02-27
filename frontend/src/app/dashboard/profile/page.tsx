@@ -13,6 +13,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth, useUser } from '@/hooks/useNextAuth';
 import DashboardLayout from '@/components/DashboardLayout';
+import OnboardingTour from '@/components/OnboardingTour';
+import { candidateProfileTour } from '@/config/onboardingTours';
 import { candidatesAPI, CandidateProfile } from '@/lib/api';
 import {
   UserIcon,
@@ -597,7 +599,7 @@ export default function ProfilePage() {
             <div className="p-6">
               {/* Section Informations personnelles */}
               {activeSection === 'personal' && (
-                <div className="space-y-6">
+                <div className="space-y-6" data-tour="profile-basics">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Téléphone */}
                     <div className="group">
@@ -773,7 +775,7 @@ export default function ProfilePage() {
 
               {/* Section Expériences */}
               {activeSection === 'experience' && (
-                <div className="space-y-4">
+                <div className="space-y-4" data-tour="profile-experiences">
                   {profile.experiences && profile.experiences.length > 0 ? (
                     profile.experiences.map((exp, index) => (
                       <div
@@ -835,7 +837,7 @@ export default function ProfilePage() {
 
               {/* Section Formation */}
               {activeSection === 'education' && (
-                <div className="space-y-4">
+                <div className="space-y-4" data-tour="profile-education">
                   {profile.education && profile.education.length > 0 ? (
                     profile.education.map((edu, index) => (
                       <div
@@ -894,7 +896,7 @@ export default function ProfilePage() {
 
               {/* Section Compétences */}
               {activeSection === 'skills' && (
-                <div className="space-y-6">
+                <div className="space-y-6" data-tour="profile-skills">
                   {profile.skills && profile.skills.length > 0 ? (
                     <div className="flex flex-wrap gap-3">
                       {profile.skills.map((skill, index) => {
@@ -1265,6 +1267,12 @@ export default function ProfilePage() {
           </div>
         </div>
       )}
+
+      {/* Système d'onboarding */}
+      <OnboardingTour
+        tourId="candidate-profile"
+        steps={candidateProfileTour}
+      />
 
       {/* Styles d'animation */}
       <style jsx>{`
