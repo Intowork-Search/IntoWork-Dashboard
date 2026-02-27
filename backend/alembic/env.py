@@ -83,12 +83,15 @@ def run_migrations_online() -> None:
     async def run_async_migrations() -> None:
         """Create async engine and run migrations."""
         import ssl
+        from sqlalchemy.ext.asyncio import create_async_engine
         
         # Get the database URL and ensure it uses asyncpg
         database_url = config.get_main_option("sqlalchemy.url")
         if database_url and database_url.startswith("postgresql://"):
             database_url = database_url.replace("postgresql://", "postgresql+asyncpg://", 1)
-            config.set_main_option("sqlalchemy.url", database_url)
+        
+        print(f"🔧 Alembic: Démarrage des migrations")
+        print(f"   DATABASE_URL détectée: {bool(database_url)}")
         
         # Détection Railway pour configuration SSL
         is_railway_internal = "railway.internal" in (database_url or "").lower()
@@ -98,7 +101,7 @@ def run_migrations_online() -> None:
         # Configuration connect_args pour Railway
         connect_args = {}
         if is_railway:
-            print(f"🔧 Alembic: Connexion Railway détectée")
+            print(f"🔧 Alembic: Connexion Railway détectée", flush=True)
             if is_railway_internal:
                 # Connexion interne: pas de SSL
                 connect_args = {
@@ -106,7 +109,7 @@ def run_migrations_online() -> None:
                     "timeout": 60,
                     "command_timeout": 120
                 }
-                print(f"   Type: INTERNE - SSL DÉSACTIVÉ")
+                print(f"   Type: INTERNE - SSL DÉSACTIVÉ", flush=True)
             else:
                 # Connexion externe: SSL avec SSLContext permissif
                 try:
@@ -122,15 +125,14 @@ def run_migrations_online() -> None:
                     "timeout": 60,
                     "command_timeout": 120
                 }
-                print(f"   Type: EXTERNE - SSL avec SSLContext permissif")
+                print(f"   Type: EXTERNE - SSL avec SSLContext permissif", flush=True)
+        else:
+            print(f"🏠 Alembic: Connexion locale détectée", flush=True)
         
-        # Créer l'engine avec connect_args
-        configuration = config.get_section(config.config_ini_section, {})
-        configuration["connect_args"] = connect_args
-        
-        connectable = async_engine_from_config(
-            configuration,
-            prefix="sqlalchemy.",
+        # Créer l'engine directement avec connect_args
+        connectable = create_async_engine(
+            database_url,
+            connect_args=connect_args,
             poolclass=pool.NullPool,
         )
 
