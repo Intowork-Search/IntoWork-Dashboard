@@ -164,7 +164,7 @@ export default function EmailTemplatesPage() {
       const apiUrl = getApiUrl();
       const url = editingTemplate
         ? `${apiUrl}/email-templates/${editingTemplate.id}`
-        : `${apiUrl}/email-templates/`;
+        : `${apiUrl}/email-templates`;
       
       const method = editingTemplate ? 'PATCH' : 'POST';
       
