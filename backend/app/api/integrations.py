@@ -4,12 +4,18 @@ OAuth flows and service integrations
 """
 
 from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update
 from typing import Annotated, Optional
 from pydantic import BaseModel
 from datetime import datetime, timedelta
 import secrets
+import base64
+import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 from app.database import get_db
 from app.auth import require_employer
@@ -104,11 +110,11 @@ async def get_linkedin_auth_url(
             detail="LinkedIn integration is not configured"
         )
     
-    # Générer un state token pour CSRF protection
-    state = secrets.token_urlsafe(32)
-    
-    # TODO: Stocker le state en session/cache avec expiration
-    # Pour l'instant, on le retourne juste
+    # Générer un state token avec le user_id encodé pour le retrouver dans le callback
+    # Format: {random_token}:{user_id} encodé en base64
+    random_part = secrets.token_urlsafe(32)
+    state_data = f"{random_part}:{employer.user_id}"
+    state = base64.urlsafe_b64encode(state_data.encode()).decode()
     
     auth_url = linkedin_service.get_authorization_url(state)
     
@@ -121,29 +127,63 @@ async def get_linkedin_auth_url(
 
 @router.get("/linkedin/callback")
 async def linkedin_oauth_callback(
-    code: str,
-    state: str,
-    employer: Annotated[Employer, Depends(get_employer_profile)],
-    db: Annotated[AsyncSession, Depends(get_db)]
+    code: Optional[str] = None,
+    error: Optional[str] = None,
+    error_description: Optional[str] = None,
+    state: Optional[str] = None,
+    db: AsyncSession = Depends(get_db)
 ):
     """
     Callback OAuth LinkedIn
     
     Reçoit le code d'autorisation et l'échange contre un access token
+    OU reçoit une erreur OAuth de LinkedIn
+    
+    Note: Ce endpoint ne nécessite PAS d'authentification JWT car l'utilisateur
+    est redirigé directement par LinkedIn. On utilise le state token pour
+    retrouver l'utilisateur et vérifier CSRF.
     """
-    if not employer.company_id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="You must create a company profile before connecting integrations"
-        )
+    # Construire l'URL de redirection vers le frontend
+    frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
+    redirect_url = f"{frontend_url}/dashboard/integrations"
+    
+    # Gérer les erreurs OAuth de LinkedIn
+    if error:
+        error_msg = error_description or error
+        logger.warning(f"LinkedIn OAuth error: {error} - {error_msg}")
+        return RedirectResponse(url=f"{redirect_url}?provider=linkedin&success=false&error={error_msg}")
+    
+    # Vérifier que le code est présent
+    if not code:
+        return RedirectResponse(url=f"{redirect_url}?provider=linkedin&success=false&error=Missing authorization code")
     
     if not linkedin_service.enabled:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="LinkedIn integration is not configured"
-        )
+        return RedirectResponse(url=f"{redirect_url}?provider=linkedin&success=false&error=LinkedIn integration not configured")
     
-    # TODO: Vérifier le state token pour CSRF protection
+    # Décoder le state pour récupérer le user_id
+    if not state:
+        return RedirectResponse(url=f"{redirect_url}?provider=linkedin&success=false&error=Missing state token")
+    
+    try:
+        # Décoder le state: {random}:{user_id}
+        state_data = base64.urlsafe_b64decode(state.encode()).decode()
+        _, user_id_str = state_data.split(':')
+        user_id = int(user_id_str)
+    except Exception as e:
+        logger.error(f"Invalid state token: {e}")
+        return RedirectResponse(url=f"{redirect_url}?provider=linkedin&success=false&error=Invalid state token")
+    
+    # Récupérer l'employer à partir du user_id
+    result = await db.execute(
+        select(Employer).where(Employer.user_id == user_id)
+    )
+    employer = result.scalar_one_or_none()
+    
+    if not employer:
+        return RedirectResponse(url=f"{redirect_url}?provider=linkedin&success=false&error=Employer profile not found")
+    
+    if not employer.company_id:
+        return RedirectResponse(url=f"{redirect_url}?provider=linkedin&success=false&error=Please create a company profile first")
     
     try:
         # Échanger le code contre un access token
@@ -182,16 +222,14 @@ async def linkedin_oauth_callback(
         
         await db.commit()
         
-        return {
-            "message": "LinkedIn integration successful",
-            "organization_id": organization_id
-        }
+        # Rediriger vers le frontend avec succès
+        logger.info(f"✅ LinkedIn integration successful for user {employer.user_id}, organization {organization_id}")
+        return RedirectResponse(url=f"{redirect_url}?provider=linkedin&success=true")
         
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"LinkedIn OAuth failed: {str(e)}"
-        )
+        logger.error(f"❌ LinkedIn OAuth failed: {str(e)}")
+        await db.rollback()
+        return RedirectResponse(url=f"{redirect_url}?provider=linkedin&success=false&error={str(e)}")
 
 
 @router.post("/linkedin/publish-job")
@@ -299,7 +337,11 @@ async def get_google_calendar_auth_url(
             detail="Google Calendar integration is not configured"
         )
     
-    state = secrets.token_urlsafe(32)
+    # Générer un state token avec le user_id encodé
+    random_part = secrets.token_urlsafe(32)
+    state_data = f"{random_part}:{employer.user_id}"
+    state = base64.urlsafe_b64encode(state_data.encode()).decode()
+    
     auth_url = google_calendar_service.get_authorization_url(state)
     
     return IntegrationAuthURLResponse(
@@ -311,23 +353,48 @@ async def get_google_calendar_auth_url(
 
 @router.get("/google-calendar/callback")
 async def google_calendar_oauth_callback(
-    code: str,
-    state: str,
-    employer: Annotated[Employer, Depends(get_employer_profile)],
-    db: Annotated[AsyncSession, Depends(get_db)]
+    code: Optional[str] = None,
+    error: Optional[str] = None,
+    error_description: Optional[str] = None,
+    state: Optional[str] = None,
+    db: AsyncSession = Depends(get_db)
 ):
     """Callback OAuth Google Calendar"""
-    if not employer.company_id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="You must create a company profile before connecting integrations"
-        )
+    frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
+    redirect_url = f"{frontend_url}/dashboard/integrations"
+    
+    # Gérer les erreurs OAuth
+    if error:
+        error_msg = error_description or error
+        logger.warning(f"Google Calendar OAuth error: {error} - {error_msg}")
+        return RedirectResponse(url=f"{redirect_url}?provider=google-calendar&success=false&error={error_msg}")
+    
+    if not code:
+        return RedirectResponse(url=f"{redirect_url}?provider=google-calendar&success=false&error=Missing authorization code")
     
     if not google_calendar_service.enabled:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Google Calendar integration is not configured"
-        )
+        return RedirectResponse(url=f"{redirect_url}?provider=google-calendar&success=false&error=Google Calendar integration not configured")
+    
+    # Décoder le state pour récupérer le user_id
+    if not state:
+        return RedirectResponse(url=f"{redirect_url}?provider=google-calendar&success=false&error=Missing state token")
+    
+    try:
+        state_data = base64.urlsafe_b64decode(state.encode()).decode()
+        _, user_id_str = state_data.split(':')
+        user_id = int(user_id_str)
+    except Exception as e:
+        logger.error(f"Invalid state token: {e}")
+        return RedirectResponse(url=f"{redirect_url}?provider=google-calendar&success=false&error=Invalid state token")
+    
+    # Récupérer l'employer
+    result = await db.execute(
+        select(Employer).where(Employer.user_id == user_id)
+    )
+    employer = result.scalar_one_or_none()
+    
+    if not employer or not employer.company_id:
+        return RedirectResponse(url=f"{redirect_url}?provider=google-calendar&success=false&error=Employer profile not found")
     
     try:
         # Échanger le code contre un access token
@@ -360,13 +427,13 @@ async def google_calendar_oauth_callback(
         
         await db.commit()
         
-        return {"message": "Google Calendar integration successful"}
+        logger.info(f"✅ Google Calendar integration successful for user {employer.user_id}")
+        return RedirectResponse(url=f"{redirect_url}?provider=google-calendar&success=true")
         
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Google Calendar OAuth failed: {str(e)}"
-        )
+        logger.error(f"❌ Google Calendar OAuth failed: {str(e)}")
+        await db.rollback()
+        return RedirectResponse(url=f"{redirect_url}?provider=google-calendar&success=false&error={str(e)}")
 
 
 @router.post("/google-calendar/create-event")
@@ -451,7 +518,11 @@ async def get_outlook_auth_url(
             detail="Outlook Calendar integration is not configured"
         )
     
-    state = secrets.token_urlsafe(32)
+    # Générer un state token avec le user_id encodé
+    random_part = secrets.token_urlsafe(32)
+    state_data = f"{random_part}:{employer.user_id}"
+    state = base64.urlsafe_b64encode(state_data.encode()).decode()
+    
     auth_url = outlook_calendar_service.get_authorization_url(state)
     
     return IntegrationAuthURLResponse(
@@ -463,23 +534,48 @@ async def get_outlook_auth_url(
 
 @router.get("/outlook/callback")
 async def outlook_oauth_callback(
-    code: str,
-    state: str,
-    employer: Annotated[Employer, Depends(get_employer_profile)],
-    db: Annotated[AsyncSession, Depends(get_db)]
+    code: Optional[str] = None,
+    error: Optional[str] = None,
+    error_description: Optional[str] = None,
+    state: Optional[str] = None,
+    db: AsyncSession = Depends(get_db)
 ):
     """Callback OAuth Outlook Calendar"""
-    if not employer.company_id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="You must create a company profile before connecting integrations"
-        )
+    frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
+    redirect_url = f"{frontend_url}/dashboard/integrations"
+    
+    # Gérer les erreurs OAuth
+    if error:
+        error_msg = error_description or error
+        logger.warning(f"Outlook OAuth error: {error} - {error_msg}")
+        return RedirectResponse(url=f"{redirect_url}?provider=outlook&success=false&error={error_msg}")
+    
+    if not code:
+        return RedirectResponse(url=f"{redirect_url}?provider=outlook&success=false&error=Missing authorization code")
     
     if not outlook_calendar_service.enabled:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Outlook Calendar integration is not configured"
-        )
+        return RedirectResponse(url=f"{redirect_url}?provider=outlook&success=false&error=Outlook integration not configured")
+    
+    # Décoder le state pour récupérer le user_id
+    if not state:
+        return RedirectResponse(url=f"{redirect_url}?provider=outlook&success=false&error=Missing state token")
+    
+    try:
+        state_data = base64.urlsafe_b64decode(state.encode()).decode()
+        _, user_id_str = state_data.split(':')
+        user_id = int(user_id_str)
+    except Exception as e:
+        logger.error(f"Invalid state token: {e}")
+        return RedirectResponse(url=f"{redirect_url}?provider=outlook&success=false&error=Invalid state token")
+    
+    # Récupérer l'employer
+    result = await db.execute(
+        select(Employer).where(Employer.user_id == user_id)
+    )
+    employer = result.scalar_one_or_none()
+    
+    if not employer or not employer.company_id:
+        return RedirectResponse(url=f"{redirect_url}?provider=outlook&success=false&error=Employer profile not found")
     
     try:
         # Échanger le code contre un access token
@@ -512,13 +608,13 @@ async def outlook_oauth_callback(
         
         await db.commit()
         
-        return {"message": "Outlook Calendar integration successful"}
+        logger.info(f"✅ Outlook integration successful for user {employer.user_id}")
+        return RedirectResponse(url=f"{redirect_url}?provider=outlook&success=true")
         
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Outlook OAuth failed: {str(e)}"
-        )
+        logger.error(f"❌ Outlook OAuth failed: {str(e)}")
+        await db.rollback()
+        return RedirectResponse(url=f"{redirect_url}?provider=outlook&success=false&error={str(e)}")
 
 
 @router.post("/outlook/create-event")

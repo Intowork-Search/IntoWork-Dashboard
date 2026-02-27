@@ -1,6 +1,6 @@
 /**
  * Get API URL with environment-aware configuration
- * PRODUCTION FIX: Always returns HTTPS to prevent Mixed Content errors
+   * PRODUCTION FIX: Always returns HTTPS to prevent Mixed Content errors
  */
 export const getApiUrl = (): string => {
   // ULTRA-SIMPLE FIX: Just return HTTPS URL

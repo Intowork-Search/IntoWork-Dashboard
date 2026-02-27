@@ -37,8 +37,8 @@ class LinkedInService:
         Générer l'URL d'autorisation LinkedIn OAuth 2.0
         
         Scopes requis:
-        - w_organization_social: Publier du contenu au nom de l'organisation
-        - r_organization_social: Lire les posts de l'organisation
+        - w_member_social: Publier du contenu au nom du membre
+        - r_organization_social: Lire les posts de l'organisation (si accès entreprise)
         
         Args:
             state: Token CSRF pour sécurité
@@ -49,7 +49,9 @@ class LinkedInService:
         if not self.enabled:
             raise ValueError("LinkedIn integration is not enabled")
         
-        scopes = "r_liteprofile r_emailaddress w_organization_social r_organization_social"
+        # Scopes LinkedIn Marketing Developer Platform
+        # Note: w_organization_social nécessite l'accès "Marketing Developer Platform"
+        scopes = "w_member_social r_organization_social"
         
         params = {
             "response_type": "code",
