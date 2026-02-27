@@ -145,7 +145,7 @@ async def create_email_template(
     return new_template
 
 
-@router.get("/", response_model=List[EmailTemplateResponse])
+@router.get("", response_model=List[EmailTemplateResponse])
 async def list_email_templates(
     employer: Annotated[Employer, Depends(get_employer_profile)],
     db: Annotated[AsyncSession, Depends(get_db)],

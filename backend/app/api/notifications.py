@@ -34,7 +34,7 @@ class MarkAsReadRequest(BaseModel):
 
 # Routes
 
-@router.get("/", response_model=NotificationListResponse)
+@router.get("", response_model=NotificationListResponse)
 async def get_notifications(
     limit: int = 20,
     offset: int = 0,

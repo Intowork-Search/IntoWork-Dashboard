@@ -72,7 +72,8 @@ app = FastAPI(
     title="INTOWORK Search - Backend",
     description="Plateforme de recrutement B2B2C - API Backend",
     version="1.0.0",
-    lifespan=lifespan
+    lifespan=lifespan,
+    redirect_slashes=False  # Éviter les redirections 307 qui causent Mixed Content avec Railway
 )
 
 # Security: Add rate limiter state and exception handler
