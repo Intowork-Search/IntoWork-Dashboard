@@ -12,6 +12,8 @@
 
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
+import OnboardingTour from '@/components/OnboardingTour';
+import { candidateJobSearchTour } from '@/config/onboardingTours';
 import { JobFilters, candidatesAPI } from '@/lib/api';
 import { useUser, useAuth } from '@/hooks/useNextAuth';
 import { useJobs, useMyJobs, useApplyToJob } from '@/hooks';
@@ -312,6 +314,7 @@ export default function JobsPage() {
 
         {/* Filtres */}
         <div
+          data-tour="job-filters"
           className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 border border-gray-100 p-6"
           style={{ animation: 'fadeIn 0.6s ease-out 0.1s both' }}
         >
@@ -399,6 +402,7 @@ export default function JobsPage() {
               return (
                 <div
                   key={job.id}
+                  data-tour={index === 0 ? "job-card" : undefined}
                   className="group bg-white rounded-3xl shadow-lg shadow-gray-200/50 border border-gray-100 overflow-hidden hover:shadow-xl hover:shadow-[#6B9B5F]/10 hover:border-[#6B9B5F]/20 transition-all"
                   style={{ animation: `fadeIn 0.4s ease-out ${0.05 * index}s both` }}
                 >
@@ -502,6 +506,7 @@ export default function JobsPage() {
                           </button>
                         ) : (
                           <button
+                            data-tour="apply-button"
                             onClick={() => handleApply(job.id)}
                             className="w-full py-3 rounded-xl font-semibold bg-gradient-to-r from-[#6B9B5F] to-[#5a8a4f] text-white shadow-lg shadow-[#6B9B5F]/20 hover:shadow-xl hover:shadow-[#6B9B5F]/30 transition-all flex items-center justify-center gap-2"
                           >
@@ -736,6 +741,14 @@ export default function JobsPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Système d'onboarding */}
+      {!isEmployer && (
+        <OnboardingTour
+          tourId="candidate-job-search"
+          steps={candidateJobSearchTour}
+        />
       )}
 
       {/* Styles d'animation */}

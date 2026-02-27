@@ -11,6 +11,8 @@
 
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
+import OnboardingTour from '@/components/OnboardingTour';
+import { employerApplicationsTour } from '@/config/onboardingTours';
 import { getApiUrl } from '@/lib/getApiUrl';
 import { 
   useEmployerApplications,
@@ -200,7 +202,7 @@ export default function CandidatesPage(): React.JSX.Element {
         </div>
 
         {/* Barre de recherche et filtres */}
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200" data-tour="application-filters">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Recherche */}
             <div className="relative">
@@ -280,8 +282,8 @@ export default function CandidatesPage(): React.JSX.Element {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredApplications.map((application: CandidateApplication) => (
-                    <tr key={application.id} className="hover:bg-gray-50 transition">
+                  {filteredApplications.map((application: CandidateApplication, index: number) => (
+                    <tr key={application.id} className="hover:bg-gray-50 transition" data-tour={index === 0 ? "candidate-card" : undefined}>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
@@ -394,7 +396,7 @@ export default function CandidatesPage(): React.JSX.Element {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <h4 className="text-lg font-semibold text-gray-900 mb-3">📊 Statut</h4>
-                  <div className="relative">
+                  <div className="relative" data-tour="change-status">
                     <select
                       value={viewingApplication.status}
                       onChange={(e) => handleStatusChange(viewingApplication.id, e.target.value)}
@@ -434,7 +436,7 @@ export default function CandidatesPage(): React.JSX.Element {
 
               {/* CV */}
               {viewingApplication.cv_url && (
-                <div>
+                <div data-tour="download-cv">
                   <h4 className="text-lg font-semibold text-gray-900 mb-3">📄 CV</h4>
                   <a
                     href={viewingApplication.cv_url.startsWith('http') 
@@ -452,7 +454,7 @@ export default function CandidatesPage(): React.JSX.Element {
               )}
 
               {/* Notes */}
-              <div>
+              <div data-tour="add-notes">
                 <h4 className="text-lg font-semibold text-gray-900 mb-3">📝 Notes internes</h4>
                 <div className="relative">
                   <textarea
@@ -560,6 +562,12 @@ export default function CandidatesPage(): React.JSX.Element {
           getToken={getToken}
         />
       )}
+
+      {/* Système d'onboarding */}
+      <OnboardingTour
+        tourId="employer-applications"
+        steps={employerApplicationsTour}
+      />
     </DashboardLayout>
   );
 }

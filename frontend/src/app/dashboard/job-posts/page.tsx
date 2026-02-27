@@ -15,6 +15,8 @@ import { useAuth } from '@/hooks/useNextAuth';
 import { jobsAPI, Job } from '@/lib/api';
 import { toast } from 'react-hot-toast';
 import DashboardLayout from '@/components/DashboardLayout';
+import OnboardingTour from '@/components/OnboardingTour';
+import { employerCreateJobTour } from '@/config/onboardingTours';
 import {
   PlusIcon,
   PencilIcon,
@@ -477,7 +479,7 @@ export default function JobPostsPage(): React.JSX.Element {
             {/* Form */}
             <form onSubmit={handleSubmit} className="p-6 space-y-6">
               {/* Titre */}
-              <div>
+              <div data-tour="job-basics">
                 <label htmlFor="title" className="block text-sm font-semibold text-gray-700 mb-2">
                   Titre du poste *
                 </label>
@@ -511,7 +513,7 @@ export default function JobPostsPage(): React.JSX.Element {
               </div>
 
               {/* Type de contrat et Mode de travail */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4" data-tour="job-requirements">
                 <div>
                   <label htmlFor="job_type" className="block text-sm font-semibold text-gray-700 mb-2">
                     Type de contrat *
@@ -570,7 +572,7 @@ export default function JobPostsPage(): React.JSX.Element {
               </div>
 
               {/* Salaire */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4" data-tour="job-salary">
                 <div>
                   <label htmlFor="salary_min" className="block text-sm font-semibold text-gray-700 mb-2">
                     Salaire minimum
@@ -629,6 +631,7 @@ export default function JobPostsPage(): React.JSX.Element {
                 </button>
                 <button
                   type="submit"
+                  data-tour="publish-job"
                   disabled={saving}
                   className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold bg-gradient-to-r from-[#6B9B5F] to-[#5a8a4f] text-white shadow-lg shadow-[#6B9B5F]/30 hover:shadow-xl hover:shadow-[#6B9B5F]/40 transition-all disabled:opacity-50"
                 >
@@ -798,6 +801,12 @@ export default function JobPostsPage(): React.JSX.Element {
           }
         }
       `}</style>
+
+      {/* Système d'onboarding */}
+      <OnboardingTour
+        tourId="employer-create-job"
+        steps={employerCreateJobTour}
+      />
 
       {/* LinkedIn Modal */}
       {selectedJobForLinkedIn && (

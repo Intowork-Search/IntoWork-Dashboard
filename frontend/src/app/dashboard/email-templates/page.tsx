@@ -16,6 +16,8 @@ import { toast } from 'react-hot-toast';
 import { useAuth } from '@/hooks/useNextAuth';
 import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/DashboardLayout';
+import OnboardingTour from '@/components/OnboardingTour';
+import { employerEmailTemplatesTour } from '@/config/onboardingTours';
 import { 
   EnvelopeIcon, 
   PlusIcon, 
