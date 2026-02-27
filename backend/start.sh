@@ -25,6 +25,15 @@ fi
 
 echo "✅ Base de données initialisée"
 
+# Initialiser l'utilisateur admin
+echo "👤 Initialisation de l'utilisateur admin..."
+python init_admin.py
+
+if [ $? -ne 0 ]; then
+    echo "⚠️  Avertissement: Impossible de créer l'utilisateur admin"
+    # Ne pas bloquer le démarrage si la création de l'admin échoue
+fi
+
 # Créer le répertoire uploads s'il n'existe pas
 mkdir -p uploads/cv
 
