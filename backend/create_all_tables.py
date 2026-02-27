@@ -6,7 +6,7 @@ Utilisé comme alternative temporaire aux migrations Alembic cassées
 import asyncio
 import sys
 from sqlalchemy import inspect
-from app.database import async_engine, Base
+from app.database import engine, Base
 from app.models.base import *  # Import tous les modèles
 
 async def create_all_tables():
@@ -15,7 +15,7 @@ async def create_all_tables():
         print("🔍 Vérification de la connexion à la base de données...")
         
         # Test de connexion
-        async with async_engine.begin() as conn:
+        async with engine.begin() as conn:
             print("✅ Connexion à la base de données réussie")
             
             # Créer toutes les tables
@@ -41,7 +41,7 @@ async def create_all_tables():
         traceback.print_exc()
         return 1
     finally:
-        await async_engine.dispose()
+        await engine.dispose()
 
 if __name__ == "__main__":
     exit_code = asyncio.run(create_all_tables())
