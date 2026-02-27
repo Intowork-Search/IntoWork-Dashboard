@@ -36,9 +36,13 @@ class LinkedInService:
         """
         Générer l'URL d'autorisation LinkedIn OAuth 2.0
         
-        Scopes requis:
+        Scopes requis (LinkedIn Sign In API - disponibles publiquement):
+        - profile: Profil de base (nom, photo)
+        - email: Adresse email
         - w_member_social: Publier du contenu au nom du membre
-        - r_organization_social: Lire les posts de l'organisation (si accès entreprise)
+        
+        Note: w_organization_social nécessite "Marketing Developer Platform" 
+        qui requiert une approbation manuelle de LinkedIn.
         
         Args:
             state: Token CSRF pour sécurité
@@ -49,9 +53,8 @@ class LinkedInService:
         if not self.enabled:
             raise ValueError("LinkedIn integration is not enabled")
         
-        # Scopes LinkedIn Marketing Developer Platform
-        # Note: w_organization_social nécessite l'accès "Marketing Developer Platform"
-        scopes = "w_member_social r_organization_social"
+        # Scopes LinkedIn Sign In API (disponibles sans approbation)
+        scopes = "profile email w_member_social"
         
         params = {
             "response_type": "code",
@@ -93,6 +96,34 @@ class LinkedInService:
             response.raise_for_status()
             return response.json()
     
+    async def get_member_urn(self, access_token: str) -> str:
+        """
+        Récupérer l'URN du membre connecté (utilisateur personnel)
+        
+        Disponible avec le scope 'profile' (inclus dans LinkedIn Sign In)
+        
+        Args:
+            access_token: Token d'accès LinkedIn
+            
+        Returns:
+            Member URN (ex: "urn:li:person:ABC123")
+        """
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{LINKEDIN_API_BASE}/me",
+                headers={"Authorization": f"Bearer {access_token}"}
+            )
+            
+            response.raise_for_status()
+            data = response.json()
+            
+            # Construire l'URN du membre
+            member_id = data.get("id")
+            if not member_id:
+                raise ValueError("Could not retrieve member ID from LinkedIn")
+            
+            return f"urn:li:person:{member_id}"
+    
     async def get_company_id(self, access_token: str) -> str:
         """
         Récupérer l'ID de l'organisation LinkedIn
@@ -123,7 +154,7 @@ class LinkedInService:
     async def publish_job_post(
         self,
         access_token: str,
-        organization_id: str,
+        organization_id: Optional[str],
         job_data: Dict[str, Any]
     ) -> str:
         """
@@ -131,7 +162,7 @@ class LinkedInService:
         
         Args:
             access_token: Token d'accès LinkedIn
-            organization_id: ID de l'organisation LinkedIn
+            organization_id: ID de l'organisation LinkedIn (None = publier au nom du membre)
             job_data: Données du job (title, description, location, etc.)
             
         Returns:
@@ -140,9 +171,18 @@ class LinkedInService:
         if not self.enabled:
             raise ValueError("LinkedIn integration is not enabled")
         
+        # Déterminer l'author (organization ou membre personnel)
+        if organization_id:
+            author_urn = organization_id
+            logger.info(f"🏬 Publishing as organization: {organization_id}")
+        else:
+            # Publier au nom du membre personnel
+            author_urn = await self.get_member_urn(access_token)
+            logger.info(f"👤 Publishing as personal member: {author_urn}")
+        
         # Préparer le payload pour LinkedIn Share API
         share_payload = {
-            "author": organization_id,
+            "author": author_urn,
             "lifecycleState": "PUBLISHED",
             "specificContent": {
                 "com.linkedin.ugc.ShareContent": {

@@ -189,8 +189,15 @@ async def linkedin_oauth_callback(
         # Échanger le code contre un access token
         token_data = await linkedin_service.exchange_code_for_token(code)
         
-        # Récupérer l'organization ID
-        organization_id = await linkedin_service.get_company_id(token_data['access_token'])
+        # Essayer de récupérer l'organization ID (nécessite Marketing Developer Platform)
+        # Si l'app n'a que les scopes standards, on stocke sans organization_id
+        organization_id = None
+        try:
+            organization_id = await linkedin_service.get_company_id(token_data['access_token'])
+            logger.info(f"✅ LinkedIn organization ID retrieved: {organization_id}")
+        except Exception as org_error:
+            logger.warning(f"⚠️  Could not retrieve organization ID (this is normal for standard LinkedIn apps): {org_error}")
+            logger.info("📝 Integration will work for personal posts only (not organization posts)")
         
         # Stocker les credentials
         # Vérifier si une intégration existe déjà
@@ -202,11 +209,13 @@ async def linkedin_oauth_callback(
         )
         existing = result.scalar_one_or_none()
         
+        provider_data = {"organization_id": organization_id} if organization_id else {}
+        
         if existing:
             # Mettre à jour
             existing.access_token = token_data['access_token']
             existing.token_expires_at = datetime.utcnow() + timedelta(seconds=token_data.get('expires_in', 5184000))
-            existing.provider_data = {"organization_id": organization_id}
+            existing.provider_data = provider_data
             existing.is_active = True
         else:
             # Créer nouvelle intégration
@@ -216,14 +225,15 @@ async def linkedin_oauth_callback(
                 provider=IntegrationProvider.LINKEDIN,
                 access_token=token_data['access_token'],
                 token_expires_at=datetime.utcnow() + timedelta(seconds=token_data.get('expires_in', 5184000)),
-                provider_data={"organization_id": organization_id}
+                provider_data=provider_data
             )
             db.add(integration)
         
         await db.commit()
         
         # Rediriger vers le frontend avec succès
-        logger.info(f"✅ LinkedIn integration successful for user {employer.user_id}, organization {organization_id}")
+        org_msg = f", organization {organization_id}" if organization_id else " (personal account only)"
+        logger.info(f"✅ LinkedIn integration successful for user {employer.user_id}{org_msg}")
         return RedirectResponse(url=f"{redirect_url}?provider=linkedin&success=true")
         
     except Exception as e:
