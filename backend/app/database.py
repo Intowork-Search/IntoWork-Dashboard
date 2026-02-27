@@ -50,20 +50,42 @@ engine_kwargs = {
 
 # Ajouter connect_args pour SSL sur Railway (asyncpg)
 if is_railway:
-    # HYPOTHÈSE: Le proxy Railway (interchange.proxy.rlwy.net) gère déjà SSL
-    # La connexion backend vers le proxy ne devrait peut-être PAS utiliser SSL
-    # car le proxy fait la terminaison SSL
+    # Railway PostgreSQL FORCE SSL - on ne peut pas le désactiver
+    # Créer un SSLContext avec PROTOCOL_TLS (pas TLS_CLIENT qui peut être trop strict)
+    try:
+        # Essayer PROTOCOL_TLS (plus permissif que TLS_CLIENT)
+        ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS)
+    except AttributeError:
+        # Fallback si PROTOCOL_TLS n'existe pas
+        ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
     
-    # TEST: Essayer SANS SSL d'abord
-    engine_kwargs["connect_args"] = {
-        "ssl": False,  # Désactiver SSL - le proxy Railway le gère peut-être
-        "server_settings": {
-            "application_name": "intowork-backend"
-        },
-        "timeout": 30,  # Timeout de connexion
-        "command_timeout": 60  # Timeout des commandes
-    }
-    print(f"🔒 Configuration SSL: DÉSACTIVÉ (test - le proxy Railway gère peut-être SSL)")
+    ssl_context.check_hostname = False
+    ssl_context.verify_mode = ssl.CERT_NONE
+    # Désactiver toutes les vérifications SSL
+    ssl_context.set_ciphers('DEFAULT@SECLEVEL=1')  # Autoriser les anciens ciphers
+    
+    if is_railway_internal:
+        # Connexion interne: moins strict
+        engine_kwargs["connect_args"] = {
+            "ssl": False,  # Pas de SSL pour connexion interne
+            "server_settings": {
+                "application_name": "intowork-backend"
+            },
+            "timeout": 60,  # Plus long timeout
+            "command_timeout": 120
+        }
+        print(f"🔒 Configuration SSL: DÉSACTIVÉ (connexion interne Railway)")
+    else:
+        # Connexion externe: SSL obligatoire
+        engine_kwargs["connect_args"] = {
+            "ssl": ssl_context,  # SSLContext avec PROTOCOL_TLS
+            "server_settings": {
+                "application_name": "intowork-backend"
+            },
+            "timeout": 60,  # Plus long timeout pour connexion externe
+            "command_timeout": 120
+        }
+        print(f"🔒 Configuration SSL: PROTOCOL_TLS avec CERT_NONE (connexion externe)")
 
 # Créer l'engine SQLAlchemy async avec pool optimisé
 engine = create_async_engine(DATABASE_URL_ASYNC, **engine_kwargs)
