@@ -99,20 +99,20 @@ export default function OnboardingTour({
 
       switch (step.position || 'bottom') {
         case 'top':
-          top = rect.top + scrollY - tooltipHeight - 20;
+          top = rect.top + scrollY - tooltipHeight - 30;
           left = rect.left + scrollX + (rect.width / 2) - (tooltipWidth / 2);
           break;
         case 'bottom':
-          top = rect.bottom + scrollY + 20;
+          top = rect.bottom + scrollY + 30;
           left = rect.left + scrollX + (rect.width / 2) - (tooltipWidth / 2);
           break;
         case 'left':
           top = rect.top + scrollY + (rect.height / 2) - (tooltipHeight / 2);
-          left = rect.left + scrollX - tooltipWidth - 20;
+          left = rect.left + scrollX - tooltipWidth - 30;
           break;
         case 'right':
           top = rect.top + scrollY + (rect.height / 2) - (tooltipHeight / 2);
-          left = rect.right + scrollX + 20;
+          left = rect.right + scrollX + 30;
           break;
       }
 
@@ -194,22 +194,32 @@ export default function OnboardingTour({
         .onboarding-highlight {
           position: relative;
           z-index: 9999 !important;
-          box-shadow: 0 0 0 4px rgba(107, 155, 95, 0.5), 0 0 0 9999px rgba(0, 0, 0, 0.5) !important;
+          outline: 3px solid rgba(107, 155, 95, 0.9) !important;
+          outline-offset: 4px;
+          box-shadow: 0 0 0 4px rgba(107, 155, 95, 0.3), 
+                      0 0 20px 8px rgba(107, 155, 95, 0.4),
+                      0 0 0 9999px rgba(0, 0, 0, 0.5) !important;
           border-radius: 8px;
           animation: pulse-highlight 2s ease-in-out infinite;
         }
 
         @keyframes pulse-highlight {
           0%, 100% {
-            box-shadow: 0 0 0 4px rgba(107, 155, 95, 0.5), 0 0 0 9999px rgba(0, 0, 0, 0.5);
+            outline-color: rgba(107, 155, 95, 0.9);
+            box-shadow: 0 0 0 4px rgba(107, 155, 95, 0.3), 
+                        0 0 20px 8px rgba(107, 155, 95, 0.4),
+                        0 0 0 9999px rgba(0, 0, 0, 0.5);
           }
           50% {
-            box-shadow: 0 0 0 8px rgba(107, 155, 95, 0.8), 0 0 0 9999px rgba(0, 0, 0, 0.5);
+            outline-color: rgba(107, 155, 95, 1);
+            box-shadow: 0 0 0 6px rgba(107, 155, 95, 0.5), 
+                        0 0 30px 12px rgba(107, 155, 95, 0.6),
+                        0 0 0 9999px rgba(0, 0, 0, 0.5);
           }
         }
       `}</style>
 
-      {/* Tooltip */}
+      {/* Tooltip avec flèche */}
       <div
         className="fixed z-[10000] animate-fadeIn"
         style={{
@@ -217,6 +227,21 @@ export default function OnboardingTour({
           left: `${tooltipPosition.left}px`,
         }}
       >
+        {/* Flèche pointant vers l'élément */}
+        <div 
+          className={`absolute w-0 h-0 ${
+            step.position === 'bottom' 
+              ? 'top-0 left-1/2 -translate-x-1/2 -translate-y-full border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-b-[12px] border-b-white'
+              : step.position === 'top'
+              ? 'bottom-0 left-1/2 -translate-x-1/2 translate-y-full border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-t-[12px] border-t-white'
+              : step.position === 'right'
+              ? 'left-0 top-1/2 -translate-y-1/2 -translate-x-full border-t-[12px] border-t-transparent border-b-[12px] border-b-transparent border-r-[12px] border-r-white'
+              : 'right-0 top-1/2 -translate-y-1/2 translate-x-full border-t-[12px] border-t-transparent border-b-[12px] border-b-transparent border-l-[12px] border-l-white'
+          }`}
+          style={{
+            filter: 'drop-shadow(0 0 2px rgba(0,0,0,0.1))'
+          }}
+        />
         <div className="bg-white rounded-2xl shadow-2xl border-2 border-[#6B9B5F]/20 overflow-hidden w-[min(400px,calc(100vw-60px))] max-h-[min(520px,calc(100vh-100px))] flex flex-col">
           {/* Header */}
           <div className="bg-gradient-to-r from-[#6B9B5F] to-[#6B9B5F]/80 px-6 py-4 flex-shrink-0">
