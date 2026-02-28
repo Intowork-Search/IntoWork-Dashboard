@@ -142,7 +142,7 @@ export default function EmailTemplatesPage() {
       
       if (response.ok) {
         const data = await response.json();
-        setAvailableVars(data.variables || []);
+        setVariables(data.variables || []);
       } else {
         const errorData = await response.json().catch(() => ({}));
       }
