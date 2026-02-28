@@ -185,8 +185,8 @@ export default function OnboardingTour({
     <>
       {/* Overlay avec spotlight */}
       <div className="fixed inset-0 z-[9998]" style={{ 
-        background: 'rgba(0, 0, 0, 0.5)',
-        backdropFilter: 'blur(2px)'
+        background: 'rgba(0, 0, 0, 0.25)',
+        backdropFilter: 'blur(1px)'
       }} />
 
       {/* Spotlight sur l'élément actif */}
@@ -198,7 +198,7 @@ export default function OnboardingTour({
           outline-offset: 4px;
           box-shadow: 0 0 0 4px rgba(107, 155, 95, 0.3), 
                       0 0 20px 8px rgba(107, 155, 95, 0.4),
-                      0 0 0 9999px rgba(0, 0, 0, 0.5) !important;
+                      0 0 0 9999px rgba(0, 0, 0, 0.25) !important;
           border-radius: 8px;
           animation: pulse-highlight 2s ease-in-out infinite;
         }
@@ -208,13 +208,13 @@ export default function OnboardingTour({
             outline-color: rgba(107, 155, 95, 0.9);
             box-shadow: 0 0 0 4px rgba(107, 155, 95, 0.3), 
                         0 0 20px 8px rgba(107, 155, 95, 0.4),
-                        0 0 0 9999px rgba(0, 0, 0, 0.5);
+                        0 0 0 9999px rgba(0, 0, 0, 0.25);
           }
           50% {
             outline-color: rgba(107, 155, 95, 1);
             box-shadow: 0 0 0 6px rgba(107, 155, 95, 0.5), 
                         0 0 30px 12px rgba(107, 155, 95, 0.6),
-                        0 0 0 9999px rgba(0, 0, 0, 0.5);
+                        0 0 0 9999px rgba(0, 0, 0, 0.25);
           }
         }
       `}</style>
