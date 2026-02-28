@@ -83,15 +83,15 @@ export default function OnboardingTour({
       const scrollY = window.scrollY;
       const scrollX = window.scrollX;
       
-      // Dimensions du tooltip (largeur et hauteur réactives)
-      const tooltipWidth = Math.min(400, window.innerWidth - 60);
-      // Hauteur max: header(~150px) + content(300px) + footer(~70px) = ~520px
-      // Mais limité à 100vh - 100px pour garder des marges
-      const tooltipHeight = Math.min(520, viewportHeight - 100);
-      
       // Dimensions du viewport
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
+      
+      // Dimensions du tooltip (largeur et hauteur réactives)
+      const tooltipWidth = Math.min(400, viewportWidth - 60);
+      // Hauteur max: header(~150px) + content(300px) + footer(~70px) = ~520px
+      // Mais limité à 100vh - 100px pour garder des marges
+      const tooltipHeight = Math.min(520, viewportHeight - 100);
 
       // Calculer la position selon l'option
       let top = 0;
