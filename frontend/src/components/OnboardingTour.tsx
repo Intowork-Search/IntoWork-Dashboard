@@ -84,7 +84,7 @@ export default function OnboardingTour({
       const scrollX = window.scrollX;
       
       // Dimensions du tooltip (largeur et hauteur réactives)
-      const tooltipWidth = Math.min(400, window.innerWidth - 40);
+      const tooltipWidth = Math.min(400, window.innerWidth - 60);
       // Hauteur max: header(~150px) + content(300px) + footer(~70px) = ~520px
       // Mais limité à 100vh - 100px pour garder des marges
       const tooltipHeight = Math.min(520, viewportHeight - 100);
@@ -116,9 +116,9 @@ export default function OnboardingTour({
           break;
       }
 
-      // Contraintes horizontales (garder dans le viewport)
-      const minLeft = scrollX + 10;
-      const maxLeft = scrollX + viewportWidth - tooltipWidth - 10;
+      // Contraintes horizontales (marges généreuses pour éviter le débordement)
+      const minLeft = scrollX + 30;
+      const maxLeft = scrollX + viewportWidth - tooltipWidth - 30;
       left = Math.max(minLeft, Math.min(left, maxLeft));
 
       // Contraintes verticales (marges généreuses pour éviter le débordement)
@@ -217,7 +217,7 @@ export default function OnboardingTour({
           left: `${tooltipPosition.left}px`,
         }}
       >
-        <div className="bg-white rounded-2xl shadow-2xl border-2 border-[#6B9B5F]/20 overflow-hidden w-[min(400px,calc(100vw-40px))] max-h-[min(520px,calc(100vh-100px))] flex flex-col">
+        <div className="bg-white rounded-2xl shadow-2xl border-2 border-[#6B9B5F]/20 overflow-hidden w-[min(400px,calc(100vw-60px))] max-h-[min(520px,calc(100vh-100px))] flex flex-col">
           {/* Header */}
           <div className="bg-gradient-to-r from-[#6B9B5F] to-[#6B9B5F]/80 px-6 py-4 flex-shrink-0">
             <div className="flex items-start justify-between">
