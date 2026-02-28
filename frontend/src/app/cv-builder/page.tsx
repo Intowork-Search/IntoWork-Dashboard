@@ -1287,7 +1287,7 @@ export default function CVBuilder() {
                                     key={level}
                                     onClick={() => updateSkill(skill.id, 'level', level)}
                                     aria-label={`Niveau ${level} sur 5`}
-                                    aria-pressed={level <= skill.level}
+                                    aria-pressed={level <= skill.level ? "true" : "false"}
                                     className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
                                       level <= skill.level
                                         ? 'bg-gradient-to-r from-amber-400 to-orange-400 text-white shadow-sm'
@@ -1430,7 +1430,7 @@ export default function CVBuilder() {
                       key={template.id}
                       onClick={() => setSelectedTemplate(template.id)}
                       aria-label={`Sélectionner le template ${template.name}`}
-                      aria-pressed={selectedTemplate === template.id}
+                      aria-pressed={selectedTemplate === template.id ? "true" : "false"}
                       className="relative p-4 rounded-2xl border-2 transition-all hover:scale-[1.02]"
                       style={
                         selectedTemplate === template.id
