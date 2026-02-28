@@ -98,18 +98,18 @@ export default function OnboardingTour({
       switch (step.position || 'bottom') {
         case 'top':
           top = rect.top + scrollY - tooltipHeight - 30;
-          left = rect.left + scrollX + rect.width / 2;
+          left = rect.left + scrollX + (rect.width / 2) - (tooltipWidth / 2);
           break;
         case 'bottom':
           top = rect.bottom + scrollY + 20;
-          left = rect.left + scrollX + rect.width / 2;
+          left = rect.left + scrollX + (rect.width / 2) - (tooltipWidth / 2);
           break;
         case 'left':
-          top = rect.top + scrollY + rect.height / 2;
+          top = rect.top + scrollY + (rect.height / 2) - (tooltipHeight / 2);
           left = rect.left + scrollX - tooltipWidth - 30;
           break;
         case 'right':
-          top = rect.top + scrollY + rect.height / 2;
+          top = rect.top + scrollY + (rect.height / 2) - (tooltipHeight / 2);
           left = rect.right + scrollX + 30;
           break;
       }

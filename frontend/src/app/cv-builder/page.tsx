@@ -1287,7 +1287,7 @@ export default function CVBuilder() {
                                     key={level}
                                     onClick={() => updateSkill(skill.id, 'level', level)}
                                     aria-label={`Niveau ${level} sur 5`}
-                                    aria-pressed={level <= skill.level ? "true" : "false"}
+                                    aria-pressed={level <= skill.level}
                                     className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
                                       level <= skill.level
                                         ? 'bg-gradient-to-r from-amber-400 to-orange-400 text-white shadow-sm'
