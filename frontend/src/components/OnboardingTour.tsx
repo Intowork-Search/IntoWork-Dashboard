@@ -83,9 +83,9 @@ export default function OnboardingTour({
       const scrollY = window.scrollY;
       const scrollX = window.scrollX;
       
-      // Dimensions du tooltip (approximatives)
-      const tooltipWidth = 380; // maxWidth: 400px - padding
-      const tooltipHeight = 300; // hauteur estimée
+      // Dimensions du tooltip (largeur réactive)
+      const tooltipWidth = Math.min(400, window.innerWidth - 40);
+      const tooltipHeight = 280; // hauteur estimée du tooltip
       
       // Dimensions du viewport
       const viewportWidth = window.innerWidth;
@@ -97,7 +97,7 @@ export default function OnboardingTour({
 
       switch (step.position || 'bottom') {
         case 'top':
-          top = rect.top + scrollY - tooltipHeight - 30;
+          top = rect.top + scrollY - tooltipHeight - 20;
           left = rect.left + scrollX + (rect.width / 2) - (tooltipWidth / 2);
           break;
         case 'bottom':
@@ -106,22 +106,22 @@ export default function OnboardingTour({
           break;
         case 'left':
           top = rect.top + scrollY + (rect.height / 2) - (tooltipHeight / 2);
-          left = rect.left + scrollX - tooltipWidth - 30;
+          left = rect.left + scrollX - tooltipWidth - 20;
           break;
         case 'right':
           top = rect.top + scrollY + (rect.height / 2) - (tooltipHeight / 2);
-          left = rect.right + scrollX + 30;
+          left = rect.right + scrollX + 20;
           break;
       }
 
       // Contraintes horizontales (garder dans le viewport)
-      const minLeft = scrollX + 20;
-      const maxLeft = scrollX + viewportWidth - tooltipWidth - 20;
+      const minLeft = scrollX + 10;
+      const maxLeft = scrollX + viewportWidth - tooltipWidth - 10;
       left = Math.max(minLeft, Math.min(left, maxLeft));
 
       // Contraintes verticales
-      const minTop = scrollY + 20;
-      const maxTop = scrollY + viewportHeight - tooltipHeight - 20;
+      const minTop = scrollY + 10;
+      const maxTop = scrollY + viewportHeight - tooltipHeight - 10;
       top = Math.max(minTop, Math.min(top, maxTop));
 
       setTooltipPosition({ top, left });
@@ -213,21 +213,18 @@ export default function OnboardingTour({
         style={{
           top: `${tooltipPosition.top}px`,
           left: `${tooltipPosition.left}px`,
-          maxWidth: '400px',
-          minWidth: '320px',
-          width: 'calc(100vw - 40px)', // Responsive sur mobile
         }}
       >
-        <div className="bg-white rounded-2xl shadow-2xl border-2 border-[#6B9B5F]/20 overflow-hidden max-h-[calc(100vh-100px)] flex flex-col">
+        <div className="bg-white rounded-2xl shadow-2xl border-2 border-[#6B9B5F]/20 overflow-hidden w-[min(400px,calc(100vw-40px))] max-h-[calc(100vh-100px)] flex flex-col">
           {/* Header */}
-          <div className="bg-gradient-to-r from-[#6B9B5F] to-[#6B9B5F]/80 px-6 py-4">
+          <div className="bg-gradient-to-r from-[#6B9B5F] to-[#6B9B5F]/80 px-6 py-4 flex-shrink-0">
             <div className="flex items-start justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
                   <SparklesIcon className="w-6 h-6 text-white" />
                 </div>
-                <div>
-                  <h3 className="text-white font-bold text-lg">{step.title}</h3>
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-white font-bold text-lg truncate">{step.title}</h3>
                   <p className="text-white/80 text-sm">
                     Étape {currentStep + 1} sur {steps.length}
                   </p>
@@ -235,7 +232,7 @@ export default function OnboardingTour({
               </div>
               <button
                 onClick={handleSkip}
-                className="text-white/80 hover:text-white transition-colors"
+                className="text-white/80 hover:text-white transition-colors flex-shrink-0 ml-2"
                 aria-label="Fermer le guide"
               >
                 <XMarkIcon className="w-6 h-6" />
@@ -252,12 +249,12 @@ export default function OnboardingTour({
           </div>
 
           {/* Contenu */}
-          <div className="px-6 py-5 overflow-y-auto max-h-[50vh]">
-            <p className="text-gray-700 text-base leading-relaxed whitespace-pre-wrap">{step.content}</p>
+          <div className="px-6 py-5 overflow-y-auto flex-1 max-h-[300px]">
+            <p className="text-gray-700 text-base leading-relaxed">{step.content}</p>
           </div>
 
           {/* Footer avec navigation */}
-          <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+          <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between flex-shrink-0 gap-2">
             <button
               onClick={handleSkip}
               className="text-sm text-gray-500 hover:text-gray-700 transition-colors font-medium"
