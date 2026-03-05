@@ -216,13 +216,13 @@ export default function Home() {
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32 w-full">
           <div className="max-w-4xl">
             {/* Badge */}
-            <div className="inline-flex items-center space-x-2 px-6 py-3 rounded-full border-2 border-teal-400/50 bg-teal-400/10 backdrop-blur-sm mb-8 animate-fade-in">
+            <div className="inline-flex items-center space-x-2 px-6 py-3 rounded-full border-2 border-[#6B9B5F]/50 bg-[#6B9B5F]/10 backdrop-blur-sm mb-8 animate-fade-in">
               <span className="text-sm sm:text-base font-medium text-white">Notre vision pour les résultats</span>
             </div>
 
             {/* Titre principal */}
             <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold text-white mb-8 leading-[1.1] tracking-tight animate-fade-in animation-delay-100">
-              INTOWORK <span className="text-teal-400">#1</span><br />
+              <span className="text-[#6B9B5F]">#1</span><br />
               Plateforme de<br />
               recrutement !
             </h1>
@@ -242,7 +242,7 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row gap-4 animate-fade-in animation-delay-300">
               <Link 
                 href="/signup" 
-                className="inline-flex items-center justify-center px-8 py-4 text-base sm:text-lg font-semibold text-white bg-teal-500 hover:bg-teal-600 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+                className="inline-flex items-center justify-center px-8 py-4 text-base sm:text-lg font-semibold text-white bg-[#6B9B5F] hover:bg-[#5a8a4f] rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
               >
                 En savoir +
               </Link>
@@ -257,15 +257,15 @@ export default function Home() {
             {/* Stats */}
             <div className="grid grid-cols-3 gap-8 mt-16 pt-8 border-t border-white/20 animate-fade-in animation-delay-400">
               <div>
-                <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-teal-400 mb-2">10K+</div>
+                <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#6B9B5F] mb-2">10K+</div>
                 <div className="text-sm sm:text-base text-white/80">Candidats qualifiés</div>
               </div>
               <div>
-                <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-teal-400 mb-2">500+</div>
+                <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#6B9B5F] mb-2">500+</div>
                 <div className="text-sm sm:text-base text-white/80">Entreprises partenaires</div>
               </div>
               <div>
-                <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-teal-400 mb-2">95%</div>
+                <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#6B9B5F] mb-2">95%</div>
                 <div className="text-sm sm:text-base text-white/80">Taux de satisfaction</div>
               </div>
             </div>
