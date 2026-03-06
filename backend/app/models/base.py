@@ -174,6 +174,12 @@ class Company(Base):
     # Branding
     logo_url = Column(String)
     cloudinary_id = Column(String)  # Cloudinary public_id pour gestion optimisée des images
+
+    # Intégration Targetym
+    targetym_tenant_id = Column(Integer, nullable=True, index=True)  # ID du tenant lié sur Targetym
+    targetym_api_key = Column(String, nullable=True)  # Clé API Targetym chiffrée
+    targetym_linked_at = Column(DateTime(timezone=True), nullable=True)  # Date de liaison
+    company_api_key = Column(String, nullable=True, index=True)  # Clé API IntoWork générée pour Targetym
     
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
@@ -231,7 +237,8 @@ class Job(Base):
     employer_id = Column(Integer, ForeignKey("employers.id"), nullable=False)
     company_id = Column(Integer, ForeignKey("companies.id"), nullable=False)
     
-    # Informations de base
+    # Intégration Targetym
+    targetym_job_posting_id = Column(Integer, nullable=True, index=True)  # ID de l'offre source Targetym
     title = Column(String, nullable=False, index=True)
     description = Column(Text, nullable=False)
     requirements = Column(Text)

@@ -267,6 +267,49 @@ export default function IntegrationsPage() {
 
         {/* Cartes des intégrations */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Targetym - Plateforme RH */}
+          <div
+            className="group relative bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border-2 border-[#6B9B5F]/30 cursor-pointer"
+            onClick={() => router.push('/dashboard/integrations/targetym')}
+            style={{ animation: 'fadeIn 0.4s ease-out' }}
+          >
+            <div className="absolute inset-0 bg-[#6B9B5F] opacity-0 group-hover:opacity-5 transition-opacity duration-300" />
+            <div className="relative p-6">
+              <div className="flex items-start justify-between mb-5">
+                <div className="p-4 rounded-2xl bg-[#6B9B5F]/10 shadow-md">
+                  <span className="text-3xl">🎯</span>
+                </div>
+                <div className="flex items-center gap-1.5 bg-gradient-to-r from-[#F7C700] to-[#e6b800] text-gray-900 px-3 py-1.5 rounded-full text-xs font-bold shadow-md">
+                  ✨ Natif
+                </div>
+              </div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">Targetym RH</h3>
+              <p className="text-sm text-gray-600 mb-5 leading-relaxed">
+                Connectez votre plateforme RH Targetym pour automatiser l'intégration des candidats embauchés
+              </p>
+              <div className="space-y-2.5 mb-5">
+                {[
+                  'Candidat embauché → Employé créé automatiquement',
+                  'Offres internes Targetym → publiées sur IntoWork',
+                  'Flux RH et recrutement unifiés',
+                ].map((f, i) => (
+                  <div key={i} className="flex items-start gap-2.5 text-sm text-gray-700">
+                    <CheckCircleIcon className="h-4 w-4 text-[#6B9B5F] flex-shrink-0 mt-0.5" />
+                    <span>{f}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="pt-4 border-t border-gray-100">
+                <button
+                  onClick={(e) => { e.stopPropagation(); router.push('/dashboard/integrations/targetym'); }}
+                  className="w-full px-4 py-2.5 bg-gradient-to-r from-[#6B9B5F] to-[#5a8450] text-white rounded-xl font-medium text-sm flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all duration-200"
+                >
+                  <LinkIcon className="h-4 w-4" />
+                  Configurer
+                </button>
+              </div>
+            </div>
+          </div>
           {/* LinkedIn */}
           <div data-tour="connect-linkedin">
             <IntegrationCard

@@ -862,3 +862,365 @@ async def disconnect_integration(
     await db.commit()
     
     return {"message": f"{provider} integration disconnected"}
+
+
+# ========================================
+# Intégration Targetym
+# ========================================
+
+TARGETYM_API_BASE_URL = os.getenv("TARGETYM_API_URL", "https://targetym-api.railway.app")
+
+
+class TargetymLinkRequest(BaseModel):
+    targetym_tenant_id: int
+    targetym_api_key: str
+
+
+class TargetymLinkResponse(BaseModel):
+    linked: bool
+    targetym_tenant_id: int
+    targetym_tenant_name: str
+    linked_at: str
+    message: str
+
+
+@router.post("/targetym/link", response_model=TargetymLinkResponse)
+async def link_targetym_account(
+    body: TargetymLinkRequest,
+    employer: Annotated[Employer, Depends(require_employer)],
+    db: Annotated[AsyncSession, Depends(get_db)]
+):
+    """
+    Lier le compte de l'entreprise IntoWork à un tenant Targetym.
+    L'employeur fournit son tenant_id Targetym et sa clé API Targetym.
+    IntoWork vérifie la clé auprès de Targetym avant de sauvegarder.
+    """
+    import httpx
+
+    # Récupérer l'entreprise
+    result = await db.execute(
+        select(Company).where(Company.id == employer.company_id)
+    )
+    company = result.scalar_one_or_none()
+    if not company:
+        raise HTTPException(status_code=404, detail="Entreprise introuvable")
+
+    # Déjà liée ?
+    if company.targetym_tenant_id:
+        raise HTTPException(
+            status_code=400,
+            detail="Ce compte est déjà lié à un tenant Targetym. Déliez d'abord l'ancien compte."
+        )
+
+    # Vérifier la clé API auprès de Targetym
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            resp = await client.post(
+                f"{TARGETYM_API_BASE_URL}/api/integrations/intowork/verify-key",
+                json={
+                    "tenant_id": body.targetym_tenant_id,
+                    "api_key": body.targetym_api_key,
+                    "intowork_company_id": employer.company_id,
+                }
+            )
+    except httpx.RequestError as e:
+        logger.error(f"Targetym unreachable: {e}")
+        raise HTTPException(status_code=503, detail="Impossible de joindre Targetym pour vérifier la clé API")
+
+    if resp.status_code != 200:
+        raise HTTPException(
+            status_code=400,
+            detail="Clé API Targetym invalide ou tenant introuvable"
+        )
+
+    tenant_data = resp.json()
+
+    # Sauvegarder la liaison
+    now = datetime.utcnow()
+    await db.execute(
+        update(Company)
+        .where(Company.id == employer.company_id)
+        .values(
+            targetym_tenant_id=body.targetym_tenant_id,
+            targetym_api_key=body.targetym_api_key,
+            targetym_linked_at=now,
+        )
+    )
+    await db.commit()
+
+    logger.info(f"Company {employer.company_id} linked to Targetym tenant {body.targetym_tenant_id}")
+
+    return TargetymLinkResponse(
+        linked=True,
+        targetym_tenant_id=body.targetym_tenant_id,
+        targetym_tenant_name=tenant_data.get("tenant_name", ""),
+        linked_at=now.isoformat(),
+        message="Compte Targetym lié avec succès"
+    )
+
+
+@router.delete("/targetym/unlink")
+async def unlink_targetym_account(
+    employer: Annotated[Employer, Depends(require_employer)],
+    db: Annotated[AsyncSession, Depends(get_db)]
+):
+    """Délier le compte IntoWork du tenant Targetym."""
+    result = await db.execute(
+        select(Company).where(Company.id == employer.company_id)
+    )
+    company = result.scalar_one_or_none()
+    if not company:
+        raise HTTPException(status_code=404, detail="Entreprise introuvable")
+
+    if not company.targetym_tenant_id:
+        raise HTTPException(status_code=400, detail="Aucun compte Targetym lié")
+
+    await db.execute(
+        update(Company)
+        .where(Company.id == employer.company_id)
+        .values(
+            targetym_tenant_id=None,
+            targetym_api_key=None,
+            targetym_linked_at=None,
+        )
+    )
+    await db.commit()
+
+    return {"message": "Compte Targetym délié avec succès"}
+
+
+@router.get("/targetym/status")
+async def get_targetym_status(
+    employer: Annotated[Employer, Depends(require_employer)],
+    db: Annotated[AsyncSession, Depends(get_db)]
+):
+    """Retourne le statut de la liaison avec Targetym pour l'entreprise courante."""
+    result = await db.execute(
+        select(Company).where(Company.id == employer.company_id)
+    )
+    company = result.scalar_one_or_none()
+    if not company:
+        raise HTTPException(status_code=404, detail="Entreprise introuvable")
+
+    if not company.targetym_tenant_id:
+        return {"linked": False}
+
+    return {
+        "linked": True,
+        "targetym_tenant_id": company.targetym_tenant_id,
+        "linked_at": company.targetym_linked_at.isoformat() if company.targetym_linked_at else None,
+    }
+
+
+# ========================================
+# Clé API IntoWork (pour Targetym)
+# ========================================
+
+class TargetymVerifyKeyRequest(BaseModel):
+    """Appelé par Targetym pour vérifier la clé API IntoWork d'une entreprise."""
+    company_id: int
+    api_key: str
+    targetym_tenant_id: int  # Pour que IntoWork enregistre la liaison côté retour
+
+
+@router.post("/api-key/generate")
+async def generate_company_api_key(
+    employer: Annotated[Employer, Depends(require_employer)],
+    db: Annotated[AsyncSession, Depends(get_db)]
+):
+    """
+    Génère (ou régénère) la clé API IntoWork de l'entreprise.
+    Cette clé permet à Targetym de s'authentifier auprès d'IntoWork.
+    """
+    result = await db.execute(
+        select(Company).where(Company.id == employer.company_id)
+    )
+    company = result.scalar_one_or_none()
+    if not company:
+        raise HTTPException(status_code=404, detail="Entreprise introuvable")
+
+    new_key = "iw_" + secrets.token_urlsafe(32)
+
+    await db.execute(
+        update(Company)
+        .where(Company.id == employer.company_id)
+        .values(company_api_key=new_key)
+    )
+    await db.commit()
+
+    return {
+        "api_key": new_key,
+        "message": "Clé API générée. Partagez-la avec votre admin Targetym pour activer la liaison."
+    }
+
+
+@router.get("/api-key")
+async def get_company_api_key(
+    employer: Annotated[Employer, Depends(require_employer)],
+    db: Annotated[AsyncSession, Depends(get_db)]
+):
+    """Retourne la clé API IntoWork actuelle de l'entreprise (masquée)."""
+    result = await db.execute(
+        select(Company).where(Company.id == employer.company_id)
+    )
+    company = result.scalar_one_or_none()
+    if not company:
+        raise HTTPException(status_code=404, detail="Entreprise introuvable")
+
+    if not company.company_api_key:
+        return {"has_key": False, "api_key_preview": None}
+
+    preview = company.company_api_key[:8] + "••••••••"
+    return {"has_key": True, "api_key_preview": preview}
+
+
+@router.post("/targetym/verify-key")
+async def verify_targetym_key_from_targetym(
+    body: TargetymVerifyKeyRequest,
+    db: Annotated[AsyncSession, Depends(get_db)]
+):
+    """
+    Endpoint appelé par Targetym pour vérifier la clé API IntoWork d'une entreprise.
+    Si valide, enregistre la liaison côté IntoWork (targetym_tenant_id sur Company).
+    Pas d'authentification requise — la clé est la preuve.
+    """
+    result = await db.execute(
+        select(Company).where(Company.id == body.company_id)
+    )
+    company = result.scalar_one_or_none()
+
+    if not company or not company.company_api_key:
+        return {"valid": False}
+
+    if company.company_api_key != body.api_key:
+        logger.warning(f"Clé API IntoWork invalide pour la Company {body.company_id}")
+        return {"valid": False}
+
+    # Enregistrer la liaison côté IntoWork
+    now = datetime.utcnow()
+    await db.execute(
+        update(Company)
+        .where(Company.id == body.company_id)
+        .values(
+            targetym_tenant_id=body.targetym_tenant_id,
+            targetym_linked_at=now,
+        )
+    )
+    await db.commit()
+
+    logger.info(f"Company {body.company_id} liée au tenant Targetym {body.targetym_tenant_id} via verify-key")
+
+    return {"valid": True, "company_name": company.name}
+
+
+# ========================================
+# Webhook : Offre Targetym publiée → Job IntoWork
+# ========================================
+
+class SyncJobWebhookPayload(BaseModel):
+    company_id: int
+    api_key: str
+    targetym_tenant_id: int
+    job: dict  # title, description, location, job_type, location_type, salary_min, salary_max, currency, targetym_job_posting_id
+
+
+@router.post("/targetym/webhook/sync-job")
+async def webhook_sync_job(
+    body: SyncJobWebhookPayload,
+    db: Annotated[AsyncSession, Depends(get_db)]
+):
+    """
+    Webhook appelé par Targetym quand une offre est publiée.
+    Crée ou met à jour un Job dans IntoWork pour la company concernée.
+    Authentification par clé API company.
+    """
+    from app.models.base import Job, JobStatus
+
+    result = await db.execute(
+        select(Company).where(Company.id == body.company_id)
+    )
+    company = result.scalar_one_or_none()
+
+    if not company or not company.company_api_key:
+        return {"synced": False, "reason": "company_not_found"}
+
+    if company.company_api_key != body.api_key:
+        logger.warning(f"Clé API invalide dans webhook sync-job pour company {body.company_id}")
+        return {"synced": False, "reason": "invalid_key"}
+
+    # Récupérer l'employer admin de la company
+    employer_result = await db.execute(
+        select(Employer).where(
+            Employer.company_id == body.company_id,
+            Employer.is_admin == True
+        )
+    )
+    employer = employer_result.scalar_one_or_none()
+    if not employer:
+        # Prendre n'importe quel employer de la company
+        employer_result = await db.execute(
+            select(Employer).where(Employer.company_id == body.company_id)
+        )
+        employer = employer_result.scalar_one_or_none()
+
+    if not employer:
+        return {"synced": False, "reason": "no_employer_found"}
+
+    job_data = body.job
+    targetym_job_id = job_data.get("targetym_job_posting_id")
+
+    # Vérifier si le job existe déjà par targetym_job_posting_id
+    existing_result = await db.execute(
+        select(Job).where(
+            Job.company_id == body.company_id,
+            Job.targetym_job_posting_id == targetym_job_id
+        )
+    )
+    existing_job = existing_result.scalar_one_or_none()
+
+    # Mapping job_type
+    valid_job_types = ["full_time", "part_time", "contract", "temporary", "internship"]
+    job_type = job_data.get("job_type", "full_time")
+    if job_type not in valid_job_types:
+        job_type = "full_time"
+
+    valid_location_types = ["on_site", "remote", "hybrid"]
+    location_type = job_data.get("location_type", "on_site")
+    if location_type not in valid_location_types:
+        location_type = "on_site"
+
+    if existing_job:
+        # Mise à jour
+        existing_job.title = job_data.get("title", existing_job.title)
+        existing_job.description = job_data.get("description", existing_job.description)
+        existing_job.location = job_data.get("location", existing_job.location)
+        existing_job.job_type = job_type
+        existing_job.location_type = location_type
+        existing_job.salary_min = job_data.get("salary_min")
+        existing_job.salary_max = job_data.get("salary_max")
+        existing_job.currency = job_data.get("currency", "XOF")
+        existing_job.status = JobStatus.PUBLISHED
+        await db.commit()
+        logger.info(f"✅ Job Targetym #{targetym_job_id} mis à jour dans IntoWork (job_id={existing_job.id})")
+        return {"synced": True, "job_id": existing_job.id, "action": "updated"}
+    else:
+        # Création
+        new_job = Job(
+            company_id=body.company_id,
+            employer_id=employer.id,
+            targetym_job_posting_id=targetym_job_id,
+            title=job_data.get("title", "Poste ouvert"),
+            description=job_data.get("description", ""),
+            location=job_data.get("location", ""),
+            job_type=job_type,
+            location_type=location_type,
+            salary_min=job_data.get("salary_min"),
+            salary_max=job_data.get("salary_max"),
+            currency=job_data.get("currency", "XOF"),
+            status=JobStatus.PUBLISHED,
+        )
+        db.add(new_job)
+        await db.commit()
+        await db.refresh(new_job)
+        logger.info(f"✅ Job Targetym #{targetym_job_id} créé dans IntoWork (job_id={new_job.id})")
+        return {"synced": True, "job_id": new_job.id, "action": "created"}

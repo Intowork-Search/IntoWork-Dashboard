@@ -841,6 +841,47 @@ export const integrationsAPI = {
     return response.data;
   },
 
+  // ── Targetym ──────────────────────────────
+  // Générer la clé API IntoWork (pour la partager avec Targetym)
+  generateApiKey: async (token: string): Promise<{ api_key: string; message: string }> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.post('/integrations/api-key/generate');
+    return response.data;
+  },
+
+  // Récupérer la clé API (masquée)
+  getApiKey: async (token: string): Promise<{ has_key: boolean; api_key_preview: string | null }> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.get('/integrations/api-key');
+    return response.data;
+  },
+
+  // Lier le compte Targetym
+  linkTargetym: async (token: string, targetym_tenant_id: number, targetym_api_key: string): Promise<{
+    linked: boolean; targetym_tenant_id: number; targetym_tenant_name: string; linked_at: string; message: string;
+  }> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.post('/integrations/targetym/link', { targetym_tenant_id, targetym_api_key });
+    return response.data;
+  },
+
+  // Délier le compte Targetym
+  unlinkTargetym: async (token: string): Promise<{ message: string }> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.delete('/integrations/targetym/unlink');
+    return response.data;
+  },
+
+  // Statut liaison Targetym
+  getTargetymStatus: async (token: string): Promise<{
+    linked: boolean; targetym_tenant_id?: number; linked_at?: string;
+  }> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.get('/integrations/targetym/status');
+    return response.data;
+  },
+  // ──────────────────────────────────────────
+
   // Déconnecter une intégration
   disconnect: async (token: string, provider: 'linkedin' | 'google-calendar' | 'outlook'): Promise<{ message: string }> => {
     const client = createAuthenticatedClient(token);

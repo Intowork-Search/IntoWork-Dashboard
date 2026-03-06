@@ -14,6 +14,14 @@ if [ -z "$NEXTAUTH_SECRET" ]; then
     exit 1
 fi
 
+# Appliquer les migrations Alembic (colonnes manquantes, nouveaux champs)
+echo "📦 Application des migrations Alembic..."
+alembic upgrade head
+
+if [ $? -ne 0 ]; then
+    echo "⚠️  Alembic a échoué - tentative avec create_all_tables..."
+fi
+
 # Créer les tables de base de données (alternative temporaire à Alembic)
 echo "📊 Initialisation de la base de données..."
 python create_all_tables.py

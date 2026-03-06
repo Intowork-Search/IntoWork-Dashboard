@@ -696,6 +696,46 @@ async def update_application_status(
                 logger.error(f"❌ Error sending status change email: {e}")
                 # Ne pas bloquer si l'envoi d'email échoue
         
+        # ── Flux Targetym : candidat accepté → employé créé ──────────────
+        if new_status == ApplicationStatus.ACCEPTED:
+            try:
+                from app.services.targetym_service import notify_candidate_hired
+                from app.models.base import Company
+
+                # Récupérer la company liée (avec les champs Targetym)
+                company_result = await db.execute(
+                    select(Company).where(Company.id == employer.company_id)
+                )
+                company = company_result.scalar_one_or_none()
+
+                if (company and company.targetym_tenant_id and company.targetym_api_key):
+                    # Récupérer les infos du candidat
+                    candidate_user_result = await db.execute(
+                        select(User).where(User.id == application.candidate.user_id)
+                    )
+                    candidate_user = candidate_user_result.scalar_one_or_none()
+
+                    if candidate_user:
+                        import asyncio
+                        asyncio.create_task(
+                            notify_candidate_hired(
+                                targetym_tenant_id=company.targetym_tenant_id,
+                                targetym_api_key=company.targetym_api_key,
+                                first_name=candidate_user.first_name,
+                                last_name=candidate_user.last_name,
+                                email=candidate_user.email,
+                                job_title=application.job.title,
+                                phone=getattr(application.candidate, 'phone', None),
+                                location=getattr(application.candidate, 'location', None),
+                                intowork_application_id=application.id,
+                                intowork_company_id=employer.company_id,
+                            )
+                        )
+            except Exception as e:
+                logger.error(f"Erreur flux Targetym (candidat accepté) : {e}")
+                # Ne pas bloquer si l'intégration échoue
+        # ──────────────────────────────────────────────────────────────────
+
         return {
             "message": "Statut mis à jour avec succès",
             "application_id": application.id,
