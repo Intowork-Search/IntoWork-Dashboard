@@ -18,19 +18,19 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    # ALTER TYPE ADD VALUE must run outside a transaction in PostgreSQL.
     connection = op.get_bind()
-    connection = connection.execution_options(isolation_level="AUTOCOMMIT")
+
+    # ALTER TYPE ADD VALUE must run outside any transaction.
+    # Commit the implicit transaction Alembic opened, then re-open one after.
+    connection.execute(text("COMMIT"))
 
     for value in ('full_time', 'part_time', 'contract', 'temporary', 'internship'):
-        connection.execute(
-            text(f"ALTER TYPE jobtype ADD VALUE IF NOT EXISTS '{value}'")
-        )
+        connection.execute(text(f"ALTER TYPE jobtype ADD VALUE IF NOT EXISTS '{value}'"))
 
     for value in ('on_site', 'remote', 'hybrid'):
-        connection.execute(
-            text(f"ALTER TYPE joblocation ADD VALUE IF NOT EXISTS '{value}'")
-        )
+        connection.execute(text(f"ALTER TYPE joblocation ADD VALUE IF NOT EXISTS '{value}'"))
+
+    connection.execute(text("BEGIN"))
 
 
 def downgrade() -> None:
