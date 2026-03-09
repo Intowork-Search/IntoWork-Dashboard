@@ -443,20 +443,32 @@ async def withdraw_application(
     db: AsyncSession = Depends(get_db)
 ):
     """Retirer une candidature"""
+    from app.models.base import ApplicationStatus
+
+    # Récupérer le profil candidat (candidate_id ≠ user_id)
+    candidate_result = await db.execute(
+        select(Candidate).filter(Candidate.user_id == current_user.id)
+    )
+    candidate = candidate_result.scalar_one_or_none()
+    if not candidate:
+        raise HTTPException(status_code=404, detail="Profil candidat introuvable")
 
     result = await db.execute(
         select(JobApplication).filter(
             JobApplication.id == application_id,
-            JobApplication.candidate_id == current_user.id,
-            JobApplication.status == "pending"  # On ne peut retirer que les candidatures en attente
+            JobApplication.candidate_id == candidate.id,
         )
     )
     application = result.scalar_one_or_none()
 
     if not application:
+        raise HTTPException(status_code=404, detail="Candidature introuvable")
+
+    # Bloquer uniquement si déjà accepté
+    if application.status == ApplicationStatus.ACCEPTED:
         raise HTTPException(
-            status_code=404,
-            detail="Candidature introuvable ou impossible à retirer"
+            status_code=400,
+            detail="Impossible de retirer une candidature déjà acceptée"
         )
 
     await db.delete(application)
