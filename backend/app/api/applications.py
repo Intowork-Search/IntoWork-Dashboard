@@ -326,6 +326,48 @@ async def create_application(
         'currency': application_with_job.job.currency
     }
     
+    # ── Sync vers Targetym : notifier qu'une candidature a été reçue ──
+    try:
+        if job.targetym_job_posting_id:
+            from app.models.base import Company
+            import re as _re
+            import httpx
+
+            company_result = await db.execute(
+                select(Company).where(Company.id == job.company_id)
+            )
+            company_obj = company_result.scalar_one_or_none()
+
+            if company_obj and company_obj.targetym_tenant_id and company_obj.targetym_api_key:
+                _raw = __import__('os').getenv('TARGETYM_API_URL', '') or ''
+                _m = _re.search(r'https?://[^\s]+', _raw)
+                targetym_url = _m.group(0).rstrip('/') if _m else 'https://web-production-06c3.up.railway.app'
+
+                webhook_payload = {
+                    'tenant_id': company_obj.targetym_tenant_id,
+                    'api_key': company_obj.targetym_api_key,
+                    'application': {
+                        'targetym_job_posting_id': job.targetym_job_posting_id,
+                        'intowork_application_id': application.id,
+                        'first_name': current_user.first_name or '',
+                        'last_name': current_user.last_name or '',
+                        'email': current_user.email,
+                        'phone': candidate.phone,
+                        'location': candidate.location,
+                        'cover_letter': application_data.cover_letter,
+                        'cv_url': cv_url,
+                        'source': 'IntoWork',
+                    }
+                }
+                async with httpx.AsyncClient(timeout=10) as client:
+                    resp = await client.post(
+                        f'{targetym_url}/api/integrations/intowork/webhook/new-application',
+                        json=webhook_payload
+                    )
+                logger.info(f'Targetym new-application webhook: {resp.status_code} for application {application.id}')
+    except Exception as _e:
+        logger.warning(f'Targetym new-application webhook failed (non-blocking): {_e}')
+
     return JobApplicationResponse(
         id=application_with_job.id,
         job_id=application_with_job.job_id,
