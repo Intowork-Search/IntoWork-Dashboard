@@ -868,7 +868,7 @@ async def disconnect_integration(
 # Intégration Targetym
 # ========================================
 
-TARGETYM_API_BASE_URL = os.getenv("TARGETYM_API_URL", "https://web-production-06c3.up.railway.app")
+TARGETYM_API_BASE_URL = (os.getenv("TARGETYM_API_URL", "").strip() or "https://web-production-06c3.up.railway.app")
 
 
 class TargetymLinkRequest(BaseModel):
@@ -905,12 +905,9 @@ async def link_targetym_account(
     if not company:
         raise HTTPException(status_code=404, detail="Entreprise introuvable")
 
-    # Déjà liée ?
-    if company.targetym_tenant_id:
-        raise HTTPException(
-            status_code=400,
-            detail="Ce compte est déjà lié à un tenant Targetym. Déliez d'abord l'ancien compte."
-        )
+    # Si déjà lié au même tenant, on accepte quand même (idempotent / re-liaison)
+    if company.targetym_tenant_id and company.targetym_tenant_id != body.targetym_tenant_id:
+        logger.warning(f"Company {employer.company_id} déjà liée au tenant {company.targetym_tenant_id}, re-liaison vers {body.targetym_tenant_id}")
 
     # Vérifier la clé API auprès de Targetym
     try:
