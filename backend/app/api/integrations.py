@@ -1141,8 +1141,8 @@ async def webhook_sync_job(
     if not company or not company.company_api_key:
         return {"synced": False, "reason": "company_not_found"}
 
-    if company.company_api_key != body.api_key:
-        logger.warning(f"Clé API invalide dans webhook sync-job pour company {body.company_id}")
+    if company.company_api_key.strip() != body.api_key.strip():
+        logger.warning(f"Clé API invalide dans webhook sync-job pour company {body.company_id} — reçu: {body.api_key[:8] if body.api_key else 'None'}... stocké: {company.company_api_key[:8] if company.company_api_key else 'None'}...")
         return {"synced": False, "reason": "invalid_key"}
 
     # Récupérer l'employer admin de la company
