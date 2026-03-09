@@ -887,7 +887,7 @@ class TargetymLinkResponse(BaseModel):
 @router.post("/targetym/link", response_model=TargetymLinkResponse)
 async def link_targetym_account(
     body: TargetymLinkRequest,
-    employer: Annotated[Employer, Depends(require_employer)],
+    employer: Annotated[Employer, Depends(get_employer_profile)],
     db: Annotated[AsyncSession, Depends(get_db)]
 ):
     """
@@ -961,7 +961,7 @@ async def link_targetym_account(
 
 @router.delete("/targetym/unlink")
 async def unlink_targetym_account(
-    employer: Annotated[Employer, Depends(require_employer)],
+    employer: Annotated[Employer, Depends(get_employer_profile)],
     db: Annotated[AsyncSession, Depends(get_db)]
 ):
     """Délier le compte IntoWork du tenant Targetym."""
@@ -991,7 +991,7 @@ async def unlink_targetym_account(
 
 @router.get("/targetym/status")
 async def get_targetym_status(
-    employer: Annotated[Employer, Depends(require_employer)],
+    employer: Annotated[Employer, Depends(get_employer_profile)],
     db: Annotated[AsyncSession, Depends(get_db)]
 ):
     """Retourne le statut de la liaison avec Targetym pour l'entreprise courante."""
@@ -1025,7 +1025,7 @@ class TargetymVerifyKeyRequest(BaseModel):
 
 @router.post("/api-key/generate")
 async def generate_company_api_key(
-    employer: Annotated[Employer, Depends(require_employer)],
+    employer: Annotated[Employer, Depends(get_employer_profile)],
     db: Annotated[AsyncSession, Depends(get_db)]
 ):
     """
@@ -1056,7 +1056,7 @@ async def generate_company_api_key(
 
 @router.get("/api-key")
 async def get_company_api_key(
-    employer: Annotated[Employer, Depends(require_employer)],
+    employer: Annotated[Employer, Depends(get_employer_profile)],
     db: Annotated[AsyncSession, Depends(get_db)]
 ):
     """Retourne la clé API IntoWork actuelle de l'entreprise (masquée)."""
