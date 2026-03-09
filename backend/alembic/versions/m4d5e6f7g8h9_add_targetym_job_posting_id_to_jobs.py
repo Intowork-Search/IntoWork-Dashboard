@@ -19,16 +19,15 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    op.add_column(
-        'jobs',
-        sa.Column('targetym_job_posting_id', sa.Integer(), nullable=True)
-    )
-    op.create_index(
-        'ix_jobs_targetym_job_posting_id',
-        'jobs',
-        ['targetym_job_posting_id'],
-        unique=False
-    )
+    # Utilisation de IF NOT EXISTS pour idempotence
+    op.execute("""
+        ALTER TABLE jobs
+            ADD COLUMN IF NOT EXISTS targetym_job_posting_id INTEGER
+    """)
+    op.execute("""
+        CREATE INDEX IF NOT EXISTS ix_jobs_targetym_job_posting_id
+            ON jobs (targetym_job_posting_id)
+    """)
 
 
 def downgrade() -> None:

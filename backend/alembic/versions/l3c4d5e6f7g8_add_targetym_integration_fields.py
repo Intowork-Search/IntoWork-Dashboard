@@ -21,34 +21,22 @@ depends_on = None
 
 
 def upgrade() -> None:
-    op.add_column(
-        'companies',
-        sa.Column('targetym_tenant_id', sa.Integer(), nullable=True)
-    )
-    op.add_column(
-        'companies',
-        sa.Column('targetym_api_key', sa.String(), nullable=True)
-    )
-    op.add_column(
-        'companies',
-        sa.Column('targetym_linked_at', sa.DateTime(timezone=True), nullable=True)
-    )
-    op.create_index(
-        'ix_companies_targetym_tenant_id',
-        'companies',
-        ['targetym_tenant_id'],
-        unique=False
-    )
-    op.add_column(
-        'companies',
-        sa.Column('company_api_key', sa.String(), nullable=True)
-    )
-    op.create_index(
-        'ix_companies_company_api_key',
-        'companies',
-        ['company_api_key'],
-        unique=True
-    )
+    # Utilisation de IF NOT EXISTS pour idempotence (DB déjà existante sans alembic)
+    op.execute("""
+        ALTER TABLE companies
+            ADD COLUMN IF NOT EXISTS targetym_tenant_id INTEGER,
+            ADD COLUMN IF NOT EXISTS targetym_api_key VARCHAR,
+            ADD COLUMN IF NOT EXISTS targetym_linked_at TIMESTAMP WITH TIME ZONE,
+            ADD COLUMN IF NOT EXISTS company_api_key VARCHAR
+    """)
+    op.execute("""
+        CREATE INDEX IF NOT EXISTS ix_companies_targetym_tenant_id
+            ON companies (targetym_tenant_id)
+    """)
+    op.execute("""
+        CREATE UNIQUE INDEX IF NOT EXISTS ix_companies_company_api_key
+            ON companies (company_api_key)
+    """)
 
 
 def downgrade() -> None:
