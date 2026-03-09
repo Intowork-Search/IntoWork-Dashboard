@@ -13,6 +13,7 @@ from datetime import datetime, timedelta
 import secrets
 import base64
 import os
+import re
 import logging
 
 logger = logging.getLogger(__name__)
@@ -868,7 +869,9 @@ async def disconnect_integration(
 # Intégration Targetym
 # ========================================
 
-TARGETYM_API_BASE_URL = (os.getenv("TARGETYM_API_URL", "").strip() or "https://web-production-06c3.up.railway.app")
+_raw_targetym_url = os.getenv("TARGETYM_API_URL", "") or ""
+_tu_match = re.search(r'https?://[^\s]+', _raw_targetym_url)
+TARGETYM_API_BASE_URL = _tu_match.group(0).rstrip('/') if _tu_match else "https://web-production-06c3.up.railway.app"
 
 
 class TargetymLinkRequest(BaseModel):

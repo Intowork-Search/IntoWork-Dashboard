@@ -6,11 +6,14 @@ Gère les appels vers l'API Targetym lors d'événements IntoWork.
 import httpx
 import logging
 import os
+import re
 from typing import Optional
 
 logger = logging.getLogger(__name__)
 
-TARGETYM_API_URL = os.getenv("TARGETYM_API_URL", "https://web-production-06c3.up.railway.app").strip()
+_raw_targetym_url = os.getenv("TARGETYM_API_URL", "") or ""
+_tu_match = re.search(r'https?://[^\s]+', _raw_targetym_url)
+TARGETYM_API_URL = _tu_match.group(0).rstrip('/') if _tu_match else "https://web-production-06c3.up.railway.app"
 TIMEOUT = 10.0
 
 
