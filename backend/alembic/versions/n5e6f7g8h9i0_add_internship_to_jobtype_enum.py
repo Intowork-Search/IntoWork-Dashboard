@@ -17,7 +17,15 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     # ALTER TYPE ADD VALUE cannot run inside a transaction in PG < 12.
     # Railway uses PG 15+, so IF NOT EXISTS is safe.
+    # jobtype values
+    op.execute("ALTER TYPE jobtype ADD VALUE IF NOT EXISTS 'full_time'")
+    op.execute("ALTER TYPE jobtype ADD VALUE IF NOT EXISTS 'part_time'")
+    op.execute("ALTER TYPE jobtype ADD VALUE IF NOT EXISTS 'contract'")
+    op.execute("ALTER TYPE jobtype ADD VALUE IF NOT EXISTS 'temporary'")
     op.execute("ALTER TYPE jobtype ADD VALUE IF NOT EXISTS 'internship'")
+    # joblocation values
+    op.execute("ALTER TYPE joblocation ADD VALUE IF NOT EXISTS 'on_site'")
+    op.execute("ALTER TYPE joblocation ADD VALUE IF NOT EXISTS 'remote'")
     op.execute("ALTER TYPE joblocation ADD VALUE IF NOT EXISTS 'hybrid'")
 
 
