@@ -246,15 +246,15 @@ class Job(Base):
     benefits = Column(Text)
     
     # Détails du poste
-    job_type = Column(SQLEnum(JobType), nullable=False, default=JobType.FULL_TIME)
-    location_type = Column(SQLEnum(JobLocation), nullable=False, default=JobLocation.ON_SITE)
+    job_type = Column(SQLEnum(JobType, native_enum=False, values_callable=lambda x: [e.value for e in x]), nullable=False, default=JobType.FULL_TIME)
+    location_type = Column(SQLEnum(JobLocation, native_enum=False, values_callable=lambda x: [e.value for e in x]), nullable=False, default=JobLocation.ON_SITE)
     location = Column(String)  # Ville, région
     salary_min = Column(Integer)
     salary_max = Column(Integer)
     currency = Column(String, default="EUR")
     
     # Paramètres
-    status = Column(SQLEnum(JobStatus), nullable=False, default=JobStatus.DRAFT)
+    status = Column(SQLEnum(JobStatus, native_enum=False, values_callable=lambda x: [e.value for e in x]), nullable=False, default=JobStatus.DRAFT)
     is_featured = Column(Boolean, default=False)
     views_count = Column(Integer, default=0)
     applications_count = Column(Integer, default=0)
