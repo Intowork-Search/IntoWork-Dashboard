@@ -328,20 +328,29 @@ async def create_application(
     
     # ── Sync vers Targetym : notifier qu'une candidature a été reçue ──
     try:
+        print(f'[TARGETYM-WEBHOOK] Checking webhook conditions for application {application.id}, job_id={job.id}')
+        print(f'[TARGETYM-WEBHOOK] job.targetym_job_posting_id={job.targetym_job_posting_id}')
+
         if job.targetym_job_posting_id:
             from app.models.base import Company
             import re as _re
             import httpx
+            import os as _os
 
             company_result = await db.execute(
                 select(Company).where(Company.id == job.company_id)
             )
             company_obj = company_result.scalar_one_or_none()
 
+            print(f'[TARGETYM-WEBHOOK] company_id={job.company_id}, company_found={company_obj is not None}')
+            if company_obj:
+                print(f'[TARGETYM-WEBHOOK] targetym_tenant_id={company_obj.targetym_tenant_id}, has_api_key={bool(company_obj.targetym_api_key)}')
+
             if company_obj and company_obj.targetym_tenant_id and company_obj.targetym_api_key:
-                _raw = __import__('os').getenv('TARGETYM_API_URL', '') or ''
+                _raw = _os.getenv('TARGETYM_API_URL', '') or ''
                 _m = _re.search(r'https?://[^\s]+', _raw)
                 targetym_url = _m.group(0).rstrip('/') if _m else 'https://web-production-06c3.up.railway.app'
+                print(f'[TARGETYM-WEBHOOK] Sending webhook to {targetym_url}')
 
                 webhook_payload = {
                     'tenant_id': company_obj.targetym_tenant_id,
@@ -364,8 +373,14 @@ async def create_application(
                         f'{targetym_url}/api/integrations/intowork/webhook/new-application',
                         json=webhook_payload
                     )
+                print(f'[TARGETYM-WEBHOOK] Response: {resp.status_code} — {resp.text[:300]}')
                 logger.info(f'Targetym new-application webhook: {resp.status_code} for application {application.id}')
+            else:
+                print(f'[TARGETYM-WEBHOOK] Skipped: company not linked to Targetym (no tenant_id/api_key)')
+        else:
+            print(f'[TARGETYM-WEBHOOK] Skipped: job has no targetym_job_posting_id')
     except Exception as _e:
+        print(f'[TARGETYM-WEBHOOK] ERROR (non-blocking): {_e}')
         logger.warning(f'Targetym new-application webhook failed (non-blocking): {_e}')
 
     return JobApplicationResponse(
@@ -738,6 +753,34 @@ async def update_application_status(
                 logger.error(f"❌ Error sending status change email: {e}")
                 # Ne pas bloquer si l'envoi d'email échoue
         
+        # ── Targetym : synchroniser le stage du Kanban (tous statuts) ────────
+        try:
+            import re as _re, os as _os
+            import httpx
+            from app.models.base import Company as _Company
+            _company_result = await db.execute(
+                select(_Company).where(_Company.id == employer.company_id)
+            )
+            _company = _company_result.scalar_one_or_none()
+            if _company and _company.targetym_tenant_id and _company.targetym_api_key:
+                _raw = _os.getenv('TARGETYM_API_URL', '') or ''
+                _m = _re.search(r'https?://[^\s]+', _raw)
+                _targetym_url = _m.group(0).rstrip('/') if _m else 'https://web-production-06c3.up.railway.app'
+                async with httpx.AsyncClient(timeout=10) as _client:
+                    _resp = await _client.put(
+                        f'{_targetym_url}/api/integrations/intowork/webhook/update-application-stage',
+                        json={
+                            'tenant_id': _company.targetym_tenant_id,
+                            'api_key': _company.targetym_api_key,
+                            'intowork_application_id': application.id,
+                            'intowork_status': new_status.value,
+                        }
+                    )
+                    print(f'[TARGETYM-STAGE-WEBHOOK] {new_status.value} → {_resp.status_code} {_resp.text[:200]}')
+        except Exception as _e:
+            logger.warning(f'Targetym stage-update webhook failed (non-blocking): {_e}')
+        # ────────────────────────────────────────────────────────────────────
+
         # ── Flux Targetym : candidat accepté → employé créé ──────────────
         if new_status == ApplicationStatus.ACCEPTED:
             try:
