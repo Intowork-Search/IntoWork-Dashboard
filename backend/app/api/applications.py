@@ -471,6 +471,13 @@ async def withdraw_application(
             detail="Impossible de retirer une candidature déjà acceptée"
         )
 
+    # Supprimer les notifications liées (contrainte FK)
+    from app.models.base import Notification
+    from sqlalchemy import delete as sql_delete
+    await db.execute(
+        sql_delete(Notification).where(Notification.related_application_id == application.id)
+    )
+
     await db.delete(application)
     await db.commit()
 
