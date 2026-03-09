@@ -42,10 +42,14 @@ export function useJobs(
     refetchInterval?: number;
   } = {}
 ) {
+  const { getToken, isSignedIn } = useAuth();
+
   return useQuery({
     queryKey: queryKeys.jobs.list(filters),
     queryFn: async () => {
-      const response = await jobsAPI.getJobs(filters);
+      // Passe le token si connecté pour que le backend calcule has_applied
+      const token = isSignedIn ? await getToken() : undefined;
+      const response = await jobsAPI.getJobs(filters, token ?? undefined);
       return response;
     },
     staleTime: options.staleTime ?? 1000 * 60 * 2, // 2 minutes par défaut

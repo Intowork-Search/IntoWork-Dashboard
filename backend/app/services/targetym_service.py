@@ -10,7 +10,7 @@ from typing import Optional
 
 logger = logging.getLogger(__name__)
 
-TARGETYM_API_URL = os.getenv("TARGETYM_API_URL", "https://targetym-api.railway.app")
+TARGETYM_API_URL = os.getenv("TARGETYM_API_URL", "https://web-production-06c3.up.railway.app").strip()
 TIMEOUT = 10.0
 
 

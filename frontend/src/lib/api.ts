@@ -483,7 +483,7 @@ export const jobsAPI = {
     await client.delete(`/jobs/${jobId}`);
   },
   // Récupérer la liste des offres d'emploi avec filtres
-  getJobs: async (filters?: JobFilters): Promise<JobListResponse> => {
+  getJobs: async (filters?: JobFilters, token?: string): Promise<JobListResponse> => {
     const params = new URLSearchParams();
     
     if (filters) {
@@ -497,7 +497,9 @@ export const jobsAPI = {
     // Add trailing slash to avoid 307 redirect from backend
     const queryString = params.toString();
     const url = queryString ? `/jobs/?${queryString}` : '/jobs/';
-    const response = await apiClient.get(url);
+    // Si token fourni, utilise le client authentifié pour has_applied
+    const client = token ? createAuthenticatedClient(token) : apiClient;
+    const response = await client.get(url);
     return response.data;
   },
 
