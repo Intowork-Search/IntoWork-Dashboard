@@ -868,7 +868,7 @@ async def disconnect_integration(
 # Intégration Targetym
 # ========================================
 
-TARGETYM_API_BASE_URL = os.getenv("TARGETYM_API_URL", "https://targetym-api.railway.app")
+TARGETYM_API_BASE_URL = os.getenv("TARGETYM_API_URL", "https://web-production-06c3.up.railway.app")
 
 
 class TargetymLinkRequest(BaseModel):
