@@ -40,6 +40,7 @@ export default function TargetymIntegrationPage() {
   // Formulaire de liaison
   const [tenantId, setTenantId] = useState('');
   const [targetymApiKey, setTargetymApiKey] = useState('');
+  const [myCompanyId, setMyCompanyId] = useState<number | null>(null);
 
   const loadData = async () => {
     try {
@@ -47,12 +48,16 @@ export default function TargetymIntegrationPage() {
       const token = await getToken();
       if (!token) { router.push('/auth/signin'); return; }
 
-      const [statusData, keyData] = await Promise.all([
+      const [statusData, keyData, employerData] = await Promise.all([
         integrationsAPI.getTargetymStatus(token),
         integrationsAPI.getApiKey(token),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/employers/me`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }).then(r => r.ok ? r.json() : null),
       ]);
       setStatus(statusData);
       setApiKeyData(keyData);
+      if (employerData?.company_id) setMyCompanyId(employerData.company_id);
     } catch (err) {
       console.error(err);
       toast.error('Erreur lors du chargement');
@@ -139,6 +144,13 @@ export default function TargetymIntegrationPage() {
             <p className="text-sm text-gray-500 mt-0.5">
               Connectez votre compte IntoWork à votre plateforme RH Targetym
             </p>
+            {myCompanyId && (
+              <div className="mt-2 flex items-center gap-2">
+                <span className="text-xs text-gray-500">Votre Company ID IntoWork :</span>
+                <span className="font-mono font-bold text-[#6B9B5F] bg-green-50 px-2 py-0.5 rounded text-sm select-all">#{myCompanyId}</span>
+                <span className="text-xs text-gray-400">(à donner au RH Targetym)</span>
+              </div>
+            )}
           </div>
         </div>
 
