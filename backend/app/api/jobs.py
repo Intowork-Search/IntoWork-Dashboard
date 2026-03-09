@@ -130,6 +130,17 @@ async def get_jobs(
     results_data = await db.execute(stmt)
     results = results_data.all()
 
+    # Calculer les vrais comptes de candidatures en une seule requête batch
+    job_ids = [job.id for job, _ in results]
+    app_counts_map: dict = {}
+    if job_ids:
+        app_counts_result = await db.execute(
+            select(JobApplication.job_id, func.count(JobApplication.id).label("cnt"))
+            .where(JobApplication.job_id.in_(job_ids))
+            .group_by(JobApplication.job_id)
+        )
+        app_counts_map = {row.job_id: row.cnt for row in app_counts_result}
+
     # Construire la réponse
     jobs = []
     for job, company in results:
@@ -148,7 +159,7 @@ async def get_jobs(
             posted_at=job.posted_at,
             is_featured=job.is_featured,
             views_count=job.views_count,
-            applications_count=job.applications_count,
+            applications_count=app_counts_map.get(job.id, 0),
             has_applied=job.id in user_applications
         ))
 
@@ -216,6 +227,17 @@ async def get_my_jobs(
     results_data = await db.execute(stmt)
     results = results_data.all()
 
+    # Calculer les vrais comptes de candidatures en une seule requête batch
+    job_ids = [job.id for job, _ in results]
+    employer_app_counts_map: dict = {}
+    if job_ids:
+        employer_app_counts_result = await db.execute(
+            select(JobApplication.job_id, func.count(JobApplication.id).label("cnt"))
+            .where(JobApplication.job_id.in_(job_ids))
+            .group_by(JobApplication.job_id)
+        )
+        employer_app_counts_map = {row.job_id: row.cnt for row in employer_app_counts_result}
+
     # Construire la réponse
     jobs = []
     for job, company in results:
@@ -234,7 +256,7 @@ async def get_my_jobs(
             posted_at=job.posted_at,
             is_featured=job.is_featured,
             views_count=job.views_count,
-            applications_count=job.applications_count,
+            applications_count=employer_app_counts_map.get(job.id, 0),
             has_applied=False  # L'employeur ne postule pas à ses propres offres
         ))
 
@@ -528,8 +550,15 @@ async def get_job(
             application = application_result.scalar_one_or_none()
             has_applied = application is not None
 
-    # Incrémenter le compteur de vues
+    # Calculer le vrai nombre de candidatures
+    app_count_result = await db.execute(
+        select(func.count(JobApplication.id)).where(JobApplication.job_id == job_id)
+    )
+    real_app_count = app_count_result.scalar() or 0
+
+    # Incrémenter le compteur de vues + synchroniser applications_count
     job.views_count += 1
+    job.applications_count = real_app_count
     await db.commit()
 
     return JobDetailResponse(
@@ -555,7 +584,7 @@ async def get_job(
         posted_at=job.posted_at,
         is_featured=job.is_featured,
         views_count=job.views_count,
-        applications_count=job.applications_count,
+        applications_count=real_app_count,
         has_applied=has_applied,
         status=job.status.value,
         created_at=job.created_at

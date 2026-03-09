@@ -230,6 +230,13 @@ async def create_application(
     await db.commit()
     await db.refresh(application)
 
+    # Incrémenter le compteur de candidatures du job
+    try:
+        job.applications_count = (job.applications_count or 0) + 1
+        await db.commit()
+    except Exception:
+        pass
+
     # Créer une notification pour l'employeur
     try:
         # Récupérer le job avec l'employeur
@@ -477,6 +484,12 @@ async def withdraw_application(
     await db.execute(
         sql_delete(Notification).where(Notification.related_application_id == application.id)
     )
+
+    # Décrémenter le compteur de candidatures du job
+    job_result = await db.execute(select(Job).where(Job.id == application.job_id))
+    job_obj = job_result.scalar_one_or_none()
+    if job_obj and job_obj.applications_count and job_obj.applications_count > 0:
+        job_obj.applications_count -= 1
 
     await db.delete(application)
     await db.commit()
