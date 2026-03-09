@@ -852,7 +852,7 @@ export const integrationsAPI = {
   },
 
   // Récupérer la clé API (masquée)
-  getApiKey: async (token: string): Promise<{ has_key: boolean; api_key_preview: string | null }> => {
+  getApiKey: async (token: string): Promise<{ has_key: boolean; api_key_preview: string | null; api_key_full: string | null }> => {
     const client = createAuthenticatedClient(token);
     const response = await client.get('/integrations/api-key');
     return response.data;

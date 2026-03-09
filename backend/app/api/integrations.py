@@ -1056,7 +1056,7 @@ async def get_company_api_key(
     employer: Annotated[Employer, Depends(get_employer_profile)],
     db: Annotated[AsyncSession, Depends(get_db)]
 ):
-    """Retourne la clé API IntoWork actuelle de l'entreprise (masquée)."""
+    """Retourne la clé API IntoWork actuelle de l'entreprise (complète)."""
     result = await db.execute(
         select(Company).where(Company.id == employer.company_id)
     )
@@ -1065,10 +1065,10 @@ async def get_company_api_key(
         raise HTTPException(status_code=404, detail="Entreprise introuvable")
 
     if not company.company_api_key:
-        return {"has_key": False, "api_key_preview": None}
+        return {"has_key": False, "api_key_preview": None, "api_key_full": None}
 
     preview = company.company_api_key[:8] + "••••••••"
-    return {"has_key": True, "api_key_preview": preview}
+    return {"has_key": True, "api_key_preview": preview, "api_key_full": company.company_api_key}
 
 
 @router.post("/targetym/verify-key")
@@ -1139,6 +1139,7 @@ async def webhook_sync_job(
     company = result.scalar_one_or_none()
 
     if not company or not company.company_api_key:
+        logger.warning(f"webhook sync-job: company {body.company_id} introuvable ou sans clé API")
         return {"synced": False, "reason": "company_not_found"}
 
     if company.company_api_key.strip() != body.api_key.strip():

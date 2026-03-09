@@ -29,7 +29,7 @@ export default function TargetymIntegrationPage() {
   const router = useRouter();
 
   const [status, setStatus] = useState<{ linked: boolean; targetym_tenant_id?: number; linked_at?: string } | null>(null);
-  const [apiKeyData, setApiKeyData] = useState<{ has_key: boolean; api_key_preview: string | null } | null>(null);
+  const [apiKeyData, setApiKeyData] = useState<{ has_key: boolean; api_key_preview: string | null; api_key_full: string | null } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isLinking, setIsLinking] = useState(false);
@@ -75,7 +75,7 @@ export default function TargetymIntegrationPage() {
       if (!token) return;
       const data = await integrationsAPI.generateApiKey(token);
       setGeneratedKey(data.api_key);
-      setApiKeyData({ has_key: true, api_key_preview: data.api_key.slice(0, 8) + '••••••••' });
+      setApiKeyData({ has_key: true, api_key_preview: data.api_key.slice(0, 8) + '••••••••', api_key_full: data.api_key });
       toast.success('Clé API générée avec succès !');
     } catch (err: any) {
       toast.error(err?.response?.data?.detail || 'Erreur lors de la génération');
@@ -85,8 +85,9 @@ export default function TargetymIntegrationPage() {
   };
 
   const handleCopyKey = async () => {
-    if (!generatedKey) return;
-    await navigator.clipboard.writeText(generatedKey);
+    const keyToCopy = generatedKey || apiKeyData?.api_key_full;
+    if (!keyToCopy) return;
+    await navigator.clipboard.writeText(keyToCopy);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -219,21 +220,19 @@ export default function TargetymIntegrationPage() {
                 {apiKeyData?.has_key && (
                   <div className="flex items-center gap-3 mb-4 p-3 bg-gray-50 rounded-xl border border-gray-200">
                     <KeyIcon className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                    <span className="font-mono text-sm text-gray-700 flex-1">
-                      {generatedKey || apiKeyData.api_key_preview}
+                    <span className="font-mono text-sm text-gray-700 flex-1 break-all">
+                      {generatedKey || apiKeyData.api_key_full || apiKeyData.api_key_preview}
                     </span>
-                    {generatedKey && (
-                      <button
-                        onClick={handleCopyKey}
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-[#6B9B5F] text-white rounded-lg text-xs font-medium hover:bg-[#5a8450] transition-colors"
-                      >
-                        {copied ? (
-                          <><CheckCircleIcon className="h-3.5 w-3.5" />Copié !</>
-                        ) : (
-                          <><ClipboardDocumentIcon className="h-3.5 w-3.5" />Copier</>
-                        )}
-                      </button>
-                    )}
+                    <button
+                      onClick={handleCopyKey}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-[#6B9B5F] text-white rounded-lg text-xs font-medium hover:bg-[#5a8450] transition-colors flex-shrink-0"
+                    >
+                      {copied ? (
+                        <><CheckCircleIcon className="h-3.5 w-3.5" />Copié !</>
+                      ) : (
+                        <><ClipboardDocumentIcon className="h-3.5 w-3.5" />Copier</>
+                      )}
+                    </button>
                   </div>
                 )}
 
@@ -249,12 +248,11 @@ export default function TargetymIntegrationPage() {
                   )}
                 </button>
 
-                {generatedKey && (
-                  <div className="mt-3 flex items-start gap-2 p-3 bg-amber-50 rounded-xl border border-amber-200">
-                    <InformationCircleIcon className="h-4 w-4 text-amber-500 flex-shrink-0 mt-0.5" />
-                    <p className="text-xs text-amber-700">
-                      Copiez cette clé maintenant — elle ne sera plus affichée en clair ensuite.
-                      Transmettez-la à votre administrateur Targetym.
+                {(generatedKey) && (
+                  <div className="mt-3 flex items-start gap-2 p-3 bg-green-50 rounded-xl border border-green-200">
+                    <CheckCircleIcon className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                    <p className="text-xs text-green-700">
+                      Nouvelle clé générée. Copiez-la et entrez-la dans Targetym → Paramètres → Intégration IntoWork.
                     </p>
                   </div>
                 )}
