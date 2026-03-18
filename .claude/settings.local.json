@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd:*)",
+      "WebFetch(domain:www.intowork.co)",
+      "Bash(find \"C:\\\\Users\\\\JDTKD\\\\OneDrive - H&C EXECUTIVE EDUCATION\\\\Bureau\\\\IntoWork-Dashboard\\\\.claude\\\\worktrees\\\\landing-templates\" -maxdepth 3 -name \"*.html\" -o -name \"*.tsx\")",
+      "Bash(find \"C:\\\\Users\\\\JDTKD\\\\OneDrive - H&C EXECUTIVE EDUCATION\\\\Bureau\\\\IntoWork-Dashboard\\\\.claude\\\\worktrees\\\\templatelandingpages\" -maxdepth 3 -name \"*.html\" -o -name \"*.tsx\")",
+      "Bash(find \"C:\\\\Users\\\\JDTKD\\\\OneDrive - H&C EXECUTIVE EDUCATION\\\\Bureau\\\\IntoWork-Dashboard\\\\.claude\\\\worktrees\\\\templates-v2\" -maxdepth 3 -name \"*.html\" -o -name \"*.tsx\")",
+      "Bash(taskkill //F //IM node.exe)",
+      "Bash(rm -rf node_modules/.cache)",
+      "Bash(npm install:*)",
+      "WebFetch(domain:localhost)",
+      "Bash(node ./node_modules/.bin/tsc --noEmit src/templates/template-8-sky-blue-professional.tsx)",
+      "Bash(ls -la \"/c/Users/JDTKD/OneDrive - H&C EXECUTIVE EDUCATION/Bureau/IntoWork-Dashboard/frontend/src/app/globals.css\")",
+      "Bash(cat \"/c/Users/JDTKD/OneDrive - H&C EXECUTIVE EDUCATION/Bureau/IntoWork-Dashboard/frontend/src/app/globals.css\")",
+      "Bash(find \"/c/Users/JDTKD/OneDrive - H&C EXECUTIVE EDUCATION/Bureau/IntoWork-Dashboard/.claude/worktrees\" -type f)",
+      "Bash(ls \"C:/Users/JDTKD/OneDrive - H&C EXECUTIVE EDUCATION/Bureau/IntoWork-Dashboard/templates/\")",
+      "Bash(ls -la \"C:\\\\Users\\\\JDTKD\\\\OneDrive - H&C EXECUTIVE EDUCATION\\\\Bureau\\\\IntoWork-Dashboard\\\\templates/\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8080/templates/index.html)",
+      "Bash(python -m http.server 8080 --bind 127.0.0.1)",
+      "Read(//c/Users/JDTKD/claude_code-gemini-mcp/**)",
+      "Bash(chmod +x setup.sh)",
+      "Bash(./setup.sh \"gd_Q5dDA1-wrXAN6BzQyV7uBhsQJ5HQO4U_\")"
+    ]
+  }
+}

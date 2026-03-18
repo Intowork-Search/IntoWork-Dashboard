@@ -20,7 +20,8 @@ import {
   ArrowRightOnRectangleIcon,
   EnvelopeIcon,
   BellAlertIcon,
-  Square3Stack3DIcon
+  Square3Stack3DIcon,
+  SparklesIcon
 } from '@heroicons/react/24/outline';
 
 interface SidebarProps {
@@ -69,16 +70,22 @@ function getEmployerNavigation(jobsCount: number): NavItem[] {
       icon: EnvelopeIcon, 
       description: 'Gérer vos templates de communication'
     },
-    { 
-      name: 'Intégrations', 
-      href: '/dashboard/integrations', 
-      icon: Square3Stack3DIcon, 
+    {
+      name: 'Intégrations',
+      href: '/dashboard/integrations',
+      icon: Square3Stack3DIcon,
       description: 'Connecter LinkedIn, Google Calendar, Teams'
     },
-    { 
-      name: 'Paramètres', 
-      href: '/dashboard/settings', 
-      icon: Cog6ToothIcon, 
+    {
+      name: 'Générateur IA',
+      href: '/dashboard/generate-image',
+      icon: SparklesIcon,
+      description: 'Générer des images avec l\'IA'
+    },
+    {
+      name: 'Paramètres',
+      href: '/dashboard/settings',
+      icon: Cog6ToothIcon,
       description: 'Configuration de votre compte'
     },
   ];

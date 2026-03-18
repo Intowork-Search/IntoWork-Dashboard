@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/JDTKD/OneDrive - H&C EXECUTIVE EDUCATION/Bureau/IntoWork-Dashboard/frontend/$USERPROFILE/.claude/**)",
+      "WebSearch",
+      "Bash(cd:*)"
+    ]
+  }
+}

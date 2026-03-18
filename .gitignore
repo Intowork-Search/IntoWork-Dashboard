@@ -95,3 +95,6 @@ deployment-secrets.txt
 *.git/
 .vercel
 .env*.local
+
+# MCP configuration (contains API keys)
+.mcp.json
