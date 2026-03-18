@@ -12,9 +12,13 @@ export default auth((req) => {
     '/signup',
     '/forgot-password',
     '/reset-password',
-    '/auth/error',
+    '/onboarding',
     '/terms',
     '/privacy',
+    '/offres',
+    '/entreprises',
+    '/support',
+    '/templates-final',
   ]
 
   const isPublicPath = publicPaths.some(path => pathname.startsWith(path))
