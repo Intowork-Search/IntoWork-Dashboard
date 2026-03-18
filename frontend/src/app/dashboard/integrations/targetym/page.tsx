@@ -46,7 +46,7 @@ export default function TargetymIntegrationPage() {
     try {
       setIsLoading(true);
       const token = await getToken();
-      if (!token) { router.push('/auth/signin'); return; }
+      if (!token) { router.push('/signin'); return; }
 
       const [statusData, keyData, employerData] = await Promise.all([
         integrationsAPI.getTargetymStatus(token),

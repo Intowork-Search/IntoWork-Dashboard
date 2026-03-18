@@ -82,7 +82,7 @@ export default function EmailTemplatesPage() {
       setLoading(true);
       const token = await getToken();
       if (!token) {
-        router.push('/auth/signin');
+        router.push('/signin');
         return;
       }
 
@@ -106,7 +106,7 @@ export default function EmailTemplatesPage() {
         }
       } else if (response.status === 401) {
         console.error('❌ 401 Unauthorized - Token invalide');
-        router.push('/auth/signin');
+        router.push('/signin');
       } else {
         const errorData = await response.json().catch(() => ({ detail: 'Unknown error' }));
         console.error('❌ Erreur backend:', response.status, errorData);
@@ -157,7 +157,7 @@ export default function EmailTemplatesPage() {
     try {
       const token = await getToken();
       if (!token) {
-        router.push('/auth/signin');
+        router.push('/signin');
         return;
       }
 
@@ -197,7 +197,7 @@ export default function EmailTemplatesPage() {
     try {
       const token = await getToken();
       if (!token) {
-        router.push('/auth/signin');
+        router.push('/signin');
         return;
       }
 
@@ -225,7 +225,7 @@ export default function EmailTemplatesPage() {
     try {
       const token = await getToken();
       if (!token) {
-        router.push('/auth/signin');
+        router.push('/signin');
         return;
       }
 

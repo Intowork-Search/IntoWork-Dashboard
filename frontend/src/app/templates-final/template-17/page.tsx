@@ -51,11 +51,11 @@ export default function Template17() {
             </div>
 
             <div className="hidden md:flex items-center gap-3">
-              <Link href="/auth/signin" className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors">
+              <Link href="/signin" className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors">
                 Se connecter
               </Link>
               <Link
-                href="/auth/signup"
+                href="/signup"
                 className="px-5 py-2.5 text-sm font-semibold rounded-lg text-white transition-all duration-300"
                 style={{
                   backgroundColor: '#6B9B5F',
@@ -90,8 +90,8 @@ export default function Template17() {
               <a href="#testimonials" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-400 hover:text-white py-2">Temoignages</a>
               <a href="#pricing" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-400 hover:text-white py-2">Tarifs</a>
               <div className="pt-3 border-t border-white/5 flex flex-col gap-2">
-                <Link href="/auth/signin" className="text-sm text-gray-300 py-2">Se connecter</Link>
-                <Link href="/auth/signup" className="text-sm font-semibold text-white py-2.5 px-4 rounded-lg text-center" style={{ backgroundColor: '#6B9B5F' }}>
+                <Link href="/signin" className="text-sm text-gray-300 py-2">Se connecter</Link>
+                <Link href="/signup" className="text-sm font-semibold text-white py-2.5 px-4 rounded-lg text-center" style={{ backgroundColor: '#6B9B5F' }}>
                   Commencer gratuitement
                 </Link>
               </div>
@@ -136,7 +136,7 @@ export default function Template17() {
           {/* CTA buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
             <Link
-              href="/auth/signup"
+              href="/signup"
               className="inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-white rounded-lg transition-all duration-300 hover:scale-105"
               style={{
                 backgroundColor: '#6B9B5F',
@@ -624,7 +624,7 @@ export default function Template17() {
                 ))}
               </ul>
               <Link
-                href="/auth/signup"
+                href="/signup"
                 className="block text-center py-2.5 rounded-lg border border-white/10 text-gray-300 font-semibold text-sm hover:border-white/30 hover:text-white transition-all"
               >
                 Commencer
@@ -661,7 +661,7 @@ export default function Template17() {
                 ))}
               </ul>
               <Link
-                href="/auth/signup"
+                href="/signup"
                 className="block text-center py-2.5 rounded-lg text-white font-bold text-sm transition-all hover:opacity-90"
                 style={{
                   backgroundColor: '#6B9B5F',
@@ -691,7 +691,7 @@ export default function Template17() {
                 ))}
               </ul>
               <Link
-                href="/auth/signup"
+                href="/signup"
                 className="block text-center py-2.5 rounded-lg border font-semibold text-sm transition-all hover:text-white"
                 style={{ borderColor: '#6B9B5F', color: '#6B9B5F' }}
                 onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#6B9B5F'; e.currentTarget.style.color = '#ffffff'; }}
@@ -720,7 +720,7 @@ export default function Template17() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/auth/signup"
+              href="/signup"
               className="inline-flex items-center justify-center px-8 py-3.5 rounded-lg font-bold text-sm text-white transition-all hover:scale-105"
               style={{
                 backgroundColor: '#6B9B5F',
@@ -730,7 +730,7 @@ export default function Template17() {
               Creer un compte gratuit
             </Link>
             <Link
-              href="/auth/signin"
+              href="/signin"
               className="inline-flex items-center justify-center px-8 py-3.5 rounded-lg border border-white/10 text-gray-300 font-semibold text-sm hover:bg-white/5 hover:border-white/30 transition-all"
             >
               Se connecter

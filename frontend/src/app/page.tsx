@@ -521,13 +521,13 @@ export default function Home() {
 
             <div className="hidden lg:flex items-center gap-3">
               <Link
-                href="/auth/signin"
+                href="/signin"
                 className="px-4 py-2 text-sm font-semibold text-gray-700 hover:text-[#6B9B5F] transition-colors"
               >
                 Connexion
               </Link>
               <Link
-                href="/auth/signup"
+                href="/signup"
                 className="px-5 py-2.5 text-sm font-semibold text-white bg-[#6B9B5F] hover:bg-[#5A8A4E] rounded-xl transition-all duration-200 shadow-sm hover:shadow-md"
               >
                 Commencer
@@ -560,13 +560,13 @@ export default function Home() {
               ))}
               <div className="pt-3 border-t border-gray-100 flex flex-col gap-2">
                 <Link
-                  href="/auth/signin"
+                  href="/signin"
                   className="px-4 py-3 text-sm font-semibold text-gray-700 text-center hover:bg-gray-50 rounded-lg transition-colors"
                 >
                   Connexion
                 </Link>
                 <Link
-                  href="/auth/signup"
+                  href="/signup"
                   className="px-4 py-3 text-sm font-semibold text-white bg-[#6B9B5F] text-center rounded-lg hover:bg-[#5A8A4E] transition-colors"
                 >
                   Commencer
@@ -620,7 +620,7 @@ export default function Home() {
             style={{ opacity: 0, animationFillMode: 'forwards' }}
           >
             <Link
-              href="/auth/signup"
+              href="/signup"
               className="group inline-flex items-center gap-2 px-8 py-4 text-base font-bold text-white bg-[#6B9B5F] hover:bg-[#5A8A4E] rounded-2xl shadow-lg shadow-green-500/20 hover:shadow-xl hover:shadow-green-500/30 transition-all duration-300 hover:-translate-y-0.5"
             >
               <IconBriefcase className="w-5 h-5" />
@@ -628,7 +628,7 @@ export default function Home() {
               <IconArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link
-              href="/auth/signup"
+              href="/signup"
               className="group inline-flex items-center gap-2 px-8 py-4 text-base font-bold text-[#6B9B5F] bg-white hover:bg-green-50 border-2 border-[#6B9B5F]/20 hover:border-[#6B9B5F]/40 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5"
             >
               <IconUser className="w-5 h-5" />
@@ -1330,14 +1330,14 @@ export default function Home() {
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link
-                  href="/auth/signup"
+                  href="/signup"
                   className="group inline-flex items-center gap-2 px-8 py-4 text-base font-bold text-[#6B9B5F] bg-white hover:bg-gray-50 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5"
                 >
                   Commencer gratuitement
                   <IconArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
                 <Link
-                  href="/auth/signup"
+                  href="/signup"
                   className="inline-flex items-center gap-2 px-8 py-4 text-base font-bold text-white border-2 border-white/30 hover:border-white/60 rounded-2xl hover:bg-white/10 transition-all duration-300"
                 >
                   Demander une demo

@@ -48,7 +48,7 @@ export default function IntegrationsPage() {
       setIsLoading(true);
       const token = await getToken();
       if (!token) {
-        router.push('/auth/signin');
+        router.push('/signin');
         return;
       }
 
@@ -88,7 +88,7 @@ export default function IntegrationsPage() {
       setConnectingProvider(provider);
       const token = await getToken();
       if (!token) {
-        router.push('/auth/signin');
+        router.push('/signin');
         return;
       }
 
@@ -119,7 +119,7 @@ export default function IntegrationsPage() {
     try {
       const token = await getToken();
       if (!token) {
-        router.push('/auth/signin');
+        router.push('/signin');
         return;
       }
 

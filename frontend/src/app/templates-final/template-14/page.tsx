@@ -332,13 +332,13 @@ export default function Template14() {
 
             <div className="hidden md:flex items-center gap-3">
               <Link
-                href="/auth/signin"
+                href="/signin"
                 className="text-[13px] font-medium text-gray-600 hover:text-gray-900 transition-colors px-4 py-2"
               >
                 Se connecter
               </Link>
               <Link
-                href="/auth/signup"
+                href="/signup"
                 className="text-[13px] font-semibold text-white bg-gray-900 hover:bg-gray-800 px-4 py-2 rounded-full transition-all duration-200"
               >
                 Commencer
@@ -378,10 +378,10 @@ export default function Template14() {
               </a>
             ))}
             <div className="pt-3 mt-3 border-t border-gray-100 space-y-2">
-              <Link href="/auth/signin" className="block px-3 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-900 rounded-lg">
+              <Link href="/signin" className="block px-3 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-900 rounded-lg">
                 Se connecter
               </Link>
-              <Link href="/auth/signup" className="block px-3 py-2.5 text-sm font-semibold text-white bg-gray-900 rounded-lg text-center">
+              <Link href="/signup" className="block px-3 py-2.5 text-sm font-semibold text-white bg-gray-900 rounded-lg text-center">
                 Commencer
               </Link>
             </div>
@@ -426,7 +426,7 @@ export default function Template14() {
           {/* CTA */}
           <div className="animate-fade-in-up-delay-3 mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              href="/auth/signup"
+              href="/signup"
               className="group inline-flex items-center gap-2 px-8 py-3.5 bg-[#6B9B5F] hover:bg-[#5a8a4e] text-white font-semibold text-sm rounded-full transition-all duration-300 shadow-lg shadow-[#6B9B5F]/20 hover:shadow-xl hover:shadow-[#6B9B5F]/30"
             >
               Commencer gratuitement
@@ -679,7 +679,7 @@ export default function Template14() {
           </p>
           <div className="mt-8">
             <Link
-              href="/auth/signup"
+              href="/signup"
               className="group inline-flex items-center gap-2 px-8 py-3.5 bg-[#6B9B5F] hover:bg-[#5a8a4e] text-white font-semibold text-sm rounded-full transition-all duration-300 shadow-lg shadow-[#6B9B5F]/20 hover:shadow-xl hover:shadow-[#6B9B5F]/30"
             >
               Commencer gratuitement

@@ -346,11 +346,11 @@ export default function Template15() {
             </div>
 
             <div className="hidden lg:flex items-center gap-3">
-              <Link href="/auth/signin" className="text-sm font-semibold text-gray-700 hover:text-[#6B9B5F] transition-colors px-4 py-2">
+              <Link href="/signin" className="text-sm font-semibold text-gray-700 hover:text-[#6B9B5F] transition-colors px-4 py-2">
                 Connexion
               </Link>
               <Link
-                href="/auth/signup"
+                href="/signup"
                 className="text-sm font-bold text-white bg-[#6B9B5F] hover:bg-[#5A8A4E] px-5 py-2.5 rounded-full transition-all shadow-md shadow-[#6B9B5F]/20 hover:shadow-lg hover:shadow-[#6B9B5F]/30"
               >
                 Commencer gratuitement
@@ -384,8 +384,8 @@ export default function Template15() {
             <a href="#companies" onClick={() => setMobileMenuOpen(false)} className="block px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-[#6B9B5F]/10 rounded-xl transition-colors">Entreprises</a>
             <a href="#pricing" onClick={() => setMobileMenuOpen(false)} className="block px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-[#6B9B5F]/10 rounded-xl transition-colors">Tarifs</a>
             <div className="pt-3 border-t border-gray-200 flex flex-col gap-2">
-              <Link href="/auth/signin" className="text-center text-sm font-semibold text-gray-700 py-2.5 rounded-xl hover:bg-gray-100 transition-colors">Connexion</Link>
-              <Link href="/auth/signup" className="text-center text-sm font-bold text-white bg-[#6B9B5F] py-2.5 rounded-full shadow-md">Commencer gratuitement</Link>
+              <Link href="/signin" className="text-center text-sm font-semibold text-gray-700 py-2.5 rounded-xl hover:bg-gray-100 transition-colors">Connexion</Link>
+              <Link href="/signup" className="text-center text-sm font-bold text-white bg-[#6B9B5F] py-2.5 rounded-full shadow-md">Commencer gratuitement</Link>
             </div>
           </div>
         )}
@@ -426,7 +426,7 @@ export default function Template15() {
 
               <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-8">
                 <Link
-                  href="/auth/signup"
+                  href="/signup"
                   className="inline-flex items-center justify-center gap-2 bg-[#6B9B5F] hover:bg-[#5A8A4E] text-white font-bold px-8 py-4 rounded-full text-base transition-all shadow-lg shadow-[#6B9B5F]/25 hover:shadow-xl hover:shadow-[#6B9B5F]/30 hover:-translate-y-0.5"
                 >
                   Je recrute
@@ -435,7 +435,7 @@ export default function Template15() {
                   </svg>
                 </Link>
                 <Link
-                  href="/auth/signup"
+                  href="/signup"
                   className="inline-flex items-center justify-center gap-2 border-2 border-[#6B9B5F] text-[#6B9B5F] hover:bg-[#6B9B5F]/5 font-bold px-8 py-4 rounded-full text-base transition-all"
                 >
                   Je cherche un emploi
@@ -722,7 +722,7 @@ export default function Template15() {
                   ))}
                 </ul>
                 <Link
-                  href="/auth/signup"
+                  href="/signup"
                   className={`block text-center font-bold py-3 rounded-full transition-all text-sm ${
                     plan.highlighted
                       ? 'bg-white text-[#6B9B5F] hover:bg-gray-100 shadow-lg'
@@ -755,7 +755,7 @@ export default function Template15() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/auth/signup"
+              href="/signup"
               className="inline-flex items-center justify-center gap-2 bg-white text-[#6B9B5F] hover:bg-gray-100 font-extrabold px-8 py-4 rounded-full text-lg transition-all shadow-xl hover:-translate-y-0.5"
             >
               Commencer gratuitement
@@ -764,7 +764,7 @@ export default function Template15() {
               </svg>
             </Link>
             <Link
-              href="/auth/signup"
+              href="/signup"
               className="inline-flex items-center justify-center gap-2 border-2 border-white/40 text-white hover:bg-white/10 font-bold px-8 py-4 rounded-full text-lg transition-all"
             >
               Decouvrir la plateforme
