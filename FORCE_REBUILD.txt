@@ -1,3 +1,0 @@
-# Force Vercel Rebuild - $(date)
-
-Trigger rebuild to clear cache and use HTTPS API URL.

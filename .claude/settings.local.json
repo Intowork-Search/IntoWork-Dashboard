@@ -20,7 +20,32 @@
       "Bash(python -m http.server 8080 --bind 127.0.0.1)",
       "Read(//c/Users/JDTKD/claude_code-gemini-mcp/**)",
       "Bash(chmod +x setup.sh)",
-      "Bash(./setup.sh \"gd_Q5dDA1-wrXAN6BzQyV7uBhsQJ5HQO4U_\")"
+      "Bash(./setup.sh \"gd_Q5dDA1-wrXAN6BzQyV7uBhsQJ5HQO4U_\")",
+      "Bash(find \"/c/Users/JDTKD/OneDrive - H&C EXECUTIVE EDUCATION/Bureau/IntoWork-Dashboard/frontend/src/app/templates-final/template-16\" -type f)",
+      "Bash(ls -la \"/c/Users/JDTKD/OneDrive - H&C EXECUTIVE EDUCATION/Bureau/IntoWork-Dashboard/frontend/src/app/\")",
+      "Bash(node node_modules/next/dist/bin/next build)",
+      "Bash(node node_modules/typescript/bin/tsc --noEmit --pretty src/app/page.tsx)",
+      "Bash(node node_modules/.bin/next build)",
+      "Bash(jpg)",
+      "Bash(jpeg)",
+      "Bash(png)",
+      "Bash(screenshot)",
+      "mcp__gemini-design-mcp__create_frontend",
+      "Bash(wc:*)",
+      "Bash(find \"C:\\\\Users\\\\JDTKD\\\\OneDrive - H&C EXECUTIVE EDUCATION\\\\Bureau\\\\IntoWork-Dashboard\" -maxdepth 1 -type f)",
+      "Bash(ls -la \"C:\\\\Users\\\\JDTKD\\\\OneDrive - H&C EXECUTIVE EDUCATION\\\\Bureau\\\\IntoWork-Dashboard\")",
+      "Bash(find \"C:\\\\Users\\\\JDTKD\\\\OneDrive - H&C EXECUTIVE EDUCATION\\\\Bureau\\\\IntoWork-Dashboard/frontend/src/app\" -maxdepth 2 -type d)",
+      "Bash(find \"C:\\\\Users\\\\JDTKD\\\\OneDrive - H&C EXECUTIVE EDUCATION\\\\Bureau\\\\IntoWork-Dashboard/backend/app/api\" -maxdepth 1 -type f -name \"*.py\")",
+      "Bash(find \"C:\\\\Users\\\\JDTKD\\\\OneDrive - H&C EXECUTIVE EDUCATION\\\\Bureau\\\\IntoWork-Dashboard/backend/app\" -maxdepth 1 -type f -name \"*.py\")",
+      "Bash(find \"C:\\\\Users\\\\JDTKD\\\\OneDrive - H&C EXECUTIVE EDUCATION\\\\Bureau\\\\IntoWork-Dashboard/frontend\" -maxdepth 1 -type f)",
+      "Bash(find \"C:\\\\Users\\\\JDTKD\\\\OneDrive - H&C EXECUTIVE EDUCATION\\\\Bureau\\\\IntoWork-Dashboard/backend/app\" -maxdepth 2 -type d)",
+      "Bash(find \"C:\\\\Users\\\\JDTKD\\\\OneDrive - H&C EXECUTIVE EDUCATION\\\\Bureau\\\\IntoWork-Dashboard/frontend/src\" -maxdepth 1 -type d)",
+      "Bash(find \"C:\\\\Users\\\\JDTKD\\\\OneDrive - H&C EXECUTIVE EDUCATION\\\\Bureau\\\\IntoWork-Dashboard/frontend/src/app/templates-final\" -type f -name \"*.tsx\")",
+      "Bash(find \"C:\\\\Users\\\\JDTKD\\\\OneDrive - H&C EXECUTIVE EDUCATION\\\\Bureau\\\\IntoWork-Dashboard/backend/app/api\" -type f -name \"*.py\")",
+      "Bash(find \"C:\\\\Users\\\\JDTKD\\\\OneDrive - H&C EXECUTIVE EDUCATION\\\\Bureau\\\\IntoWork-Dashboard/docs\" -type f)",
+      "Bash(ls -lh \"C:\\\\Users\\\\JDTKD\\\\OneDrive - H&C EXECUTIVE EDUCATION\\\\Bureau\\\\IntoWork-Dashboard/.claude/worktrees/landing-templates\")",
+      "Bash(find \"C:\\\\Users\\\\JDTKD\\\\OneDrive - H&C EXECUTIVE EDUCATION\\\\Bureau\\\\IntoWork-Dashboard/backend\" -maxdepth 1 \\\\\\( -name \"*.md\" -o -name \"*.txt\" \\\\\\) -type f)",
+      "Bash(find \"C:\\\\Users\\\\JDTKD\\\\OneDrive - H&C EXECUTIVE EDUCATION\\\\Bureau\\\\IntoWork-Dashboard\" -maxdepth 1 -type f \\\\\\( -name \".env*\" -o -name \"*.json\" -o -name \"*.toml\" -o -name \"*.yml\" -o -name \"*.yaml\" \\\\\\))"
     ]
   }
 }
