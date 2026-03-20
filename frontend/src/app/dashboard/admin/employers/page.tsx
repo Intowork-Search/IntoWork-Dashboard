@@ -27,7 +27,10 @@ export default function AdminEmployersPage() {
     if (status === 'unauthenticated') {
       router.push('/signin');
     }
-  }, [status, router]);
+    if (status === 'authenticated' && session?.user?.role !== 'admin') {
+      router.replace('/dashboard');
+    }
+  }, [status, session, router]);
 
   const loadEmployers = async () => {
     if (!session?.accessToken) return;

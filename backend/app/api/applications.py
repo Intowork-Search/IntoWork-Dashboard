@@ -10,7 +10,7 @@ from app.auth import require_user
 from app.api.notifications import create_notification
 from app.services.email_service import email_service
 from pydantic import BaseModel
-from datetime import datetime
+from datetime import datetime, timezone
 import logging
 
 # Logger pour les emails
@@ -223,7 +223,7 @@ async def create_application(
         cv_url=cv_url,  # Pour compatibilité
         status=ApplicationStatus.APPLIED,
         cover_letter=application_data.cover_letter,
-        applied_at=datetime.utcnow()
+        applied_at=datetime.now(timezone.utc)
     )
 
     db.add(application)
@@ -290,7 +290,7 @@ async def create_application(
                     "job_title": job.title,
                     "job_location": job.location or "Non spécifiée",
                     "company_name": job_with_company.company.name,
-                    "application_date": datetime.utcnow().strftime("%d/%m/%Y"),
+                    "application_date": datetime.now(timezone.utc).strftime("%d/%m/%Y"),
                     "application_status": "Candidature reçue"
                 }
                 
@@ -408,12 +408,20 @@ async def get_application(
 ):
     """Récupérer une candidature spécifique"""
 
+    # Fetch the candidate profile — candidate_id references candidates.id, not users.id
+    candidate_result = await db.execute(
+        select(Candidate).filter(Candidate.user_id == current_user.id)
+    )
+    candidate = candidate_result.scalar_one_or_none()
+    if not candidate:
+        raise HTTPException(status_code=404, detail="Profil candidat introuvable")
+
     result = await db.execute(
         select(JobApplication)
         .options(selectinload(JobApplication.job))
         .filter(
             JobApplication.id == application_id,
-            JobApplication.candidate_id == current_user.id
+            JobApplication.candidate_id == candidate.id
         )
     )
     application = result.scalar_one_or_none()

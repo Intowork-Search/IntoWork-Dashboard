@@ -8,7 +8,7 @@ import { useCallback } from 'react';
  * Retourne getToken qui récupère l'accessToken de la session NextAuth
  */
 export function useAuth() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
 
   const getToken = useCallback(async () => {
     return session?.accessToken || null;
@@ -16,7 +16,7 @@ export function useAuth() {
 
   return {
     getToken,
-    isLoaded: true, // NextAuth charge automatiquement
+    isLoaded: status !== 'loading',
     isSignedIn: !!session,
     userId: session?.user?.id,
   };

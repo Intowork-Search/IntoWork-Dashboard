@@ -1,10 +1,11 @@
 """
 Service d'envoi d'emails avec Resend
 """
+import asyncio
 import os
 import logging
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, timezone
 
 # Configuration du logger
 logger = logging.getLogger(__name__)
@@ -41,7 +42,7 @@ class EmailService:
                 logger.error(f"   FROM_EMAIL value: {FROM_EMAIL}")
                 logger.error(f"   FRONTEND_URL value: {FRONTEND_URL}")
 
-    def send_password_reset_email(
+    async def send_password_reset_email(
         self,
         email: str,
         token: str,
@@ -81,7 +82,7 @@ class EmailService:
             }
 
             logger.info(f"📧 Sending password reset email from {FROM_EMAIL} to {email}")
-            response = resend.Emails.send(params)
+            response = await asyncio.to_thread(resend.Emails.send, params)
             
             if response and 'id' in response:
                 logger.info(f"✅ Password reset email sent successfully to {email}. ID: {response.get('id')}")
@@ -175,7 +176,7 @@ class EmailService:
             }
             
             logger.info(f"📧 Sending email from template '{template.name}' (ID: {template_id}) to {to_email}")
-            response = resend.Emails.send(params)
+            response = await asyncio.to_thread(resend.Emails.send, params)
             
             if response and 'id' in response:
                 # Incrémenter le compteur d'utilisation du template
@@ -184,7 +185,7 @@ class EmailService:
                     .where(EmailTemplate.id == template_id)
                     .values(
                         usage_count=EmailTemplate.usage_count + 1,
-                        last_used_at=datetime.utcnow()
+                        last_used_at=datetime.now(timezone.utc)
                     )
                 )
                 await db.commit()

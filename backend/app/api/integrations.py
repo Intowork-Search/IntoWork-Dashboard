@@ -9,7 +9,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update
 from typing import Annotated, Optional
 from pydantic import BaseModel
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+import hmac
 import secrets
 import base64
 import os
@@ -19,7 +20,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from app.database import get_db
-from app.auth import require_employer
+from app.auth import require_employer, require_admin
 from app.models.base import IntegrationCredential, IntegrationProvider, Employer, Job, Company, User
 from app.services.linkedin_service import linkedin_service
 from app.services.google_calendar_service import google_calendar_service
@@ -33,7 +34,7 @@ router = APIRouter(prefix="/integrations", tags=["integrations"])
 # ========================================
 
 @router.get("/debug/config")
-async def debug_oauth_config():
+async def debug_oauth_config(current_user: User = Depends(require_admin)):
     """Endpoint de debug pour vérifier la configuration OAuth"""
     from app.services.google_calendar_service import (
         GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI
@@ -253,7 +254,7 @@ async def linkedin_oauth_callback(
         if existing:
             # Mettre à jour
             existing.access_token = token_data['access_token']
-            existing.token_expires_at = datetime.utcnow() + timedelta(seconds=token_data.get('expires_in', 5184000))
+            existing.token_expires_at = datetime.now(timezone.utc) + timedelta(seconds=token_data.get('expires_in', 5184000))
             existing.provider_data = provider_data
             existing.is_active = True
         else:
@@ -263,7 +264,7 @@ async def linkedin_oauth_callback(
                 user_id=employer.user_id,
                 provider=IntegrationProvider.LINKEDIN,
                 access_token=token_data['access_token'],
-                token_expires_at=datetime.utcnow() + timedelta(seconds=token_data.get('expires_in', 5184000)),
+                token_expires_at=datetime.now(timezone.utc) + timedelta(seconds=token_data.get('expires_in', 5184000)),
                 provider_data=provider_data
             )
             db.add(integration)
@@ -353,7 +354,7 @@ async def publish_job_to_linkedin(
         )
         
         # Mettre à jour last_used_at
-        credentials.last_used_at = datetime.utcnow()
+        credentials.last_used_at = datetime.now(timezone.utc)
         await db.commit()
         
         # TODO: Créer un JobPosting record avec external_id=post_id
@@ -461,7 +462,7 @@ async def google_calendar_oauth_callback(
         if existing:
             existing.access_token = token_data['access_token']
             existing.refresh_token = token_data.get('refresh_token', existing.refresh_token)
-            existing.token_expires_at = datetime.utcnow() + timedelta(seconds=token_data.get('expires_in', 3600))
+            existing.token_expires_at = datetime.now(timezone.utc) + timedelta(seconds=token_data.get('expires_in', 3600))
             existing.is_active = True
         else:
             integration = IntegrationCredential(
@@ -470,7 +471,7 @@ async def google_calendar_oauth_callback(
                 provider=IntegrationProvider.GOOGLE_CALENDAR,
                 access_token=token_data['access_token'],
                 refresh_token=token_data.get('refresh_token'),
-                token_expires_at=datetime.utcnow() + timedelta(seconds=token_data.get('expires_in', 3600))
+                token_expires_at=datetime.now(timezone.utc) + timedelta(seconds=token_data.get('expires_in', 3600))
             )
             db.add(integration)
         
@@ -535,7 +536,7 @@ async def create_google_calendar_event(
         )
         
         # Mettre à jour last_used_at
-        credentials.last_used_at = datetime.utcnow()
+        credentials.last_used_at = datetime.now(timezone.utc)
         await db.commit()
         
         # TODO: Mettre à jour InterviewSchedule avec google_event_id
@@ -642,7 +643,7 @@ async def outlook_oauth_callback(
         if existing:
             existing.access_token = token_data['access_token']
             existing.refresh_token = token_data.get('refresh_token', existing.refresh_token)
-            existing.token_expires_at = datetime.utcnow() + timedelta(seconds=token_data.get('expires_in', 3600))
+            existing.token_expires_at = datetime.now(timezone.utc) + timedelta(seconds=token_data.get('expires_in', 3600))
             existing.is_active = True
         else:
             integration = IntegrationCredential(
@@ -651,7 +652,7 @@ async def outlook_oauth_callback(
                 provider=IntegrationProvider.OUTLOOK_CALENDAR,
                 access_token=token_data['access_token'],
                 refresh_token=token_data.get('refresh_token'),
-                token_expires_at=datetime.utcnow() + timedelta(seconds=token_data.get('expires_in', 3600))
+                token_expires_at=datetime.now(timezone.utc) + timedelta(seconds=token_data.get('expires_in', 3600))
             )
             db.add(integration)
         
@@ -715,7 +716,7 @@ async def create_outlook_event(
         )
         
         # Mettre à jour last_used_at
-        credentials.last_used_at = datetime.utcnow()
+        credentials.last_used_at = datetime.now(timezone.utc)
         await db.commit()
         
         # TODO: Mettre à jour InterviewSchedule avec outlook_event_id
@@ -936,7 +937,7 @@ async def link_targetym_account(
     tenant_data = resp.json()
 
     # Sauvegarder la liaison
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     await db.execute(
         update(Company)
         .where(Company.id == employer.company_id)
@@ -1092,12 +1093,12 @@ async def verify_targetym_key_from_targetym(
     if not company or not company.company_api_key:
         return {"valid": False}
 
-    if company.company_api_key != body.api_key:
+    if not hmac.compare_digest(company.company_api_key or '', body.api_key or ''):
         logger.warning(f"Clé API IntoWork invalide pour la Company {body.company_id}")
         return {"valid": False}
 
     # Enregistrer la liaison côté IntoWork
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     await db.execute(
         update(Company)
         .where(Company.id == body.company_id)
@@ -1145,7 +1146,7 @@ async def webhook_sync_job(
         logger.warning(f"webhook sync-job: company {body.company_id} introuvable ou sans clé API")
         return {"synced": False, "reason": "company_not_found"}
 
-    if company.company_api_key.strip() != body.api_key.strip():
+    if not hmac.compare_digest((company.company_api_key or '').strip(), (body.api_key or '').strip()):
         logger.warning(f"Clé API invalide dans webhook sync-job pour company {body.company_id} — reçu: {body.api_key[:8] if body.api_key else 'None'}... stocké: {company.company_api_key[:8] if company.company_api_key else 'None'}...")
         return {"synced": False, "reason": "invalid_key"}
 

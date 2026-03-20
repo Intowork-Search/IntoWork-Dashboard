@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 from app.database import get_db
 from app.models.base import User, UserRole
+from app.auth import require_admin
 from pydantic import BaseModel
 from typing import List
 
@@ -27,7 +28,7 @@ class UserCreate(UserBase):
     pass
 
 @router.get("/users", response_model=List[UserResponse])
-async def get_users(db: AsyncSession = Depends(get_db)):
+async def get_users(current_user: User = Depends(require_admin), db: AsyncSession = Depends(get_db)):
     """Récupérer tous les utilisateurs"""
     result = await db.execute(select(User))
     users = result.scalars().all()
@@ -52,7 +53,7 @@ async def create_user(user: UserCreate, db: AsyncSession = Depends(get_db)):
     return db_user
 
 @router.get("/users/{user_id}", response_model=UserResponse)
-async def get_user(user_id: int, db: AsyncSession = Depends(get_db)):
+async def get_user(user_id: int, current_user: User = Depends(require_admin), db: AsyncSession = Depends(get_db)):
     """Récupérer un utilisateur par ID"""
     result = await db.execute(
         select(User).filter(User.id == user_id)
@@ -63,7 +64,7 @@ async def get_user(user_id: int, db: AsyncSession = Depends(get_db)):
     return user
 
 @router.get("/db-status")
-async def check_db_connection(db: AsyncSession = Depends(get_db)):
+async def check_db_connection(current_user: User = Depends(require_admin), db: AsyncSession = Depends(get_db)):
     """Vérifier la connexion à la base de données"""
     try:
         from sqlalchemy import text

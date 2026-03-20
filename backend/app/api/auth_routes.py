@@ -12,6 +12,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Request, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update
 from datetime import datetime, timedelta, timezone
+import hmac
 import secrets
 from loguru import logger
 from slowapi import Limiter
@@ -246,11 +247,12 @@ async def refresh_tokens(
         )
         sessions = result.scalars().all()
 
-        # Verify refresh token hash matches stored hash
+        # Verify refresh token hash matches stored hash (hash_token uses SHA-256, consistent with signin)
+        provided_hash = PasswordHasher.hash_token(refresh_data.refresh_token)
         valid_session = None
         for session in sessions:
-            if session.refresh_token_hash and PasswordHasher.verify_password(
-                refresh_data.refresh_token, session.refresh_token_hash
+            if session.refresh_token_hash and hmac.compare_digest(
+                provided_hash, session.refresh_token_hash
             ):
                 valid_session = session
                 break
@@ -291,8 +293,8 @@ async def refresh_tokens(
             email=user.email
         )
 
-        # Update session with new refresh token hash
-        new_refresh_token_hash = PasswordHasher.hash_password(new_refresh_token)
+        # Update session with new refresh token hash (use hash_token for SHA-256 consistency)
+        new_refresh_token_hash = PasswordHasher.hash_token(new_refresh_token)
         valid_session.refresh_token_hash = new_refresh_token_hash
         valid_session.session_token = new_access_token[-32:]
         valid_session.expires = datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRATION_DAYS)
@@ -418,24 +420,34 @@ async def delete_account(
     Supprimer le compte de l'utilisateur connecté
     """
     try:
+        from app.models.base import JobApplication, Job
+        from sqlalchemy import delete as sql_delete
+
+        # Explicitly fetch relationships — lazy loading is not allowed with AsyncSession
+        candidate_result = await db.execute(
+            select(Candidate).filter(Candidate.user_id == user.id)
+        )
+        candidate = candidate_result.scalar_one_or_none()
+
+        employer_result = await db.execute(
+            select(Employer).filter(Employer.user_id == user.id)
+        )
+        employer = employer_result.scalar_one_or_none()
+
         # Si c'est un candidat, supprimer les candidatures d'abord
-        if user.role == UserRole.CANDIDATE and user.candidate:
-            from app.models.base import JobApplication
-            from sqlalchemy import delete as sql_delete
+        if user.role == UserRole.CANDIDATE and candidate:
             # Supprimer toutes les candidatures (ASYNC)
             await db.execute(
                 sql_delete(JobApplication).filter(
-                    JobApplication.candidate_id == user.candidate.id
+                    JobApplication.candidate_id == candidate.id
                 )
             )
 
         # Si c'est un employeur, supprimer les offres d'emploi et candidatures associées
-        if user.role == UserRole.EMPLOYER and user.employer:
-            from app.models.base import Job, JobApplication
-            from sqlalchemy import delete as sql_delete
+        if user.role == UserRole.EMPLOYER and employer:
             # Récupérer tous les jobs de l'employeur (ASYNC)
             result = await db.execute(
-                select(Job).filter(Job.employer_id == user.employer.id)
+                select(Job).filter(Job.employer_id == employer.id)
             )
             employer_jobs = result.scalars().all()
 
@@ -505,7 +517,7 @@ async def forgot_password(
             await db.commit()
 
             # Envoyer l'email
-            email_sent = email_service.send_password_reset_email(
+            email_sent = await email_service.send_password_reset_email(
                 email=user.email,
                 token=token,
                 user_name=user.first_name or user.name

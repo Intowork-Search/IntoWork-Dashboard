@@ -45,7 +45,10 @@ export default function AdminDashboardPage() {
     if (status === 'unauthenticated') {
       router.push('/signin');
     }
-  }, [status, router]);
+    if (status === 'authenticated' && session?.user?.role !== 'admin') {
+      router.replace('/dashboard');
+    }
+  }, [status, session, router]);
 
   const loadStats = async () => {
     if (!session?.accessToken) return;

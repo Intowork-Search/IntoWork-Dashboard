@@ -3,8 +3,6 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import axios from "axios"
 import { getApiUrl } from "./lib/getApiUrl"
 
-const API_URL = getApiUrl()
-
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     CredentialsProvider({
@@ -14,6 +12,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
+        const API_URL = getApiUrl()
         if (!credentials?.email || !credentials?.password) {
           return null
         }

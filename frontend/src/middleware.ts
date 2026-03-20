@@ -35,6 +35,14 @@ export default auth((req) => {
     return NextResponse.redirect(signInUrl)
   }
 
+  // Si authentifié mais pas admin et route admin, rediriger vers dashboard
+  if (isAuthenticated && pathname.startsWith('/dashboard/admin')) {
+    const role = req.auth?.user?.role
+    if (role !== 'admin') {
+      return NextResponse.redirect(new URL('/dashboard', req.url))
+    }
+  }
+
   // Si authentifié et sur page auth, rediriger vers dashboard
   if (isAuthenticated && (pathname.startsWith('/signin') || pathname.startsWith('/signup') || pathname.startsWith('/forgot-password') || pathname.startsWith('/reset-password'))) {
     return NextResponse.redirect(new URL('/dashboard', req.url))

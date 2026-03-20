@@ -29,6 +29,11 @@ export default function AdminUsersPage() {
     return null;
   }
 
+  if (status === 'authenticated' && session?.user?.role !== 'admin') {
+    router.replace('/dashboard');
+    return null;
+  }
+
   const handleToggleUserStatus = async (userId: number, currentStatus: boolean) => {
     if (!session?.accessToken) return;
     

@@ -8,7 +8,7 @@ from app.models.base import User, Candidate, Experience, Education, Skill, Skill
 from app.auth import get_current_user, require_user
 from pydantic import BaseModel, Field
 from typing import Optional, List
-from datetime import datetime
+from datetime import datetime, timezone
 from loguru import logger
 router = APIRouter()
 # Schémas Pydantic pour les données du profil
@@ -505,6 +505,8 @@ async def update_skill(
         select(Candidate).filter(Candidate.user_id == current_user.id)
     )
     candidate = candidate_result.scalar_one_or_none()
+    if not candidate:
+        raise HTTPException(status_code=404, detail="Profil candidat non trouvé")
 
     skill_result = await db.execute(
         select(Skill).filter(
@@ -646,7 +648,7 @@ async def upload_cv(
 
         # Aussi mettre à jour les champs legacy dans candidate pour compatibilité
         candidate.cv_filename = cv.filename
-        candidate.cv_uploaded_at = datetime.utcnow()
+        candidate.cv_uploaded_at = datetime.now(timezone.utc)
         candidate.cv_url = cv_path
 
         logger.info(f"Nouveau CV ajouté - filename: {cv.filename}")

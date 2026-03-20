@@ -267,7 +267,10 @@ async def get_all_jobs(
         .join(Company)
         .join(Employer)
         .join(User)
-        .options(selectinload(Job.company))
+        .options(
+            selectinload(Job.company),
+            selectinload(Job.employer).selectinload(Employer.user)
+        )
     )
 
     if status:
@@ -277,21 +280,27 @@ async def get_all_jobs(
     result_exec = await db.execute(query)
     jobs = result_exec.scalars().all()
 
+    # Batch query application counts — avoids one query per job (N+1)
+    job_ids = [job.id for job in jobs]
+    if job_ids:
+        count_result = await db.execute(
+            select(JobApplication.job_id, func.count(JobApplication.id).label('count'))
+            .filter(JobApplication.job_id.in_(job_ids))
+            .group_by(JobApplication.job_id)
+        )
+        app_counts = {row.job_id: row.count for row in count_result}
+    else:
+        app_counts = {}
+
     result = []
     for job in jobs:
         company = job.company
 
-        # Récupérer l'employeur
-        employer_query = select(Employer).filter(Employer.id == job.employer_id).options(selectinload(Employer.user))
-        employer_result = await db.execute(employer_query)
-        employer = employer_result.scalar_one_or_none()
-        user = employer.user if employer else None
+        # Employeur already eager-loaded via selectinload on the main query
+        employer = job.employer if hasattr(job, 'employer') and job.employer else None
+        user = employer.user if employer and hasattr(employer, 'user') else None
 
-        # Compter les candidatures réelles pour cette offre
-        count_result = await db.execute(
-            select(func.count()).select_from(JobApplication).filter(JobApplication.job_id == job.id)
-        )
-        real_applications_count = count_result.scalar()
+        real_applications_count = app_counts.get(job.id, 0)
 
         result.append(JobListItem(
             id=job.id,

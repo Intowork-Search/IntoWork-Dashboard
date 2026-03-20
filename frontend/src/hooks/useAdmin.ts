@@ -148,7 +148,7 @@ export function useAdminJobs(
   const { getToken, isSignedIn } = useAuth();
 
   return useQuery({
-    queryKey: queryKeys.admin.jobs(page, limit),
+    queryKey: [...queryKeys.admin.jobs(page, limit), { status }],
     queryFn: async () => {
       const token = await getToken();
       if (!token) throw new Error('Non authentifié');

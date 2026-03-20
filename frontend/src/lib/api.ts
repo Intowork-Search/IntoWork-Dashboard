@@ -42,7 +42,7 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401) {
       // Token expiré ou invalide - rediriger vers login
       if (typeof window !== 'undefined') {
-        window.location.href = '/sign-in';
+        window.location.href = '/signin';
       }
     }
     return Promise.reject(error);
@@ -254,20 +254,6 @@ export const dashboardAPI = {
   }
 };
 
-// API simplifiée pour les candidats (pour les paramètres)
-export const candidateAPI = {
-  // Récupérer le profil
-  getProfile: async () => {
-    const response = await apiClient.get('/candidates/profile');
-    return response;
-  },
-  
-  // Mettre à jour le profil
-  updateProfile: async (profileData: any) => {
-    const response = await apiClient.put('/candidates/profile', profileData);
-    return response;
-  },
-};
 
 export const candidatesAPI = {
   // Récupérer le profil du candidat connecté
@@ -353,11 +339,10 @@ export const candidatesAPI = {
     return response.data;
   },
   
-  // Obtenir l'URL du CV pour prévisualisation
-  getCVUrl: (token: string): string => {
-    // Use getApiUrl() to enforce HTTPS in production
-    const apiUrl = getApiUrl();
-    return `${apiUrl}/candidates/cv/download?token=${token}`;
+  // Obtenir l'URL du CV pour prévisualisation (blob URL via authenticated request)
+  getCVUrl: async (token: string): Promise<string> => {
+    const response = await createAuthenticatedClient(token).get('/candidates/cv/download', { responseType: 'blob' });
+    return URL.createObjectURL(response.data);
   },
   
   // Lister tous les CV
@@ -936,7 +921,7 @@ export const getUploadUrl = (path: string | null | undefined): string => {
   if (!path) return '';
   
   // Use getApiUrl() and remove /api suffix to get base URL
-  const baseUrl = getApiUrl().replace('/api', '');
+  const baseUrl = getApiUrl().replace(/\/api$/, '');
     
   // Si le path commence déjà par http, le retourner tel quel
   if (path.startsWith('http://') || path.startsWith('https://')) {
