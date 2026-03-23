@@ -4,7 +4,6 @@ import { useSession } from 'next-auth/react';
 import { useCallback } from 'react';
 
 /**
- * Hook personnalisé pour remplacer useAuth de Clerk
  * Retourne getToken qui récupère l'accessToken de la session NextAuth
  */
 export function useAuth() {
@@ -23,7 +22,6 @@ export function useAuth() {
 }
 
 /**
- * Hook personnalisé pour remplacer useUser de Clerk
  * Retourne les informations de l'utilisateur depuis la session NextAuth
  */
 export function useUser() {

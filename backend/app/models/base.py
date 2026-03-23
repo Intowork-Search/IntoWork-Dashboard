@@ -22,9 +22,6 @@ class User(Base):
     name = Column(String, nullable=True)  # Combinaison first_name + last_name
     image = Column(String, nullable=True)  # URL de l'avatar
     
-    # Legacy Clerk (garde pour transition)
-    clerk_id = Column(String, unique=True, nullable=True, index=True)
-    
     # App-specific fields
     role = Column(SQLEnum(UserRole), nullable=False)
     first_name = Column(String, nullable=False)

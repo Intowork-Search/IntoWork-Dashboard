@@ -4,11 +4,37 @@ Utilise Anthropic Claude pour analyser la compatibilité candidat-offre
 """
 import os
 import json
-from typing import Dict, Optional
-from anthropic import AsyncAnthropic
+from typing import Dict, List, Optional
+from anthropic import Anthropic, AsyncAnthropic
 from dotenv import load_dotenv
 
 load_dotenv()
+
+# Client synchrone pour les fonctions utilitaires de conversation
+client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+model = "claude-sonnet-4-6"
+
+
+# ── Fonctions utilitaires de gestion des conversations ──────────────────────
+
+def add_user_message(messages: List[Dict], text: str) -> None:
+    """Ajoute un message utilisateur à la liste des messages."""
+    messages.append({"role": "user", "content": text})
+
+
+def add_assistant_message(messages: List[Dict], text: str) -> None:
+    """Ajoute un message assistant à la liste des messages."""
+    messages.append({"role": "assistant", "content": text})
+
+
+def chat(messages: List[Dict]) -> str:
+    """Envoie les messages à Claude et retourne la réponse texte."""
+    message = client.messages.create(
+        model=model,
+        max_tokens=1000,
+        messages=messages,
+    )
+    return message.content[0].text
 
 class AIEvaluationService:
     def __init__(self):

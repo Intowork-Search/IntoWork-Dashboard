@@ -6,10 +6,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 INTOWORK Search is a B2B2C recruitment platform with AI-powered job matching serving candidates and employers.
 
-**Current Status**: ATS Phase 2 complete (February 2026)
+**Current Status**: Phase 3 (Admin) complete (March 2026)
 - Phases 1-2: Auth, candidate/employer dashboards, job posting, applications, notifications
 - ATS Phase 2: AI scoring, CV builder, email templates, job alerts, calendar integrations (Google/Outlook), LinkedIn, TargetYM, employer collaboration
-- Phase 3 (In Progress): Admin dashboard and platform management
+- Phase 3: Admin dashboard and platform management (complete)
+- Phase 4 (Next): AI matching, advanced analytics, third-party integrations
 
 ## Architecture
 
@@ -24,21 +25,13 @@ INTOWORK Search is a B2B2C recruitment platform with AI-powered job matching ser
 - SlowAPI rate limiting, Prometheus metrics, Redis cache (optional)
 
 **Frontend** (`/frontend`):
-- Next.js 16 (App Router), TypeScript strict
-- Tailwind CSS 4 (inline theming, no separate config file) + DaisyUI 5.5+
+- Next.js 16 (App Router), TypeScript strict, React Compiler enabled (`reactCompiler: true` in `next.config.ts`) — avoid manual `useMemo`/`useCallback`
+- Tailwind CSS 4 — config is **inline in `src/app/globals.css`** via `@plugin "daisyui/theme"`. **No `tailwind.config.js`** file. All theme tokens live in that CSS file.
+- DaisyUI 5.5+ — use component classes (`btn`, `card`, `modal`) over hand-rolled Tailwind
 - NextAuth v5 (JWT strategy, 24h session)
 - TanStack React Query v5 for all server state
 - Axios via `createAuthenticatedClient(token)` from `lib/api.ts`
 - React Hot Toast for notifications
-
-### Critical Known Issue — Hardcoded API URL
-
-`frontend/src/lib/getApiUrl.ts` currently **hardcodes the Railway production URL** instead of reading `NEXT_PUBLIC_API_URL`. This means local dev calls hit production. When fixing backend features, check and restore env-var-based routing:
-
-```ts
-// Should be:
-return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api';
-```
 
 ### Authentication
 
@@ -57,7 +50,9 @@ NextAuth v5 with CredentialsProvider (`frontend/src/auth.ts`):
 - `useAuth()` — returns `getToken()`, `isSignedIn`, `userId`
 - `useUser()` — returns `user`, `isLoaded`, `isSignedIn`
 
-**Migration note**: Clerk → NextAuth v5. `clerk_id` field in User model is nullable and kept for compatibility. `@clerk/nextjs` in package.json is unused legacy.
+**Migration note**: Clerk → NextAuth v5 complete. `clerk_id` field is being removed (migration `r9i0j1k2l3m4` pending). `@clerk/nextjs` in package.json is unused legacy — safe to remove.
+
+**`src/middleware.ts`** wraps `auth()` and runs on the Edge runtime — it has NOT been renamed to `proxy.ts`. Do not add Node.js APIs here.
 
 ### Backend API Routes
 
@@ -208,6 +203,10 @@ JWT_SECRET=<jwt signing key>
 RESEND_API_KEY=re_...
 FROM_EMAIL=INTOWORK <noreply@intowork.com>
 FRONTEND_URL=http://localhost:3000
+ANTHROPIC_API_KEY=<required for AI scoring service>
+CLOUDINARY_CLOUD_NAME=<for image/media uploads>
+CLOUDINARY_API_KEY=<cloudinary>
+CLOUDINARY_API_SECRET=<cloudinary>
 ```
 
 **`frontend/.env.local`**:
@@ -222,14 +221,16 @@ NEXT_PUBLIC_API_URL=http://localhost:8001/api
 ## Database Schema
 
 Core models (`backend/app/models/base.py`):
-- **User** — email, password_hash, role (candidate/employer/admin), first_name, last_name, clerk_id (legacy nullable)
+- **User** — email, password_hash, role (candidate/employer/admin), first_name, last_name (`clerk_id` being removed — migration `r9i0j1k2l3m4` pending)
 - **Candidate** → User (1:1) — profile, CV fields, relations: experiences, educations, skills, cvs
 - **CandidateCV** → Candidate — multiple CVs with is_active flag
 - **Experience**, **Education**, **Skill** → Candidate (cascade delete)
 - **Company** — company info for employers
 - **Employer** → User + Company (1:1)
 - **Job** → Company — status: draft/active/closed/archived; job_type stored as VARCHAR (not enum, after migration)
-- **JobApplication** → Candidate + Job — status: applied/pending/viewed/shortlisted/interview/accepted/rejected
+- **JobApplication** → Candidate + Job — status: applied/pending/viewed/shortlisted/interview/accepted/rejected; has `notes` and `cv_id` fields
+- **CVDocument** → Candidate — CV Builder documents (5 templates), with `slug` for public sharing
+- **CVAnalytics** → CVDocument — view/download tracking per public CV
 - **Notification** → User
 - **PasswordResetToken** — single-use, 24h expiry
 - **Account**, **Session** — NextAuth OAuth support
@@ -249,13 +250,103 @@ Core models (`backend/app/models/base.py`):
 
 ## Key Gotchas
 
-1. **getApiUrl.ts is hardcoded** to Railway prod URL — fix for local dev by restoring `NEXT_PUBLIC_API_URL` env var
-2. **Dashboard layout is client-side guard** — uses `useUser()` hook, not `auth()` server-side
-3. **Backend venv required** before any `python` or `uvicorn` commands
-4. **NEXTAUTH_SECRET must be identical** in backend `.env` and frontend `.env.local`
-5. **Job enums are VARCHAR** in DB (after `q8h9i0j1k2l3` migration) — don't use SQLEnum for new job-related queries
-6. **`/api` prefix required** — `NEXT_PUBLIC_API_URL` must end with `/api`
-7. **React Query cache** — always call `queryClient.invalidateQueries()` after mutations
-8. **Migrations must be reviewed** before applying — check async compatibility in Alembic versions
-9. **File uploads** stored at `backend/uploads/cvs/{candidate_id}/` — served at `/uploads` with public CORS
-10. **Railway startup** runs `alembic upgrade head` automatically — new migrations deploy on next push
+1. **Dashboard layout is client-side guard** — uses `useUser()` hook, not `auth()` server-side
+2. **Backend venv required** before any `python` or `uvicorn` commands
+3. **NEXTAUTH_SECRET must be identical** in backend `.env` (`NEXTAUTH_SECRET`) and frontend `.env.local` (`AUTH_SECRET` + `NEXTAUTH_SECRET`)
+4. **Job enums are VARCHAR** in DB (after `q8h9i0j1k2l3` migration) — don't use SQLEnum for new job-related queries
+5. **`/api` prefix required** — `NEXT_PUBLIC_API_URL` must end with `/api`
+6. **React Query cache** — always call `queryClient.invalidateQueries()` after mutations
+7. **Migrations must be reviewed** before applying — check async compatibility in Alembic versions
+8. **File uploads** stored at `backend/uploads/cvs/{candidate_id}/` — served at `/uploads` with public CORS
+9. **Railway startup** runs `alembic upgrade head` automatically — new migrations deploy on next push
+10. **`middleware.ts` is NOT `proxy.ts`** — the Next.js 16 rename to `proxy.ts` has NOT been applied; `middleware.ts` wraps `auth()` on the Edge runtime
+11. **AI scoring requires `ANTHROPIC_API_KEY`** — `ai_scoring.py` uses the Anthropic SDK directly (not the AI Gateway); ensure the key is set in backend `.env`
+12. **Tailwind config is inline** — no `tailwind.config.js`; all tokens (colors, radii) are in `frontend/src/app/globals.css`
+
+---
+
+# MCP Gemini Design - MANDATORY UNIQUE WORKFLOW
+
+## ABSOLUTE RULE
+
+You NEVER write frontend/UI code yourself. Gemini is your frontend developer.
+
+---
+
+## AVAILABLE TOOLS
+
+### `generate_vibes`
+Generates a visual page with 5 differently styled sections. The user opens the page, sees all 5 vibes, and picks their favorite. The code from the chosen vibe becomes the design-system.md.
+
+### `create_frontend`
+Creates a NEW complete file (page, component, section).
+
+### `modify_frontend`
+Makes ONE design modification to existing code. Returns a FIND/REPLACE block to apply.
+
+### `snippet_frontend`
+Generates a code snippet to INSERT into an existing file. For adding elements without rewriting the entire file.
+
+---
+
+## WORKFLOW (NO ALTERNATIVES)
+
+### STEP 1: Check for design-system.md
+
+BEFORE any frontend call → check if `design-system.md` exists at project root.
+
+### STEP 2A: If design-system.md DOES NOT EXIST
+
+1. Call `generate_vibes` with projectDescription, projectType, techStack
+2. Receive the code for a page with 5 visual sections
+3. Ask: "You don't have a design system. Can I create vibes-selection.tsx so you can visually choose your style?"
+4. If yes → Write the page to the file
+5. User chooses: "vibe 3" or "the 5th one"
+6. Extract THE ENTIRE CODE between `<!-- VIBE_X_START -->` and `<!-- VIBE_X_END -->`
+7. Save it to `design-system.md`
+8. Ask: "Delete vibes-selection.tsx?"
+9. Continue normally
+
+### STEP 2B: If design-system.md EXISTS
+
+Read it and use its content for frontend calls.
+
+### STEP 3: Frontend Calls
+
+For EVERY call (create_frontend, modify_frontend, snippet_frontend), you MUST pass:
+
+- `designSystem`: Copy-paste the ENTIRE content of design-system.md (all the code, not a summary)
+- `context`: Functional/business context WITH ALL REAL DATA. Include:
+  - What it does, features, requirements
+  - ALL real text/labels to display (status labels, button text, titles...)
+  - ALL real data values (prices, stats, numbers...)
+  - Enum values and their exact meaning
+  - Any business-specific information
+
+**WHY**: Gemini will use placeholders `[Title]`, `[Price]` for missing info. If you don't provide real data, you'll get placeholders or worse - fake data.
+
+---
+
+## FORBIDDEN
+
+- Writing frontend without Gemini
+- Skipping the vibes workflow when design-system.md is missing
+- Extracting "rules" instead of THE ENTIRE code
+- Manually creating design-system.md
+- Passing design/styling info in `context` (that goes in `designSystem`)
+- Summarizing the design system instead of copy-pasting it entirely
+- Calling Gemini without providing real data (labels, stats, prices, etc.) → leads to fake info
+
+## EXPECTED
+
+- Check for design-system.md BEFORE anything
+- Follow the complete vibes workflow if missing
+- Pass the FULL design-system.md content in `designSystem`
+- Pass functional context in `context` (purpose, features, requirements)
+
+## EXCEPTIONS (you can code these yourself)
+
+- Text-only changes
+- JS logic without UI
+- Non-visual bug fixes
+- Data wiring (useQuery, etc.)

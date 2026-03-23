@@ -5,14 +5,6 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['@heroicons/react']
   },
-  images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'images.clerk.dev',
-      },
-    ],
-  },
   env: {
     CUSTOM_KEY: process.env.CUSTOM_KEY,
   },

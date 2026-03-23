@@ -52,7 +52,6 @@ apiClient.interceptors.response.use(
 // Types pour l'API
 export interface User {
   id: number;
-  clerk_id: string;
   email: string;
   first_name: string;
   last_name: string;
@@ -62,7 +61,6 @@ export interface User {
 }
 
 export interface UserProfile {
-  clerk_id: string;
   email: string;
   first_name: string;
   last_name: string;
@@ -159,7 +157,6 @@ export interface CandidateProfile {
 
 // Services API
 export const authAPI = {
-  // Synchroniser l'utilisateur avec le backend après auth Clerk
   syncUser: async (userProfile: UserProfile, token?: string): Promise<User> => {
     const client = token ? createAuthenticatedClient(token) : apiClient;
     const response = await client.post('/auth/sync', userProfile);

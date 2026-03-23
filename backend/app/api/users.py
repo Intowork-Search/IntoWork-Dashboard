@@ -11,7 +11,6 @@ router = APIRouter()
 
 # Schémas Pydantic
 class UserBase(BaseModel):
-    clerk_id: str
     email: str
     role: UserRole
     first_name: str
@@ -20,7 +19,7 @@ class UserBase(BaseModel):
 class UserResponse(UserBase):
     id: int
     is_active: bool
-    
+
     class Config:
         from_attributes = True
 
@@ -39,11 +38,11 @@ async def create_user(user: UserCreate, db: AsyncSession = Depends(get_db)):
     """Créer un nouvel utilisateur"""
     # Vérifier si l'utilisateur existe déjà
     result = await db.execute(
-        select(User).filter(User.clerk_id == user.clerk_id)
+        select(User).filter(User.email == user.email)
     )
     existing_user = result.scalar_one_or_none()
     if existing_user:
-        raise HTTPException(status_code=400, detail="User with this Clerk ID already exists")
+        raise HTTPException(status_code=400, detail="User with this email already exists")
 
     # Créer le nouvel utilisateur
     db_user = User(**user.model_dump())
