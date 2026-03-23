@@ -138,6 +138,18 @@ class SignInRequest(BaseModel):
     password: str
 
 
+class OAuthSignInRequest(BaseModel):
+    """OAuth signin request — called by frontend NextAuth after Google callback"""
+    provider: str  # "google"
+    provider_account_id: str
+    email: EmailStr
+    name: Optional[str] = None
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    image: Optional[str] = None
+    id_token: Optional[str] = None
+
+
 class AuthUserData(BaseModel):
     """User data included in auth response"""
     id: int

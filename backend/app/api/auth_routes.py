@@ -19,14 +19,14 @@ from slowapi import Limiter
 from slowapi.util import get_remote_address
 
 from app.database import get_db
-from app.models.base import User, UserRole, Candidate, Employer, PasswordResetToken, Session
+from app.models.base import User, UserRole, Candidate, Employer, PasswordResetToken, Session, Account
 from app.auth import (
     PasswordHasher, Auth, CurrentUser, DBSession,
     REFRESH_TOKEN_EXPIRATION_DAYS
 )
 from app.services.email_service import email_service
 from app.schemas import (
-    SignUpRequest, SignInRequest, AuthResponse, AuthUserData,
+    SignUpRequest, SignInRequest, OAuthSignInRequest, AuthResponse, AuthUserData,
     RefreshTokenRequest, RefreshTokenResponse,
     ChangePasswordRequest, ChangePasswordResponse,
     ChangeEmailRequest, ChangeEmailResponse,
@@ -197,6 +197,131 @@ async def signin(
         refresh_token_hash=refresh_token_hash
     )
     db.add(session)
+    await db.commit()
+
+    return AuthResponse(
+        access_token=access_token,
+        refresh_token=refresh_token,
+        token_type="bearer",
+        user=AuthUserData(
+            id=user.id,
+            email=user.email,
+            first_name=user.first_name,
+            last_name=user.last_name,
+            role=user.role.value,
+            image=user.image
+        )
+    )
+
+
+@router.post("/oauth/signin", response_model=AuthResponse)
+@limiter.limit("5/15minutes")
+async def oauth_signin(
+    request: Request,
+    oauth_data: OAuthSignInRequest,
+    db: DBSession
+) -> AuthResponse:
+    """
+    OAuth sign-in — échange une identité Google contre un JWT backend.
+
+    Appelé par le callback jwt de NextAuth après un flux Google OAuth réussi.
+    Crée ou lie le compte utilisateur et retourne les tokens backend.
+
+    Rate limit: 5 requests per 15 minutes per IP address
+    """
+    # Chercher l'utilisateur par email
+    result = await db.execute(
+        select(User).filter(User.email == oauth_data.email)
+    )
+    user = result.scalar_one_or_none()
+
+    if user:
+        if not user.is_active:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Account is inactive"
+            )
+
+        # Créer le record Account si inexistant (liaison compte existant → Google)
+        account_result = await db.execute(
+            select(Account).filter(
+                Account.user_id == user.id,
+                Account.provider == oauth_data.provider,
+                Account.provider_account_id == oauth_data.provider_account_id
+            )
+        )
+        if not account_result.scalar_one_or_none():
+            db.add(Account(
+                user_id=user.id,
+                type="oauth",
+                provider=oauth_data.provider,
+                provider_account_id=oauth_data.provider_account_id,
+                id_token=oauth_data.id_token,
+            ))
+
+        # Mettre à jour les champs manquants
+        if not user.email_verified:
+            user.email_verified = datetime.now(timezone.utc)
+        if not user.image and oauth_data.image:
+            user.image = oauth_data.image
+
+        await db.commit()
+        await db.refresh(user)
+
+    else:
+        # Nouvel utilisateur via OAuth — créer avec rôle candidate par défaut
+        first_name = oauth_data.first_name
+        last_name = oauth_data.last_name
+        if not first_name and oauth_data.name:
+            parts = oauth_data.name.strip().split(" ", 1)
+            first_name = parts[0]
+            last_name = parts[1] if len(parts) > 1 else ""
+        first_name = first_name or "Utilisateur"
+        last_name = last_name or ""
+
+        user = User(
+            email=oauth_data.email,
+            password_hash=None,
+            first_name=first_name,
+            last_name=last_name,
+            name=oauth_data.name or f"{first_name} {last_name}".strip(),
+            image=oauth_data.image,
+            email_verified=datetime.now(timezone.utc),
+            role=UserRole.CANDIDATE,
+            is_active=True
+        )
+        db.add(user)
+        await db.commit()
+        await db.refresh(user)
+
+        db.add(Candidate(user_id=user.id))
+        db.add(Account(
+            user_id=user.id,
+            type="oauth",
+            provider=oauth_data.provider,
+            provider_account_id=oauth_data.provider_account_id,
+            id_token=oauth_data.id_token,
+        ))
+        await db.commit()
+
+    # Générer les tokens backend
+    access_token = Auth.create_access_token(
+        user_id=user.id,
+        email=user.email,
+        role=user.role.value
+    )
+    refresh_token = Auth.create_refresh_token(
+        user_id=user.id,
+        email=user.email
+    )
+
+    refresh_token_hash = PasswordHasher.hash_token(refresh_token)
+    db.add(Session(
+        user_id=user.id,
+        session_token=access_token[-32:],
+        expires=datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRATION_DAYS),
+        refresh_token_hash=refresh_token_hash
+    ))
     await db.commit()
 
     return AuthResponse(
