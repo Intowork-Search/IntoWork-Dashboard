@@ -1000,19 +1000,19 @@ export default function Home() {
           <p className="text-center text-sm font-semibold text-gray-400 uppercase tracking-wider mb-8">
             Ils recrutent sur INTOWORK
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-6 lg:gap-10">
+          <div className="flex flex-wrap items-center justify-center gap-8 lg:gap-12">
             {logoCompanies.map((company) => (
               <div
                 key={company.name}
-                className="flex items-center gap-2.5 group cursor-default"
+                className="flex items-center gap-3 group cursor-default"
               >
                 <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-sm group-hover:scale-110 transition-transform"
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center text-white font-bold text-xl shadow-md group-hover:scale-110 transition-transform"
                   style={{ backgroundColor: company.color }}
                 >
                   {company.name.charAt(0)}
                 </div>
-                <span className="text-sm font-semibold text-gray-500 group-hover:text-gray-800 transition-colors hidden sm:inline">
+                <span className="text-base font-bold text-gray-600 group-hover:text-gray-900 transition-colors">
                   {company.name}
                 </span>
               </div>
