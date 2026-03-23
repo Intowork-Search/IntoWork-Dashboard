@@ -17,7 +17,7 @@ import {
   ArrowUpTrayIcon
 } from '@heroicons/react/24/outline';
 import { useAuthenticatedAPI } from '@/hooks/useAuthenticatedAPI';
-import { companiesAPI, authAPI, getUploadUrl } from '@/lib/api';
+import { companiesAPI, authAPI, getUploadUrl, type CandidateProfile } from '@/lib/api';
 import { getApiUrl } from '@/lib/getApiUrl';
 import ToggleButton from '@/components/ToggleButton';
 import DashboardLayout from '@/components/DashboardLayout';
@@ -126,30 +126,30 @@ export default function SettingsPage() {
         }
 
         try {
-          const profileData = await candidateAPI.getProfile() as unknown as UserProfile;
+          const apiProfile = await candidateAPI.getProfile() as unknown as UserProfile;
           setUserRole('candidate');
-          setProfile(profileData);
+          setProfile(apiProfile);
 
           setProfileData({
-            first_name: profileData.first_name || user?.firstName || '',
-            last_name: profileData.last_name || user?.lastName || '',
-            phone: profileData.phone || '',
-            location: profileData.location || '',
-            bio: profileData.bio || '',
-            website: profileData.website || '',
-            linkedin_url: profileData.linkedin_url || '',
-            github_url: profileData.github_url || ''
+            first_name: apiProfile.first_name || user?.firstName || '',
+            last_name: apiProfile.last_name || user?.lastName || '',
+            phone: apiProfile.phone || '',
+            location: apiProfile.location || '',
+            bio: apiProfile.bio || '',
+            website: apiProfile.website || '',
+            linkedin_url: apiProfile.linkedin_url || '',
+            github_url: apiProfile.github_url || ''
           });
 
           setNotifications({
-            email_notifications: profileData.email_notifications ?? true,
-            job_alerts: profileData.job_alerts ?? true,
-            marketing_emails: profileData.marketing_emails ?? false,
+            email_notifications: apiProfile.email_notifications ?? true,
+            job_alerts: apiProfile.job_alerts ?? true,
+            marketing_emails: apiProfile.marketing_emails ?? false,
             push_notifications: true
           });
 
           setPrivacy({
-            is_profile_public: profileData.is_profile_public ?? true,
+            is_profile_public: apiProfile.is_profile_public ?? true,
             show_email: false,
             show_phone: false,
             allow_recruiter_contact: true
@@ -228,7 +228,7 @@ export default function SettingsPage() {
   const updateProfile = async () => {
     try {
       setLoading(true);
-      await candidateAPI.updateProfile(profileData);
+      await candidateAPI.updateProfile(profileData as unknown as Partial<CandidateProfile>);
       toast.success('Profil mis à jour avec succès !');
     } catch (error) {
       console.error('Erreur lors de la mise à jour:', error);
@@ -367,7 +367,7 @@ export default function SettingsPage() {
   const updatePrivacy = async () => {
     try {
       setLoading(true);
-      await candidateAPI.updateProfile({ is_profile_public: privacy.is_profile_public });
+      await candidateAPI.updateProfile({ is_profile_public: privacy.is_profile_public } as unknown as Partial<CandidateProfile>);
       toast.success('Paramètres de confidentialité mis à jour !');
     } catch (error) {
       console.error('Erreur lors de la mise à jour:', error);
