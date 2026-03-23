@@ -1012,186 +1012,160 @@ export default function Home() {
       </section>
 
       {/* ═══════════════════════ HOW IT WORKS ═══════════════════════ */}
-      <section id="how-it-works" className="py-20 lg:py-28 bg-[#F0F7EE] relative overflow-hidden">
+      <section id="how-it-works" className="py-24 lg:py-32 bg-white relative overflow-hidden">
+        {/* Decorative Background Blobs */}
+        <div className="absolute top-1/4 -left-64 w-[500px] h-[500px] bg-[#6B9B5F]/5 rounded-full blur-[100px]" />
+        <div className="absolute bottom-1/4 -right-64 w-[500px] h-[500px] bg-[#7C3AED]/5 rounded-full blur-[100px]" />
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <AnimateOnScroll className="text-center mb-16 lg:mb-20">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[#6B9B5F]/20 text-sm font-semibold text-[#6B9B5F] mb-6">
+          <AnimateOnScroll className="text-center mb-16 lg:mb-24">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-50 border border-green-100 text-sm font-bold text-[#6B9B5F] mb-6">
               <IconSparkles className="w-4 h-4" />
-              Comment ça marche
+              PROCESSUS DE RÉUSSITE
             </div>
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-tight mb-6">
-              Votre carrière propulsée par l&apos;IA
+              Votre carrière propulsée par <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6B9B5F] to-[#93C587]">l&apos;IA</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              Un processus simplifié conçu pour connecter les meilleurs talents aux opportunités les plus pertinentes en Afrique de l&apos;Ouest.
+            <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+              Connectez-vous aux meilleures opportunités d&apos;Afrique de l&apos;Ouest en 3 étapes intelligentes.
             </p>
           </AnimateOnScroll>
 
-          <div className="relative space-y-20 lg:space-y-28">
-            {/* Vertical Timeline Line */}
-            <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-gray-300 to-transparent hidden lg:block" />
-
-            {/* Étape 1 */}
-            <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
-              <AnimateOnScroll className="order-2 lg:order-1" delay={0}>
-                <div className="relative">
-                  <span className="hidden sm:block absolute -top-16 -left-8 text-8xl lg:text-[10rem] font-black text-gray-900/[0.06] select-none pointer-events-none">01</span>
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#6B9B5F]/20 text-[#6B9B5F] mb-8 ring-1 ring-[#6B9B5F]/30">
-                    <IconUser className="w-8 h-8" />
-                  </div>
-                  <h3 className="text-3xl font-bold text-gray-900 mb-6">Créez votre profil</h3>
-                  <p className="text-lg text-gray-600 leading-relaxed mb-8">
-                    Importez votre CV ou connectez votre LinkedIn. Notre IA extrait instantanément vos compétences clés pour bâtir un profil professionnel attractif qui parle aux recruteurs.
-                  </p>
-                  <ul className="space-y-4">
-                    {['Analyse automatique de CV', 'Extraction de compétences IA', 'Portfolio dynamique'].map((item) => (
-                      <li key={item} className="flex items-center gap-3 text-gray-700">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#6B9B5F]" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </AnimateOnScroll>
-              <AnimateOnScroll className="order-1 lg:order-2" delay={200}>
-                <div className="relative p-8 rounded-3xl bg-white border border-gray-200 shadow-md group hover:border-[#6B9B5F]/40 transition-colors">
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="w-14 h-14 rounded-2xl overflow-hidden ring-2 ring-gray-100">
-                      <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100&h=100&fit=crop" alt="User" className="w-full h-full object-cover" />
-                    </div>
-                    <div>
-                      <div className="h-4 w-32 bg-gray-200 rounded-full mb-2" />
-                      <div className="h-3 w-20 bg-gray-100 rounded-full" />
-                    </div>
-                  </div>
-                  <div className="space-y-4">
-                    <div className="flex justify-between text-xs font-semibold text-[#6B9B5F] mb-2 uppercase tracking-wider">
-                      <span>Complétion du profil</span>
-                      <span>85%</span>
-                    </div>
-                    <div className="h-3 w-full bg-gray-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-gradient-to-r from-[#6B9B5F] to-[#93C587] rounded-full" style={{ width: '85%' }} />
-                    </div>
-                    <div className="flex flex-wrap gap-2 pt-4">
-                      {['React.js', 'Project Management', 'UI/UX', 'Python'].map(tag => (
-                        <span key={tag} className="px-3 py-1 text-xs font-medium bg-gray-100 text-gray-600 rounded-lg border border-gray-200">{tag}</span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </AnimateOnScroll>
-            </div>
-
-            {/* Étape 2 */}
-            <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
-              <AnimateOnScroll className="order-2" delay={0}>
-                <div className="relative">
-                  <span className="hidden sm:block absolute -top-16 -right-8 lg:-right-16 text-8xl lg:text-[10rem] font-black text-gray-900/[0.06] select-none pointer-events-none">02</span>
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#7C3AED]/20 text-[#7C3AED] mb-8 ring-1 ring-[#7C3AED]/30">
-                    <IconSparkles className="w-8 h-8" />
-                  </div>
-                  <h3 className="text-3xl font-bold text-gray-900 mb-6">L&apos;IA trouve vos matchs</h3>
-                  <p className="text-lg text-gray-600 leading-relaxed mb-8">
-                    Fini les recherches interminables. Notre algorithme analyse en temps réel des milliers d&apos;offres pour vous proposer uniquement celles qui correspondent à vos critères et à votre potentiel.
-                  </p>
-                  <div className="p-4 rounded-2xl bg-[#7C3AED]/10 border border-[#7C3AED]/20 text-[#A78BFA] text-sm italic">
-                    &quot;94% de précision dans le matching constaté par nos utilisateurs.&quot;
-                  </div>
-                </div>
-              </AnimateOnScroll>
-              <AnimateOnScroll className="order-1" delay={200}>
-                <div className="relative p-6 rounded-3xl bg-white border border-gray-200 shadow-md group hover:border-[#7C3AED]/30 transition-colors">
-                  <div className="flex items-center justify-between mb-8">
-                    <div className="flex items-center gap-2">
-                      <IconSparkles className="w-5 h-5 text-[#7C3AED]" />
-                      <span className="text-sm font-bold text-gray-900">Matching Intelligent</span>
-                    </div>
-                    <span className="text-xs text-[#7C3AED] font-bold">ACTIF</span>
-                  </div>
-                  <div className="space-y-4">
-                    {[
-                      { name: "Orange Côte d'Ivoire", score: 94, loc: 'Abidjan' },
-                      { name: 'Ecobank Group', score: 89, loc: 'Lomé / Remote' },
-                      { name: 'MTN Sénégal', score: 85, loc: 'Dakar' },
-                    ].map((m, i) => (
-                      <div key={i} className="flex items-center justify-between p-4 rounded-xl bg-gray-50 border border-gray-100 hover:bg-gray-100 transition-colors cursor-default">
-                        <div className="flex flex-col">
-                          <span className="text-sm font-bold text-gray-900">{m.name}</span>
-                          <span className="text-xs text-gray-500">{m.loc}</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <div className="text-right">
-                            <span className="block text-sm font-black text-[#7C3AED]">{m.score}%</span>
-                            <span className="text-[10px] text-gray-500 uppercase tracking-tighter">Match</span>
-                          </div>
-                          <div className="w-1.5 h-8 bg-[#7C3AED]/20 rounded-full overflow-hidden flex flex-col justify-end">
-                            <div className="w-full bg-[#7C3AED] rounded-full" style={{ height: `${m.score}%` }} />
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </AnimateOnScroll>
-            </div>
-
-            {/* Étape 3 */}
-            <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
-              <AnimateOnScroll className="order-2 lg:order-1" delay={0}>
-                <div className="relative">
-                  <span className="hidden sm:block absolute -top-16 -left-8 text-8xl lg:text-[10rem] font-black text-gray-900/[0.06] select-none pointer-events-none">03</span>
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#F59E0B]/20 text-[#F59E0B] mb-8 ring-1 ring-[#F59E0B]/30">
-                    <IconSend className="w-8 h-8" />
-                  </div>
-                  <h3 className="text-3xl font-bold text-gray-900 mb-6">Décrochez le poste</h3>
-                  <p className="text-lg text-gray-600 leading-relaxed mb-8">
-                    Postulez instantanément et suivez chaque étape de votre candidature. Discutez en direct avec les recruteurs et planifiez vos entretiens sans quitter la plateforme.
-                  </p>
-                  <a href="/signup" className="inline-flex items-center gap-2 px-6 py-3 bg-[#6B9B5F] hover:bg-[#5A8A4E] text-white font-bold rounded-xl transition-all shadow-lg shadow-[#6B9B5F]/20">
-                    Commencer maintenant
-                  </a>
-                </div>
-              </AnimateOnScroll>
-              <AnimateOnScroll className="order-1 lg:order-2" delay={200}>
-                <div className="relative p-8 rounded-3xl bg-white border border-gray-200 shadow-md group hover:border-[#F59E0B]/40 transition-colors">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-full bg-[#F59E0B]/20 flex items-center justify-center">
-                      <IconCalendar className="w-5 h-5 text-[#F59E0B]" />
-                    </div>
-                    <span className="text-gray-900 font-bold">Prochain Entretien</span>
-                  </div>
-                  <div className="p-5 rounded-2xl bg-gray-50 border border-gray-100">
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="w-12 h-12 rounded-xl bg-[#FF6600] flex items-center justify-center font-black text-white text-xl">O</div>
-                      <div>
-                        <div className="text-gray-900 font-bold">Orange Côte d&apos;Ivoire</div>
-                        <div className="text-xs text-gray-500">Mardi 25 Mars — 14h00</div>
-                      </div>
-                    </div>
-                    <div className="flex gap-2 mb-4">
-                      <span className="px-3 py-1 rounded-full bg-[#6B9B5F]/20 text-[#6B9B5F] text-xs font-bold border border-[#6B9B5F]/30">Confirmé</span>
-                      <span className="px-3 py-1 rounded-full bg-blue-500/20 text-blue-600 text-xs font-bold border border-blue-500/30">Visio-conférence</span>
-                    </div>
-                    <div className="pt-4 border-t border-gray-200 flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1614289371518-722f2615943d?w=64&h=64&fit=crop" className="w-full h-full object-cover" alt="Recruiter" />
-                      </div>
-                      <span className="text-xs text-gray-500 italic">&quot;Hâte de discuter de votre profil !&quot;</span>
-                    </div>
-                  </div>
-                </div>
-              </AnimateOnScroll>
-            </div>
+          {/* Progress Timeline (Desktop) */}
+          <div className="hidden lg:flex items-center justify-between max-w-4xl mx-auto mb-16 relative">
+            <div className="absolute left-0 right-0 h-0.5 bg-gray-100 top-1/2 -translate-y-1/2" />
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="relative z-10 w-4 h-4 rounded-full bg-white border-4 border-[#6B9B5F] shadow-[0_0_15px_rgba(107,155,95,0.4)] animate-pulse-soft" />
+            ))}
           </div>
 
-          {/* Final CTA */}
-          <AnimateOnScroll className="text-center mt-20" delay={400}>
-            <div className="p-6 sm:p-10 lg:p-12 rounded-2xl sm:rounded-[2.5rem] bg-white border border-gray-200 shadow-sm relative overflow-hidden">
-              <h3 className="text-3xl font-bold text-gray-900 mb-6">Prêt à changer de dimension ?</h3>
-              <p className="text-gray-600 mb-10 max-w-xl mx-auto">Rejoignez des milliers de professionnels qui ont déjà trouvé leur match idéal grâce à notre technologie.</p>
-              <a href="/signup" className="inline-flex items-center gap-2 px-10 py-5 text-lg font-bold text-white bg-[#6B9B5F] hover:bg-[#5A8A4E] rounded-2xl transition-all hover:scale-105 shadow-xl shadow-[#6B9B5F]/20">
-                Lancer ma recherche gratuite
-              </a>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-24">
+            {/* Étape 1 */}
+            <AnimateOnScroll delay={0}>
+              <div className="group relative h-full p-8 rounded-[2rem] bg-white border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 overflow-hidden">
+                <span className="absolute -top-6 -right-4 text-9xl font-black text-gray-50/80 pointer-events-none transition-transform group-hover:scale-110 select-none">01</span>
+                <div className="relative z-10">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#6B9B5F] to-[#93C587] flex items-center justify-center text-white mb-6 shadow-lg shadow-green-100">
+                    <IconUser className="w-7 h-7" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">Créez votre profil</h3>
+                  <p className="text-gray-600 mb-8 leading-relaxed">Importez votre CV. Notre IA extrait vos compétences pour bâtir un profil attractif.</p>
+                  {/* Inline Mockup 1 */}
+                  <div className="p-5 rounded-2xl bg-gray-50/80 border border-gray-100">
+                    <div className="flex items-center gap-3 mb-4">
+                      <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&q=80" className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm" alt="Amadou" loading="lazy" />
+                      <div className="flex-1">
+                        <div className="h-2.5 w-24 bg-gray-200 rounded-full mb-1.5" />
+                        <div className="h-2 w-16 bg-gray-100 rounded-full" />
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="flex justify-between text-[10px] font-bold text-[#6B9B5F] uppercase">
+                        <span>Complétion</span>
+                        <span>85%</span>
+                      </div>
+                      <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-[#6B9B5F] to-[#93C587] rounded-full w-[85%]" />
+                      </div>
+                      <div className="flex flex-wrap gap-1.5 pt-1">
+                        {['React.js', 'UI/UX', 'Python'].map(t => (
+                          <span key={t} className="px-2 py-0.5 text-[10px] bg-white border border-gray-100 rounded-md font-medium text-gray-500">{t}</span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </AnimateOnScroll>
+
+            {/* Étape 2 */}
+            <AnimateOnScroll delay={150}>
+              <div className="group relative h-full p-8 rounded-[2rem] bg-white border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 overflow-hidden">
+                <span className="absolute -top-6 -right-4 text-9xl font-black text-gray-50/80 pointer-events-none select-none">02</span>
+                <div className="relative z-10">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#7C3AED] to-[#A78BFA] flex items-center justify-center text-white mb-6 shadow-lg shadow-purple-100">
+                    <IconSparkles className="w-7 h-7" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">L&apos;IA trouve vos matchs</h3>
+                  <p className="text-gray-600 mb-8 leading-relaxed">Notre algorithme analyse en temps réel des milliers d&apos;offres pour vous proposer le match parfait.</p>
+                  {/* Inline Mockup 2 */}
+                  <div className="space-y-3">
+                    {[
+                      { n: 'Orange CI', s: 94, loc: 'Abidjan' },
+                      { n: 'Ecobank Group', s: 89, loc: 'Lomé' },
+                      { n: 'MTN Sénégal', s: 85, loc: 'Dakar' },
+                    ].map((m, idx) => (
+                      <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-gray-50/50 border border-gray-100">
+                        <div>
+                          <span className="text-xs font-bold text-gray-900 block">{m.n}</span>
+                          <span className="text-[10px] text-gray-500">{m.loc}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-[#7C3AED]">{m.s}%</span>
+                          <div className="w-1 h-6 bg-[#7C3AED]/20 rounded-full overflow-hidden flex flex-col justify-end">
+                            <div className="w-full bg-[#7C3AED] rounded-full" style={{ height: `${m.s}%` }} />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </AnimateOnScroll>
+
+            {/* Étape 3 */}
+            <AnimateOnScroll delay={300}>
+              <div className="group relative h-full p-8 rounded-[2rem] bg-white border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 overflow-hidden">
+                <span className="absolute -top-6 -right-4 text-9xl font-black text-gray-50/80 pointer-events-none select-none">03</span>
+                <div className="relative z-10">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#F59E0B] to-[#FBBF24] flex items-center justify-center text-white mb-6 shadow-lg shadow-amber-100">
+                    <IconSend className="w-7 h-7" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">Décrochez le poste</h3>
+                  <p className="text-gray-600 mb-8 leading-relaxed">Suivez vos candidatures, discutez avec les recruteurs et planifiez vos entretiens.</p>
+                  {/* Inline Mockup 3 */}
+                  <div className="p-4 rounded-2xl bg-[#6B9B5F]/5 border border-[#6B9B5F]/10">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center border border-gray-100 shadow-sm">
+                        <IconCalendar className="w-4 h-4 text-[#6B9B5F]" />
+                      </div>
+                      <span className="text-xs font-bold text-gray-900">Entretien Confirmé</span>
+                    </div>
+                    <div className="flex items-center gap-3 pt-3 border-t border-[#6B9B5F]/10">
+                      <div className="w-8 h-8 rounded-lg bg-[#FF6600] flex items-center justify-center text-white text-[10px] font-black shrink-0">O</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[11px] font-bold text-gray-900 truncate">Orange Côte d&apos;Ivoire</div>
+                        <div className="text-[9px] text-gray-500">Mardi 25 Mars — 14h00</div>
+                      </div>
+                      <div className="px-2 py-0.5 rounded-full bg-[#6B9B5F] text-[9px] font-bold text-white shrink-0">OK</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </AnimateOnScroll>
+          </div>
+
+          {/* Final CTA Banner */}
+          <AnimateOnScroll delay={450}>
+            <div className="relative p-8 sm:p-16 rounded-[3rem] bg-gradient-to-br from-[#6B9B5F] to-[#4B7340] overflow-hidden shadow-2xl shadow-green-200">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl pointer-events-none" />
+              <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/10 rounded-full -ml-20 -mb-20 blur-3xl pointer-events-none" />
+              <div className="relative z-10 flex flex-col items-center text-center">
+                <h3 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mb-6 leading-tight">
+                  Prêt à changer de dimension ?
+                </h3>
+                <p className="text-green-50/80 text-lg mb-12 max-w-xl mx-auto">
+                  Rejoignez les talents qui transforment l&apos;économie numérique en Afrique de l&apos;Ouest dès aujourd&apos;hui.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                  <a href="/signup" className="px-10 py-5 bg-white text-[#6B9B5F] font-bold text-lg rounded-2xl hover:bg-gray-50 transition-all hover:scale-105 shadow-xl text-center">
+                    Lancer ma recherche gratuite
+                  </a>
+                  <a href="/signin" className="px-8 py-5 bg-transparent border-2 border-white/30 text-white font-bold text-lg rounded-2xl hover:bg-white/10 transition-all text-center">
+                    Se connecter
+                  </a>
+                </div>
+              </div>
             </div>
           </AnimateOnScroll>
         </div>
