@@ -128,7 +128,7 @@ export default function SettingsPage() {
         try {
           const response = await candidateAPI.getProfile();
           setUserRole('candidate');
-          setProfile(response);
+          setProfile(response as unknown as UserProfile);
 
           setProfileData({
             first_name: response.first_name || user?.firstName || '',
