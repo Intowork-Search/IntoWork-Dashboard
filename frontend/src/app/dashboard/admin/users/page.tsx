@@ -21,8 +21,9 @@ export default function AdminUsersPage() {
   const [userSearch, setUserSearch] = useState('');
   const [userRoleFilter, setUserRoleFilter] = useState('');
 
-  // Utilise SWR pour le cache automatique
-  const { users, isLoading, refresh } = useAdminUsers(userSearch, userRoleFilter);
+  const { data: users = [], isLoading, refetch } = useAdminUsers(
+    { search: userSearch || undefined, role: userRoleFilter || undefined }
+  );
 
   if (status === 'unauthenticated') {
     router.push('/signin');
@@ -40,7 +41,7 @@ export default function AdminUsersPage() {
     try {
       await adminAPI.toggleUserActivation(session.accessToken, userId, !currentStatus);
       toast.success(currentStatus ? 'Utilisateur désactivé avec succès' : 'Utilisateur activé avec succès');
-      refresh(); // Rafraîchit le cache SWR
+      refetch(); // Rafraîchit le cache SWR
     } catch (error) {
       console.error('Erreur toggle status:', error);
       toast.error('Erreur lors de la modification du statut');
@@ -54,7 +55,7 @@ export default function AdminUsersPage() {
     try {
       await adminAPI.deleteUser(session.accessToken, userId);
       toast.success('Utilisateur supprimé avec succès');
-      refresh(); // Rafraîchit le cache SWR
+      refetch(); // Rafraîchit le cache SWR
     } catch (error: any) {
       console.error('Erreur suppression:', error);
       const errorMessage = error.response?.data?.detail || 'Erreur lors de la suppression';
@@ -103,7 +104,7 @@ export default function AdminUsersPage() {
               <option value="admin">Admins</option>
             </select>
             <button
-              onClick={() => refresh()}
+              onClick={() => refetch()}
               className="px-6 py-3 bg-gradient-to-r from-[#6B9B5F] to-[#5a8a4f] text-white rounded-2xl hover:shadow-lg hover:shadow-[#6B9B5F]/30 transition-all duration-300 flex items-center gap-2 font-medium"
             >
               <ArrowPathIcon className="w-5 h-5" />
