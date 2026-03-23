@@ -126,30 +126,30 @@ export default function SettingsPage() {
         }
 
         try {
-          const response = await candidateAPI.getProfile();
+          const profileData = await candidateAPI.getProfile() as unknown as UserProfile;
           setUserRole('candidate');
-          setProfile(response as unknown as UserProfile);
+          setProfile(profileData);
 
           setProfileData({
-            first_name: response.first_name || user?.firstName || '',
-            last_name: response.last_name || user?.lastName || '',
-            phone: response.phone || '',
-            location: response.location || '',
-            bio: response.bio || '',
-            website: response.website || '',
-            linkedin_url: response.linkedin_url || '',
-            github_url: response.github_url || ''
+            first_name: profileData.first_name || user?.firstName || '',
+            last_name: profileData.last_name || user?.lastName || '',
+            phone: profileData.phone || '',
+            location: profileData.location || '',
+            bio: profileData.bio || '',
+            website: profileData.website || '',
+            linkedin_url: profileData.linkedin_url || '',
+            github_url: profileData.github_url || ''
           });
 
           setNotifications({
-            email_notifications: response.email_notifications ?? true,
-            job_alerts: response.job_alerts ?? true,
-            marketing_emails: response.marketing_emails ?? false,
+            email_notifications: profileData.email_notifications ?? true,
+            job_alerts: profileData.job_alerts ?? true,
+            marketing_emails: profileData.marketing_emails ?? false,
             push_notifications: true
           });
 
           setPrivacy({
-            is_profile_public: response.is_profile_public ?? true,
+            is_profile_public: profileData.is_profile_public ?? true,
             show_email: false,
             show_phone: false,
             allow_recruiter_contact: true
