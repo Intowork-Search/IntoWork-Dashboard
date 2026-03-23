@@ -814,16 +814,6 @@ export default function Home() {
 
             {/* --- LEFT COLUMN: CONTENT --- */}
             <div className="lg:col-span-6 text-center lg:text-left mb-12 lg:mb-0">
-              {/* Badge */}
-              <div className="flex justify-center lg:justify-start mb-8 animate-fade-in-up" style={{ opacity: 0, animationFillMode: 'forwards' }}>
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200/60 shadow-sm">
-                  <IconSparkles className="w-4 h-4 text-[#6B9B5F]" />
-                  <span className="text-xs sm:text-sm font-semibold text-[#6B9B5F] uppercase tracking-wide">
-                    Nouveau : Matching IA avec 94% de précision
-                  </span>
-                </div>
-              </div>
-
               {/* Heading */}
               <h1
                 className="text-4xl sm:text-5xl lg:text-5xl xl:text-6xl font-extrabold tracking-tight text-gray-900 leading-[1.1] animate-fade-in-up delay-100"
