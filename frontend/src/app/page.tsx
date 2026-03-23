@@ -697,7 +697,7 @@ export default function Home() {
               <img
                 src="/logo-intowork.png"
                 alt="INTOWORK"
-                className="h-24 sm:h-28 w-auto"
+                className="h-28 sm:h-36 w-auto"
               />
             </Link>
 
@@ -2076,7 +2076,7 @@ export default function Home() {
                 <img
                   src="/logo-intowork.png"
                   alt="INTOWORK"
-                  className="h-20 w-auto brightness-0 invert"
+                  className="h-24 w-auto brightness-0 invert"
                 />
               </Link>
               <p className="text-sm text-gray-400 leading-relaxed mb-4">
