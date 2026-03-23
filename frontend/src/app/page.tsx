@@ -132,7 +132,7 @@ const testimonials = [
     role: 'DRH',
     company: 'Orange Cote d\'Ivoire',
     avatar: '#FF6600',
-    photo: 'https://images.unsplash.com/photo-1598439210625-5067c578f3f6?w=200&h=200&fit=crop&crop=face',
+    photo: 'https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?w=200&h=200&fit=crop&crop=face',
     quote:
       'INTOWORK a transforme notre processus de recrutement. Nous avons reduit notre temps de recrutement de 60% tout en ameliorant la qualite des candidatures recues.',
     metric: '-60%',
@@ -143,7 +143,7 @@ const testimonials = [
     role: 'Talent Acquisition Manager',
     company: 'Ecobank Senegal',
     avatar: '#003DA5',
-    photo: 'https://images.unsplash.com/photo-1583195764036-6dc248ac07d9?w=200&h=200&fit=crop&crop=face',
+    photo: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&h=200&fit=crop&crop=face',
     quote:
       "Le matching IA est remarquable. Sur les 50 derniers recrutements, 92% des candidats proposes ont ete valides en entretien. C'est un gain de temps considerable.",
     metric: '92%',
@@ -154,7 +154,7 @@ const testimonials = [
     role: 'Candidate',
     company: 'Placee chez Total Energies',
     avatar: '#E31837',
-    photo: 'https://images.unsplash.com/photo-1685634113141-93cc677b2724?w=200&h=200&fit=crop&crop=face',
+    photo: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=200&h=200&fit=crop&crop=face',
     quote:
       "J'ai trouve mon poste ideal en seulement 2 semaines. La plateforme m'a propose des offres vraiment adaptees a mon profil et a mes ambitions. Merci INTOWORK !",
     metric: '2 sem.',
@@ -1192,7 +1192,7 @@ export default function Home() {
           <AnimateOnScroll className="mb-16 lg:mb-20">
             <div className="relative overflow-hidden rounded-2xl">
               <img
-                src="https://images.unsplash.com/photo-1540058404349-2e5fabf32d75?w=1400&h=480&fit=crop"
+                src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1400&h=480&fit=crop&q=80"
                 alt="Équipe africaine en collaboration"
                 className="w-full h-48 sm:h-64 object-cover"
                 loading="lazy"
@@ -1204,7 +1204,7 @@ export default function Home() {
               <div className="absolute bottom-4 left-6 bg-white/95 backdrop-blur-sm rounded-xl px-4 py-2.5 shadow-lg">
                 <div className="flex items-center gap-2">
                   <div className="flex -space-x-2">
-                    {['https://images.unsplash.com/photo-1598439210625-5067c578f3f6?w=60&h=60&fit=crop&crop=face','https://images.unsplash.com/photo-1583195764036-6dc248ac07d9?w=60&h=60&fit=crop&crop=face','https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=60&h=60&fit=crop&crop=face'].map((src, i) => (
+                    {['https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?w=60&h=60&fit=crop&crop=face','https://images.unsplash.com/photo-1560250097-0b93528c311a?w=60&h=60&fit=crop&crop=face','https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=60&h=60&fit=crop&crop=face'].map((src, i) => (
                       <img key={i} src={src} alt="Utilisateur INTOWORK" className="w-7 h-7 rounded-full object-cover object-top border-2 border-white" loading="lazy" decoding="async" width={28} height={28} />
                     ))}
                   </div>
@@ -1680,64 +1680,93 @@ export default function Home() {
       </section>
 
       {/* ═══════════════════════ ENTREPRISES PARTENAIRES ═══════════════════════ */}
-      <section className="py-20 lg:py-28 bg-gray-50">
+      <section className="relative py-24 lg:py-32 overflow-hidden bg-white">
+        {/* Background Decorative Blobs */}
+        <div className="absolute top-1/4 -left-20 w-96 h-96 bg-[#6B9B5F]/5 rounded-full blur-3xl -z-10 animate-pulse" />
+        <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-[#7C3AED]/5 rounded-full blur-3xl -z-10" />
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <AnimateOnScroll className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-50 border border-purple-200/60 text-sm font-semibold text-purple-600 mb-4">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <AnimateOnScroll className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200/60 shadow-sm text-sm font-semibold text-[#6B9B5F] mb-6">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
               </svg>
-              Partenaires
+              ÉCOSYSTÈME PARTENAIRE
             </div>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
-              Entreprises qui recrutent
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 tracking-tight">
+              Entreprises qui <span className="text-[#6B9B5F]">recrutent</span>
             </h2>
-            <p className="mt-4 text-lg text-gray-500 max-w-2xl mx-auto">
-              Des entreprises de confiance qui trouvent leurs talents sur INTOWORK
+            <p className="mt-6 text-lg text-gray-600 max-w-2xl mx-auto">
+              Rejoignez les leaders du marché qui font confiance à INTOWORK pour bâtir leurs équipes de demain.
             </p>
           </AnimateOnScroll>
 
           {loadingJobs ? (
-            <div className="flex justify-center py-12">
-              <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
-            </div>
-          ) : companies.length > 0 ? (
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 max-w-4xl mx-auto mb-10">
-              {companies.map((company) => (
-                <Link
-                  key={company.name}
-                  href="/entreprises"
-                  className="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-purple-300 hover:shadow-lg hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300 text-center"
-                >
-                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center mx-auto mb-3 shadow-md group-hover:scale-110 transition-transform">
-                    <span className="text-xl font-bold text-white">
-                      {company.name.charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-                  <h3 className="text-sm font-bold text-gray-900 mb-1 group-hover:text-purple-600 transition-colors truncate">
-                    {company.name}
-                  </h3>
-                  <p className="text-xs text-gray-500">
-                    {company.count} offre{company.count > 1 ? 's' : ''}
-                  </p>
-                </Link>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-16">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm animate-pulse">
+                  <div className="w-20 h-20 rounded-full bg-gray-100 mx-auto mb-6" />
+                  <div className="h-4 bg-gray-100 rounded-full w-3/4 mx-auto mb-3" />
+                  <div className="h-3 bg-gray-50 rounded-full w-1/2 mx-auto" />
+                </div>
               ))}
             </div>
+          ) : companies.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-16">
+              {companies.map((company, idx) => {
+                const gradients = [
+                  'from-[#6B9B5F] to-[#93C587]',
+                  'from-[#7C3AED] to-[#A78BFA]',
+                  'from-[#003DA5] to-[#60A5FA]',
+                  'from-[#F59E0B] to-[#FCD34D]',
+                  'from-[#10B981] to-[#6EE7B7]'
+                ];
+                const gradient = gradients[idx % gradients.length];
+
+                return (
+                  <Link
+                    key={company.name}
+                    href="/entreprises"
+                    className="group relative bg-white rounded-2xl p-8 border border-gray-100 hover:border-[#6B9B5F]/30 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 text-center"
+                  >
+                    <div className={`w-20 h-20 rounded-full bg-gradient-to-br ${gradient} flex items-center justify-center mx-auto mb-6 shadow-lg shadow-gray-200 group-hover:scale-110 transition-transform duration-500`}>
+                      <span className="text-2xl font-bold text-white">
+                        {company.name.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                    <h3 className="text-base font-bold text-gray-900 mb-2 group-hover:text-[#6B9B5F] transition-colors truncate">
+                      {company.name}
+                    </h3>
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-50 text-xs font-medium text-gray-500 group-hover:bg-green-50 group-hover:text-[#6B9B5F] transition-colors">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#6B9B5F] animate-pulse" />
+                      {company.count} offre{company.count > 1 ? 's' : ''} active{company.count > 1 ? 's' : ''}
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
           ) : (
-            <div className="text-center py-12 bg-white rounded-2xl border border-gray-100">
-              <p className="text-gray-500">Les entreprises apparaitront des qu&apos;elles publieront des offres</p>
+            <div className="max-w-2xl mx-auto mb-16 text-center py-20 px-8 rounded-3xl border-2 border-dashed border-gray-100 bg-gray-50/50">
+              <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm border border-gray-50">
+                <svg className="w-10 h-10 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </div>
+              <h4 className="text-lg font-bold text-gray-900 mb-2">Bientôt disponible</h4>
+              <p className="text-gray-500">Les entreprises apparaitront ici dès qu&apos;elles auront publié leurs premières offres.</p>
             </div>
           )}
 
-          <div className="text-center">
+          <div className="flex justify-center">
             <Link
               href="/entreprises"
-              className="inline-flex items-center gap-2 px-8 py-3.5 bg-purple-600 text-white font-semibold rounded-full hover:bg-purple-700 transition-colors shadow-lg shadow-purple-500/20"
+              className="group relative inline-flex items-center gap-3 px-10 py-4 text-base font-bold text-white bg-[#6B9B5F] hover:bg-[#5A8A4E] rounded-2xl transition-all duration-300 shadow-lg shadow-[#6B9B5F]/20 hover:shadow-xl hover:shadow-[#6B9B5F]/30 overflow-hidden"
             >
-              Voir toutes les entreprises
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <span className="relative z-10">Parcourir toutes les entreprises</span>
+              <svg className="relative z-10 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
+              <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
             </Link>
           </div>
         </div>
