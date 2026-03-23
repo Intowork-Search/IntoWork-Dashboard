@@ -128,28 +128,28 @@ export default function SettingsPage() {
         try {
           const response = await candidateAPI.getProfile();
           setUserRole('candidate');
-          setProfile(response.data);
+          setProfile(response);
 
           setProfileData({
-            first_name: response.data.first_name || user?.firstName || '',
-            last_name: response.data.last_name || user?.lastName || '',
-            phone: response.data.phone || '',
-            location: response.data.location || '',
-            bio: response.data.bio || '',
-            website: response.data.website || '',
-            linkedin_url: response.data.linkedin_url || '',
-            github_url: response.data.github_url || ''
+            first_name: response.first_name || user?.firstName || '',
+            last_name: response.last_name || user?.lastName || '',
+            phone: response.phone || '',
+            location: response.location || '',
+            bio: response.bio || '',
+            website: response.website || '',
+            linkedin_url: response.linkedin_url || '',
+            github_url: response.github_url || ''
           });
 
           setNotifications({
-            email_notifications: response.data.email_notifications ?? true,
-            job_alerts: response.data.job_alerts ?? true,
-            marketing_emails: response.data.marketing_emails ?? false,
+            email_notifications: response.email_notifications ?? true,
+            job_alerts: response.job_alerts ?? true,
+            marketing_emails: response.marketing_emails ?? false,
             push_notifications: true
           });
 
           setPrivacy({
-            is_profile_public: response.data.is_profile_public ?? true,
+            is_profile_public: response.is_profile_public ?? true,
             show_email: false,
             show_phone: false,
             allow_recruiter_contact: true
