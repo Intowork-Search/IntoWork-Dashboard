@@ -18,13 +18,16 @@ export default auth((req) => {
     '/offres',
     '/entreprises',
     '/support',
-    '/templates-final',
   ]
 
   const isPublicPath = publicPaths.some(path => pathname.startsWith(path))
 
   // Si page publique, laisser passer
   if (isPublicPath) {
+    // Redirect authenticated users away from auth pages
+    if (isAuthenticated && ['/signin', '/signup', '/forgot-password', '/reset-password'].some(p => pathname.startsWith(p))) {
+      return NextResponse.redirect(new URL('/dashboard', req.url))
+    }
     return NextResponse.next()
   }
 
@@ -43,10 +46,6 @@ export default auth((req) => {
     }
   }
 
-  // Si authentifié et sur page auth, rediriger vers dashboard
-  if (isAuthenticated && (pathname.startsWith('/signin') || pathname.startsWith('/signup') || pathname.startsWith('/forgot-password') || pathname.startsWith('/reset-password'))) {
-    return NextResponse.redirect(new URL('/dashboard', req.url))
-  }
 
   return NextResponse.next()
 })

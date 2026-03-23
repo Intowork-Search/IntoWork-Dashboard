@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Plus_Jakarta_Sans } from 'next/font/google';
 import { useUser } from '@/hooks/useNextAuth';
@@ -22,9 +22,9 @@ const plusJakarta = Plus_Jakarta_Sans({
    ═══════════════════════════════════════════════════════════════ */
 
 const navLinks = [
+  { label: 'Comment ca marche', href: '#how-it-works' },
   { label: 'Fonctionnalites', href: '#features' },
   { label: 'Offres', href: '/offres' },
-  { label: 'Entreprises', href: '/entreprises' },
   { label: 'Temoignages', href: '#testimonials' },
   { label: 'Tarifs', href: '#pricing' },
 ];
@@ -140,6 +140,7 @@ const testimonials = [
     role: 'DRH',
     company: 'Orange Cote d\'Ivoire',
     avatar: '#FF6600',
+    photo: 'https://images.unsplash.com/photo-1598439210625-5067c578f3f6?w=200&h=200&fit=crop&crop=face',
     quote:
       'INTOWORK a transforme notre processus de recrutement. Nous avons reduit notre temps de recrutement de 60% tout en ameliorant la qualite des candidatures recues.',
     metric: '-60%',
@@ -150,6 +151,7 @@ const testimonials = [
     role: 'Talent Acquisition Manager',
     company: 'Ecobank Senegal',
     avatar: '#003DA5',
+    photo: 'https://images.unsplash.com/photo-1583195764036-6dc248ac07d9?w=200&h=200&fit=crop&crop=face',
     quote:
       "Le matching IA est remarquable. Sur les 50 derniers recrutements, 92% des candidats proposes ont ete valides en entretien. C'est un gain de temps considerable.",
     metric: '92%',
@@ -160,6 +162,7 @@ const testimonials = [
     role: 'Candidate',
     company: 'Placee chez Total Energies',
     avatar: '#E31837',
+    photo: 'https://images.unsplash.com/photo-1685634113141-93cc677b2724?w=200&h=200&fit=crop&crop=face',
     quote:
       "J'ai trouve mon poste ideal en seulement 2 semaines. La plateforme m'a propose des offres vraiment adaptees a mon profil et a mes ambitions. Merci INTOWORK !",
     metric: '2 sem.',
@@ -230,21 +233,21 @@ const footerLinks = {
 };
 
 const countries = [
-  { name: 'Cote d\'Ivoire', flag: '\uD83C\uDDE8\uD83C\uDDEE' },
-  { name: 'Senegal', flag: '\uD83C\uDDF8\uD83C\uDDF3' },
-  { name: 'Cameroun', flag: '\uD83C\uDDE8\uD83C\uDDF2' },
-  { name: 'Mali', flag: '\uD83C\uDDF2\uD83C\uDDF1' },
-  { name: 'Guinee', flag: '\uD83C\uDDEC\uD83C\uDDF3' },
-  { name: 'Burkina Faso', flag: '\uD83C\uDDE7\uD83C\uDDEB' },
-  { name: 'Togo', flag: '\uD83C\uDDF9\uD83C\uDDEC' },
-  { name: 'Benin', flag: '\uD83C\uDDE7\uD83C\uDDEF' },
-  { name: 'Niger', flag: '\uD83C\uDDF3\uD83C\uDDEA' },
-  { name: 'Gabon', flag: '\uD83C\uDDEC\uD83C\uDDE6' },
-  { name: 'Congo', flag: '\uD83C\uDDE8\uD83C\uDDEC' },
-  { name: 'RDC', flag: '\uD83C\uDDE8\uD83C\uDDE9' },
-  { name: 'Maroc', flag: '\uD83C\uDDF2\uD83C\uDDE6' },
-  { name: 'Tunisie', flag: '\uD83C\uDDF9\uD83C\uDDF3' },
-  { name: 'Madagascar', flag: '\uD83C\uDDF2\uD83C\uDDEC' },
+  { name: "Côte d'Ivoire", code: "ci" },
+  { name: "Sénégal", code: "sn" },
+  { name: "Cameroun", code: "cm" },
+  { name: "Mali", code: "ml" },
+  { name: "Guinée", code: "gn" },
+  { name: "Burkina Faso", code: "bf" },
+  { name: "Togo", code: "tg" },
+  { name: "Bénin", code: "bj" },
+  { name: "Niger", code: "ne" },
+  { name: "Gabon", code: "ga" },
+  { name: "Congo", code: "cg" },
+  { name: "RDC", code: "cd" },
+  { name: "Maroc", code: "ma" },
+  { name: "Tunisie", code: "tn" },
+  { name: "Madagascar", code: "mg" },
 ];
 
 /* ═══════════════════════════════════════════════════════════════
@@ -404,6 +407,69 @@ const statIcons: Record<string, React.FC<{ className?: string }>> = {
 };
 
 /* ═══════════════════════════════════════════════════════════════
+   ANIMATION UTILITIES
+   ═══════════════════════════════════════════════════════════════ */
+
+function useInView(threshold = 0.15) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [isInView, setIsInView] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setIsInView(true); obs.disconnect(); } },
+      { threshold }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [threshold]);
+  return { ref, isInView };
+}
+
+function AnimateOnScroll({ children, className = '', delay = 0 }: {
+  children: React.ReactNode; className?: string; delay?: number;
+}) {
+  const { ref, isInView } = useInView();
+  return (
+    <div
+      ref={ref}
+      className={`${className} ${isInView ? 'reveal-up' : 'reveal-hidden'}`}
+      style={delay ? { animationDelay: `${delay}ms` } : undefined}
+    >
+      {children}
+    </div>
+  );
+}
+
+function AnimatedStat({ end, suffix, label, start }: {
+  end: number; suffix: string; label: string; start: boolean;
+}) {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    if (!start) return;
+    const duration = 1800;
+    let startTime: number | null = null;
+    const tick = (now: number) => {
+      if (!startTime) startTime = now;
+      const p = Math.min((now - startTime) / duration, 1);
+      setCount(Math.floor(p * end));
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }, [end, start]);
+  return (
+    <div className="text-center">
+      <div className="text-4xl lg:text-5xl font-extrabold text-[#6B9B5F]">
+        {count.toLocaleString()}{suffix}
+      </div>
+      <div className="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">
+        {label}
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
    MAIN COMPONENT
    ═══════════════════════════════════════════════════════════════ */
 
@@ -413,6 +479,8 @@ export default function Home() {
   const [featuredJobs, setFeaturedJobs] = useState<Job[]>([]);
   const [companies, setCompanies] = useState<Array<{ name: string; count: number }>>([]);
   const [loadingJobs, setLoadingJobs] = useState(false);
+  const [statsVisible, setStatsVisible] = useState(false);
+  const statsRef = useRef<HTMLDivElement>(null);
   const { isLoaded, isSignedIn } = useUser();
   const router = useRouter();
 
@@ -457,6 +525,17 @@ export default function Home() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    const el = statsRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setStatsVisible(true); obs.disconnect(); } },
+      { threshold: 0.2 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
   if (!isLoaded) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
@@ -466,7 +545,7 @@ export default function Home() {
   }
 
   return (
-    <div className={`${plusJakarta.variable} font-sans antialiased bg-white`}>
+    <div className={`${plusJakarta.variable} font-sans antialiased bg-white scroll-smooth`}>
       {/* ═══════════════════════ INLINE STYLES ═══════════════════════ */}
       <style>{`
         @keyframes fadeInUp {
@@ -522,6 +601,86 @@ export default function Home() {
         .scroll-left-track {
           animation: scroll-left 30s linear infinite;
         }
+        @keyframes revealUp {
+          from { opacity: 0; transform: translateY(32px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .reveal-up {
+          animation: revealUp 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+        .reveal-hidden { opacity: 0; }
+        @keyframes countLine {
+          from { width: 0; }
+          to { width: 100%; }
+        }
+        .step-line-animate {
+          animation: countLine 1.2s ease-out forwards;
+        }
+        /* --- Score bar animee - Feature 1 Matching IA --- */
+        @keyframes scoreBarFill {
+          from { width: 0%; }
+          to { width: var(--score-width); }
+        }
+        @keyframes scoreNumberReveal {
+          from { opacity: 0; transform: scale(0.5); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        .score-bar-animate {
+          animation: scoreBarFill 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+          animation-delay: 0.4s;
+          width: 0;
+        }
+        .score-number-animate {
+          animation: scoreNumberReveal 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+          animation-delay: 1.1s;
+          opacity: 0;
+        }
+        /* --- Carousel templates CV - Feature 2 --- */
+        @keyframes templateSlide {
+          0%, 20% { transform: translateX(0); }
+          25%, 45% { transform: translateX(-33.333%); }
+          50%, 70% { transform: translateX(-66.666%); }
+          75%, 100% { transform: translateX(0); }
+        }
+        .template-carousel {
+          animation: templateSlide 12s ease-in-out infinite;
+        }
+        /* --- Notification glissante - Feature 3 --- */
+        @keyframes slideInNotification {
+          from { opacity: 0; transform: translateX(40px) scale(0.9); }
+          to { opacity: 1; transform: translateX(0) scale(1); }
+        }
+        .notification-slide-in {
+          animation: slideInNotification 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+          animation-delay: 1.5s;
+          opacity: 0;
+        }
+        @keyframes floatSlow {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-12px); }
+        }
+        @keyframes heroMockupReveal {
+          from {
+            opacity: 0;
+            transform: perspective(1200px) rotateY(-8deg) rotateX(4deg) translateY(40px) scale(0.9);
+          }
+          to {
+            opacity: 1;
+            transform: perspective(1200px) rotateY(-3deg) rotateX(2deg) translateY(0) scale(1);
+          }
+        }
+        @keyframes slideInFromLeftHero {
+          from { opacity: 0; transform: translateX(-40px) scale(0.95); }
+          to { opacity: 1; transform: translateX(0) scale(1); }
+        }
+        .animate-float-slow { animation: floatSlow 6s ease-in-out infinite; }
+        .animate-hero-mockup { animation: heroMockupReveal 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        .animate-slide-in-left-hero { animation: slideInFromLeftHero 0.8s ease-out forwards; }
+        .delay-600 { animation-delay: 600ms; }
+        .delay-700 { animation-delay: 700ms; }
+        .delay-800 { animation-delay: 800ms; }
+        .delay-900 { animation-delay: 900ms; }
+        .delay-1000 { animation-delay: 1000ms; }
       `}</style>
 
       {/* ═══════════════════════ NAVIGATION ═══════════════════════ */}
@@ -548,6 +707,11 @@ export default function Home() {
                   <a
                     key={link.href}
                     href={link.href}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      document.querySelector(link.href)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      setMobileMenuOpen(false);
+                    }}
                     className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-[#6B9B5F] rounded-lg hover:bg-green-50/60 transition-all duration-200"
                   >
                     {link.label}
@@ -598,7 +762,11 @@ export default function Home() {
                   <a
                     key={link.href}
                     href={link.href}
-                    onClick={() => setMobileMenuOpen(false)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setMobileMenuOpen(false);
+                      document.querySelector(link.href)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }}
                     className="block px-4 py-3 text-sm font-medium text-gray-700 hover:text-[#6B9B5F] hover:bg-green-50 rounded-lg transition-colors"
                   >
                     {link.label}
@@ -634,262 +802,204 @@ export default function Home() {
       </nav>
 
       {/* ═══════════════════════ HERO ═══════════════════════ */}
-      <section className="relative pt-28 sm:pt-32 lg:pt-36 pb-16 lg:pb-24 overflow-hidden">
-        {/* Background gradient */}
+      <section className="relative pt-24 sm:pt-28 lg:pt-32 pb-12 lg:pb-20 overflow-hidden">
+        {/* Background gradients */}
         <div className="absolute inset-0 bg-gradient-to-b from-white via-green-50/40 to-white pointer-events-none" />
-        <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-[#6B9B5F]/5 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#7C3AED]/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-20 right-0 w-[600px] h-[600px] bg-[#6B9B5F]/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#7C3AED]/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/2 right-1/4 w-[300px] h-[300px] bg-[#F59E0B]/5 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Badge */}
-          <div className="flex justify-center mb-6 animate-fade-in-up" style={{ opacity: 0, animationFillMode: 'forwards' }}>
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200/60 shadow-sm">
-              <IconSparkles className="w-4 h-4 text-[#6B9B5F]" />
-              <span className="text-sm font-semibold text-[#6B9B5F]">
-                Nouveau : Matching IA avec 94% de precision
-              </span>
-            </div>
-          </div>
+          <div className="lg:grid lg:grid-cols-12 lg:gap-12 lg:items-center">
 
-          {/* Heading */}
-          <div className="text-center max-w-4xl mx-auto mb-8">
-            <h1
-              className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold tracking-tight text-gray-900 leading-[1.1] animate-fade-in-up delay-100"
-              style={{ opacity: 0, animationFillMode: 'forwards' }}
-            >
-              La plateforme de recrutement{' '}
-              <span className="animate-shimmer">qui comprend l&apos;Afrique</span>
-            </h1>
-            <p
-              className="mt-6 text-lg sm:text-xl text-gray-500 leading-relaxed max-w-2xl mx-auto animate-fade-in-up delay-200"
-              style={{ opacity: 0, animationFillMode: 'forwards' }}
-            >
-              Connectez les meilleurs talents aux entreprises les plus ambitieuses
-              dans plus de 15 pays francophones. Matching IA, processus simplifie,
-              resultats garantis.
-            </p>
-          </div>
-
-          {/* Dual CTAs */}
-          <div
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 animate-fade-in-up delay-300"
-            style={{ opacity: 0, animationFillMode: 'forwards' }}
-          >
-            <Link
-              href="/signup"
-              className="group inline-flex items-center gap-2 px-8 py-4 text-base font-bold text-white bg-[#6B9B5F] hover:bg-[#5A8A4E] rounded-2xl shadow-lg shadow-green-500/20 hover:shadow-xl hover:shadow-green-500/30 transition-all duration-300 hover:-translate-y-0.5"
-            >
-              <IconBriefcase className="w-5 h-5" />
-              Espace Recruteur
-              <IconArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Link>
-            <Link
-              href="/signup"
-              className="group inline-flex items-center gap-2 px-8 py-4 text-base font-bold text-[#6B9B5F] bg-white hover:bg-green-50 border-2 border-[#6B9B5F]/20 hover:border-[#6B9B5F]/40 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5"
-            >
-              <IconUser className="w-5 h-5" />
-              Espace Candidat
-              <IconArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </div>
-
-          {/* Stats inline */}
-          <div
-            className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mb-14 animate-fade-in-up delay-400"
-            style={{ opacity: 0, animationFillMode: 'forwards' }}
-          >
-            {[
-              { value: '10K+', label: 'candidats' },
-              { value: '500+', label: 'entreprises' },
-              { value: '15+', label: 'pays' },
-            ].map((stat, i) => (
-              <div key={i} className="flex items-center gap-2">
-                {i > 0 && <span className="text-gray-300 hidden sm:inline">|</span>}
-                <span className="text-sm font-bold text-gray-900">{stat.value}</span>
-                <span className="text-sm text-gray-500">{stat.label}</span>
+            {/* --- LEFT COLUMN: CONTENT --- */}
+            <div className="lg:col-span-6 text-center lg:text-left mb-12 lg:mb-0">
+              {/* Badge */}
+              <div className="flex justify-center lg:justify-start mb-8 animate-fade-in-up" style={{ opacity: 0, animationFillMode: 'forwards' }}>
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200/60 shadow-sm">
+                  <IconSparkles className="w-4 h-4 text-[#6B9B5F]" />
+                  <span className="text-xs sm:text-sm font-semibold text-[#6B9B5F] uppercase tracking-wide">
+                    Nouveau : Matching IA avec 94% de précision
+                  </span>
+                </div>
               </div>
-            ))}
-          </div>
 
-          {/* ── PRODUCT MOCKUP ── */}
-          <div
-            className="max-w-5xl mx-auto animate-fade-in-up delay-500"
-            style={{ opacity: 0, animationFillMode: 'forwards' }}
-          >
-            <div className="relative">
-              {/* Glow behind */}
-              <div className="absolute -inset-4 bg-gradient-to-b from-[#6B9B5F]/10 via-[#6B9B5F]/5 to-transparent rounded-3xl blur-2xl pointer-events-none" />
+              {/* Heading */}
+              <h1
+                className="text-4xl sm:text-5xl lg:text-5xl xl:text-6xl font-extrabold tracking-tight text-gray-900 leading-[1.1] animate-fade-in-up delay-100"
+                style={{ opacity: 0, animationFillMode: 'forwards' }}
+              >
+                La plateforme de recrutement{' '}
+                <span className="animate-shimmer">qui comprend l&apos;Afrique</span>
+              </h1>
 
-              <div className="relative bg-white rounded-2xl lg:rounded-3xl border border-gray-200/80 shadow-2xl overflow-hidden">
-                {/* Browser chrome */}
-                <div className="flex items-center gap-2 px-4 py-3 bg-gray-50 border-b border-gray-200">
-                  <div className="flex gap-1.5">
-                    <div className="w-3 h-3 rounded-full bg-red-400" />
-                    <div className="w-3 h-3 rounded-full bg-yellow-400" />
-                    <div className="w-3 h-3 rounded-full bg-green-400" />
-                  </div>
-                  <div className="flex-1 mx-4">
-                    <div className="flex items-center gap-2 bg-white rounded-lg border border-gray-200 px-3 py-1.5">
-                      <IconLock className="w-3.5 h-3.5 text-green-600" />
-                      <span className="text-xs text-gray-500 font-medium">
-                        app.intowork.co/dashboard
-                      </span>
+              <p
+                className="mt-6 text-lg sm:text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto lg:mx-0 animate-fade-in-up delay-200"
+                style={{ opacity: 0, animationFillMode: 'forwards' }}
+              >
+                Connectez les meilleurs talents aux entreprises les plus ambitieuses
+                dans plus de 15 pays francophones.
+              </p>
+
+              {/* Dual CTAs */}
+              <div
+                className="mt-10 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 animate-fade-in-up delay-300"
+                style={{ opacity: 0, animationFillMode: 'forwards' }}
+              >
+                <Link
+                  href="/signup"
+                  className="w-full sm:w-auto group inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-bold text-white bg-[#6B9B5F] hover:bg-[#5A8A4E] rounded-2xl shadow-lg shadow-green-500/20 hover:shadow-xl hover:shadow-green-500/30 transition-all duration-300 hover:-translate-y-0.5"
+                >
+                  <IconBriefcase className="w-5 h-5" />
+                  Espace Recruteur
+                  <IconArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
+                <Link
+                  href="/signup"
+                  className="w-full sm:w-auto group inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-bold text-[#6B9B5F] bg-white hover:bg-green-50 border-2 border-[#6B9B5F]/20 hover:border-[#6B9B5F]/40 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5"
+                >
+                  <IconUser className="w-5 h-5" />
+                  Espace Candidat
+                  <IconArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </div>
+
+              {/* Avatar Stack Trust Strip */}
+              <div className="mt-12 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 animate-fade-in-up delay-400" style={{ opacity: 0, animationFillMode: 'forwards' }}>
+                <div className="flex -space-x-3">
+                  {[
+                    "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=400&q=80",
+                    "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?w=400&q=80",
+                    "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&q=80",
+                    "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80",
+                    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80"
+                  ].map((url, i) => (
+                    <img key={i} src={url} className="w-10 h-10 rounded-full border-2 border-white shadow-sm object-cover" alt="User avatar" />
+                  ))}
+                </div>
+                <p className="text-sm text-gray-500 font-medium text-center sm:text-left">
+                  Rejoint par <span className="text-gray-900 font-bold">10 000+ candidats</span> dans 500+ entreprises et 15 pays
+                </p>
+              </div>
+            </div>
+
+            {/* --- RIGHT COLUMN: INTERACTIVE MOCKUP --- */}
+            <div className="lg:col-span-6 relative animate-hero-mockup delay-500" style={{ opacity: 0, animationFillMode: 'forwards' }}>
+
+              {/* OVERLAY: Portrait Photo */}
+              <div className="hidden lg:block absolute -left-14 -top-4 z-30 animate-slide-in-left-hero delay-1000" style={{ opacity: 0, animationFillMode: 'forwards' }}>
+                <div className="relative group">
+                  <div className="absolute -inset-4 bg-[#6B9B5F]/20 rounded-[2.5rem] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                  <img
+                    src="https://images.unsplash.com/photo-1739300293504-234817eead52?w=400&h=560&fit=crop&crop=top&q=80"
+                    className="w-44 h-64 object-cover rounded-3xl shadow-[0_20px_40px_rgba(0,0,0,0.2)] border-[6px] border-white relative z-10"
+                    alt="Candidate"
+                  />
+                </div>
+              </div>
+
+              {/* OVERLAY: Notification Toast */}
+              <div className="hidden lg:block absolute -top-8 -right-8 z-40 w-72 notification-slide-in" style={{ opacity: 0, animationFillMode: 'forwards' }}>
+                <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-[0_20px_40px_rgba(0,0,0,0.12)] border border-white p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="relative shrink-0">
+                      <div className="w-10 h-10 rounded-xl bg-[#F0F7EE] flex items-center justify-center border border-gray-100 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1614850523296-d8c1af93d400?w=100&q=80" className="w-full h-full object-cover" alt="Orange CI" />
+                      </div>
+                      <div className="absolute -bottom-1 -right-1 bg-[#6B9B5F] rounded-full p-1 border-2 border-white shadow-sm">
+                        <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-0.5">
+                        <p className="text-[13px] font-bold text-gray-900 leading-tight">Nouvelle candidature</p>
+                        <span className="text-[9px] font-bold text-[#6B9B5F] bg-[#6B9B5F]/10 px-1.5 py-0.5 rounded">À l&apos;instant</span>
+                      </div>
+                      <p className="text-[11px] text-gray-500 font-medium truncate">Orange CI — Product Designer</p>
                     </div>
                   </div>
                 </div>
+              </div>
 
-                {/* Dashboard content */}
-                <div className="p-4 sm:p-6 lg:p-8">
-                  {/* Dashboard header */}
-                  <div className="bg-gradient-to-r from-[#6B9B5F] to-[#93C587] rounded-xl lg:rounded-2xl p-5 lg:p-6 mb-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-white/80 text-sm font-medium">Bonjour,</p>
-                        <h2 className="text-xl lg:text-2xl font-bold text-white">
-                          Bienvenue, Aminata
-                        </h2>
+              {/* OVERLAY: AI Match Card */}
+              <div className="hidden lg:block absolute -bottom-12 -left-10 z-40 animate-fade-in-up delay-700" style={{ opacity: 0, animationFillMode: 'forwards' }}>
+                <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-[0_20px_40px_rgba(0,0,0,0.15)] border border-white p-4 w-60">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <div className="bg-[#7C3AED]/10 p-1.5 rounded-lg">
+                        <IconSparkles className="w-4 h-4 text-[#7C3AED]" />
                       </div>
-                      <div className="hidden sm:flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-lg px-3 py-2">
-                        <div className="w-2 h-2 rounded-full bg-green-300 animate-pulse-soft" />
-                        <span className="text-sm text-white font-medium">En ligne</span>
+                      <span className="text-[11px] font-bold text-gray-900 uppercase tracking-tight">IA Matching</span>
+                    </div>
+                    <span className="text-sm font-extrabold text-[#6B9B5F]">94%</span>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-[#6B9B5F] to-[#93C587] w-[94%] rounded-full shadow-[0_0_8px_rgba(107,155,95,0.4)]" />
+                    </div>
+                    <div className="flex items-center gap-2.5">
+                      <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&q=80" className="w-6 h-6 rounded-full ring-2 ring-white object-cover shadow-sm" alt="Kofi M." />
+                      <p className="text-[11px] font-bold text-gray-700">Kofi M. <span className="text-gray-400 font-medium ml-1">Expert Cloud</span></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Main Mockup */}
+              <div className="relative" style={{ transform: 'perspective(1200px) rotateY(-3deg) rotateX(2deg)' }}>
+                {/* Intense Green Glow */}
+                <div className="absolute -inset-10 bg-[#6B9B5F]/20 rounded-[3rem] blur-[80px] pointer-events-none" />
+
+                <div className="relative bg-white rounded-2xl border border-gray-200/80 shadow-[0_32px_64px_rgba(107,155,95,0.25)] overflow-hidden">
+                  {/* Browser Chrome */}
+                  <div className="flex items-center gap-2 px-4 py-3 bg-gray-50 border-b border-gray-200">
+                    <div className="flex gap-1.5">
+                      <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-yellow-400" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-green-400" />
+                    </div>
+                    <div className="flex-1 mx-4">
+                      <div className="flex items-center gap-2 bg-white rounded-md border border-gray-200 px-3 py-1">
+                        <IconLock className="w-3 h-3 text-green-600" />
+                        <span className="text-[10px] text-gray-400 font-medium">app.intowork.co/dashboard</span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Stat cards */}
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 mb-6">
-                    {dashboardStats.map((stat, i) => {
-                      const StatIcon = statIcons[stat.icon];
-                      return (
-                        <div
-                          key={i}
-                          className="bg-white border border-gray-100 rounded-xl p-4 hover:shadow-md transition-shadow group"
-                        >
-                          <div className="flex items-center justify-between mb-2">
-                            <div
-                              className="w-9 h-9 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform"
-                              style={{ backgroundColor: stat.color + '15' }}
-                            >
-                              <StatIcon
-                                className="w-4.5 h-4.5"
-                              />
-                            </div>
-                            <span
-                              className="text-xl lg:text-2xl font-bold"
-                              style={{ color: stat.color }}
-                            >
-                              {stat.value}
-                            </span>
-                          </div>
-                          <p className="text-xs text-gray-500 font-medium">{stat.label}</p>
+                  {/* Dashboard Header */}
+                  <div className="p-5">
+                    <div className="bg-gradient-to-r from-[#6B9B5F] to-[#93C587] rounded-xl p-5 mb-5 shadow-sm">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-white/80 text-[10px] font-semibold uppercase tracking-wider">Bonjour,</p>
+                          <h2 className="text-lg font-bold text-white">Bienvenue, Aminata</h2>
                         </div>
-                      );
-                    })}
-                  </div>
-
-                  {/* Job cards + activity sidebar */}
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
-                    {/* Jobs */}
-                    <div className="lg:col-span-2 space-y-3">
-                      <div className="flex items-center justify-between mb-1">
-                        <h3 className="text-sm font-semibold text-gray-900">
-                          Offres recommandees
-                        </h3>
-                        <span className="text-xs text-[#6B9B5F] font-medium cursor-pointer hover:underline">
-                          Voir tout
-                        </span>
+                        <div className="flex items-center gap-1.5 bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1">
+                          <div className="w-1.5 h-1.5 rounded-full bg-green-300 animate-pulse" />
+                          <span className="text-[10px] text-white font-bold">En ligne</span>
+                        </div>
                       </div>
-                      {mockJobs.map((job, i) => (
-                        <div
-                          key={i}
-                          className="flex items-center gap-4 p-4 bg-gray-50 hover:bg-green-50/40 rounded-xl border border-gray-100 hover:border-green-200 transition-all group cursor-pointer"
-                        >
-                          <div
-                            className="w-11 h-11 rounded-xl flex items-center justify-center text-white font-bold text-sm shrink-0"
-                            style={{ backgroundColor: job.logo }}
-                          >
-                            {job.company.charAt(0)}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-gray-900 truncate">
-                              {job.title}
-                            </p>
-                            <div className="flex items-center gap-2 mt-0.5">
-                              <span className="text-xs text-gray-500">{job.company}</span>
-                              <span className="text-gray-300">|</span>
-                              <span className="inline-flex items-center gap-0.5 text-xs text-gray-500">
-                                <IconMapPin className="w-3 h-3" />
-                                {job.location}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-1.5 mt-2">
-                              {job.tags.map((tag) => (
-                                <span
-                                  key={tag}
-                                  className="px-2 py-0.5 text-[10px] font-medium bg-white rounded-md border border-gray-200 text-gray-600"
-                                >
-                                  {tag}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                          <div className="text-right shrink-0 hidden sm:block">
-                            <p className="text-sm font-bold text-gray-900">{job.salary}</p>
-                            <div className="flex items-center gap-1 mt-1">
-                              <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                                <div
-                                  className="h-full rounded-full bg-[#6B9B5F]"
-                                  style={{ width: `${job.match}%` }}
-                                />
-                              </div>
-                              <span className="text-[10px] font-semibold text-[#6B9B5F]">
-                                {job.match}%
-                              </span>
-                            </div>
-                          </div>
+                    </div>
+
+                    {/* Stats Grid */}
+                    <div className="grid grid-cols-2 gap-3">
+                      {[
+                        { label: 'Profil complet', value: '85%', color: '#6B9B5F' },
+                        { label: 'Offres actives', value: '127', color: '#7C3AED' },
+                        { label: 'Candidatures', value: '8', color: '#F59E0B' },
+                        { label: 'Score matching', value: '94%', color: '#6B9B5F' }
+                      ].map((stat, i) => (
+                        <div key={i} className="bg-gray-50 border border-gray-100 rounded-xl p-3">
+                          <div className="text-[10px] text-gray-500 font-semibold mb-1 uppercase tracking-tight">{stat.label}</div>
+                          <div className="text-xl font-extrabold" style={{ color: stat.color }}>{stat.value}</div>
                         </div>
                       ))}
                     </div>
-
-                    {/* Activity sidebar */}
-                    <div className="hidden lg:block">
-                      <h3 className="text-sm font-semibold text-gray-900 mb-3">
-                        Activite recente
-                      </h3>
-                      <div className="space-y-3">
-                        {activityItems.map((item, i) => {
-                          const ActivityIcon =
-                            item.type === 'view'
-                              ? IconEye
-                              : item.type === 'match'
-                              ? IconZap
-                              : IconCalendar;
-                          const iconBg =
-                            item.type === 'view'
-                              ? 'bg-blue-50 text-blue-600'
-                              : item.type === 'match'
-                              ? 'bg-green-50 text-green-600'
-                              : 'bg-purple-50 text-purple-600';
-                          return (
-                            <div key={i} className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${iconBg}`}>
-                                <ActivityIcon className="w-4 h-4" />
-                              </div>
-                              <div>
-                                <p className="text-xs font-medium text-gray-800 leading-snug">
-                                  {item.text}
-                                </p>
-                                <p className="text-[10px] text-gray-400 mt-0.5">{item.time}</p>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
                   </div>
                 </div>
               </div>
             </div>
+
           </div>
         </div>
       </section>
@@ -921,10 +1031,206 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ═══════════════════════ ANIMATED STATS ═══════════════════════ */}
+      <section ref={statsRef} className="py-12 lg:py-16 bg-gradient-to-b from-gray-50/50 to-white border-y border-gray-100">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+          <AnimatedStat end={10000} suffix="+" label="Candidats actifs" start={statsVisible} />
+          <AnimatedStat end={500} suffix="+" label="Entreprises" start={statsVisible} />
+          <AnimatedStat end={94} suffix="%" label="Taux de matching" start={statsVisible} />
+          <AnimatedStat end={15} suffix="+" label="Pays couverts" start={statsVisible} />
+        </div>
+      </section>
+
+      {/* ═══════════════════════ HOW IT WORKS ═══════════════════════ */}
+      <section id="how-it-works" className="py-20 lg:py-28 bg-[#F0F7EE] relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <AnimateOnScroll className="text-center mb-16 lg:mb-20">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[#6B9B5F]/20 text-sm font-semibold text-[#6B9B5F] mb-6">
+              <IconSparkles className="w-4 h-4" />
+              Comment ça marche
+            </div>
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-tight mb-6">
+              Votre carrière propulsée par l&apos;IA
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+              Un processus simplifié conçu pour connecter les meilleurs talents aux opportunités les plus pertinentes en Afrique de l&apos;Ouest.
+            </p>
+          </AnimateOnScroll>
+
+          <div className="relative space-y-20 lg:space-y-28">
+            {/* Vertical Timeline Line */}
+            <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-gray-300 to-transparent hidden lg:block" />
+
+            {/* Étape 1 */}
+            <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
+              <AnimateOnScroll className="order-2 lg:order-1" delay={0}>
+                <div className="relative">
+                  <span className="absolute -top-16 -left-8 text-8xl lg:text-[10rem] font-black text-gray-900/[0.06] select-none pointer-events-none">01</span>
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#6B9B5F]/20 text-[#6B9B5F] mb-8 ring-1 ring-[#6B9B5F]/30">
+                    <IconUser className="w-8 h-8" />
+                  </div>
+                  <h3 className="text-3xl font-bold text-gray-900 mb-6">Créez votre profil</h3>
+                  <p className="text-lg text-gray-600 leading-relaxed mb-8">
+                    Importez votre CV ou connectez votre LinkedIn. Notre IA extrait instantanément vos compétences clés pour bâtir un profil professionnel attractif qui parle aux recruteurs.
+                  </p>
+                  <ul className="space-y-4">
+                    {['Analyse automatique de CV', 'Extraction de compétences IA', 'Portfolio dynamique'].map((item) => (
+                      <li key={item} className="flex items-center gap-3 text-gray-700">
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#6B9B5F]" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </AnimateOnScroll>
+              <AnimateOnScroll className="order-1 lg:order-2" delay={200}>
+                <div className="relative p-8 rounded-3xl bg-white border border-gray-200 shadow-md group hover:border-[#6B9B5F]/40 transition-colors">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-14 h-14 rounded-2xl overflow-hidden ring-2 ring-gray-100">
+                      <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100&h=100&fit=crop" alt="User" className="w-full h-full object-cover" />
+                    </div>
+                    <div>
+                      <div className="h-4 w-32 bg-gray-200 rounded-full mb-2" />
+                      <div className="h-3 w-20 bg-gray-100 rounded-full" />
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="flex justify-between text-xs font-semibold text-[#6B9B5F] mb-2 uppercase tracking-wider">
+                      <span>Complétion du profil</span>
+                      <span>85%</span>
+                    </div>
+                    <div className="h-3 w-full bg-gray-100 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-[#6B9B5F] to-[#93C587] rounded-full" style={{ width: '85%' }} />
+                    </div>
+                    <div className="flex flex-wrap gap-2 pt-4">
+                      {['React.js', 'Project Management', 'UI/UX', 'Python'].map(tag => (
+                        <span key={tag} className="px-3 py-1 text-xs font-medium bg-gray-100 text-gray-600 rounded-lg border border-gray-200">{tag}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </AnimateOnScroll>
+            </div>
+
+            {/* Étape 2 */}
+            <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
+              <AnimateOnScroll className="order-2" delay={0}>
+                <div className="relative">
+                  <span className="absolute -top-16 -right-8 lg:-right-16 text-8xl lg:text-[10rem] font-black text-gray-900/[0.06] select-none pointer-events-none">02</span>
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#7C3AED]/20 text-[#7C3AED] mb-8 ring-1 ring-[#7C3AED]/30">
+                    <IconSparkles className="w-8 h-8" />
+                  </div>
+                  <h3 className="text-3xl font-bold text-gray-900 mb-6">L&apos;IA trouve vos matchs</h3>
+                  <p className="text-lg text-gray-600 leading-relaxed mb-8">
+                    Fini les recherches interminables. Notre algorithme analyse en temps réel des milliers d&apos;offres pour vous proposer uniquement celles qui correspondent à vos critères et à votre potentiel.
+                  </p>
+                  <div className="p-4 rounded-2xl bg-[#7C3AED]/10 border border-[#7C3AED]/20 text-[#A78BFA] text-sm italic">
+                    &quot;94% de précision dans le matching constaté par nos utilisateurs.&quot;
+                  </div>
+                </div>
+              </AnimateOnScroll>
+              <AnimateOnScroll className="order-1" delay={200}>
+                <div className="relative p-6 rounded-3xl bg-white border border-gray-200 shadow-md group hover:border-[#7C3AED]/30 transition-colors">
+                  <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center gap-2">
+                      <IconSparkles className="w-5 h-5 text-[#7C3AED]" />
+                      <span className="text-sm font-bold text-gray-900">Matching Intelligent</span>
+                    </div>
+                    <span className="text-xs text-[#7C3AED] font-bold">ACTIF</span>
+                  </div>
+                  <div className="space-y-4">
+                    {[
+                      { name: "Orange Côte d'Ivoire", score: 94, loc: 'Abidjan' },
+                      { name: 'Ecobank Group', score: 89, loc: 'Lomé / Remote' },
+                      { name: 'MTN Sénégal', score: 85, loc: 'Dakar' },
+                    ].map((m, i) => (
+                      <div key={i} className="flex items-center justify-between p-4 rounded-xl bg-gray-50 border border-gray-100 hover:bg-gray-100 transition-colors cursor-default">
+                        <div className="flex flex-col">
+                          <span className="text-sm font-bold text-gray-900">{m.name}</span>
+                          <span className="text-xs text-gray-500">{m.loc}</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="text-right">
+                            <span className="block text-sm font-black text-[#7C3AED]">{m.score}%</span>
+                            <span className="text-[10px] text-gray-500 uppercase tracking-tighter">Match</span>
+                          </div>
+                          <div className="w-1.5 h-8 bg-[#7C3AED]/20 rounded-full overflow-hidden flex flex-col justify-end">
+                            <div className="w-full bg-[#7C3AED] rounded-full" style={{ height: `${m.score}%` }} />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </AnimateOnScroll>
+            </div>
+
+            {/* Étape 3 */}
+            <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
+              <AnimateOnScroll className="order-2 lg:order-1" delay={0}>
+                <div className="relative">
+                  <span className="absolute -top-16 -left-8 text-8xl lg:text-[10rem] font-black text-gray-900/[0.06] select-none pointer-events-none">03</span>
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#F59E0B]/20 text-[#F59E0B] mb-8 ring-1 ring-[#F59E0B]/30">
+                    <IconSend className="w-8 h-8" />
+                  </div>
+                  <h3 className="text-3xl font-bold text-gray-900 mb-6">Décrochez le poste</h3>
+                  <p className="text-lg text-gray-600 leading-relaxed mb-8">
+                    Postulez instantanément et suivez chaque étape de votre candidature. Discutez en direct avec les recruteurs et planifiez vos entretiens sans quitter la plateforme.
+                  </p>
+                  <a href="/signup" className="inline-flex items-center gap-2 px-6 py-3 bg-[#6B9B5F] hover:bg-[#5A8A4E] text-white font-bold rounded-xl transition-all shadow-lg shadow-[#6B9B5F]/20">
+                    Commencer maintenant
+                  </a>
+                </div>
+              </AnimateOnScroll>
+              <AnimateOnScroll className="order-1 lg:order-2" delay={200}>
+                <div className="relative p-8 rounded-3xl bg-white border border-gray-200 shadow-md group hover:border-[#F59E0B]/40 transition-colors">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 rounded-full bg-[#F59E0B]/20 flex items-center justify-center">
+                      <IconCalendar className="w-5 h-5 text-[#F59E0B]" />
+                    </div>
+                    <span className="text-gray-900 font-bold">Prochain Entretien</span>
+                  </div>
+                  <div className="p-5 rounded-2xl bg-gray-50 border border-gray-100">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-xl bg-[#FF6600] flex items-center justify-center font-black text-white text-xl">O</div>
+                      <div>
+                        <div className="text-gray-900 font-bold">Orange Côte d&apos;Ivoire</div>
+                        <div className="text-xs text-gray-500">Mardi 25 Mars — 14h00</div>
+                      </div>
+                    </div>
+                    <div className="flex gap-2 mb-4">
+                      <span className="px-3 py-1 rounded-full bg-[#6B9B5F]/20 text-[#6B9B5F] text-xs font-bold border border-[#6B9B5F]/30">Confirmé</span>
+                      <span className="px-3 py-1 rounded-full bg-blue-500/20 text-blue-600 text-xs font-bold border border-blue-500/30">Visio-conférence</span>
+                    </div>
+                    <div className="pt-4 border-t border-gray-200 flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1614289371518-722f2615943d?w=64&h=64&fit=crop" className="w-full h-full object-cover" alt="Recruiter" />
+                      </div>
+                      <span className="text-xs text-gray-500 italic">&quot;Hâte de discuter de votre profil !&quot;</span>
+                    </div>
+                  </div>
+                </div>
+              </AnimateOnScroll>
+            </div>
+          </div>
+
+          {/* Final CTA */}
+          <AnimateOnScroll className="text-center mt-20" delay={400}>
+            <div className="p-12 rounded-[2.5rem] bg-white border border-gray-200 shadow-sm relative overflow-hidden">
+              <h3 className="text-3xl font-bold text-gray-900 mb-6">Prêt à changer de dimension ?</h3>
+              <p className="text-gray-600 mb-10 max-w-xl mx-auto">Rejoignez des milliers de professionnels qui ont déjà trouvé leur match idéal grâce à notre technologie.</p>
+              <a href="/signup" className="inline-flex items-center gap-2 px-10 py-5 text-lg font-bold text-white bg-[#6B9B5F] hover:bg-[#5A8A4E] rounded-2xl transition-all hover:scale-105 shadow-xl shadow-[#6B9B5F]/20">
+                Lancer ma recherche gratuite
+              </a>
+            </div>
+          </AnimateOnScroll>
+        </div>
+      </section>
+
       {/* ═══════════════════════ FEATURES ═══════════════════════ */}
       <section id="features" className="py-20 lg:py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16 lg:mb-20">
+          <AnimateOnScroll className="text-center mb-14">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-50 border border-green-200/60 text-sm font-semibold text-[#6B9B5F] mb-4">
               <IconSparkles className="w-4 h-4" />
               Fonctionnalites
@@ -936,7 +1242,33 @@ export default function Home() {
               Une plateforme complete pour optimiser chaque etape de votre
               processus de recrutement en Afrique francophone.
             </p>
-          </div>
+          </AnimateOnScroll>
+
+          {/* Photo d'équipe contextuelle */}
+          <AnimateOnScroll className="mb-16 lg:mb-20">
+            <div className="relative overflow-hidden rounded-2xl">
+              <img
+                src="https://images.unsplash.com/photo-1540058404349-2e5fabf32d75?w=1400&h=480&fit=crop"
+                alt="Équipe africaine en collaboration"
+                className="w-full h-48 sm:h-64 object-cover"
+                loading="lazy"
+                decoding="async"
+                width={1400}
+                height={480}
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#6B9B5F]/30 via-transparent to-transparent" />
+              <div className="absolute bottom-4 left-6 bg-white/95 backdrop-blur-sm rounded-xl px-4 py-2.5 shadow-lg">
+                <div className="flex items-center gap-2">
+                  <div className="flex -space-x-2">
+                    {['https://images.unsplash.com/photo-1598439210625-5067c578f3f6?w=60&h=60&fit=crop&crop=face','https://images.unsplash.com/photo-1583195764036-6dc248ac07d9?w=60&h=60&fit=crop&crop=face','https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=60&h=60&fit=crop&crop=face'].map((src, i) => (
+                      <img key={i} src={src} alt="Utilisateur INTOWORK" className="w-7 h-7 rounded-full object-cover object-top border-2 border-white" loading="lazy" decoding="async" width={28} height={28} />
+                    ))}
+                  </div>
+                  <span className="text-xs font-semibold text-gray-700">500+ entreprises utilisent INTOWORK</span>
+                </div>
+              </div>
+            </div>
+          </AnimateOnScroll>
 
           <div className="space-y-20 lg:space-y-28">
             {features.map((feature, i) => {
@@ -998,18 +1330,32 @@ export default function Home() {
                                 <p className="text-xs text-gray-500">3 nouveaux matchs</p>
                               </div>
                             </div>
+                            {/* Badge IA Active */}
+                            <div className="flex items-center gap-2 mb-4 px-3 py-1.5 bg-green-50 rounded-lg border border-green-100 w-fit">
+                              <div className="w-2 h-2 rounded-full bg-[#6B9B5F] animate-pulse-soft" />
+                              <span className="text-[10px] font-semibold text-[#6B9B5F] uppercase tracking-wide">IA Active</span>
+                            </div>
                             {/* Match candidates */}
                             {[
-                              { name: 'Kofi Mensah', role: 'Dev Full Stack', score: 94, loc: 'Abidjan' },
-                              { name: 'Aissatou Ba', role: 'Data Analyst', score: 89, loc: 'Dakar' },
-                              { name: 'Ibrahim Traore', role: 'DevOps Engineer', score: 85, loc: 'Douala' },
+                              { name: 'Kofi Mensah', role: 'Dev Full Stack', score: 94, loc: 'Abidjan', photo: 'https://images.unsplash.com/photo-1668752741330-8adc5cef7485?w=80&h=80&fit=crop&crop=face' },
+                              { name: 'Aissatou Ba', role: 'Data Analyst', score: 89, loc: 'Dakar', photo: 'https://images.unsplash.com/photo-1770191954675-06f770e6cbd0?w=80&h=80&fit=crop&crop=face' },
+                              { name: 'Ibrahim Traore', role: 'DevOps Engineer', score: 85, loc: 'Douala', photo: 'https://images.unsplash.com/photo-1703059680709-d9554370fff9?w=80&h=80&fit=crop&crop=face' },
                             ].map((c, j) => (
                               <div
                                 key={j}
                                 className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors mb-2"
                               >
-                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#6B9B5F] to-[#93C587] flex items-center justify-center text-white font-bold text-sm">
-                                  {c.name.split(' ').map(n => n[0]).join('')}
+                                <img
+                                  src={c.photo}
+                                  alt={c.name}
+                                  className="w-10 h-10 rounded-full object-cover object-top border-2 border-white shadow-sm hidden md:block"
+                                  loading="lazy"
+                                  decoding="async"
+                                  width={40}
+                                  height={40}
+                                />
+                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#6B9B5F] to-[#93C587] flex md:hidden items-center justify-center text-white font-bold text-sm shrink-0">
+                                  {c.name.split(' ').map((n: string) => n[0]).join('')}
                                 </div>
                                 <div className="flex-1 min-w-0">
                                   <p className="text-sm font-semibold text-gray-900 truncate">{c.name}</p>
@@ -1020,11 +1366,11 @@ export default function Home() {
                                 <div className="flex items-center gap-2">
                                   <div className="w-12 h-1.5 bg-gray-200 rounded-full overflow-hidden">
                                     <div
-                                      className="h-full rounded-full bg-[#6B9B5F]"
-                                      style={{ width: `${c.score}%` }}
+                                      className="h-full rounded-full bg-[#6B9B5F] score-bar-animate"
+                                      style={{ '--score-width': `${c.score}%` } as React.CSSProperties}
                                     />
                                   </div>
-                                  <span className="text-xs font-bold text-[#6B9B5F]">
+                                  <span className="text-xs font-bold text-[#6B9B5F] score-number-animate">
                                     {c.score}%
                                   </span>
                                 </div>
@@ -1097,6 +1443,43 @@ export default function Home() {
                                 ))}
                               </div>
                             </div>
+                            {/* Mini carousel CV Builder */}
+                            <div className="mt-4 overflow-hidden rounded-xl border border-gray-100">
+                              <div className="px-3 py-2 bg-white border-b border-gray-100 flex items-center justify-between">
+                                <span className="text-[10px] font-semibold text-gray-700">CV Builder — 5 templates</span>
+                                <span className="text-[10px] text-[#7C3AED] font-medium">Aperçu</span>
+                              </div>
+                              <div className="overflow-hidden bg-gray-50">
+                                <div className="flex template-carousel" style={{ width: '300%' }}>
+                                  {[
+                                    { name: 'Elegance', color: '#6B9B5F', accent: '#93C587' },
+                                    { name: 'Impact', color: '#6B46C1', accent: '#8B5CF6' },
+                                    { name: 'Epure', color: '#1f2937', accent: '#6b7280' },
+                                  ].map((tpl) => (
+                                    <div key={tpl.name} className="w-1/3 p-3 flex-shrink-0">
+                                      <div className="bg-white rounded-lg border border-gray-200 p-2.5 h-20">
+                                        <div className="flex gap-2 mb-2">
+                                          <div className="w-7 h-7 rounded-full shrink-0" style={{ backgroundColor: tpl.color + '25' }}>
+                                            <div className="w-full h-full rounded-full flex items-center justify-center">
+                                              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: tpl.color + '80' }} />
+                                            </div>
+                                          </div>
+                                          <div className="flex-1 space-y-1">
+                                            <div className="h-2 rounded-full w-3/4" style={{ backgroundColor: tpl.color }} />
+                                            <div className="h-1.5 rounded-full bg-gray-200 w-full" />
+                                          </div>
+                                        </div>
+                                        <div className="space-y-1 mb-1">
+                                          <div className="h-1 rounded-full bg-gray-100 w-full" />
+                                          <div className="h-1 rounded-full bg-gray-100 w-5/6" />
+                                        </div>
+                                        <div className="text-[8px] font-bold text-center mt-1" style={{ color: tpl.color }}>{tpl.name}</div>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         )}
 
@@ -1114,9 +1497,16 @@ export default function Home() {
                             {/* Chat messages */}
                             <div className="space-y-3">
                               <div className="flex gap-3">
-                                <div className="w-8 h-8 rounded-full bg-[#FF6600] flex items-center justify-center text-white text-xs font-bold shrink-0">
-                                  OC
-                                </div>
+                                <img
+                                  src="https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?w=64&h=64&fit=crop&crop=face"
+                                  alt="Orange CI"
+                                  className="w-8 h-8 rounded-full object-cover object-top border border-gray-200 shrink-0 hidden md:block"
+                                  loading="lazy"
+                                  decoding="async"
+                                  width={32}
+                                  height={32}
+                                />
+                                <div className="w-8 h-8 rounded-full bg-[#FF6600] flex md:hidden items-center justify-center text-white text-xs font-bold shrink-0">OC</div>
                                 <div className="bg-gray-100 rounded-2xl rounded-tl-md px-4 py-2.5 max-w-[80%]">
                                   <p className="text-xs font-medium text-gray-800">
                                     Bonjour Aminata, votre candidature nous a beaucoup
@@ -1133,14 +1523,28 @@ export default function Home() {
                                   </p>
                                   <p className="text-[10px] text-white/60 mt-1">Vous - 10:45</p>
                                 </div>
-                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#6B9B5F] to-[#93C587] flex items-center justify-center text-white text-xs font-bold shrink-0">
-                                  AD
-                                </div>
+                                <img
+                                  src="https://images.unsplash.com/photo-1739300293504-234817eead52?w=64&h=64&fit=crop&crop=face"
+                                  alt="Aminata"
+                                  className="w-8 h-8 rounded-full object-cover object-top border border-white shadow-sm shrink-0 hidden md:block"
+                                  loading="lazy"
+                                  decoding="async"
+                                  width={32}
+                                  height={32}
+                                />
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#6B9B5F] to-[#93C587] flex md:hidden items-center justify-center text-white text-xs font-bold shrink-0">AD</div>
                               </div>
                               <div className="flex gap-3">
-                                <div className="w-8 h-8 rounded-full bg-[#FF6600] flex items-center justify-center text-white text-xs font-bold shrink-0">
-                                  OC
-                                </div>
+                                <img
+                                  src="https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?w=64&h=64&fit=crop&crop=face"
+                                  alt="Orange CI"
+                                  className="w-8 h-8 rounded-full object-cover object-top border border-gray-200 shrink-0 hidden md:block"
+                                  loading="lazy"
+                                  decoding="async"
+                                  width={32}
+                                  height={32}
+                                />
+                                <div className="w-8 h-8 rounded-full bg-[#FF6600] flex md:hidden items-center justify-center text-white text-xs font-bold shrink-0">OC</div>
                                 <div className="bg-gray-100 rounded-2xl rounded-tl-md px-4 py-2.5 max-w-[80%]">
                                   <p className="text-xs font-medium text-gray-800">
                                     Parfait ! Je vous envoie une invitation pour mardi a
@@ -1149,6 +1553,17 @@ export default function Home() {
                                   <p className="text-[10px] text-gray-400 mt-1">Orange CI - 11:02</p>
                                 </div>
                               </div>
+                            </div>
+                            {/* Notification entretien animee */}
+                            <div className="notification-slide-in flex items-center gap-2 mt-3 p-2.5 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200/60">
+                              <div className="w-6 h-6 rounded-full bg-[#6B9B5F] flex items-center justify-center shrink-0">
+                                <IconCalendar className="w-3.5 h-3.5 text-white" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-[10px] font-semibold text-gray-800 truncate">Entretien confirme — Mardi 25 Mars, 14h00</p>
+                                <p className="text-[9px] text-[#6B9B5F] font-medium">Invitation Google Meet envoyee</p>
+                              </div>
+                              <div className="w-2 h-2 rounded-full bg-[#6B9B5F] animate-pulse-soft shrink-0" />
                             </div>
                             {/* Input bar */}
                             <div className="flex items-center gap-2 mt-4 p-2 bg-gray-50 rounded-xl">
@@ -1174,7 +1589,7 @@ export default function Home() {
       {/* ═══════════════════════ SECURITY ═══════════════════════ */}
       <section id="security" className="py-20 lg:py-28 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14">
+          <AnimateOnScroll className="text-center mb-14">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-50 border border-green-200/60 text-sm font-semibold text-[#6B9B5F] mb-4">
               <IconShield className="w-4 h-4" />
               Securite
@@ -1186,15 +1601,31 @@ export default function Home() {
               Nous appliquons les standards les plus exigeants pour proteger
               les donnees de vos candidats et de votre entreprise.
             </p>
+          </AnimateOnScroll>
+
+          {/* Photo de confiance - desktop uniquement */}
+          <div className="relative mb-10 hidden lg:block overflow-hidden rounded-2xl">
+            <img
+              src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=1400&h=320&fit=crop&q=80"
+              alt="Professionnelle de confiance"
+              className="w-full h-40 object-cover object-top opacity-60"
+              loading="lazy"
+              decoding="async"
+              width={1400}
+              height={320}
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-gray-50 via-gray-50/60 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-gray-50 via-transparent to-gray-50/40" />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {securityCards.map((card, i) => {
               const CardIcon = securityIcons[card.icon];
               return (
-                <div
+                <AnimateOnScroll
                   key={i}
-                  className="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-[#6B9B5F]/30 hover:shadow-lg hover:shadow-green-500/5 transition-all duration-300"
+                  delay={i * 100}
+                  className="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-[#6B9B5F]/30 hover:shadow-lg hover:shadow-green-500/5 hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300"
                 >
                   <div className="w-12 h-12 rounded-xl bg-[#6B9B5F]/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                     <CardIcon className="w-6 h-6 text-[#6B9B5F]" />
@@ -1205,7 +1636,7 @@ export default function Home() {
                   <p className="text-sm text-gray-500 leading-relaxed">
                     {card.description}
                   </p>
-                </div>
+                </AnimateOnScroll>
               );
             })}
           </div>
@@ -1215,7 +1646,7 @@ export default function Home() {
       {/* ═══════════════════════ OFFRES EN VEDETTE ═══════════════════════ */}
       <section id="offres" className="py-20 lg:py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14">
+          <AnimateOnScroll className="text-center mb-14">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-50 border border-green-200/60 text-sm font-semibold text-[#6B9B5F] mb-4">
               <IconBriefcase className="w-4 h-4" />
               Opportunites
@@ -1226,7 +1657,7 @@ export default function Home() {
             <p className="mt-4 text-lg text-gray-500 max-w-2xl mx-auto">
               Decouvrez les dernieres opportunites publiees sur notre plateforme
             </p>
-          </div>
+          </AnimateOnScroll>
 
           {loadingJobs ? (
             <div className="flex justify-center py-12">
@@ -1238,7 +1669,7 @@ export default function Home() {
                 <Link
                   key={job.id}
                   href="/offres"
-                  className="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-[#6B9B5F]/40 hover:shadow-lg hover:shadow-green-500/5 transition-all duration-300"
+                  className="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-[#6B9B5F]/40 hover:shadow-lg hover:shadow-green-500/5 hover:-translate-y-1 transition-all duration-300"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1 min-w-0">
@@ -1307,7 +1738,7 @@ export default function Home() {
       {/* ═══════════════════════ ENTREPRISES PARTENAIRES ═══════════════════════ */}
       <section className="py-20 lg:py-28 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14">
+          <AnimateOnScroll className="text-center mb-14">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-50 border border-purple-200/60 text-sm font-semibold text-purple-600 mb-4">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -1320,7 +1751,7 @@ export default function Home() {
             <p className="mt-4 text-lg text-gray-500 max-w-2xl mx-auto">
               Des entreprises de confiance qui trouvent leurs talents sur INTOWORK
             </p>
-          </div>
+          </AnimateOnScroll>
 
           {loadingJobs ? (
             <div className="flex justify-center py-12">
@@ -1332,7 +1763,7 @@ export default function Home() {
                 <Link
                   key={company.name}
                   href="/entreprises"
-                  className="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-purple-300 hover:shadow-lg transition-all duration-300 text-center"
+                  className="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-purple-300 hover:shadow-lg hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300 text-center"
                 >
                   <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center mx-auto mb-3 shadow-md group-hover:scale-110 transition-transform">
                     <span className="text-xl font-bold text-white">
@@ -1371,7 +1802,7 @@ export default function Home() {
       {/* ═══════════════════════ TESTIMONIALS ═══════════════════════ */}
       <section id="testimonials" className="py-20 lg:py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14">
+          <AnimateOnScroll className="text-center mb-14">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-50 border border-green-200/60 text-sm font-semibold text-[#6B9B5F] mb-4">
               <IconStar className="w-4 h-4 text-[#6B9B5F]" />
               Temoignages
@@ -1383,13 +1814,14 @@ export default function Home() {
               Decouvrez comment INTOWORK transforme le recrutement pour les
               entreprises et les candidats a travers l&apos;Afrique.
             </p>
-          </div>
+          </AnimateOnScroll>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
             {testimonials.map((t, i) => (
-              <div
+              <AnimateOnScroll
                 key={i}
-                className="group bg-white rounded-2xl border border-gray-100 p-6 lg:p-8 hover:shadow-xl hover:shadow-gray-100/80 hover:border-gray-200 transition-all duration-300"
+                delay={i * 150}
+                className="group bg-white rounded-2xl border border-gray-100 p-6 lg:p-8 hover:shadow-xl hover:shadow-gray-100/80 hover:border-gray-200 hover:-translate-y-1.5 transition-all duration-300"
               >
                 {/* Metric badge */}
                 <div className="flex items-center gap-3 mb-6">
@@ -1417,12 +1849,12 @@ export default function Home() {
 
                 {/* Author */}
                 <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
-                  <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm"
-                    style={{ backgroundColor: t.avatar }}
-                  >
-                    {t.name.split(' ').map(n => n[0]).join('')}
-                  </div>
+                  <img
+                    src={t.photo}
+                    alt={t.name}
+                    className="w-10 h-10 rounded-full object-cover border-2 border-[#6B9B5F]/20 shrink-0"
+                    loading="lazy"
+                  />
                   <div>
                     <p className="text-sm font-semibold text-gray-900">{t.name}</p>
                     <p className="text-xs text-gray-500">
@@ -1430,7 +1862,7 @@ export default function Home() {
                     </p>
                   </div>
                 </div>
-              </div>
+              </AnimateOnScroll>
             ))}
           </div>
         </div>
@@ -1439,7 +1871,7 @@ export default function Home() {
       {/* ═══════════════════════ PRICING ═══════════════════════ */}
       <section id="pricing" className="py-20 lg:py-28 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14">
+          <AnimateOnScroll className="text-center mb-14">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-50 border border-green-200/60 text-sm font-semibold text-[#6B9B5F] mb-4">
               Tarifs
             </div>
@@ -1450,16 +1882,17 @@ export default function Home() {
               Commencez gratuitement et evoluez avec vos besoins. Pas de frais
               caches, pas d&apos;engagement.
             </p>
-          </div>
+          </AnimateOnScroll>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto">
             {pricingPlans.map((plan, i) => (
-              <div
+              <AnimateOnScroll
                 key={i}
+                delay={i * 150}
                 className={`relative rounded-2xl p-6 lg:p-8 transition-all duration-300 ${
                   plan.highlighted
-                    ? 'bg-white border-2 border-[#6B9B5F] shadow-xl shadow-green-500/10 scale-[1.02] lg:scale-105'
-                    : 'bg-white border border-gray-200 hover:border-gray-300 hover:shadow-lg'
+                    ? 'bg-white border-2 border-[#6B9B5F] shadow-xl shadow-green-500/10 scale-[1.02] lg:scale-105 hover:shadow-2xl hover:scale-[1.06]'
+                    : 'bg-white border border-gray-200 hover:border-gray-300 hover:shadow-lg hover:-translate-y-1'
                 }`}
               >
                 {plan.highlighted && (
@@ -1509,16 +1942,17 @@ export default function Home() {
                   ))}
                 </ul>
 
-                <button
-                  className={`w-full py-3 px-6 rounded-xl text-sm font-bold transition-all duration-200 ${
+                <a
+                  href="/signup"
+                  className={`w-full py-3 px-6 rounded-xl text-sm font-bold transition-all duration-200 text-center block ${
                     plan.highlighted
                       ? 'bg-[#6B9B5F] text-white hover:bg-[#5A8A4E] shadow-md hover:shadow-lg'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
                   {plan.cta}
-                </button>
-              </div>
+                </a>
+              </AnimateOnScroll>
             ))}
           </div>
         </div>
@@ -1555,7 +1989,32 @@ export default function Home() {
                   Demander une demo
                 </Link>
               </div>
-              <p className="mt-6 text-sm text-white/60">
+              {/* Social proof — avatar stack */}
+              <div className="mt-8 flex items-center justify-center gap-3">
+                <div className="flex -space-x-3">
+                  {[
+                    'https://images.unsplash.com/photo-1598439210625-5067c578f3f6?w=80&h=80&fit=crop&crop=face',
+                    'https://images.unsplash.com/photo-1583195764036-6dc248ac07d9?w=80&h=80&fit=crop&crop=face',
+                    'https://images.unsplash.com/photo-1685634113141-93cc677b2724?w=80&h=80&fit=crop&crop=face',
+                    'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=80&h=80&fit=crop&crop=face',
+                  ].map((src, i) => (
+                    <img
+                      key={i}
+                      src={src}
+                      alt="Utilisateur INTOWORK"
+                      className="w-9 h-9 rounded-full object-cover object-top border-2 border-white/80"
+                      loading="lazy"
+                      decoding="async"
+                      width={36}
+                      height={36}
+                    />
+                  ))}
+                </div>
+                <p className="text-sm text-white/70">
+                  <span className="font-bold text-white">500+</span> recruteurs actifs cette semaine
+                </p>
+              </div>
+              <p className="mt-3 text-sm text-white/60">
                 Essai gratuit 14 jours - Aucune carte bancaire requise
               </p>
             </div>
@@ -1564,22 +2023,52 @@ export default function Home() {
       </section>
 
       {/* ═══════════════════════ COUNTRIES BANNER ═══════════════════════ */}
-      <section className="py-10 border-t border-gray-100 bg-white overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
-          <p className="text-center text-sm font-semibold text-gray-400 uppercase tracking-wider">
-            Present dans 15+ pays francophones
-          </p>
+      <section className="py-20 lg:py-28 border-t border-gray-50 bg-white overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+          <div className="flex flex-col items-center text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F0F7EE] border border-[#6B9B5F]/20 mb-6">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#6B9B5F] opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#6B9B5F]"></span>
+              </span>
+              <span className="text-xs font-semibold uppercase tracking-widest text-[#6B9B5F]">
+                Expansion Afrique
+              </span>
+            </div>
+            <h2 className="text-2xl md:text-4xl font-bold text-gray-900 tracking-tight">
+              Présent dans <span className="text-[#6B9B5F] relative inline-block">
+                15+ pays
+                <span className="absolute -bottom-1 left-0 w-full h-1 bg-[#6B9B5F]/20 rounded-full"></span>
+              </span> francophones
+            </h2>
+          </div>
         </div>
+
         <div className="relative">
-          <div className="flex gap-8 overflow-hidden">
-            <div className="flex gap-8 scroll-left-track" style={{ minWidth: 'max-content' }}>
-              {[...countries, ...countries].map((c, i) => (
+          <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-white to-transparent z-10 hidden md:block"></div>
+          <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-white to-transparent z-10 hidden md:block"></div>
+
+          <div className="flex overflow-hidden">
+            <div className="flex gap-6 py-4 scroll-left-track" style={{ minWidth: 'max-content' }}>
+              {[...countries, ...countries, ...countries].map((c, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-full border border-gray-100 whitespace-nowrap"
+                  className={`flex items-center gap-4 px-6 py-4 bg-white rounded-full border shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 cursor-default whitespace-nowrap ${
+                    [
+                      'border-emerald-100 hover:border-emerald-300',
+                      'border-blue-100 hover:border-blue-300',
+                      'border-amber-100 hover:border-amber-300',
+                      'border-rose-100 hover:border-rose-300',
+                      'border-indigo-100 hover:border-indigo-300'
+                    ][i % 5]
+                  }`}
                 >
-                  <span className="text-lg">{c.flag}</span>
-                  <span className="text-sm font-medium text-gray-600">{c.name}</span>
+                  <img
+                    src={`https://flagcdn.com/w40/${c.code}.png`}
+                    alt={c.name}
+                    className="w-8 h-6 object-cover rounded-md shadow-sm border border-gray-100 flex-shrink-0"
+                  />
+                  <span className="text-sm font-bold text-gray-900 tracking-tight whitespace-nowrap">{c.name}</span>
                 </div>
               ))}
             </div>
@@ -1604,16 +2093,33 @@ export default function Home() {
                 La plateforme de recrutement qui comprend l&apos;Afrique francophone.
               </p>
               <div className="flex gap-3">
-                {['LinkedIn', 'Twitter', 'Facebook'].map((social) => (
-                  <a
-                    key={social}
-                    href="#"
-                    className="w-9 h-9 rounded-lg bg-gray-800 hover:bg-[#6B9B5F] flex items-center justify-center text-gray-400 hover:text-white transition-all duration-200"
-                    aria-label={social}
-                  >
-                    <span className="text-xs font-bold">{social[0]}</span>
-                  </a>
-                ))}
+                <a
+                  href="https://linkedin.com/company/intowork"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-9 h-9 rounded-lg bg-gray-800 hover:bg-[#6B9B5F] flex items-center justify-center text-gray-400 hover:text-white transition-all duration-200"
+                  aria-label="LinkedIn"
+                >
+                  <span className="text-xs font-bold">L</span>
+                </a>
+                <a
+                  href="https://twitter.com/intowork"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-9 h-9 rounded-lg bg-gray-800 hover:bg-[#6B9B5F] flex items-center justify-center text-gray-400 hover:text-white transition-all duration-200"
+                  aria-label="Twitter"
+                >
+                  <span className="text-xs font-bold">T</span>
+                </a>
+                <a
+                  href="https://facebook.com/intowork"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-9 h-9 rounded-lg bg-gray-800 hover:bg-[#6B9B5F] flex items-center justify-center text-gray-400 hover:text-white transition-all duration-200"
+                  aria-label="Facebook"
+                >
+                  <span className="text-xs font-bold">F</span>
+                </a>
               </div>
             </div>
 
@@ -1643,10 +2149,10 @@ export default function Home() {
               &copy; 2026 INTOWORK. Tous droits reserves.
             </p>
             <div className="flex items-center gap-4">
-              <a href="#" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
+              <a href="/terms" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
                 CGU
               </a>
-              <a href="#" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
+              <a href="/privacy" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
                 Confidentialite
               </a>
               <a href="#" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
