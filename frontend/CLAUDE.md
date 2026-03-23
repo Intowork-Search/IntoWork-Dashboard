@@ -70,7 +70,7 @@ src/components/
   UserButton.tsx          Avatar dropdown (sign out, settings)
   profile/                Modals and sections for candidate profile page
   settings/               Modals for email/password change
-  brand/                  Brand design system components
+
 ```
 
 Dashboard pages use `DashboardLayout` directly — it is a client component. The `src/app/dashboard/layout.tsx` client guard uses `useUser()` to check auth; unauthenticated users get redirected before `DashboardLayout` renders.
@@ -78,9 +78,8 @@ Dashboard pages use `DashboardLayout` directly — it is a client component. The
 ## Styling Conventions
 
 - Primary brand green: `oklch(64% 0.2 131.684)` → use `bg-primary`, `text-primary` DaisyUI tokens
-- Brand colors are also imported from `src/styles/brand-colors.css` as CSS custom properties
 - Landing page (`src/app/page.tsx`) uses **Plus Jakarta Sans** font and brand green `#6B9B5F` — distinct from the dashboard Tailwind/DaisyUI theme
-- `src/components/brand/BrandComponents.tsx` has reusable brand-aligned primitives for the landing page
+- Brand color tokens are in `src/styles/brand-colors.css` as CSS custom properties
 
 ## Types
 

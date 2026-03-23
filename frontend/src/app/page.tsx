@@ -29,14 +29,6 @@ const navLinks = [
   { label: 'Tarifs', href: '#pricing' },
 ];
 
-const logoCompanies = [
-  { name: 'Orange', color: '#FF6600' },
-  { name: 'Ecobank', color: '#003DA5' },
-  { name: 'Total', color: '#E31837' },
-  { name: 'MTN', color: '#FFCC00' },
-  { name: 'Bollore', color: '#00205B' },
-  { name: 'Canal+', color: '#1A1A1A' },
-];
 
 const dashboardStats = [
   { label: 'Profil', value: '85%', icon: 'user', color: '#6B9B5F' },
@@ -681,6 +673,20 @@ export default function Home() {
         .delay-800 { animation-delay: 800ms; }
         .delay-900 { animation-delay: 900ms; }
         .delay-1000 { animation-delay: 1000ms; }
+        @media (min-width: 1024px) {
+          .hero-mockup-3d {
+            transform: perspective(1200px) rotateY(-3deg) rotateX(2deg);
+          }
+        }
+        @media (max-width: 1023px) {
+          .animate-hero-mockup {
+            animation: heroMockupRevealMobile 0.8s ease-out forwards;
+          }
+          @keyframes heroMockupRevealMobile {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+        }
       `}</style>
 
       {/* ═══════════════════════ NAVIGATION ═══════════════════════ */}
@@ -697,7 +703,7 @@ export default function Home() {
               <img
                 src="/logo-intowork.png"
                 alt="INTOWORK"
-                className="h-28 sm:h-36 w-auto"
+                className="h-10 sm:h-12 lg:h-14 w-auto"
               />
             </Link>
 
@@ -936,7 +942,7 @@ export default function Home() {
               </div>
 
               {/* Main Mockup */}
-              <div className="relative" style={{ transform: 'perspective(1200px) rotateY(-3deg) rotateX(2deg)' }}>
+              <div className="relative hero-mockup-3d">
                 {/* Intense Green Glow */}
                 <div className="absolute -inset-10 bg-[#6B9B5F]/20 rounded-[3rem] blur-[80px] pointer-events-none" />
 
@@ -994,32 +1000,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ═══════════════════════ LOGOS ═══════════════════════ */}
-      <section className="py-12 lg:py-16 border-y border-gray-100 bg-gray-50/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-sm font-semibold text-gray-400 uppercase tracking-wider mb-8">
-            Ils recrutent sur INTOWORK
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-8 lg:gap-12">
-            {logoCompanies.map((company) => (
-              <div
-                key={company.name}
-                className="flex items-center gap-3 group cursor-default"
-              >
-                <div
-                  className="w-14 h-14 rounded-2xl flex items-center justify-center text-white font-bold text-xl shadow-md group-hover:scale-110 transition-transform"
-                  style={{ backgroundColor: company.color }}
-                >
-                  {company.name.charAt(0)}
-                </div>
-                <span className="text-base font-bold text-gray-600 group-hover:text-gray-900 transition-colors">
-                  {company.name}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* ═══════════════════════ ANIMATED STATS ═══════════════════════ */}
       <section ref={statsRef} className="py-12 lg:py-16 bg-gradient-to-b from-gray-50/50 to-white border-y border-gray-100">
@@ -1055,7 +1035,7 @@ export default function Home() {
             <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
               <AnimateOnScroll className="order-2 lg:order-1" delay={0}>
                 <div className="relative">
-                  <span className="absolute -top-16 -left-8 text-8xl lg:text-[10rem] font-black text-gray-900/[0.06] select-none pointer-events-none">01</span>
+                  <span className="hidden sm:block absolute -top-16 -left-8 text-8xl lg:text-[10rem] font-black text-gray-900/[0.06] select-none pointer-events-none">01</span>
                   <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#6B9B5F]/20 text-[#6B9B5F] mb-8 ring-1 ring-[#6B9B5F]/30">
                     <IconUser className="w-8 h-8" />
                   </div>
@@ -1106,7 +1086,7 @@ export default function Home() {
             <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
               <AnimateOnScroll className="order-2" delay={0}>
                 <div className="relative">
-                  <span className="absolute -top-16 -right-8 lg:-right-16 text-8xl lg:text-[10rem] font-black text-gray-900/[0.06] select-none pointer-events-none">02</span>
+                  <span className="hidden sm:block absolute -top-16 -right-8 lg:-right-16 text-8xl lg:text-[10rem] font-black text-gray-900/[0.06] select-none pointer-events-none">02</span>
                   <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#7C3AED]/20 text-[#7C3AED] mb-8 ring-1 ring-[#7C3AED]/30">
                     <IconSparkles className="w-8 h-8" />
                   </div>
@@ -1159,7 +1139,7 @@ export default function Home() {
             <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
               <AnimateOnScroll className="order-2 lg:order-1" delay={0}>
                 <div className="relative">
-                  <span className="absolute -top-16 -left-8 text-8xl lg:text-[10rem] font-black text-gray-900/[0.06] select-none pointer-events-none">03</span>
+                  <span className="hidden sm:block absolute -top-16 -left-8 text-8xl lg:text-[10rem] font-black text-gray-900/[0.06] select-none pointer-events-none">03</span>
                   <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#F59E0B]/20 text-[#F59E0B] mb-8 ring-1 ring-[#F59E0B]/30">
                     <IconSend className="w-8 h-8" />
                   </div>
@@ -1206,7 +1186,7 @@ export default function Home() {
 
           {/* Final CTA */}
           <AnimateOnScroll className="text-center mt-20" delay={400}>
-            <div className="p-12 rounded-[2.5rem] bg-white border border-gray-200 shadow-sm relative overflow-hidden">
+            <div className="p-6 sm:p-10 lg:p-12 rounded-2xl sm:rounded-[2.5rem] bg-white border border-gray-200 shadow-sm relative overflow-hidden">
               <h3 className="text-3xl font-bold text-gray-900 mb-6">Prêt à changer de dimension ?</h3>
               <p className="text-gray-600 mb-10 max-w-xl mx-auto">Rejoignez des milliers de professionnels qui ont déjà trouvé leur match idéal grâce à notre technologie.</p>
               <a href="/signup" className="inline-flex items-center gap-2 px-10 py-5 text-lg font-bold text-white bg-[#6B9B5F] hover:bg-[#5A8A4E] rounded-2xl transition-all hover:scale-105 shadow-xl shadow-[#6B9B5F]/20">
@@ -1881,7 +1861,7 @@ export default function Home() {
                 delay={i * 150}
                 className={`relative rounded-2xl p-6 lg:p-8 transition-all duration-300 ${
                   plan.highlighted
-                    ? 'bg-white border-2 border-[#6B9B5F] shadow-xl shadow-green-500/10 scale-[1.02] lg:scale-105 hover:shadow-2xl hover:scale-[1.06]'
+                    ? 'bg-white border-2 border-[#6B9B5F] shadow-xl shadow-green-500/10 md:scale-[1.02] lg:scale-105 hover:shadow-2xl hover:scale-[1.06]'
                     : 'bg-white border border-gray-200 hover:border-gray-300 hover:shadow-lg hover:-translate-y-1'
                 }`}
               >

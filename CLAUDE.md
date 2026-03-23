@@ -50,7 +50,7 @@ NextAuth v5 with CredentialsProvider (`frontend/src/auth.ts`):
 - `useAuth()` — returns `getToken()`, `isSignedIn`, `userId`
 - `useUser()` — returns `user`, `isLoaded`, `isSignedIn`
 
-**Migration note**: Clerk → NextAuth v5 complete. `clerk_id` field is being removed (migration `r9i0j1k2l3m4` pending). `@clerk/nextjs` in package.json is unused legacy — safe to remove.
+**Migration note**: Clerk → NextAuth v5 migration complete. `clerk_id` removed (migration `r9i0j1k2l3m4` applied). `@clerk/nextjs` removed from package.json.
 
 **`src/middleware.ts`** wraps `auth()` and runs on the Edge runtime — it has NOT been renamed to `proxy.ts`. Do not add Node.js APIs here.
 
@@ -113,7 +113,6 @@ Static files: `backend/uploads/` served at `/uploads` via FastAPI StaticFiles wi
 /cv/[slug]                Public CV viewer
 /offres                   Public job listings
 /entreprises              Public company directory
-/templates-final/         5 landing page template variants (template-13 to 17) — design exploration
 ```
 
 **Landing page design reference**: `frontend/design-system.md` — tokens, colors, components, animations for intowork.co brand.
@@ -221,7 +220,7 @@ NEXT_PUBLIC_API_URL=http://localhost:8001/api
 ## Database Schema
 
 Core models (`backend/app/models/base.py`):
-- **User** — email, password_hash, role (candidate/employer/admin), first_name, last_name (`clerk_id` being removed — migration `r9i0j1k2l3m4` pending)
+- **User** — email, password_hash, role (candidate/employer/admin), first_name, last_name
 - **Candidate** → User (1:1) — profile, CV fields, relations: experiences, educations, skills, cvs
 - **CandidateCV** → Candidate — multiple CVs with is_active flag
 - **Experience**, **Education**, **Skill** → Candidate (cascade delete)
@@ -239,7 +238,7 @@ Core models (`backend/app/models/base.py`):
 
 ## Deployment
 
-- **Frontend**: Vercel → `intowork.co`, auto-deploys from GitHub main
+- **Frontend**: Vercel — deploy manually with `vercel --prod` from `frontend/` directory. **Note**: Two Vercel projects exist — `frontend` (where deploys go) and `into-work-dashboard` (currently serves `intowork.co`). Git auto-deploy is not configured.
 - **Backend**: Railway → `intowork-dashboard-production-1ede.up.railway.app`, migrations run automatically via `backend/start.sh`
 - CORS: `allowed_origins` in `main.py` + regex `https://.*\.vercel\.app` for preview URLs
 
@@ -262,6 +261,9 @@ Core models (`backend/app/models/base.py`):
 10. **`middleware.ts` is NOT `proxy.ts`** — the Next.js 16 rename to `proxy.ts` has NOT been applied; `middleware.ts` wraps `auth()` on the Edge runtime
 11. **AI scoring requires `ANTHROPIC_API_KEY`** — `ai_scoring.py` uses the Anthropic SDK directly (not the AI Gateway); ensure the key is set in backend `.env`
 12. **Tailwind config is inline** — no `tailwind.config.js`; all tokens (colors, radii) are in `frontend/src/app/globals.css`
+13. **`CandidateProfile` type mismatch** — backend returns merged user+candidate data but `CandidateProfile` type only declares candidate fields (no `first_name`, `last_name`, `email`, etc.). Cast via `as unknown as UserProfile` when consuming in settings/profile pages
+14. **Two Vercel projects** — `frontend` project is where deploys go; `into-work-dashboard` project is what serves `intowork.co`. Domain transfer needed via Vercel Dashboard to point `intowork.co` at the `frontend` project
+15. **Vercel deploys are manual** — Git auto-deploy is not configured. Always run `vercel --prod` from `frontend/` directory after pushing
 
 ---
 
