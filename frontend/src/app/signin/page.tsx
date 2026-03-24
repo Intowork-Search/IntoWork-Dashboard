@@ -32,6 +32,7 @@ export default function SignInPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,13 +46,16 @@ export default function SignInPage() {
       });
 
       if (result?.error) {
+        setFormError('Email ou mot de passe incorrect');
         toast.error('Email ou mot de passe incorrect');
       } else {
+        setFormError(null);
         toast.success('Connexion réussie');
         router.push('/dashboard');
         router.refresh();
       }
     } catch (error) {
+      setFormError('Une erreur est survenue');
       toast.error('Une erreur est survenue');
       console.error('Sign in error:', error);
     } finally {
@@ -74,7 +78,7 @@ export default function SignInPage() {
     <div className={`${plusJakarta.variable} font-sans min-h-screen bg-white`} data-theme="light">
       <div className="flex min-h-screen overflow-hidden">
         {/* Left Panel - Branding & Features */}
-        <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden flex-col justify-between p-12 xl:p-16">
+        <aside className="hidden lg:flex lg:w-1/2 relative overflow-hidden flex-col justify-between p-12 xl:p-16" aria-label="Présentation INTOWORK">
           {/* Background solid color */}
           <div className="absolute inset-0 bg-[var(--color-brand-green)]"></div>
 
@@ -102,7 +106,7 @@ export default function SignInPage() {
                 <div className="flex gap-4 animate-fade-in animation-delay-200">
                   <div className="flex-shrink-0">
                     <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center backdrop-blur-sm border border-white/20">
-                      <BuildingOfficeIcon className="w-6 h-6 text-white" />
+                      <BuildingOfficeIcon className="w-6 h-6 text-white" aria-hidden="true" />
                     </div>
                   </div>
                   <div>
@@ -115,7 +119,7 @@ export default function SignInPage() {
                 <div className="flex gap-4 animate-fade-in animation-delay-300">
                   <div className="flex-shrink-0">
                     <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center backdrop-blur-sm border border-white/20">
-                      <UserGroupIcon className="w-6 h-6 text-white" />
+                      <UserGroupIcon className="w-6 h-6 text-white" aria-hidden="true" />
                     </div>
                   </div>
                   <div>
@@ -128,7 +132,7 @@ export default function SignInPage() {
                 <div className="flex gap-4 animate-fade-in animation-delay-400">
                   <div className="flex-shrink-0">
                     <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center backdrop-blur-sm border border-white/20">
-                      <ChartBarIcon className="w-6 h-6 text-white" />
+                      <ChartBarIcon className="w-6 h-6 text-white" aria-hidden="true" />
                     </div>
                   </div>
                   <div>
@@ -143,14 +147,14 @@ export default function SignInPage() {
           {/* Trust badges */}
           <div className="relative z-10 border-t border-white/20 pt-8 animate-fade-in animation-delay-500">
             <div className="flex items-center gap-2 text-sm text-white/80">
-              <ShieldCheckIcon className="w-5 h-5 flex-shrink-0" />
+              <ShieldCheckIcon className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
               <span>Plateforme sécurisée et conforme RGPD</span>
             </div>
           </div>
-        </div>
+        </aside>
 
         {/* Right Panel - Sign In Form */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-white relative overflow-hidden">
+        <main className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-white relative overflow-hidden">
           {/* Subtle background pattern */}
           <div className="absolute inset-0 opacity-30">
             <div className="absolute inset-0 bg-[linear-gradient(to_right,transparent_1px,rgba(0,0,0,0.02)_1px)] bg-[length:4rem_4rem]"></div>
@@ -170,9 +174,9 @@ export default function SignInPage() {
 
             {/* Form Header */}
             <div className="mb-8 sm:mb-10 animate-fade-in animation-delay-100">
-              <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-2 sm:mb-3">
+              <h1 id="signin-title" className="text-3xl sm:text-4xl font-bold text-slate-900 mb-2 sm:mb-3">
                 Connexion
-              </h2>
+              </h1>
               <p className="text-slate-600 text-base sm:text-lg">
                 Accédez à votre espace professionnel
               </p>
@@ -191,7 +195,7 @@ export default function SignInPage() {
                   {socialLoading === 'google' ? (
                     <span className="loading loading-spinner loading-sm"></span>
                   ) : (
-                    <svg className="w-5 h-5" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
                       <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                       <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                       <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
@@ -202,13 +206,24 @@ export default function SignInPage() {
                 </button>
 
                 {/* Separator */}
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="flex-1 h-px bg-slate-200"></div>
-                  <span className="text-xs text-slate-400 font-medium">ou</span>
-                  <div className="flex-1 h-px bg-slate-200"></div>
+                <div className="flex items-center gap-3 mb-6" role="separator" aria-label="ou">
+                  <div className="flex-1 h-px bg-slate-200" aria-hidden="true"></div>
+                  <span className="text-xs text-slate-400 font-medium" aria-hidden="true">ou</span>
+                  <div className="flex-1 h-px bg-slate-200" aria-hidden="true"></div>
                 </div>
 
-                <form className="space-y-5 sm:space-y-6" onSubmit={handleSubmit}>
+                <form className="space-y-5 sm:space-y-6" onSubmit={handleSubmit} aria-busy={loading} aria-labelledby="signin-title">
+                  {/* Message d'erreur accessible */}
+                  {formError && (
+                    <div
+                      id="form-error"
+                      role="alert"
+                      className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700"
+                    >
+                      {formError}
+                    </div>
+                  )}
+
                   {/* Email */}
                   <div className="form-control">
                     <label className="label pb-1 sm:pb-2" htmlFor="email">
@@ -223,10 +238,12 @@ export default function SignInPage() {
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        aria-invalid={formError ? 'true' : 'false'}
+                        aria-describedby={formError ? 'form-error' : undefined}
                         className="w-full px-4 py-2.5 sm:py-3 pl-10 sm:pl-12 bg-slate-50 border border-slate-300 rounded-lg sm:rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300 text-sm sm:text-base"
                         placeholder="nom.prenom@entreprise.com"
                       />
-                      <EnvelopeIcon className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-slate-400" />
+                      <EnvelopeIcon className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-slate-400" aria-hidden="true" />
                     </div>
                   </div>
 
@@ -244,10 +261,12 @@ export default function SignInPage() {
                         required
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        aria-invalid={formError ? 'true' : 'false'}
+                        aria-describedby={formError ? 'form-error' : undefined}
                         className="w-full px-4 py-2.5 sm:py-3 pl-10 sm:pl-12 bg-slate-50 border border-slate-300 rounded-lg sm:rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300 text-sm sm:text-base"
                         placeholder="••••••••••••"
                       />
-                      <LockClosedIcon className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-slate-400" />
+                      <LockClosedIcon className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-slate-400" aria-hidden="true" />
                     </div>
                   </div>
 
@@ -274,18 +293,18 @@ export default function SignInPage() {
                   <button
                     type="submit"
                     disabled={loading}
+                    aria-label={loading ? 'Connexion en cours, veuillez patienter' : 'Se connecter'}
                     className="w-full h-11 sm:h-12 mt-2 bg-primary hover:bg-primary/90 text-white font-semibold rounded-lg sm:rounded-xl transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 group shadow-lg hover:shadow-xl relative overflow-hidden text-sm sm:text-base"
                   >
-
                     {loading ? (
                       <>
-                        <span className="loading loading-spinner loading-sm"></span>
+                        <span className="loading loading-spinner loading-sm" aria-hidden="true"></span>
                         <span>Connexion en cours</span>
                       </>
                     ) : (
                       <>
                         <span>Se connecter</span>
-                        <ArrowRightIcon className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
+                        <ArrowRightIcon className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
                       </>
                     )}
                   </button>
@@ -319,7 +338,7 @@ export default function SignInPage() {
               </p>
             </div>
           </div>
-        </div>
+        </main>
       </div>
     </div>
   );
