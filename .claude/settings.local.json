@@ -45,7 +45,27 @@
       "Bash(find \"C:\\\\Users\\\\JDTKD\\\\OneDrive - H&C EXECUTIVE EDUCATION\\\\Bureau\\\\IntoWork-Dashboard/docs\" -type f)",
       "Bash(ls -lh \"C:\\\\Users\\\\JDTKD\\\\OneDrive - H&C EXECUTIVE EDUCATION\\\\Bureau\\\\IntoWork-Dashboard/.claude/worktrees/landing-templates\")",
       "Bash(find \"C:\\\\Users\\\\JDTKD\\\\OneDrive - H&C EXECUTIVE EDUCATION\\\\Bureau\\\\IntoWork-Dashboard/backend\" -maxdepth 1 \\\\\\( -name \"*.md\" -o -name \"*.txt\" \\\\\\) -type f)",
-      "Bash(find \"C:\\\\Users\\\\JDTKD\\\\OneDrive - H&C EXECUTIVE EDUCATION\\\\Bureau\\\\IntoWork-Dashboard\" -maxdepth 1 -type f \\\\\\( -name \".env*\" -o -name \"*.json\" -o -name \"*.toml\" -o -name \"*.yml\" -o -name \"*.yaml\" \\\\\\))"
+      "Bash(find \"C:\\\\Users\\\\JDTKD\\\\OneDrive - H&C EXECUTIVE EDUCATION\\\\Bureau\\\\IntoWork-Dashboard\" -maxdepth 1 -type f \\\\\\( -name \".env*\" -o -name \"*.json\" -o -name \"*.toml\" -o -name \"*.yml\" -o -name \"*.yaml\" \\\\\\))",
+      "Read(//c/Users/JDTKD/.claude/plugins/data/context7-claude-plugins-official/**)",
+      "Read(//c/Users/JDTKD/.claude/plugins/cache/claude-plugins-official/context7/**)",
+      "Bash(python:*)",
+      "Bash(mkdir -p \"C:/Users/JDTKD/OneDrive - H&C EXECUTIVE EDUCATION/Bureau/IntoWork-Dashboard/frontend/src/app/templates-final/template-19\")",
+      "Bash(mkdir -p \"C:/Users/JDTKD/OneDrive - H&C EXECUTIVE EDUCATION/Bureau/IntoWork-Dashboard/frontend/src/app/templates-final/template-20\")",
+      "Bash(mkdir -p \"C:/Users/JDTKD/OneDrive - H&C EXECUTIVE EDUCATION/Bureau/IntoWork-Dashboard/frontend/src/app/templates-final/template-21\")",
+      "Bash(mkdir -p \"C:/Users/JDTKD/OneDrive - H&C EXECUTIVE EDUCATION/Bureau/IntoWork-Dashboard/frontend/src/app/templates-final/template-22\")",
+      "Bash(git:*)",
+      "Bash(npx tsc:*)",
+      "Bash(powershell.exe -Command \"Start-Process -NoNewWindow -FilePath 'cmd.exe' -ArgumentList '/c cd \\\\\"C:\\\\Users\\\\JDTKD\\\\OneDrive - H&C EXECUTIVE EDUCATION\\\\Bureau\\\\IntoWork-Dashboard\\\\frontend\\\\\" && npm run dev > C:\\\\Users\\\\JDTKD\\\\AppData\\\\Local\\\\Temp\\\\nextdev.log 2>&1'\")",
+      "mcp__plugin_playwright_playwright__browser_navigate",
+      "mcp__plugin_playwright_playwright__browser_take_screenshot",
+      "mcp__plugin_playwright_playwright__browser_snapshot",
+      "Bash(head -100 \"/c/Users/JDTKD/OneDrive - H&C EXECUTIVE EDUCATION/Bureau/IntoWork-Dashboard/frontend/src/app/templates-final/template-19/page.tsx\")",
+      "Bash(npm run:*)",
+      "Bash(npx next:*)",
+      "mcp__plugin_playwright_playwright__browser_evaluate",
+      "Bash(ls \"c:/Users/JDTKD/OneDrive - H&C EXECUTIVE EDUCATION/Bureau/IntoWork-Dashboard/frontend/src/app/templates-final/\")",
+      "Bash(ls -la \"c:/Users/JDTKD/OneDrive - H&C EXECUTIVE EDUCATION/Bureau/IntoWork-Dashboard/frontend/src/app/templates-final/\")",
+      "mcp__plugin_playwright_playwright__browser_install"
     ]
   }
 }

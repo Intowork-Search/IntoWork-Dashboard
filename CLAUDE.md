@@ -63,8 +63,9 @@ All routes prefixed with `/api`:
 | `/api` | `ping.py`, `users.py` | Health check, user management |
 | `/api/auth` | `auth_routes.py` | signup, signin, forgot/reset password |
 | `/api/candidates` | `candidates.py` | Profile, CV upload, experiences, education, skills |
+| `/api/employers` | `employers.py` | Employer profile management |
 | `/api/jobs` | `jobs.py` | Job CRUD, search with filters (role-aware) |
-| `/api/applications` | `applications.py`, `applications_update.py` | Job applications, status updates |
+| `/api/applications` | `applications.py` | Job applications, status updates |
 | `/api/companies` | `companies.py` | Company management |
 | `/api/dashboard` | `dashboard.py` | Stats and recent activities |
 | `/api/notifications` | `notifications.py` | Notification CRUD, mark as read |
@@ -103,6 +104,7 @@ Static files: `backend/uploads/` served at `/uploads` via FastAPI StaticFiles wi
   /applications           Applications list
   /job-posts              Employer job management
   /company                Employer company settings
+  /profile                User profile settings
   /settings               Account/notifications/privacy
   /ai-scoring/[jobId]     AI scoring for a job (ATS Phase 2)
   /email-templates        Email templates manager (ATS Phase 2)
@@ -115,7 +117,7 @@ Static files: `backend/uploads/` served at `/uploads` via FastAPI StaticFiles wi
 /entreprises              Public company directory
 ```
 
-**Landing page design reference**: `frontend/design-system.md` — tokens, colors, components, animations for intowork.co brand.
+**Landing page design reference**: `frontend/design-system.md` — tokens, colors, components, animations for intowork.co brand. Brand color palette in `frontend/src/styles/brand-colors.css`; candidate profile styles in `frontend/src/styles/profile.css`.
 
 ### Key Patterns
 
@@ -166,7 +168,7 @@ const response = await client.get('/candidates/profile');
 
 ```bash
 # Start both services
-make dev          # or ./start-dev.sh
+make dev          # or ./start-dev.sh (Linux/Mac) / start-dev.bat (Windows)
 
 # Backend (activate venv first)
 cd backend
