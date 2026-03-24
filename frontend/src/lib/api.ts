@@ -38,10 +38,12 @@ export const createAuthenticatedClient = (token: string) => {
 // Intercepteur pour gérer les erreurs
 apiClient.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
     if (error.response?.status === 401) {
-      // Token expiré ou invalide - rediriger vers login
       if (typeof window !== 'undefined') {
+        // Importer signOut dynamiquement pour éviter les imports circulaires
+        const { signOut } = await import('next-auth/react');
+        await signOut({ redirect: false });
         window.location.href = '/signin';
       }
     }

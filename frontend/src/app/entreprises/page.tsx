@@ -61,22 +61,15 @@ export default function EntreprisesPage() {
         // Use getApiUrl() to enforce HTTPS in production
         const apiUrl = getApiUrl();
 
-        console.log('🏢 Fetching companies from:', `${apiUrl}/companies/all`); // Debug
-
         // Récupérer TOUTES les entreprises inscrites (avec ou sans jobs)
         const response = await fetch(`${apiUrl}/companies/all?page=1&limit=1000`);
 
-        console.log('📊 Response status:', response.status); // Debug
-
         if (response.ok) {
           const data = await response.json();
-          console.log('✅ Data received:', data); // Debug
 
           // Les données viennent directement de la table Company
           const companiesArray = data.companies.map((company: any) => {
             const logoUrl = company.logo_url;
-            console.log('🏢 Company:', company.name, '| Logo URL:', logoUrl, '| Full URL:', logoUrl ? getUploadUrl(logoUrl) : 'none');
-            
             return {
               id: company.id,
               name: company.name,
@@ -314,7 +307,6 @@ export default function EntreprisesPage() {
                         alt={company.name} 
                         className="w-16 h-16 rounded-2xl object-cover shrink-0 bg-slate-100" 
                         onError={(e) => {
-                          console.log('❌ Image error for:', company.name, company.logo_url);
                           e.currentTarget.style.display = 'none';
                           const fallback = e.currentTarget.nextElementSibling as HTMLElement;
                           if (fallback) fallback.style.display = 'flex';

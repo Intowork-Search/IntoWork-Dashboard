@@ -34,7 +34,7 @@ async def get_users(current_user: User = Depends(require_admin), db: AsyncSessio
     return users
 
 @router.post("/users", response_model=UserResponse)
-async def create_user(user: UserCreate, db: AsyncSession = Depends(get_db)):
+async def create_user(user: UserCreate, current_user: User = Depends(require_admin), db: AsyncSession = Depends(get_db)):
     """Créer un nouvel utilisateur"""
     # Vérifier si l'utilisateur existe déjà
     result = await db.execute(

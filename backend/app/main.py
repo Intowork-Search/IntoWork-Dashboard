@@ -209,7 +209,9 @@ class CORSStaticFiles(BaseStaticFiles):
         
         # Add CORS headers to allow cross-origin image loading
         if isinstance(response, FileResponse):
-            response.headers["Access-Control-Allow-Origin"] = "*"
+            # Restreindre aux origines connues
+            response.headers["Access-Control-Allow-Origin"] = "https://intowork.co"
+            response.headers["Vary"] = "Origin"
             response.headers["Access-Control-Allow-Methods"] = "GET, HEAD, OPTIONS"
             response.headers["Access-Control-Allow-Headers"] = "*"
             response.headers["Cross-Origin-Resource-Policy"] = "cross-origin"

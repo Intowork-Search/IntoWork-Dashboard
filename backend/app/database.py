@@ -16,24 +16,12 @@ raw_public_url = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@local
 # Utiliser l'URL interne si disponible, sinon l'URL publique
 DATABASE_URL = raw_private_url or raw_public_url
 
-print(f"🔍 DEBUG Railway:")
-print(f"   DATABASE_PRIVATE_URL définie: {bool(raw_private_url)}")
-print(f"   DATABASE_URL définie: {bool(raw_public_url)}")
-
 # Détection de l'environnement Railway
 is_railway_internal = "railway.internal" in DATABASE_URL.lower()
 is_railway_external = "proxy.rlwy.net" in DATABASE_URL.lower() or ".railway.app" in DATABASE_URL.lower()
 is_railway = is_railway_internal or is_railway_external
 
 # Log de debug pour Railway (masquer le mot de passe)
-if is_railway:
-    import re
-    masked_url = re.sub(r':([^:@]+)@', ':****@', DATABASE_URL)
-    connection_type = "INTERNE (*.railway.internal)" if is_railway_internal else "EXTERNE (proxy/public)"
-    print(f"🔌 Connexion Railway détectée - Type: {connection_type}")
-    print(f"   URL masquée: {masked_url}")
-else:
-    print(f"🏠 Connexion locale détectée")
 
 # NE PAS ajouter ssl dans l'URL pour Railway
 # On gère SSL via connect_args avec un SSLContext personnalisé (voir plus bas)
@@ -74,7 +62,6 @@ if is_railway:
             "timeout": 60,  # Plus long timeout
             "command_timeout": 120
         }
-        print(f"🔒 Configuration SSL: DÉSACTIVÉ (connexion interne Railway)")
     else:
         # Connexion externe: SSL obligatoire
         engine_kwargs["connect_args"] = {
@@ -85,7 +72,6 @@ if is_railway:
             "timeout": 60,  # Plus long timeout pour connexion externe
             "command_timeout": 120
         }
-        print(f"🔒 Configuration SSL: PROTOCOL_TLS avec CERT_NONE (connexion externe)")
 
 # Créer l'engine SQLAlchemy async avec pool optimisé
 engine = create_async_engine(DATABASE_URL_ASYNC, **engine_kwargs)

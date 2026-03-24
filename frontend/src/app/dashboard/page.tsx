@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/DashboardLayout';
 import { candidatesAPI, jobsAPI } from '@/lib/api';
 import { getApiUrl } from '@/lib/getApiUrl';
+import toast from 'react-hot-toast';
 import { dashboardAPI, DashboardData } from '@/lib/api/dashboard';
 import OnboardingTour from '@/components/OnboardingTour';
 import HelpButton from '@/components/HelpButton';
@@ -142,12 +143,14 @@ export default function Dashboard() {
     if (!file) return;
 
     if (file.type !== 'application/pdf') {
-      alert('Veuillez sélectionner un fichier PDF.');
+      toast.error('Veuillez sélectionner un fichier PDF.');
+      if (fileInputRef.current) fileInputRef.current.value = '';
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      alert('Le fichier ne peut pas dépasser 5MB.');
+      toast.error('Le fichier ne peut pas dépasser 5MB.');
+      if (fileInputRef.current) fileInputRef.current.value = '';
       return;
     }
 
@@ -155,7 +158,7 @@ export default function Dashboard() {
       setIsUploadingCV(true);
       const token = await getToken();
       if (!token) {
-        alert('Erreur d\'authentification');
+        toast.error("Erreur d'authentification. Veuillez vous reconnecter.");
         return;
       }
 
@@ -171,16 +174,15 @@ export default function Dashboard() {
       });
 
       if (response.ok) {
-        alert('CV téléchargé avec succès !');
+        toast.success('CV téléchargé avec succès !');
         loadDashboardData();
         router.push('/dashboard/cv');
       } else {
-        const errorData = await response.json();
-        alert(`Erreur lors du téléchargement: ${errorData.detail || 'Erreur inconnue'}`);
+        const errorData = await response.json().catch(() => ({ detail: 'Erreur inconnue' }));
+        toast.error(`Erreur: ${errorData.detail || 'Téléchargement échoué'}`);
       }
     } catch (error) {
-      console.error('Erreur lors du téléchargement du CV:', error);
-      alert('Erreur lors du téléchargement du CV');
+      toast.error('Erreur réseau lors du téléchargement du CV');
     } finally {
       setIsUploadingCV(false);
       if (fileInputRef.current) {

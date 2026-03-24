@@ -87,23 +87,16 @@ export default function EmailTemplatesPage() {
       }
 
       const apiUrl = getApiUrl();
-      console.log('🔍 Fetching templates from:', `${apiUrl}/email-templates`);
-      
+
       const response = await fetch(`${apiUrl}/email-templates`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
       });
-      
-      console.log('📡 Response status:', response.status, response.statusText);
-      
+
       if (response.ok) {
         const data = await response.json();
-        console.log('✅ Templates loaded:', data.length, 'templates');
         setTemplates(data);
-        if (data.length === 0) {
-          console.log('⚠️ Liste vide - Vérifiez que votre entreprise est créée');
-        }
       } else if (response.status === 401) {
         console.error('❌ 401 Unauthorized - Token invalide');
         router.push('/signin');
@@ -130,16 +123,13 @@ export default function EmailTemplatesPage() {
       if (!token) return;
 
       const apiUrl = getApiUrl();
-      console.log('🔍 Fetching variables from:', `${apiUrl}/email-templates/variables`);
-      
+
       const response = await fetch(`${apiUrl}/email-templates/variables`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
       });
-      
-      console.log('📡 Variables response:', response.status);
-      
+
       if (response.ok) {
         const data = await response.json();
         setVariables(data.variables || []);

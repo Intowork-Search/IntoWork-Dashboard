@@ -82,37 +82,46 @@ class AIEvaluationService:
             message = await self.client.messages.create(
                 model=self.model,
                 max_tokens=2000,
-                temperature=0.3,  # Peu de créativité, plus de précision
+                temperature=0.3,
                 system="Tu es un expert en recrutement et évaluation de candidatures. "
                        "Tu analyses objectivement la compatibilité entre un candidat et une offre d'emploi. "
                        "Tu fournis des évaluations précises, structurées et factuelles basées sur les données fournies.",
-                messages=[
-                    {
-                        "role": "user",
-                        "content": prompt
-                    }
-                ]
+                messages=[{"role": "user", "content": prompt}]
             )
-            
-            # Extraire le contenu de la réponse
+
             response_text = message.content[0].text
-            
-            # Parser la réponse JSON
-            result = json.loads(response_text)
-            
+
+            # Parser et valider la réponse JSON
+            try:
+                result = json.loads(response_text)
+            except json.JSONDecodeError:
+                # Tenter d'extraire le JSON si Claude a ajouté du texte autour
+                import re
+                json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
+                if json_match:
+                    result = json.loads(json_match.group())
+                else:
+                    raise ValueError("Réponse Claude non parseable en JSON")
+
+            # Valider les champs obligatoires
+            required_keys = {"score", "strengths", "weaknesses", "skills_match", "experience_match", "recommendation"}
+            missing = required_keys - set(result.keys())
+            if missing:
+                raise ValueError(f"Champs manquants dans la réponse IA: {missing}")
+
             return result
-            
+
         except Exception as e:
-            print(f"Erreur lors de l'analyse IA: {e}")
-            # Retourner un score par défaut en cas d'erreur
+            from app.logging_config import logger
+            logger.error(f"Erreur lors de l'analyse IA: {type(e).__name__}")
             return {
-                "score": 50.0,
-                "strengths": ["Analyse IA indisponible"],
-                "weaknesses": ["Analyse IA indisponible"],
+                "score": None,
+                "strengths": [],
+                "weaknesses": [],
                 "skills_match": {"matched": [], "missing": [], "percentage": 0},
-                "experience_match": "Non analysé",
+                "experience_match": "Analyse IA indisponible",
                 "recommendation": "Analyse manuelle recommandée",
-                "error": str(e)
+                "error": "Service IA temporairement indisponible"
             }
     
     def _build_evaluation_prompt(
