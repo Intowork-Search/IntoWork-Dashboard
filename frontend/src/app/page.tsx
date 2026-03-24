@@ -1077,6 +1077,51 @@ export default function Home() {
             </p>
           </AnimateOnScroll>
 
+          {/* Partenaires fondateurs — statiques */}
+          <div className="mb-12">
+            <div className="flex items-center justify-center gap-3 mb-8">
+              <div className="h-px flex-1 max-w-[80px] bg-gray-100" />
+              <span className="text-xs font-bold uppercase tracking-widest text-gray-400">Partenaires fondateurs</span>
+              <div className="h-px flex-1 max-w-[80px] bg-gray-100" />
+            </div>
+            <div className="flex flex-col sm:flex-row items-stretch justify-center gap-6 max-w-2xl mx-auto">
+              {[
+                {
+                  name: 'Agiltym',
+                  logo: 'https://agiltym.com/wp-content/uploads/2025/12/agiltym-by-HC.png',
+                  href: 'https://agiltym.com',
+                },
+                {
+                  name: 'H&C Executive Education',
+                  logo: 'https://hcexecutive.co/wp-content/uploads/2025/02/LOG-IN-HOR.png',
+                  href: 'https://hcexecutive.co',
+                },
+              ].map((partner) => (
+                <a
+                  key={partner.name}
+                  href={partner.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex-1 min-w-[220px] max-w-[320px] bg-white rounded-2xl p-8 border border-gray-100 hover:border-[#6B9B5F]/30 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 text-center flex flex-col items-center justify-between"
+                >
+                  <div className="h-16 flex items-center justify-center mb-4">
+                    <img
+                      src={partner.logo}
+                      alt={`Logo ${partner.name}`}
+                      className="max-h-14 max-w-[180px] w-auto object-contain group-hover:scale-105 transition-transform duration-300"
+                      loading="lazy"
+                    />
+                  </div>
+                  <h3 className="text-sm font-bold text-gray-900 mb-3">{partner.name}</h3>
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-xs font-semibold text-[#6B9B5F]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#6B9B5F] animate-pulse" />
+                    Partenaire vérifié
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+
           {loadingJobs ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-16">
               {[...Array(8)].map((_, i) => (
