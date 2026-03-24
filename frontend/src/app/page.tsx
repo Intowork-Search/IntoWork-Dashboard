@@ -934,7 +934,7 @@ export default function Home() {
                       <div className="h-full bg-gradient-to-r from-[#6B9B5F] to-[#93C587] w-[94%] rounded-full shadow-[0_0_8px_rgba(107,155,95,0.4)]" />
                     </div>
                     <div className="flex items-center gap-2.5">
-                      <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&q=80" className="w-6 h-6 rounded-full ring-2 ring-white object-cover shadow-sm" alt="Kofi M." />
+                      <img src="/candidates/kofi-mensah.jpeg" className="w-6 h-6 rounded-full ring-2 ring-white object-cover object-center shadow-sm" alt="Kofi M." />
                       <p className="text-[11px] font-bold text-gray-700">Kofi M. <span className="text-gray-400 font-medium ml-1">Expert Cloud</span></p>
                     </div>
                   </div>
@@ -1281,9 +1281,9 @@ export default function Home() {
                             </div>
                             {/* Match candidates */}
                             {[
-                              { name: 'Kofi Mensah', role: 'Dev Full Stack', score: 94, loc: 'Abidjan', photo: 'https://images.unsplash.com/photo-1668752741330-8adc5cef7485?w=80&h=80&fit=crop&crop=face' },
-                              { name: 'Aissatou Ba', role: 'Data Analyst', score: 89, loc: 'Dakar', photo: 'https://images.unsplash.com/photo-1770191954675-06f770e6cbd0?w=80&h=80&fit=crop&crop=face' },
-                              { name: 'Ibrahim Traore', role: 'DevOps Engineer', score: 85, loc: 'Douala', photo: 'https://images.unsplash.com/photo-1703059680709-d9554370fff9?w=80&h=80&fit=crop&crop=face' },
+                              { name: 'Kofi Mensah', role: 'Dev Full Stack', score: 94, loc: 'Abidjan', photo: '/candidates/kofi-mensah.jpeg' },
+                              { name: 'Aissatou Ba', role: 'Data Analyst', score: 89, loc: 'Dakar', photo: '/candidates/aissatou-ba.jpeg' },
+                              { name: 'Ibrahim Traore', role: 'DevOps Engineer', score: 85, loc: 'Douala', photo: '/candidates/ibrahim-traore.jpeg' },
                             ].map((c, j) => (
                               <div
                                 key={j}
@@ -1292,7 +1292,7 @@ export default function Home() {
                                 <img
                                   src={c.photo}
                                   alt={c.name}
-                                  className="w-10 h-10 rounded-full object-cover object-top border-2 border-white shadow-sm hidden md:block"
+                                  className="w-10 h-10 rounded-full object-cover object-center border-2 border-white shadow-sm hidden md:block"
                                   loading="lazy"
                                   decoding="async"
                                   width={40}
