@@ -703,7 +703,7 @@ export default function Home() {
               <img
                 src="/logo-intowork.png"
                 alt="INTOWORK"
-                className="h-10 sm:h-12 lg:h-14 w-auto"
+                className="h-12 sm:h-14 lg:h-16 w-auto"
               />
             </Link>
 
@@ -934,7 +934,7 @@ export default function Home() {
                       <div className="h-full bg-gradient-to-r from-[#6B9B5F] to-[#93C587] w-[94%] rounded-full shadow-[0_0_8px_rgba(107,155,95,0.4)]" />
                     </div>
                     <div className="flex items-center gap-2.5">
-                      <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&q=80" className="w-6 h-6 rounded-full ring-2 ring-white object-cover shadow-sm" alt="Kofi M." />
+                      <img src="/candidates/kofi-mensah.jpeg" className="w-6 h-6 rounded-full ring-2 ring-white object-cover object-center shadow-sm" alt="Kofi M." />
                       <p className="text-[11px] font-bold text-gray-700">Kofi M. <span className="text-gray-400 font-medium ml-1">Expert Cloud</span></p>
                     </div>
                   </div>
@@ -1001,6 +1001,198 @@ export default function Home() {
       </section>
 
 
+      {/* ═══════════════════════ COUNTRIES BANNER ═══════════════════════ */}
+      <section className="py-20 lg:py-28 border-t border-gray-50 bg-white overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+          <div className="flex flex-col items-center text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F0F7EE] border border-[#6B9B5F]/20 mb-6">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#6B9B5F] opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#6B9B5F]"></span>
+              </span>
+              <span className="text-xs font-semibold uppercase tracking-widest text-[#6B9B5F]">
+                Expansion Afrique
+              </span>
+            </div>
+            <h2 className="text-2xl md:text-4xl font-bold text-gray-900 tracking-tight">
+              Présent dans <span className="text-[#6B9B5F] relative inline-block">
+                15+ pays
+                <span className="absolute -bottom-1 left-0 w-full h-1 bg-[#6B9B5F]/20 rounded-full"></span>
+              </span> francophones
+            </h2>
+          </div>
+        </div>
+
+        <div className="relative">
+          <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-white to-transparent z-10 hidden md:block"></div>
+          <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-white to-transparent z-10 hidden md:block"></div>
+
+          <div className="flex overflow-hidden">
+            <div className="flex gap-6 py-4 scroll-left-track" style={{ minWidth: 'max-content' }}>
+              {[...countries, ...countries, ...countries].map((c, i) => (
+                <div
+                  key={i}
+                  className={`flex items-center gap-4 px-6 py-4 bg-white rounded-full border shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 cursor-default whitespace-nowrap ${
+                    [
+                      'border-emerald-100 hover:border-emerald-300',
+                      'border-blue-100 hover:border-blue-300',
+                      'border-amber-100 hover:border-amber-300',
+                      'border-rose-100 hover:border-rose-300',
+                      'border-indigo-100 hover:border-indigo-300'
+                    ][i % 5]
+                  }`}
+                >
+                  <img
+                    src={`https://flagcdn.com/w40/${c.code}.png`}
+                    alt={c.name}
+                    className="w-8 h-6 object-cover rounded-md shadow-sm border border-gray-100 flex-shrink-0"
+                  />
+                  <span className="text-sm font-bold text-gray-900 tracking-tight whitespace-nowrap">{c.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════ ENTREPRISES PARTENAIRES ═══════════════════════ */}
+      <section className="relative py-24 lg:py-32 overflow-hidden bg-white">
+        {/* Background Decorative Blobs */}
+        <div className="absolute top-1/4 -left-20 w-96 h-96 bg-[#6B9B5F]/5 rounded-full blur-3xl -z-10 animate-pulse" />
+        <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-[#7C3AED]/5 rounded-full blur-3xl -z-10" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <AnimateOnScroll className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200/60 shadow-sm text-sm font-semibold text-[#6B9B5F] mb-6">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+              ÉCOSYSTÈME PARTENAIRE
+            </div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 tracking-tight">
+              Entreprises qui <span className="text-[#6B9B5F]">recrutent</span>
+            </h2>
+            <p className="mt-6 text-lg text-gray-600 max-w-2xl mx-auto">
+              Rejoignez les leaders du marché qui font confiance à INTOWORK pour bâtir leurs équipes de demain.
+            </p>
+          </AnimateOnScroll>
+
+          {/* Partenaires fondateurs — statiques */}
+          <div className="mb-12">
+            <div className="flex items-center justify-center gap-3 mb-8">
+              <div className="h-px flex-1 max-w-[80px] bg-gray-100" />
+              <span className="text-xs font-bold uppercase tracking-widest text-gray-400">Partenaires fondateurs</span>
+              <div className="h-px flex-1 max-w-[80px] bg-gray-100" />
+            </div>
+            <div className="flex flex-col sm:flex-row items-stretch justify-center gap-6 max-w-2xl mx-auto">
+              {[
+                {
+                  name: 'Agiltym',
+                  logo: 'https://agiltym.com/wp-content/uploads/2025/12/agiltym-by-HC.png',
+                  href: 'https://agiltym.com',
+                },
+                {
+                  name: 'H&C Executive Education',
+                  logo: 'https://hcexecutive.co/wp-content/uploads/2025/02/LOG-IN-HOR.png',
+                  href: 'https://hcexecutive.co',
+                },
+              ].map((partner) => (
+                <a
+                  key={partner.name}
+                  href={partner.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex-1 min-w-[220px] max-w-[320px] bg-white rounded-2xl p-8 border border-gray-100 hover:border-[#6B9B5F]/30 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 text-center flex flex-col items-center justify-between"
+                >
+                  <div className="h-16 flex items-center justify-center mb-4">
+                    <img
+                      src={partner.logo}
+                      alt={`Logo ${partner.name}`}
+                      className="max-h-14 max-w-[180px] w-auto object-contain group-hover:scale-105 transition-transform duration-300"
+                      loading="lazy"
+                    />
+                  </div>
+                  <h3 className="text-sm font-bold text-gray-900 mb-3">{partner.name}</h3>
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-xs font-semibold text-[#6B9B5F]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#6B9B5F] animate-pulse" />
+                    Partenaire vérifié
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {loadingJobs ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-16">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm animate-pulse">
+                  <div className="w-20 h-20 rounded-full bg-gray-100 mx-auto mb-6" />
+                  <div className="h-4 bg-gray-100 rounded-full w-3/4 mx-auto mb-3" />
+                  <div className="h-3 bg-gray-50 rounded-full w-1/2 mx-auto" />
+                </div>
+              ))}
+            </div>
+          ) : companies.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-16">
+              {companies.map((company, idx) => {
+                const gradients = [
+                  'from-[#6B9B5F] to-[#93C587]',
+                  'from-[#7C3AED] to-[#A78BFA]',
+                  'from-[#003DA5] to-[#60A5FA]',
+                  'from-[#F59E0B] to-[#FCD34D]',
+                  'from-[#10B981] to-[#6EE7B7]'
+                ];
+                const gradient = gradients[idx % gradients.length];
+
+                return (
+                  <Link
+                    key={company.name}
+                    href="/entreprises"
+                    className="group relative bg-white rounded-2xl p-8 border border-gray-100 hover:border-[#6B9B5F]/30 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 text-center"
+                  >
+                    <div className={`w-20 h-20 rounded-full bg-gradient-to-br ${gradient} flex items-center justify-center mx-auto mb-6 shadow-lg shadow-gray-200 group-hover:scale-110 transition-transform duration-500`}>
+                      <span className="text-2xl font-bold text-white">
+                        {company.name.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                    <h3 className="text-base font-bold text-gray-900 mb-2 group-hover:text-[#6B9B5F] transition-colors truncate">
+                      {company.name}
+                    </h3>
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-50 text-xs font-medium text-gray-500 group-hover:bg-green-50 group-hover:text-[#6B9B5F] transition-colors">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#6B9B5F] animate-pulse" />
+                      {company.count} offre{company.count > 1 ? 's' : ''} active{company.count > 1 ? 's' : ''}
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="max-w-2xl mx-auto mb-16 text-center py-20 px-8 rounded-3xl border-2 border-dashed border-gray-100 bg-gray-50/50">
+              <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm border border-gray-50">
+                <svg className="w-10 h-10 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </div>
+              <h4 className="text-lg font-bold text-gray-900 mb-2">Bientôt disponible</h4>
+              <p className="text-gray-500">Les entreprises apparaitront ici dès qu&apos;elles auront publié leurs premières offres.</p>
+            </div>
+          )}
+
+          <div className="flex justify-center">
+            <Link
+              href="/entreprises"
+              className="group relative inline-flex items-center gap-3 px-10 py-4 text-base font-bold text-white bg-[#6B9B5F] hover:bg-[#5A8A4E] rounded-2xl transition-all duration-300 shadow-lg shadow-[#6B9B5F]/20 hover:shadow-xl hover:shadow-[#6B9B5F]/30 overflow-hidden"
+            >
+              <span className="relative z-10">Parcourir toutes les entreprises</span>
+              <svg className="relative z-10 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+              <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* ═══════════════════════ ANIMATED STATS ═══════════════════════ */}
       <section ref={statsRef} className="py-12 lg:py-16 bg-gradient-to-b from-gray-50/50 to-white border-y border-gray-100">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
@@ -1008,166 +1200,6 @@ export default function Home() {
           <AnimatedStat end={500} suffix="+" label="Entreprises" start={statsVisible} />
           <AnimatedStat end={94} suffix="%" label="Taux de matching" start={statsVisible} />
           <AnimatedStat end={15} suffix="+" label="Pays couverts" start={statsVisible} />
-        </div>
-      </section>
-
-      {/* ═══════════════════════ HOW IT WORKS ═══════════════════════ */}
-      <section id="how-it-works" className="py-24 lg:py-32 bg-white relative overflow-hidden">
-        {/* Decorative Background Blobs */}
-        <div className="absolute top-1/4 -left-64 w-[500px] h-[500px] bg-[#6B9B5F]/5 rounded-full blur-[100px]" />
-        <div className="absolute bottom-1/4 -right-64 w-[500px] h-[500px] bg-[#7C3AED]/5 rounded-full blur-[100px]" />
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <AnimateOnScroll className="text-center mb-16 lg:mb-24">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-50 border border-green-100 text-sm font-bold text-[#6B9B5F] mb-6">
-              <IconSparkles className="w-4 h-4" />
-              PROCESSUS DE RÉUSSITE
-            </div>
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-tight mb-6">
-              Votre carrière propulsée par <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6B9B5F] to-[#93C587]">l&apos;IA</span>
-            </h2>
-            <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              Connectez-vous aux meilleures opportunités d&apos;Afrique de l&apos;Ouest en 3 étapes intelligentes.
-            </p>
-          </AnimateOnScroll>
-
-          {/* Progress Timeline (Desktop) */}
-          <div className="hidden lg:flex items-center justify-between max-w-4xl mx-auto mb-16 relative">
-            <div className="absolute left-0 right-0 h-0.5 bg-gray-100 top-1/2 -translate-y-1/2" />
-            {[0, 1, 2].map((i) => (
-              <div key={i} className="relative z-10 w-4 h-4 rounded-full bg-white border-4 border-[#6B9B5F] shadow-[0_0_15px_rgba(107,155,95,0.4)] animate-pulse-soft" />
-            ))}
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-24">
-            {/* Étape 1 */}
-            <AnimateOnScroll delay={0}>
-              <div className="group relative h-full p-8 rounded-[2rem] bg-white border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 overflow-hidden">
-                <span className="absolute -top-6 -right-4 text-9xl font-black text-gray-50/80 pointer-events-none transition-transform group-hover:scale-110 select-none">01</span>
-                <div className="relative z-10">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#6B9B5F] to-[#93C587] flex items-center justify-center text-white mb-6 shadow-lg shadow-green-100">
-                    <IconUser className="w-7 h-7" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">Créez votre profil</h3>
-                  <p className="text-gray-600 mb-8 leading-relaxed">Importez votre CV. Notre IA extrait vos compétences pour bâtir un profil attractif.</p>
-                  {/* Inline Mockup 1 */}
-                  <div className="p-5 rounded-2xl bg-gray-50/80 border border-gray-100">
-                    <div className="flex items-center gap-3 mb-4">
-                      <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&q=80" className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm" alt="Amadou" loading="lazy" />
-                      <div className="flex-1">
-                        <div className="h-2.5 w-24 bg-gray-200 rounded-full mb-1.5" />
-                        <div className="h-2 w-16 bg-gray-100 rounded-full" />
-                      </div>
-                    </div>
-                    <div className="space-y-3">
-                      <div className="flex justify-between text-[10px] font-bold text-[#6B9B5F] uppercase">
-                        <span>Complétion</span>
-                        <span>85%</span>
-                      </div>
-                      <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-[#6B9B5F] to-[#93C587] rounded-full w-[85%]" />
-                      </div>
-                      <div className="flex flex-wrap gap-1.5 pt-1">
-                        {['React.js', 'UI/UX', 'Python'].map(t => (
-                          <span key={t} className="px-2 py-0.5 text-[10px] bg-white border border-gray-100 rounded-md font-medium text-gray-500">{t}</span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </AnimateOnScroll>
-
-            {/* Étape 2 */}
-            <AnimateOnScroll delay={150}>
-              <div className="group relative h-full p-8 rounded-[2rem] bg-white border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 overflow-hidden">
-                <span className="absolute -top-6 -right-4 text-9xl font-black text-gray-50/80 pointer-events-none select-none">02</span>
-                <div className="relative z-10">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#7C3AED] to-[#A78BFA] flex items-center justify-center text-white mb-6 shadow-lg shadow-purple-100">
-                    <IconSparkles className="w-7 h-7" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">L&apos;IA trouve vos matchs</h3>
-                  <p className="text-gray-600 mb-8 leading-relaxed">Notre algorithme analyse en temps réel des milliers d&apos;offres pour vous proposer le match parfait.</p>
-                  {/* Inline Mockup 2 */}
-                  <div className="space-y-3">
-                    {[
-                      { n: 'Orange CI', s: 94, loc: 'Abidjan' },
-                      { n: 'Ecobank Group', s: 89, loc: 'Lomé' },
-                      { n: 'MTN Sénégal', s: 85, loc: 'Dakar' },
-                    ].map((m, idx) => (
-                      <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-gray-50/50 border border-gray-100">
-                        <div>
-                          <span className="text-xs font-bold text-gray-900 block">{m.n}</span>
-                          <span className="text-[10px] text-gray-500">{m.loc}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold text-[#7C3AED]">{m.s}%</span>
-                          <div className="w-1 h-6 bg-[#7C3AED]/20 rounded-full overflow-hidden flex flex-col justify-end">
-                            <div className="w-full bg-[#7C3AED] rounded-full" style={{ height: `${m.s}%` }} />
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </AnimateOnScroll>
-
-            {/* Étape 3 */}
-            <AnimateOnScroll delay={300}>
-              <div className="group relative h-full p-8 rounded-[2rem] bg-white border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 overflow-hidden">
-                <span className="absolute -top-6 -right-4 text-9xl font-black text-gray-50/80 pointer-events-none select-none">03</span>
-                <div className="relative z-10">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#F59E0B] to-[#FBBF24] flex items-center justify-center text-white mb-6 shadow-lg shadow-amber-100">
-                    <IconSend className="w-7 h-7" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">Décrochez le poste</h3>
-                  <p className="text-gray-600 mb-8 leading-relaxed">Suivez vos candidatures, discutez avec les recruteurs et planifiez vos entretiens.</p>
-                  {/* Inline Mockup 3 */}
-                  <div className="p-4 rounded-2xl bg-[#6B9B5F]/5 border border-[#6B9B5F]/10">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center border border-gray-100 shadow-sm">
-                        <IconCalendar className="w-4 h-4 text-[#6B9B5F]" />
-                      </div>
-                      <span className="text-xs font-bold text-gray-900">Entretien Confirmé</span>
-                    </div>
-                    <div className="flex items-center gap-3 pt-3 border-t border-[#6B9B5F]/10">
-                      <div className="w-8 h-8 rounded-lg bg-[#FF6600] flex items-center justify-center text-white text-[10px] font-black shrink-0">O</div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-[11px] font-bold text-gray-900 truncate">Orange Côte d&apos;Ivoire</div>
-                        <div className="text-[9px] text-gray-500">Mardi 25 Mars — 14h00</div>
-                      </div>
-                      <div className="px-2 py-0.5 rounded-full bg-[#6B9B5F] text-[9px] font-bold text-white shrink-0">OK</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </AnimateOnScroll>
-          </div>
-
-          {/* Final CTA Banner */}
-          <AnimateOnScroll delay={450}>
-            <div className="relative p-8 sm:p-16 rounded-[3rem] bg-gradient-to-br from-[#6B9B5F] to-[#4B7340] overflow-hidden shadow-2xl shadow-green-200">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl pointer-events-none" />
-              <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/10 rounded-full -ml-20 -mb-20 blur-3xl pointer-events-none" />
-              <div className="relative z-10 flex flex-col items-center text-center">
-                <h3 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mb-6 leading-tight">
-                  Prêt à changer de dimension ?
-                </h3>
-                <p className="text-green-50/80 text-lg mb-12 max-w-xl mx-auto">
-                  Rejoignez les talents qui transforment l&apos;économie numérique en Afrique de l&apos;Ouest dès aujourd&apos;hui.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-                  <a href="/signup" className="px-10 py-5 bg-white text-[#6B9B5F] font-bold text-lg rounded-2xl hover:bg-gray-50 transition-all hover:scale-105 shadow-xl text-center">
-                    Lancer ma recherche gratuite
-                  </a>
-                  <a href="/signin" className="px-8 py-5 bg-transparent border-2 border-white/30 text-white font-bold text-lg rounded-2xl hover:bg-white/10 transition-all text-center">
-                    Se connecter
-                  </a>
-                </div>
-              </div>
-            </div>
-          </AnimateOnScroll>
         </div>
       </section>
 
@@ -1281,9 +1313,9 @@ export default function Home() {
                             </div>
                             {/* Match candidates */}
                             {[
-                              { name: 'Kofi Mensah', role: 'Dev Full Stack', score: 94, loc: 'Abidjan', photo: 'https://images.unsplash.com/photo-1668752741330-8adc5cef7485?w=80&h=80&fit=crop&crop=face' },
-                              { name: 'Aissatou Ba', role: 'Data Analyst', score: 89, loc: 'Dakar', photo: 'https://images.unsplash.com/photo-1770191954675-06f770e6cbd0?w=80&h=80&fit=crop&crop=face' },
-                              { name: 'Ibrahim Traore', role: 'DevOps Engineer', score: 85, loc: 'Douala', photo: 'https://images.unsplash.com/photo-1703059680709-d9554370fff9?w=80&h=80&fit=crop&crop=face' },
+                              { name: 'Kofi Mensah', role: 'Dev Full Stack', score: 94, loc: 'Abidjan', photo: '/candidates/kofi-mensah.jpeg' },
+                              { name: 'Aissatou Ba', role: 'Data Analyst', score: 89, loc: 'Dakar', photo: '/candidates/aissatou-ba.jpeg' },
+                              { name: 'Ibrahim Traore', role: 'DevOps Engineer', score: 85, loc: 'Douala', photo: '/candidates/ibrahim-traore.jpeg' },
                             ].map((c, j) => (
                               <div
                                 key={j}
@@ -1292,7 +1324,7 @@ export default function Home() {
                                 <img
                                   src={c.photo}
                                   alt={c.name}
-                                  className="w-10 h-10 rounded-full object-cover object-top border-2 border-white shadow-sm hidden md:block"
+                                  className="w-10 h-10 rounded-full object-cover object-center border-2 border-white shadow-sm hidden md:block"
                                   loading="lazy"
                                   decoding="async"
                                   width={40}
@@ -1530,60 +1562,163 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ═══════════════════════ SECURITY ═══════════════════════ */}
-      <section id="security" className="py-20 lg:py-28 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <AnimateOnScroll className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-50 border border-green-200/60 text-sm font-semibold text-[#6B9B5F] mb-4">
-              <IconShield className="w-4 h-4" />
-              Securite
+      {/* ═══════════════════════ HOW IT WORKS ═══════════════════════ */}
+      <section id="how-it-works" className="py-24 lg:py-32 bg-white relative overflow-hidden">
+        {/* Decorative Background Blobs */}
+        <div className="absolute top-1/4 -left-64 w-[500px] h-[500px] bg-[#6B9B5F]/5 rounded-full blur-[100px]" />
+        <div className="absolute bottom-1/4 -right-64 w-[500px] h-[500px] bg-[#7C3AED]/5 rounded-full blur-[100px]" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <AnimateOnScroll className="text-center mb-16 lg:mb-24">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-50 border border-green-100 text-sm font-bold text-[#6B9B5F] mb-6">
+              <IconSparkles className="w-4 h-4" />
+              PROCESSUS DE RÉUSSITE
             </div>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
-              Vos donnees sont en securite
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-tight mb-6">
+              Votre carrière propulsée par <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6B9B5F] to-[#93C587]">l&apos;IA</span>
             </h2>
-            <p className="mt-4 text-lg text-gray-500 max-w-2xl mx-auto">
-              Nous appliquons les standards les plus exigeants pour proteger
-              les donnees de vos candidats et de votre entreprise.
+            <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+              Connectez-vous aux meilleures opportunités d&apos;Afrique de l&apos;Ouest en 3 étapes intelligentes.
             </p>
           </AnimateOnScroll>
 
-          {/* Photo de confiance - desktop uniquement */}
-          <div className="relative mb-10 hidden lg:block overflow-hidden rounded-2xl">
-            <img
-              src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=1400&h=320&fit=crop&q=80"
-              alt="Professionnelle de confiance"
-              className="w-full h-40 object-cover object-top opacity-60"
-              loading="lazy"
-              decoding="async"
-              width={1400}
-              height={320}
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-gray-50 via-gray-50/60 to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-t from-gray-50 via-transparent to-gray-50/40" />
+          {/* Progress Timeline (Desktop) */}
+          <div className="hidden lg:flex items-center justify-between max-w-4xl mx-auto mb-16 relative">
+            <div className="absolute left-0 right-0 h-0.5 bg-gray-100 top-1/2 -translate-y-1/2" />
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="relative z-10 w-4 h-4 rounded-full bg-white border-4 border-[#6B9B5F] shadow-[0_0_15px_rgba(107,155,95,0.4)] animate-pulse-soft" />
+            ))}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {securityCards.map((card, i) => {
-              const CardIcon = securityIcons[card.icon];
-              return (
-                <AnimateOnScroll
-                  key={i}
-                  delay={i * 100}
-                  className="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-[#6B9B5F]/30 hover:shadow-lg hover:shadow-green-500/5 hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300"
-                >
-                  <div className="w-12 h-12 rounded-xl bg-[#6B9B5F]/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <CardIcon className="w-6 h-6 text-[#6B9B5F]" />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-24">
+            {/* Étape 1 */}
+            <AnimateOnScroll delay={0}>
+              <div className="group relative h-full p-8 rounded-[2rem] bg-white border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 overflow-hidden">
+                <span className="absolute -top-6 -right-4 text-9xl font-black text-gray-50/80 pointer-events-none transition-transform group-hover:scale-110 select-none">01</span>
+                <div className="relative z-10">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#6B9B5F] to-[#93C587] flex items-center justify-center text-white mb-6 shadow-lg shadow-green-100">
+                    <IconUser className="w-7 h-7" />
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">
-                    {card.title}
-                  </h3>
-                  <p className="text-sm text-gray-500 leading-relaxed">
-                    {card.description}
-                  </p>
-                </AnimateOnScroll>
-              );
-            })}
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">Créez votre profil</h3>
+                  <p className="text-gray-600 mb-8 leading-relaxed">Importez votre CV. Notre IA extrait vos compétences pour bâtir un profil attractif.</p>
+                  {/* Inline Mockup 1 */}
+                  <div className="p-5 rounded-2xl bg-gray-50/80 border border-gray-100">
+                    <div className="flex items-center gap-3 mb-4">
+                      <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&q=80" className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm" alt="Amadou" loading="lazy" />
+                      <div className="flex-1">
+                        <div className="h-2.5 w-24 bg-gray-200 rounded-full mb-1.5" />
+                        <div className="h-2 w-16 bg-gray-100 rounded-full" />
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="flex justify-between text-[10px] font-bold text-[#6B9B5F] uppercase">
+                        <span>Complétion</span>
+                        <span>85%</span>
+                      </div>
+                      <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-[#6B9B5F] to-[#93C587] rounded-full w-[85%]" />
+                      </div>
+                      <div className="flex flex-wrap gap-1.5 pt-1">
+                        {['React.js', 'UI/UX', 'Python'].map(t => (
+                          <span key={t} className="px-2 py-0.5 text-[10px] bg-white border border-gray-100 rounded-md font-medium text-gray-500">{t}</span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </AnimateOnScroll>
+
+            {/* Étape 2 */}
+            <AnimateOnScroll delay={150}>
+              <div className="group relative h-full p-8 rounded-[2rem] bg-white border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 overflow-hidden">
+                <span className="absolute -top-6 -right-4 text-9xl font-black text-gray-50/80 pointer-events-none select-none">02</span>
+                <div className="relative z-10">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#7C3AED] to-[#A78BFA] flex items-center justify-center text-white mb-6 shadow-lg shadow-purple-100">
+                    <IconSparkles className="w-7 h-7" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">L&apos;IA trouve vos matchs</h3>
+                  <p className="text-gray-600 mb-8 leading-relaxed">Notre algorithme analyse en temps réel des milliers d&apos;offres pour vous proposer le match parfait.</p>
+                  {/* Inline Mockup 2 */}
+                  <div className="space-y-3">
+                    {[
+                      { n: 'Orange CI', s: 94, loc: 'Abidjan' },
+                      { n: 'Ecobank Group', s: 89, loc: 'Lomé' },
+                      { n: 'MTN Sénégal', s: 85, loc: 'Dakar' },
+                    ].map((m, idx) => (
+                      <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-gray-50/50 border border-gray-100">
+                        <div>
+                          <span className="text-xs font-bold text-gray-900 block">{m.n}</span>
+                          <span className="text-[10px] text-gray-500">{m.loc}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-[#7C3AED]">{m.s}%</span>
+                          <div className="w-1 h-6 bg-[#7C3AED]/20 rounded-full overflow-hidden flex flex-col justify-end">
+                            <div className="w-full bg-[#7C3AED] rounded-full" style={{ height: `${m.s}%` }} />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </AnimateOnScroll>
+
+            {/* Étape 3 */}
+            <AnimateOnScroll delay={300}>
+              <div className="group relative h-full p-8 rounded-[2rem] bg-white border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 overflow-hidden">
+                <span className="absolute -top-6 -right-4 text-9xl font-black text-gray-50/80 pointer-events-none select-none">03</span>
+                <div className="relative z-10">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#F59E0B] to-[#FBBF24] flex items-center justify-center text-white mb-6 shadow-lg shadow-amber-100">
+                    <IconSend className="w-7 h-7" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">Décrochez le poste</h3>
+                  <p className="text-gray-600 mb-8 leading-relaxed">Suivez vos candidatures, discutez avec les recruteurs et planifiez vos entretiens.</p>
+                  {/* Inline Mockup 3 */}
+                  <div className="p-4 rounded-2xl bg-[#6B9B5F]/5 border border-[#6B9B5F]/10">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center border border-gray-100 shadow-sm">
+                        <IconCalendar className="w-4 h-4 text-[#6B9B5F]" />
+                      </div>
+                      <span className="text-xs font-bold text-gray-900">Entretien Confirmé</span>
+                    </div>
+                    <div className="flex items-center gap-3 pt-3 border-t border-[#6B9B5F]/10">
+                      <div className="w-8 h-8 rounded-lg bg-[#FF6600] flex items-center justify-center text-white text-[10px] font-black shrink-0">O</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[11px] font-bold text-gray-900 truncate">Orange Côte d&apos;Ivoire</div>
+                        <div className="text-[9px] text-gray-500">Mardi 25 Mars — 14h00</div>
+                      </div>
+                      <div className="px-2 py-0.5 rounded-full bg-[#6B9B5F] text-[9px] font-bold text-white shrink-0">OK</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </AnimateOnScroll>
           </div>
+
+          {/* Final CTA Banner */}
+          <AnimateOnScroll delay={450}>
+            <div className="relative p-8 sm:p-16 rounded-[3rem] bg-gradient-to-br from-[#6B9B5F] to-[#4B7340] overflow-hidden shadow-2xl shadow-green-200">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl pointer-events-none" />
+              <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/10 rounded-full -ml-20 -mb-20 blur-3xl pointer-events-none" />
+              <div className="relative z-10 flex flex-col items-center text-center">
+                <h3 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mb-6 leading-tight">
+                  Prêt à changer de dimension ?
+                </h3>
+                <p className="text-green-50/80 text-lg mb-12 max-w-xl mx-auto">
+                  Rejoignez les talents qui transforment l&apos;économie numérique en Afrique de l&apos;Ouest dès aujourd&apos;hui.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                  <a href="/signup" className="px-10 py-5 bg-white text-[#6B9B5F] font-bold text-lg rounded-2xl hover:bg-gray-50 transition-all hover:scale-105 shadow-xl text-center">
+                    Lancer ma recherche gratuite
+                  </a>
+                  <a href="/signin" className="px-8 py-5 bg-transparent border-2 border-white/30 text-white font-bold text-lg rounded-2xl hover:bg-white/10 transition-all text-center">
+                    Se connecter
+                  </a>
+                </div>
+              </div>
+            </div>
+          </AnimateOnScroll>
         </div>
       </section>
 
@@ -1679,99 +1814,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ═══════════════════════ ENTREPRISES PARTENAIRES ═══════════════════════ */}
-      <section className="relative py-24 lg:py-32 overflow-hidden bg-white">
-        {/* Background Decorative Blobs */}
-        <div className="absolute top-1/4 -left-20 w-96 h-96 bg-[#6B9B5F]/5 rounded-full blur-3xl -z-10 animate-pulse" />
-        <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-[#7C3AED]/5 rounded-full blur-3xl -z-10" />
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <AnimateOnScroll className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200/60 shadow-sm text-sm font-semibold text-[#6B9B5F] mb-6">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
-              ÉCOSYSTÈME PARTENAIRE
-            </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 tracking-tight">
-              Entreprises qui <span className="text-[#6B9B5F]">recrutent</span>
-            </h2>
-            <p className="mt-6 text-lg text-gray-600 max-w-2xl mx-auto">
-              Rejoignez les leaders du marché qui font confiance à INTOWORK pour bâtir leurs équipes de demain.
-            </p>
-          </AnimateOnScroll>
-
-          {loadingJobs ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-16">
-              {[...Array(8)].map((_, i) => (
-                <div key={i} className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm animate-pulse">
-                  <div className="w-20 h-20 rounded-full bg-gray-100 mx-auto mb-6" />
-                  <div className="h-4 bg-gray-100 rounded-full w-3/4 mx-auto mb-3" />
-                  <div className="h-3 bg-gray-50 rounded-full w-1/2 mx-auto" />
-                </div>
-              ))}
-            </div>
-          ) : companies.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-16">
-              {companies.map((company, idx) => {
-                const gradients = [
-                  'from-[#6B9B5F] to-[#93C587]',
-                  'from-[#7C3AED] to-[#A78BFA]',
-                  'from-[#003DA5] to-[#60A5FA]',
-                  'from-[#F59E0B] to-[#FCD34D]',
-                  'from-[#10B981] to-[#6EE7B7]'
-                ];
-                const gradient = gradients[idx % gradients.length];
-
-                return (
-                  <Link
-                    key={company.name}
-                    href="/entreprises"
-                    className="group relative bg-white rounded-2xl p-8 border border-gray-100 hover:border-[#6B9B5F]/30 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 text-center"
-                  >
-                    <div className={`w-20 h-20 rounded-full bg-gradient-to-br ${gradient} flex items-center justify-center mx-auto mb-6 shadow-lg shadow-gray-200 group-hover:scale-110 transition-transform duration-500`}>
-                      <span className="text-2xl font-bold text-white">
-                        {company.name.charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                    <h3 className="text-base font-bold text-gray-900 mb-2 group-hover:text-[#6B9B5F] transition-colors truncate">
-                      {company.name}
-                    </h3>
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-50 text-xs font-medium text-gray-500 group-hover:bg-green-50 group-hover:text-[#6B9B5F] transition-colors">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#6B9B5F] animate-pulse" />
-                      {company.count} offre{company.count > 1 ? 's' : ''} active{company.count > 1 ? 's' : ''}
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="max-w-2xl mx-auto mb-16 text-center py-20 px-8 rounded-3xl border-2 border-dashed border-gray-100 bg-gray-50/50">
-              <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm border border-gray-50">
-                <svg className="w-10 h-10 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-              </div>
-              <h4 className="text-lg font-bold text-gray-900 mb-2">Bientôt disponible</h4>
-              <p className="text-gray-500">Les entreprises apparaitront ici dès qu&apos;elles auront publié leurs premières offres.</p>
-            </div>
-          )}
-
-          <div className="flex justify-center">
-            <Link
-              href="/entreprises"
-              className="group relative inline-flex items-center gap-3 px-10 py-4 text-base font-bold text-white bg-[#6B9B5F] hover:bg-[#5A8A4E] rounded-2xl transition-all duration-300 shadow-lg shadow-[#6B9B5F]/20 hover:shadow-xl hover:shadow-[#6B9B5F]/30 overflow-hidden"
-            >
-              <span className="relative z-10">Parcourir toutes les entreprises</span>
-              <svg className="relative z-10 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-              <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
       {/* ═══════════════════════ TESTIMONIALS ═══════════════════════ */}
       <section id="testimonials" className="py-20 lg:py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1837,6 +1879,63 @@ export default function Home() {
                 </div>
               </AnimateOnScroll>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════ SECURITY ═══════════════════════ */}
+      <section id="security" className="py-20 lg:py-28 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <AnimateOnScroll className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-50 border border-green-200/60 text-sm font-semibold text-[#6B9B5F] mb-4">
+              <IconShield className="w-4 h-4" />
+              Securite
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
+              Vos donnees sont en securite
+            </h2>
+            <p className="mt-4 text-lg text-gray-500 max-w-2xl mx-auto">
+              Nous appliquons les standards les plus exigeants pour proteger
+              les donnees de vos candidats et de votre entreprise.
+            </p>
+          </AnimateOnScroll>
+
+          {/* Photo de confiance - desktop uniquement */}
+          <div className="relative mb-10 hidden lg:block overflow-hidden rounded-2xl">
+            <img
+              src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=1400&h=320&fit=crop&q=80"
+              alt="Professionnelle de confiance"
+              className="w-full h-40 object-cover object-top opacity-60"
+              loading="lazy"
+              decoding="async"
+              width={1400}
+              height={320}
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-gray-50 via-gray-50/60 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-gray-50 via-transparent to-gray-50/40" />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {securityCards.map((card, i) => {
+              const CardIcon = securityIcons[card.icon];
+              return (
+                <AnimateOnScroll
+                  key={i}
+                  delay={i * 100}
+                  className="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-[#6B9B5F]/30 hover:shadow-lg hover:shadow-green-500/5 hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300"
+                >
+                  <div className="w-12 h-12 rounded-xl bg-[#6B9B5F]/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <CardIcon className="w-6 h-6 text-[#6B9B5F]" />
+                  </div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">
+                    {card.title}
+                  </h3>
+                  <p className="text-sm text-gray-500 leading-relaxed">
+                    {card.description}
+                  </p>
+                </AnimateOnScroll>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -1995,60 +2094,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ═══════════════════════ COUNTRIES BANNER ═══════════════════════ */}
-      <section className="py-20 lg:py-28 border-t border-gray-50 bg-white overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
-          <div className="flex flex-col items-center text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F0F7EE] border border-[#6B9B5F]/20 mb-6">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#6B9B5F] opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#6B9B5F]"></span>
-              </span>
-              <span className="text-xs font-semibold uppercase tracking-widest text-[#6B9B5F]">
-                Expansion Afrique
-              </span>
-            </div>
-            <h2 className="text-2xl md:text-4xl font-bold text-gray-900 tracking-tight">
-              Présent dans <span className="text-[#6B9B5F] relative inline-block">
-                15+ pays
-                <span className="absolute -bottom-1 left-0 w-full h-1 bg-[#6B9B5F]/20 rounded-full"></span>
-              </span> francophones
-            </h2>
-          </div>
-        </div>
-
-        <div className="relative">
-          <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-white to-transparent z-10 hidden md:block"></div>
-          <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-white to-transparent z-10 hidden md:block"></div>
-
-          <div className="flex overflow-hidden">
-            <div className="flex gap-6 py-4 scroll-left-track" style={{ minWidth: 'max-content' }}>
-              {[...countries, ...countries, ...countries].map((c, i) => (
-                <div
-                  key={i}
-                  className={`flex items-center gap-4 px-6 py-4 bg-white rounded-full border shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 cursor-default whitespace-nowrap ${
-                    [
-                      'border-emerald-100 hover:border-emerald-300',
-                      'border-blue-100 hover:border-blue-300',
-                      'border-amber-100 hover:border-amber-300',
-                      'border-rose-100 hover:border-rose-300',
-                      'border-indigo-100 hover:border-indigo-300'
-                    ][i % 5]
-                  }`}
-                >
-                  <img
-                    src={`https://flagcdn.com/w40/${c.code}.png`}
-                    alt={c.name}
-                    className="w-8 h-6 object-cover rounded-md shadow-sm border border-gray-100 flex-shrink-0"
-                  />
-                  <span className="text-sm font-bold text-gray-900 tracking-tight whitespace-nowrap">{c.name}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* ═══════════════════════ FOOTER ═══════════════════════ */}
       <footer className="bg-gray-900 text-white pt-16 lg:pt-20 pb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -2059,7 +2104,7 @@ export default function Home() {
                 <img
                   src="/logo-intowork.png"
                   alt="INTOWORK"
-                  className="h-24 w-auto brightness-0 invert"
+                  className="h-28 w-auto brightness-0 invert"
                 />
               </Link>
               <p className="text-sm text-gray-400 leading-relaxed mb-4">

@@ -1,0 +1,19 @@
+{
+  "audit_id": "signin_page_20260324_110000",
+  "target": "frontend/src/app/signin/page.tsx",
+  "wcag_level": "A",
+  "focus_areas": ["all"],
+  "status": "complete",
+  "started_at": "2026-03-24T11:00:00Z",
+  "completed_at": "2026-03-24T11:05:00Z",
+  "files_audited": 2,
+  "compliance_status": "needs_improvement",
+  "issues_found": {
+    "critical": 2,
+    "serious": 3,
+    "moderate": 2,
+    "minor": 1
+  },
+  "criteria_checked": 12,
+  "criteria_passed": 6
+}
