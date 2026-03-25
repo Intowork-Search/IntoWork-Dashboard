@@ -98,3 +98,13 @@ deployment-secrets.txt
 
 # MCP configuration (contains API keys)
 .mcp.json
+
+# Claude Code - fichiers locaux (settings machine + worktrees temporaires)
+.claude/settings.local.json
+.claude/settings.json
+.claude/worktrees/
+
+# Captures d'écran et images de debug à la racine du projet
+/*.jpeg
+/*.jpg
+/*.png

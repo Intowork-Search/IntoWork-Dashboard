@@ -398,6 +398,8 @@ const statIcons: Record<string, React.FC<{ className?: string }>> = {
   zap: IconZap,
 };
 
+const typewriterPhrases = ['Développeur Full-Stack', 'Chef de Projet', 'Comptable', 'Designer UX', 'Commercial B2B'];
+
 /* ═══════════════════════════════════════════════════════════════
    ANIMATION UTILITIES
    ═══════════════════════════════════════════════════════════════ */
@@ -473,6 +475,14 @@ export default function Home() {
   const [loadingJobs, setLoadingJobs] = useState(false);
   const [statsVisible, setStatsVisible] = useState(false);
   const statsRef = useRef<HTMLDivElement>(null);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [searchJob, setSearchJob] = useState('');
+  const [searchLocation, setSearchLocation] = useState('');
+  const [searchContract, setSearchContract] = useState('');
+  const [searchPlaceholder, setSearchPlaceholder] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [placeholderIndex, setPlaceholderIndex] = useState(0);
+  const [charIndex, setCharIndex] = useState(0);
   const { isLoaded, isSignedIn } = useUser();
   const router = useRouter();
 
@@ -516,6 +526,33 @@ export default function Home() {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Typewriter effect for search bar placeholder
+  useEffect(() => {
+    const currentPhrase = typewriterPhrases[placeholderIndex];
+    let timeout: ReturnType<typeof setTimeout>;
+    if (!isDeleting) {
+      if (charIndex < currentPhrase.length) {
+        timeout = setTimeout(() => {
+          setSearchPlaceholder(currentPhrase.slice(0, charIndex + 1));
+          setCharIndex(c => c + 1);
+        }, 80);
+      } else {
+        timeout = setTimeout(() => setIsDeleting(true), 1800);
+      }
+    } else {
+      if (charIndex > 0) {
+        timeout = setTimeout(() => {
+          setSearchPlaceholder(currentPhrase.slice(0, charIndex - 1));
+          setCharIndex(c => c - 1);
+        }, 40);
+      } else {
+        setIsDeleting(false);
+        setPlaceholderIndex(i => (i + 1) % typewriterPhrases.length);
+      }
+    }
+    return () => clearTimeout(timeout);
+  }, [charIndex, isDeleting, placeholderIndex]);
 
   useEffect(() => {
     const el = statsRef.current;
@@ -698,12 +735,12 @@ export default function Home() {
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16 lg:h-18">
+          <div className="flex justify-between items-center h-16">
             <Link href="/" className="flex items-center gap-2 shrink-0">
               <img
                 src="/logo-intowork.png"
                 alt="INTOWORK"
-                className="h-12 sm:h-14 lg:h-16 w-auto"
+                className="h-auto w-28 sm:w-32 lg:w-40 object-contain"
               />
             </Link>
 
@@ -808,7 +845,7 @@ export default function Home() {
       </nav>
 
       {/* ═══════════════════════ HERO ═══════════════════════ */}
-      <section className="relative pt-24 sm:pt-28 lg:pt-32 pb-12 lg:pb-20 overflow-hidden">
+      <section className="relative pt-24 sm:pt-28 lg:pt-32 pb-12 lg:pb-24 overflow-hidden">
         {/* Background gradients */}
         <div className="absolute inset-0 bg-gradient-to-b from-white via-green-50/40 to-white pointer-events-none" />
         <div className="absolute top-20 right-0 w-[600px] h-[600px] bg-[#6B9B5F]/5 rounded-full blur-3xl pointer-events-none" />
@@ -816,86 +853,42 @@ export default function Home() {
         <div className="absolute top-1/2 right-1/4 w-[300px] h-[300px] bg-[#F59E0B]/5 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:grid lg:grid-cols-12 lg:gap-12 lg:items-center">
+          {/* ZONE 1: TOP CONTENT + MOCKUP */}
+          <div className="lg:grid lg:grid-cols-12 lg:gap-16 lg:items-center mb-16 lg:mb-24">
 
-            {/* --- LEFT COLUMN: CONTENT --- */}
-            <div className="lg:col-span-6 text-center lg:text-left mb-12 lg:mb-0">
-              {/* Heading */}
+            {/* --- LEFT COLUMN: HEADING --- */}
+            <div className="lg:col-span-7 text-center lg:text-left mb-16 lg:mb-0">
               <h1
-                className="text-4xl sm:text-5xl lg:text-5xl xl:text-6xl font-extrabold tracking-tight text-gray-900 leading-[1.1] animate-fade-in-up delay-100"
+                className="mt-8 text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-gray-900 leading-[1.05] animate-fade-in-up delay-200"
                 style={{ opacity: 0, animationFillMode: 'forwards' }}
               >
-                La plateforme de recrutement{' '}
-                <span className="animate-shimmer">qui comprend l&apos;Afrique</span>
+                Le recrutement{' '}
+                <span className="animate-shimmer block sm:inline">qui comprend l&apos;Afrique</span>
               </h1>
 
               <p
-                className="mt-6 text-lg sm:text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto lg:mx-0 animate-fade-in-up delay-200"
+                className="mt-8 text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto lg:mx-0 animate-fade-in-up delay-300"
                 style={{ opacity: 0, animationFillMode: 'forwards' }}
               >
                 Connectez les meilleurs talents aux entreprises les plus ambitieuses
-                dans plus de 15 pays francophones.
+                dans plus de 15 pays francophones grâce au matching intelligent.
               </p>
-
-              {/* Dual CTAs */}
-              <div
-                className="mt-10 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 animate-fade-in-up delay-300"
-                style={{ opacity: 0, animationFillMode: 'forwards' }}
-              >
-                <Link
-                  href="/signup"
-                  className="w-full sm:w-auto group inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-bold text-white bg-[#6B9B5F] hover:bg-[#5A8A4E] rounded-2xl shadow-lg shadow-green-500/20 hover:shadow-xl hover:shadow-green-500/30 transition-all duration-300 hover:-translate-y-0.5"
-                >
-                  <IconBriefcase className="w-5 h-5" />
-                  Espace Recruteur
-                  <IconArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
-                <Link
-                  href="/signup"
-                  className="w-full sm:w-auto group inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-bold text-[#6B9B5F] bg-white hover:bg-green-50 border-2 border-[#6B9B5F]/20 hover:border-[#6B9B5F]/40 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5"
-                >
-                  <IconUser className="w-5 h-5" />
-                  Espace Candidat
-                  <IconArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </div>
-
-              {/* Avatar Stack Trust Strip */}
-              <div className="mt-12 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 animate-fade-in-up delay-400" style={{ opacity: 0, animationFillMode: 'forwards' }}>
-                <div className="flex -space-x-3">
-                  {[
-                    "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=400&q=80",
-                    "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?w=400&q=80",
-                    "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&q=80",
-                    "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80",
-                    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80"
-                  ].map((url, i) => (
-                    <img key={i} src={url} className="w-10 h-10 rounded-full border-2 border-white shadow-sm object-cover" alt="User avatar" />
-                  ))}
-                </div>
-                <p className="text-sm text-gray-500 font-medium text-center sm:text-left">
-                  Rejoint par <span className="text-gray-900 font-bold">10 000+ candidats</span> dans 500+ entreprises et 15 pays
-                </p>
-              </div>
             </div>
 
             {/* --- RIGHT COLUMN: INTERACTIVE MOCKUP --- */}
-            <div className="lg:col-span-6 relative animate-hero-mockup delay-500" style={{ opacity: 0, animationFillMode: 'forwards' }}>
+            <div className="lg:col-span-5 relative animate-hero-mockup delay-500" style={{ opacity: 0, animationFillMode: 'forwards' }}>
 
               {/* OVERLAY: Portrait Photo */}
-              <div className="hidden lg:block absolute -left-14 -top-4 z-30 animate-slide-in-left-hero delay-1000" style={{ opacity: 0, animationFillMode: 'forwards' }}>
-                <div className="relative group">
-                  <div className="absolute -inset-4 bg-[#6B9B5F]/20 rounded-[2.5rem] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                  <img
-                    src="https://images.unsplash.com/photo-1739300293504-234817eead52?w=400&h=560&fit=crop&crop=top&q=80"
-                    className="w-44 h-64 object-cover rounded-3xl shadow-[0_20px_40px_rgba(0,0,0,0.2)] border-[6px] border-white relative z-10"
-                    alt="Candidate"
-                  />
-                </div>
+              <div className="hidden lg:block absolute -left-16 -top-8 z-30 animate-slide-in-left-hero delay-1000" style={{ opacity: 0, animationFillMode: 'forwards' }}>
+                <img
+                  src="https://images.unsplash.com/photo-1739300293504-234817eead52?w=400&h=560&fit=crop&crop=top&q=80"
+                  className="w-40 h-56 object-cover rounded-3xl shadow-[0_20px_40px_rgba(0,0,0,0.2)] border-[6px] border-white relative z-10"
+                  alt="Candidate"
+                />
               </div>
 
               {/* OVERLAY: Notification Toast */}
-              <div className="hidden lg:block absolute -top-8 -right-8 z-40 w-72 notification-slide-in" style={{ opacity: 0, animationFillMode: 'forwards' }}>
+              <div className="hidden lg:block absolute -top-12 -right-4 z-40 w-72 notification-slide-in" style={{ opacity: 0, animationFillMode: 'forwards' }}>
                 <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-[0_20px_40px_rgba(0,0,0,0.12)] border border-white p-4">
                   <div className="flex items-start gap-3">
                     <div className="relative shrink-0">
@@ -918,7 +911,7 @@ export default function Home() {
               </div>
 
               {/* OVERLAY: AI Match Card */}
-              <div className="hidden lg:block absolute -bottom-12 -left-10 z-40 animate-fade-in-up delay-700" style={{ opacity: 0, animationFillMode: 'forwards' }}>
+              <div className="hidden lg:block absolute -bottom-12 -left-10 z-40 animate-fade-in-up delay-400" style={{ opacity: 0, animationFillMode: 'forwards' }}>
                 <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-[0_20px_40px_rgba(0,0,0,0.15)] border border-white p-4 w-60">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
@@ -943,11 +936,8 @@ export default function Home() {
 
               {/* Main Mockup */}
               <div className="relative hero-mockup-3d">
-                {/* Intense Green Glow */}
-                <div className="absolute -inset-10 bg-[#6B9B5F]/20 rounded-[3rem] blur-[80px] pointer-events-none" />
-
-                <div className="relative bg-white rounded-2xl border border-gray-200/80 shadow-[0_32px_64px_rgba(107,155,95,0.25)] overflow-hidden">
-                  {/* Browser Chrome */}
+                <div className="absolute -inset-10 bg-[#6B9B5F]/15 rounded-[3rem] blur-[80px] pointer-events-none" />
+                <div className="relative bg-white rounded-2xl border border-gray-200/80 shadow-[0_32px_64px_rgba(107,155,95,0.2)] overflow-hidden">
                   <div className="flex items-center gap-2 px-4 py-3 bg-gray-50 border-b border-gray-200">
                     <div className="flex gap-1.5">
                       <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
@@ -961,8 +951,6 @@ export default function Home() {
                       </div>
                     </div>
                   </div>
-
-                  {/* Dashboard Header */}
                   <div className="p-5">
                     <div className="bg-gradient-to-r from-[#6B9B5F] to-[#93C587] rounded-xl p-5 mb-5 shadow-sm">
                       <div className="flex items-center justify-between">
@@ -976,8 +964,6 @@ export default function Home() {
                         </div>
                       </div>
                     </div>
-
-                    {/* Stats Grid */}
                     <div className="grid grid-cols-2 gap-3">
                       {[
                         { label: 'Profil complet', value: '85%', color: '#6B9B5F' },
@@ -997,6 +983,139 @@ export default function Home() {
             </div>
 
           </div>
+
+          {/* ZONE 2: SEARCH BAR PLEINE LARGEUR */}
+          <div className="max-w-5xl mx-auto animate-fade-in-up delay-400" style={{ opacity: 0, animationFillMode: 'forwards' }}>
+            <div className="mb-6 flex items-center justify-center gap-2">
+              <span className="w-8 h-[1.5px] bg-[#6B9B5F]/30 rounded-full"></span>
+              <span className="px-3 py-1 rounded-full bg-[#6B9B5F]/10 text-[11px] font-extrabold text-[#6B9B5F] uppercase tracking-wider">
+                Recherchez parmi +2 500 offres actives
+              </span>
+              <span className="w-8 h-[1.5px] bg-[#6B9B5F]/30 rounded-full"></span>
+            </div>
+
+            <div className="bg-white/95 backdrop-blur-2xl p-2 lg:p-3 rounded-[2.5rem] border border-white shadow-[0_32px_80px_-15px_rgba(0,0,0,0.12)] hover:shadow-[0_40px_100px_-10px_rgba(107,155,95,0.2)] transition-all duration-500 group relative ring-4 ring-[#6B9B5F]/5">
+              <div className="flex flex-col lg:flex-row items-stretch lg:items-center">
+                {/* Field 1: Job */}
+                <div className="flex-[1.5] relative flex items-center px-6 py-4 lg:py-3 border-b lg:border-b-0 lg:border-r border-gray-100">
+                  <div className="flex-shrink-0 text-gray-400 group-hover:text-[#6B9B5F] transition-colors duration-300">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <div className="ml-4 flex-1">
+                    <label className="block text-[9px] font-extrabold text-gray-400 uppercase tracking-widest mb-1">Métier ou compétence</label>
+                    <input
+                      type="text"
+                      value={searchJob}
+                      onChange={(e) => setSearchJob(e.target.value)}
+                      placeholder={searchPlaceholder || 'Développeur, Chef de projet...'}
+                      className="w-full bg-transparent border-none p-0 focus:ring-0 text-gray-900 placeholder-gray-400 font-bold text-base outline-none"
+                    />
+                  </div>
+                </div>
+
+                {/* Field 2: Location */}
+                <div className="flex-1 relative flex items-center px-6 py-4 lg:py-3 border-b lg:border-b-0 lg:border-r border-gray-100">
+                  <div className="flex-shrink-0 text-gray-400 group-hover:text-[#6B9B5F] transition-colors duration-300">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
+                  <div className="ml-4 flex-1">
+                    <label className="block text-[9px] font-extrabold text-gray-400 uppercase tracking-widest mb-1">Localisation</label>
+                    <input
+                      type="text"
+                      value={searchLocation}
+                      onChange={(e) => setSearchLocation(e.target.value)}
+                      placeholder="Abidjan, Dakar..."
+                      className="w-full bg-transparent border-none p-0 focus:ring-0 text-gray-900 placeholder-gray-400 font-bold text-base outline-none"
+                    />
+                  </div>
+                </div>
+
+                {/* Field 3: Contract */}
+                <div className="flex-1 relative flex items-center px-6 py-4 lg:py-3">
+                  <div className="flex-shrink-0 text-gray-400 group-hover:text-[#6B9B5F] transition-colors duration-300">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <div className="ml-4 flex-1 pr-4">
+                    <label className="block text-[9px] font-extrabold text-gray-400 uppercase tracking-widest mb-1">Type de contrat</label>
+                    <select
+                      value={searchContract}
+                      onChange={(e) => setSearchContract(e.target.value)}
+                      className="w-full bg-transparent border-none p-0 focus:ring-0 text-gray-900 font-bold text-base cursor-pointer appearance-none outline-none"
+                    >
+                      <option value="">Tous les types</option>
+                      <option value="CDI">CDI</option>
+                      <option value="CDD">CDD</option>
+                      <option value="Stage">Stage</option>
+                      <option value="Freelance">Freelance</option>
+                      <option value="Alternance">Alternance</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* CTA */}
+                <div className="p-1 lg:p-0 lg:ml-2">
+                  <Link
+                    href={`/offres?job=${encodeURIComponent(searchJob)}&location=${encodeURIComponent(searchLocation)}&contract=${encodeURIComponent(searchContract)}`}
+                    className="flex items-center justify-center gap-3 w-full lg:w-auto px-12 py-5 text-base font-bold text-white bg-[#6B9B5F] hover:bg-[#5A8A4E] rounded-3xl transition-all duration-300 shadow-lg shadow-green-500/25 active:scale-95 group/btn"
+                  >
+                    <svg className="w-5 h-5 transition-transform duration-300 group-hover/btn:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <span>Rechercher</span>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ZONE 3: SOCIAL PROOF + CTAs */}
+          <div className="mt-14 flex flex-col lg:flex-row items-center justify-between gap-8 animate-fade-in-up delay-500" style={{ opacity: 0, animationFillMode: 'forwards' }}>
+            <div className="flex flex-col sm:flex-row items-center gap-5">
+              <div className="flex -space-x-3">
+                {[
+                  "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=100&q=80",
+                  "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?w=100&q=80",
+                  "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&q=80",
+                  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80",
+                  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80"
+                ].map((url, i) => (
+                  <img key={i} src={url} className="w-10 h-10 rounded-full border-2 border-white shadow-md object-cover" alt="Avatar" />
+                ))}
+              </div>
+              <p className="text-sm text-gray-500 font-semibold text-center sm:text-left">
+                Rejoint par <span className="text-gray-900 font-extrabold">+10 000 candidats</span> & <span className="text-gray-900 font-extrabold">500+ entreprises</span>
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-center gap-4 lg:gap-6">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#7C3AED]/5 border border-[#7C3AED]/10 text-[11px] font-bold text-[#7C3AED]">
+                <IconSparkles className="w-3.5 h-3.5" /> Matching IA 94%
+              </div>
+              <div className="w-[1px] h-5 bg-gray-200 hidden lg:block"></div>
+              <div className="flex items-center gap-5">
+                <Link href="/signup" className="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-[#6B9B5F] transition-colors group">
+                  <div className="p-2 rounded-xl bg-gray-50 group-hover:bg-green-50 transition-colors">
+                    <IconBriefcase className="w-4 h-4" />
+                  </div>
+                  Espace Recruteur
+                </Link>
+                <Link href="/signup" className="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-[#6B9B5F] transition-colors group">
+                  <div className="p-2 rounded-xl bg-gray-50 group-hover:bg-green-50 transition-colors">
+                    <IconUser className="w-4 h-4" />
+                  </div>
+                  Espace Candidat
+                </Link>
+              </div>
+            </div>
+          </div>
+
         </div>
       </section>
 
@@ -1562,157 +1681,323 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ═══════════════════════ SPLIT CANDIDATS/EMPLOYEURS ═══════════════════════ */}
+      <section className="relative py-20 lg:py-24 overflow-hidden bg-white">
+  <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#6B9B5F]/5 rounded-full blur-3xl -z-10" />
+  <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#7C3AED]/5 rounded-full blur-3xl -z-10" />
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="text-center mb-16 animate-fade-in-up">
+      <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200/60 shadow-sm mb-6">
+        <span className="relative flex h-2 w-2">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#6B9B5F] opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-[#6B9B5F]"></span>
+        </span>
+        <span className="text-xs font-semibold uppercase tracking-wider text-[#6B9B5F]">Plateforme Duale</span>
+      </div>
+      <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 tracking-tight">
+        Que vous soyez <span className="text-[#6B9B5F]">talent</span> ou <span className="text-[#7C3AED]">recruteur</span>
+      </h2>
+      <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+        Nous connectons les meilleures opportunités avec les profils les plus qualifiés d&apos;Afrique de l&apos;Ouest.
+      </p>
+    </div>
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+      {/* CANDIDATE PANEL */}
+      <div className="group relative bg-white border border-gray-100 rounded-3xl p-8 lg:p-12 shadow-sm hover:shadow-2xl transition-all duration-500 flex flex-col justify-between">
+        <div>
+          <div className="flex items-center gap-4 mb-8">
+            <div className="w-12 h-12 rounded-2xl bg-green-50 flex items-center justify-center text-[#6B9B5F]">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900">Vous êtes candidat ?</h3>
+          </div>
+          <p className="text-gray-600 mb-10 leading-relaxed">
+            Propulsez votre carrière avec des outils intelligents conçus pour vous démarquer sur le marché du travail ivoirien et régional.
+          </p>
+          <ul className="space-y-6 mb-12">
+            {[
+              { title: "Matching IA personnalisé", desc: "Recevez uniquement les offres qui correspondent à vos compétences réelles.", icon: "M13 10V3L4 14h7v7l9-11h-7z" },
+              { title: "CV Builder professionnel", desc: "Générez un CV optimisé pour les ATS des plus grandes entreprises.", icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" },
+              { title: "Alertes emploi temps réel", desc: "Soyez le premier informé dès qu'une opportunité correspond à vos critères.", icon: "M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" },
+              { title: "Accompagnement carrière", desc: "Conseils d'experts et ressources pour réussir vos entretiens.", icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" }
+            ].map((item, idx) => (
+              <li key={idx} className="flex gap-4">
+                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-[#6B9B5F]/10 flex items-center justify-center mt-1">
+                  <svg className="w-3.5 h-3.5 text-[#6B9B5F]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d={item.icon} />
+                  </svg>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-900 text-sm mb-1">{item.title}</h4>
+                  <p className="text-xs text-gray-500">{item.desc}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <Link href="/signup" className="w-full inline-flex items-center justify-center px-8 py-4 text-base font-bold text-white bg-[#6B9B5F] hover:bg-[#5A8A4E] rounded-2xl transition-all duration-300 shadow-md hover:shadow-xl">
+          Trouver mon emploi
+          <svg className="ml-2 w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+          </svg>
+        </Link>
+      </div>
+      {/* EMPLOYER PANEL */}
+      <div className="group relative bg-[#F0F7EE] border border-green-100 rounded-3xl p-8 lg:p-12 shadow-sm hover:shadow-2xl transition-all duration-500 flex flex-col justify-between overflow-hidden">
+        <div className="absolute top-0 right-0 p-4 opacity-10">
+          <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="60" cy="60" r="58" stroke="#6B9B5F" strokeWidth="4" strokeDasharray="8 8" />
+          </svg>
+        </div>
+        <div className="relative z-10">
+          <div className="flex items-center gap-4 mb-8">
+            <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-[#6B9B5F] shadow-sm">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900">Vous recrutez ?</h3>
+          </div>
+          <p className="text-gray-600 mb-10 leading-relaxed">
+            Simplifiez vos recrutements avec une technologie de pointe et accédez aux meilleurs profils qualifiés de la sous-région.
+          </p>
+          <ul className="space-y-6 mb-12">
+            {[
+              { title: "Accès à 50 000+ candidats", desc: "Une base de données qualifiée et mise à jour quotidiennement.", icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" },
+              { title: "ATS intégré et automatisé", desc: "Gérez vos candidatures sans effort de la sélection à l'onboarding.", icon: "M4 6h16M4 10h16M4 14h16M4 18h16" },
+              { title: "Matching automatique 94%", desc: "Précision de filtrage IA pour ne rencontrer que les profils pertinents.", icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" },
+              { title: "Support dédié & onboarding", desc: "Un account manager dédié pour vous accompagner dans vos recherches.", icon: "M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" }
+            ].map((item, idx) => (
+              <li key={idx} className="flex gap-4">
+                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-[#6B9B5F]/20 flex items-center justify-center mt-1">
+                  <svg className="w-3.5 h-3.5 text-[#6B9B5F]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d={item.icon} />
+                  </svg>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-900 text-sm mb-1">{item.title}</h4>
+                  <p className="text-xs text-gray-600">{item.desc}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <Link href="/signup" className="relative z-10 w-full inline-flex items-center justify-center px-8 py-4 text-base font-bold text-white bg-[#6B9B5F] hover:bg-[#5A8A4E] rounded-2xl transition-all duration-300 shadow-md hover:shadow-xl">
+          Publier une offre
+          <svg className="ml-2 w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+        </Link>
+      </div>
+    </div>
+  </div>
+</section>
+
       {/* ═══════════════════════ HOW IT WORKS ═══════════════════════ */}
-      <section id="how-it-works" className="py-24 lg:py-32 bg-white relative overflow-hidden">
-        {/* Decorative Background Blobs */}
-        <div className="absolute top-1/4 -left-64 w-[500px] h-[500px] bg-[#6B9B5F]/5 rounded-full blur-[100px]" />
-        <div className="absolute bottom-1/4 -right-64 w-[500px] h-[500px] bg-[#7C3AED]/5 rounded-full blur-[100px]" />
+      <section id="how-it-works" className="py-24 lg:py-40 bg-white relative overflow-hidden">
+        {/* Background Decorative Elements */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none">
+          <div className="absolute top-1/4 -left-64 w-[600px] h-[600px] bg-[#6B9B5F]/5 rounded-full blur-[120px]" />
+          <div className="absolute bottom-1/4 -right-64 w-[600px] h-[600px] bg-[#7C3AED]/5 rounded-full blur-[120px]" />
+        </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <AnimateOnScroll className="text-center mb-16 lg:mb-24">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-50 border border-green-100 text-sm font-bold text-[#6B9B5F] mb-6">
+          <AnimateOnScroll className="text-center mb-24 lg:mb-32">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200/60 shadow-sm text-sm font-semibold text-[#6B9B5F] mb-8">
               <IconSparkles className="w-4 h-4" />
-              PROCESSUS DE RÉUSSITE
+              PARCOURS CANDIDAT
             </div>
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-tight mb-6">
-              Votre carrière propulsée par <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6B9B5F] to-[#93C587]">l&apos;IA</span>
+            <h2 className="text-5xl lg:text-7xl font-extrabold text-gray-900 tracking-tight mb-8">
+              Votre carrière propulsée par <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6B9B5F] to-[#93C587] animate-shimmer" style={{ backgroundSize: '200% auto' }}>l&apos;IA</span>
             </h2>
-            <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              Connectez-vous aux meilleures opportunités d&apos;Afrique de l&apos;Ouest en 3 étapes intelligentes.
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed font-medium">
+              Une expérience fluide conçue pour les talents d&apos;Afrique. Connectez-vous aux leaders du marché en 3 étapes clés.
             </p>
           </AnimateOnScroll>
 
-          {/* Progress Timeline (Desktop) */}
-          <div className="hidden lg:flex items-center justify-between max-w-4xl mx-auto mb-16 relative">
-            <div className="absolute left-0 right-0 h-0.5 bg-gray-100 top-1/2 -translate-y-1/2" />
-            {[0, 1, 2].map((i) => (
-              <div key={i} className="relative z-10 w-4 h-4 rounded-full bg-white border-4 border-[#6B9B5F] shadow-[0_0_15px_rgba(107,155,95,0.4)] animate-pulse-soft" />
-            ))}
-          </div>
+          {/* Timeline ZigZag Layout */}
+          <div className="relative space-y-24 lg:space-y-48">
+            {/* Desktop Vertical Line */}
+            <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-gray-100 via-gray-200 to-gray-100 hidden lg:block -translate-x-1/2" />
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-24">
-            {/* Étape 1 */}
-            <AnimateOnScroll delay={0}>
-              <div className="group relative h-full p-8 rounded-[2rem] bg-white border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 overflow-hidden">
-                <span className="absolute -top-6 -right-4 text-9xl font-black text-gray-50/80 pointer-events-none transition-transform group-hover:scale-110 select-none">01</span>
-                <div className="relative z-10">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#6B9B5F] to-[#93C587] flex items-center justify-center text-white mb-6 shadow-lg shadow-green-100">
-                    <IconUser className="w-7 h-7" />
+            {/* Step 1: Left Text, Right Mockup */}
+            <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
+              <AnimateOnScroll className="order-2 lg:order-1 relative">
+                <span className="absolute -top-20 -left-10 text-[12rem] font-black text-gray-100/50 select-none pointer-events-none z-0">01</span>
+                <div className="relative z-10 lg:pr-12">
+                  <div className="w-16 h-16 rounded-2xl bg-white shadow-xl shadow-green-100 flex items-center justify-center text-[#6B9B5F] mb-8 border border-gray-50">
+                    <IconUser className="w-8 h-8" />
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">Créez votre profil</h3>
-                  <p className="text-gray-600 mb-8 leading-relaxed">Importez votre CV. Notre IA extrait vos compétences pour bâtir un profil attractif.</p>
-                  {/* Inline Mockup 1 */}
-                  <div className="p-5 rounded-2xl bg-gray-50/80 border border-gray-100">
-                    <div className="flex items-center gap-3 mb-4">
-                      <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&q=80" className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm" alt="Amadou" loading="lazy" />
-                      <div className="flex-1">
-                        <div className="h-2.5 w-24 bg-gray-200 rounded-full mb-1.5" />
-                        <div className="h-2 w-16 bg-gray-100 rounded-full" />
-                      </div>
+                  <h3 className="text-3xl lg:text-4xl font-extrabold text-gray-900 mb-6">Créez votre profil intelligent</h3>
+                  <p className="text-lg text-gray-600 leading-relaxed mb-8">
+                    Importez votre CV en un clic. Notre IA analyse votre parcours et extrait automatiquement vos expertises pour construire un profil valorisé par les recruteurs.
+                  </p>
+                  <ul className="space-y-4">
+                    {['Analyse sémantique de CV', 'Extraction auto-compétences', 'Score de visibilité'].map((item) => (
+                      <li key={item} className="flex items-center gap-3 text-sm font-semibold text-gray-700">
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#6B9B5F]" /> {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </AnimateOnScroll>
+              <AnimateOnScroll delay={200} className="order-1 lg:order-2">
+                <div className="relative p-8 rounded-[2.5rem] bg-white border border-gray-100 shadow-2xl animate-float">
+                  <div className="flex items-center gap-4 mb-8">
+                    <img src="https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?w=400&q=80" className="w-16 h-16 rounded-2xl object-cover shadow-lg border-2 border-white" alt="Profile" loading="lazy" />
+                    <div>
+                      <h4 className="text-lg font-bold text-gray-900">Fatou Diop</h4>
+                      <p className="text-sm text-gray-500">Fullstack Developer — Dakar</p>
                     </div>
-                    <div className="space-y-3">
-                      <div className="flex justify-between text-[10px] font-bold text-[#6B9B5F] uppercase">
-                        <span>Complétion</span>
+                  </div>
+                  <div className="space-y-6">
+                    <div>
+                      <div className="flex justify-between text-xs font-bold text-[#6B9B5F] uppercase mb-2">
+                        <span>Complétion Profil</span>
                         <span>85%</span>
                       </div>
-                      <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-[#6B9B5F] to-[#93C587] rounded-full w-[85%]" />
+                      <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-[#6B9B5F] to-[#93C587] rounded-full w-[85%] transition-all duration-1000" />
                       </div>
-                      <div className="flex flex-wrap gap-1.5 pt-1">
-                        {['React.js', 'UI/UX', 'Python'].map(t => (
-                          <span key={t} className="px-2 py-0.5 text-[10px] bg-white border border-gray-100 rounded-md font-medium text-gray-500">{t}</span>
-                        ))}
-                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {['React.js', 'UI/UX', 'Python', 'NestJS', 'PostgreSQL'].map(t => (
+                        <span key={t} className="px-3 py-1.5 text-xs bg-gray-50 border border-gray-100 rounded-xl font-bold text-gray-600">{t}</span>
+                      ))}
                     </div>
                   </div>
                 </div>
-              </div>
-            </AnimateOnScroll>
+              </AnimateOnScroll>
+            </div>
 
-            {/* Étape 2 */}
-            <AnimateOnScroll delay={150}>
-              <div className="group relative h-full p-8 rounded-[2rem] bg-white border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 overflow-hidden">
-                <span className="absolute -top-6 -right-4 text-9xl font-black text-gray-50/80 pointer-events-none select-none">02</span>
-                <div className="relative z-10">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#7C3AED] to-[#A78BFA] flex items-center justify-center text-white mb-6 shadow-lg shadow-purple-100">
-                    <IconSparkles className="w-7 h-7" />
+            {/* Step 2: Right Text, Left Mockup */}
+            <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
+              <AnimateOnScroll delay={200} className="order-1">
+                <div className="relative p-8 rounded-[2.5rem] bg-white border border-gray-100 shadow-2xl lg:-ml-8">
+                  <div className="mb-6 flex items-center justify-between">
+                    <span className="text-sm font-bold text-gray-400">Matchs suggérés par l&apos;IA</span>
+                    <div className="px-3 py-1 rounded-full bg-purple-50 text-[10px] font-black text-[#7C3AED] uppercase tracking-wider">Temps Réel</div>
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">L&apos;IA trouve vos matchs</h3>
-                  <p className="text-gray-600 mb-8 leading-relaxed">Notre algorithme analyse en temps réel des milliers d&apos;offres pour vous proposer le match parfait.</p>
-                  {/* Inline Mockup 2 */}
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {[
-                      { n: 'Orange CI', s: 94, loc: 'Abidjan' },
-                      { n: 'Ecobank Group', s: 89, loc: 'Lomé' },
-                      { n: 'MTN Sénégal', s: 85, loc: 'Dakar' },
+                      { n: "Orange Côte d'Ivoire", s: 94, loc: 'Abidjan', color: '#FF6600' },
+                      { n: 'Ecobank Group', s: 89, loc: 'Lomé', color: '#003DA5' },
+                      { n: 'MTN Sénégal', s: 85, loc: 'Dakar', color: '#FFCC00' },
                     ].map((m, idx) => (
-                      <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-gray-50/50 border border-gray-100">
-                        <div>
-                          <span className="text-xs font-bold text-gray-900 block">{m.n}</span>
-                          <span className="text-[10px] text-gray-500">{m.loc}</span>
+                      <div key={idx} className="flex items-center gap-4 p-4 rounded-2xl bg-gray-50/50 border border-gray-100 hover:border-[#7C3AED]/30 transition-colors group">
+                        <div className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-black text-lg shadow-sm shrink-0" style={{ backgroundColor: m.color }}>{m.n[0]}</div>
+                        <div className="flex-1">
+                          <span className="text-sm font-bold text-gray-900 block group-hover:text-[#7C3AED] transition-colors">{m.n}</span>
+                          <span className="text-[11px] text-gray-500 font-medium">{m.loc}</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold text-[#7C3AED]">{m.s}%</span>
-                          <div className="w-1 h-6 bg-[#7C3AED]/20 rounded-full overflow-hidden flex flex-col justify-end">
-                            <div className="w-full bg-[#7C3AED] rounded-full" style={{ height: `${m.s}%` }} />
-                          </div>
+                        <div className="text-right">
+                          <span className="text-lg font-black text-[#7C3AED]">{m.s}%</span>
+                          <span className="block text-[9px] font-bold text-gray-400 uppercase">Match IA</span>
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
-              </div>
-            </AnimateOnScroll>
-
-            {/* Étape 3 */}
-            <AnimateOnScroll delay={300}>
-              <div className="group relative h-full p-8 rounded-[2rem] bg-white border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 overflow-hidden">
-                <span className="absolute -top-6 -right-4 text-9xl font-black text-gray-50/80 pointer-events-none select-none">03</span>
-                <div className="relative z-10">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#F59E0B] to-[#FBBF24] flex items-center justify-center text-white mb-6 shadow-lg shadow-amber-100">
-                    <IconSend className="w-7 h-7" />
+              </AnimateOnScroll>
+              <AnimateOnScroll className="order-2 relative">
+                <span className="absolute -top-20 lg:-right-10 text-[12rem] font-black text-gray-100/50 select-none pointer-events-none z-0">02</span>
+                <div className="relative z-10 lg:pl-12">
+                  <div className="w-16 h-16 rounded-2xl bg-white shadow-xl shadow-purple-100 flex items-center justify-center text-[#7C3AED] mb-8 border border-gray-50">
+                    <IconSparkles className="w-8 h-8" />
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">Décrochez le poste</h3>
-                  <p className="text-gray-600 mb-8 leading-relaxed">Suivez vos candidatures, discutez avec les recruteurs et planifiez vos entretiens.</p>
-                  {/* Inline Mockup 3 */}
-                  <div className="p-4 rounded-2xl bg-[#6B9B5F]/5 border border-[#6B9B5F]/10">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center border border-gray-100 shadow-sm">
-                        <IconCalendar className="w-4 h-4 text-[#6B9B5F]" />
-                      </div>
-                      <span className="text-xs font-bold text-gray-900">Entretien Confirmé</span>
+                  <h3 className="text-3xl lg:text-4xl font-extrabold text-gray-900 mb-6">L&apos;IA trouve vos opportunités</h3>
+                  <p className="text-lg text-gray-600 leading-relaxed mb-8">
+                    Oubliez la recherche manuelle. Notre algorithme croise vos compétences avec des milliers d&apos;offres pour vous proposer les postes où vous avez le plus de chances de réussir.
+                  </p>
+                  <ul className="space-y-4">
+                    {['Matching prédictif multicritères', 'Alertes intelligentes 24/7', 'Analyses de marché locales'].map((item) => (
+                      <li key={item} className="flex items-center gap-3 text-sm font-semibold text-gray-700">
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#7C3AED]" /> {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </AnimateOnScroll>
+            </div>
+
+            {/* Step 3: Left Text, Right Mockup */}
+            <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
+              <AnimateOnScroll className="order-2 lg:order-1 relative">
+                <span className="absolute -top-20 -left-10 text-[12rem] font-black text-gray-100/50 select-none pointer-events-none z-0">03</span>
+                <div className="relative z-10 lg:pr-12">
+                  <div className="w-16 h-16 rounded-2xl bg-white shadow-xl shadow-amber-100 flex items-center justify-center text-[#F59E0B] mb-8 border border-gray-50">
+                    <IconSend className="w-8 h-8" />
+                  </div>
+                  <h3 className="text-3xl lg:text-4xl font-extrabold text-gray-900 mb-6">Décrochez votre futur poste</h3>
+                  <p className="text-lg text-gray-600 leading-relaxed mb-8">
+                    Gérez vos candidatures, échangez directement avec les RH et planifiez vos entretiens depuis votre tableau de bord unifié.
+                  </p>
+                  <ul className="space-y-4">
+                    {["Messagerie instantanée pro", "Suivi de candidature live", "Gestionnaire d'entretiens"].map((item) => (
+                      <li key={item} className="flex items-center gap-3 text-sm font-semibold text-gray-700">
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#F59E0B]" /> {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </AnimateOnScroll>
+              <AnimateOnScroll delay={200} className="order-1 lg:order-2">
+                <div className="relative p-10 rounded-[2.5rem] bg-gray-900 shadow-2xl border border-gray-800 animate-float delay-150">
+                  <div className="flex items-center gap-4 mb-10 pb-8 border-b border-white/10">
+                    <div className="w-12 h-12 rounded-xl bg-[#6B9B5F] flex items-center justify-center text-white shrink-0">
+                      <IconCalendar className="w-6 h-6" />
                     </div>
-                    <div className="flex items-center gap-3 pt-3 border-t border-[#6B9B5F]/10">
-                      <div className="w-8 h-8 rounded-lg bg-[#FF6600] flex items-center justify-center text-white text-[10px] font-black shrink-0">O</div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-[11px] font-bold text-gray-900 truncate">Orange Côte d&apos;Ivoire</div>
-                        <div className="text-[9px] text-gray-500">Mardi 25 Mars — 14h00</div>
+                    <div>
+                      <h4 className="text-lg font-bold text-white">Entretien Confirmé</h4>
+                      <p className="text-xs font-semibold text-green-400 uppercase tracking-widest">Étape Finale</p>
+                    </div>
+                  </div>
+                  <div className="space-y-8">
+                    <div className="flex items-center gap-6">
+                      <div className="w-14 h-14 rounded-2xl bg-[#FF6600] flex items-center justify-center text-white text-2xl font-black shadow-lg shrink-0">O</div>
+                      <div className="flex-1">
+                        <div className="text-xl font-bold text-white mb-1">Orange Côte d&apos;Ivoire</div>
+                        <div className="text-sm text-gray-400 font-medium">Mardi 25 Mars — 14h00</div>
                       </div>
-                      <div className="px-2 py-0.5 rounded-full bg-[#6B9B5F] text-[9px] font-bold text-white shrink-0">OK</div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="p-4 rounded-2xl bg-white/5 border border-white/10 text-center">
+                        <div className="text-[10px] font-bold text-gray-500 uppercase mb-1">Mode</div>
+                        <div className="text-sm font-bold text-white">Visioconférence</div>
+                      </div>
+                      <div className="p-4 rounded-2xl bg-[#6B9B5F]/20 border border-[#6B9B5F]/30 text-center">
+                        <div className="text-[10px] font-bold text-[#6B9B5F] uppercase mb-1">Status</div>
+                        <div className="text-sm font-bold text-white">Validé</div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </AnimateOnScroll>
+              </AnimateOnScroll>
+            </div>
           </div>
 
-          {/* Final CTA Banner */}
-          <AnimateOnScroll delay={450}>
-            <div className="relative p-8 sm:p-16 rounded-[3rem] bg-gradient-to-br from-[#6B9B5F] to-[#4B7340] overflow-hidden shadow-2xl shadow-green-200">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl pointer-events-none" />
-              <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/10 rounded-full -ml-20 -mb-20 blur-3xl pointer-events-none" />
-              <div className="relative z-10 flex flex-col items-center text-center">
-                <h3 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mb-6 leading-tight">
-                  Prêt à changer de dimension ?
+          {/* Elegant Dark CTA Banner */}
+          <AnimateOnScroll delay={400} className="mt-40">
+            <div className="relative p-12 sm:p-24 rounded-[4rem] bg-[#0A0C10] overflow-hidden border border-white/5 shadow-2xl">
+              {/* Refined Dark Gradients */}
+              <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#6B9B5F]/10 rounded-full blur-[100px] -mr-32 -mt-32 pointer-events-none" />
+              <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#7C3AED]/10 rounded-full blur-[100px] -ml-32 -mb-32 pointer-events-none" />
+
+              <div className="relative z-10 max-w-4xl mx-auto text-center">
+                <h3 className="text-4xl sm:text-6xl font-extrabold text-white mb-8 tracking-tight leading-tight">
+                  Prêt à changer de <span className="text-[#6B9B5F]">dimension</span> ?
                 </h3>
-                <p className="text-green-50/80 text-lg mb-12 max-w-xl mx-auto">
-                  Rejoignez les talents qui transforment l&apos;économie numérique en Afrique de l&apos;Ouest dès aujourd&apos;hui.
+                <p className="text-gray-400 text-xl mb-14 max-w-2xl mx-auto leading-relaxed">
+                  Rejoignez la nouvelle élite technologique en Afrique. Votre prochaine opportunité est déjà là.
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-                  <a href="/signup" className="px-10 py-5 bg-white text-[#6B9B5F] font-bold text-lg rounded-2xl hover:bg-gray-50 transition-all hover:scale-105 shadow-xl text-center">
+                <div className="flex flex-col sm:flex-row gap-6 justify-center">
+                  <a href="/signup" className="group px-10 py-5 bg-[#6B9B5F] hover:bg-[#5A8A4E] text-white font-bold text-lg rounded-2xl transition-all hover:scale-105 shadow-xl shadow-green-900/20 flex items-center justify-center gap-3">
                     Lancer ma recherche gratuite
+                    <IconSend className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </a>
-                  <a href="/signin" className="px-8 py-5 bg-transparent border-2 border-white/30 text-white font-bold text-lg rounded-2xl hover:bg-white/10 transition-all text-center">
+                  <a href="/signin" className="px-10 py-5 bg-white/5 border border-white/10 text-white font-bold text-lg rounded-2xl hover:bg-white/10 transition-all text-center backdrop-blur-md">
                     Se connecter
                   </a>
                 </div>
@@ -1939,6 +2224,90 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* ═══════════════════════ FAQ ═══════════════════════ */}
+      <section id="faq" className="py-20 bg-gray-50/50 overflow-hidden">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <AnimateOnScroll>
+      <div className="text-center mb-16">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200/60 shadow-sm mb-6">
+          <span className="w-2 h-2 rounded-full bg-[#6B9B5F] animate-pulse" />
+          <span className="text-xs font-semibold uppercase tracking-wide text-[#6B9B5F]">
+            Questions fréquentes
+          </span>
+        </div>
+        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 font-sans tracking-tight">
+          Tout ce que vous devez savoir
+        </h2>
+        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          Retrouvez les réponses aux questions les plus courantes pour démarrer sereinement sur INTOWORK.
+        </p>
+      </div>
+    </AnimateOnScroll>
+
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {[
+        {
+          q: "Comment fonctionne le matching IA ?",
+          a: "Notre algorithme analyse en profondeur les compétences, l'expérience et les aspirations de chaque candidat pour les mettre en relation avec les offres les plus pertinentes. Le taux de précision atteint 94%."
+        },
+        {
+          q: "Est-ce gratuit pour les candidats ?",
+          a: "Oui, l'inscription, la création de profil et la candidature aux offres sont entièrement gratuites pour les candidats. Les fonctionnalités avancées sont disponibles dans notre offre Pro."
+        },
+        {
+          q: "Dans quels pays êtes-vous présents ?",
+          a: "INTOWORK est disponible dans 15 pays d'Afrique de l'Ouest et centrale : Côte d'Ivoire, Sénégal, Cameroun, Mali, Burkina Faso, Guinée, Togo, Bénin, Niger, et bien d'autres."
+        },
+        {
+          q: "Comment publier une offre d'emploi ?",
+          a: "Créez un compte employeur, complétez le profil de votre entreprise et cliquez sur 'Publier une offre'. Notre IA vous guidera pour optimiser votre annonce et maximiser les candidatures qualifiées."
+        },
+        {
+          q: "Combien de temps pour recevoir des candidatures ?",
+          a: "En moyenne, les employeurs reçoivent leurs premières candidatures qualifiées dans les 48h suivant la publication d&apos;une offre grâce au matching IA en temps réel."
+        },
+        {
+          q: "Mes données sont-elles protégées ?",
+          a: "Absolument. INTOWORK est conforme RGPD et aux réglementations CEDEAO. Vos données sont chiffrées, stockées en sécurité et ne sont jamais revendues à des tiers."
+        }
+      ].map((faq, index) => (
+        <AnimateOnScroll key={index} delay={index * 100}>
+          <div
+            className={`group border border-gray-100 rounded-2xl bg-white transition-all duration-300 ${
+              openFaq === index ? 'shadow-lg border-green-100 ring-1 ring-green-50' : 'shadow-sm hover:shadow-md'
+            }`}
+          >
+            <button
+              onClick={() => setOpenFaq(openFaq === index ? null : index)}
+              className="w-full text-left p-6 flex items-start justify-between gap-4 focus:outline-none"
+            >
+              <span className={`text-lg font-semibold transition-colors duration-200 ${
+                openFaq === index ? 'text-[#6B9B5F]' : 'text-gray-900'
+              }`}>
+                {faq.q}
+              </span>
+              <span className={`mt-1 flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-all duration-300 ${
+                openFaq === index ? 'bg-[#6B9B5F] text-white rotate-180' : 'bg-gray-50 text-gray-400 group-hover:bg-gray-100'
+              }`}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </span>
+            </button>
+            <div className={`overflow-hidden transition-all duration-300 ease-in-out ${
+              openFaq === index ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'
+            }`}>
+              <div className="px-6 pb-6 text-gray-600 leading-relaxed border-t border-gray-50/50 pt-4">
+                {faq.a}
+              </div>
+            </div>
+          </div>
+        </AnimateOnScroll>
+      ))}
+    </div>
+  </div>
+</section>
 
       {/* ═══════════════════════ PRICING ═══════════════════════ */}
       <section id="pricing" className="py-20 lg:py-28 bg-gray-50">
