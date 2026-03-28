@@ -7,6 +7,7 @@ import { useUser } from '@/hooks/useNextAuth';
 import { useRouter } from 'next/navigation';
 import { jobsAPI } from '@/lib/api';
 import type { Job } from '@/lib/api';
+import { getApiUrl } from '@/lib/getApiUrl';
 import { logger } from '@/lib/logger';
 
 const plusJakarta = Plus_Jakarta_Sans({
@@ -475,6 +476,7 @@ export default function Home() {
   const [companies, setCompanies] = useState<Array<{ name: string; count: number }>>([]);
   const [loadingJobs, setLoadingJobs] = useState(false);
   const [statsVisible, setStatsVisible] = useState(false);
+  const [platformStats, setPlatformStats] = useState({ candidates: 10000, companies: 500, active_jobs: 15, applications: 0 });
   const statsRef = useRef<HTMLDivElement>(null);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [searchJob, setSearchJob] = useState('');
@@ -492,6 +494,28 @@ export default function Home() {
       router.push('/dashboard');
     }
   }, [isLoaded, isSignedIn, router]);
+
+  // Charger les stats publiques de la plateforme
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const apiUrl = getApiUrl();
+        const res = await fetch(`${apiUrl}/stats/public`);
+        if (res.ok) {
+          const data = await res.json();
+          setPlatformStats(prev => ({
+            candidates: data.candidates > 0 ? data.candidates : prev.candidates,
+            companies: data.companies > 0 ? data.companies : prev.companies,
+            active_jobs: data.active_jobs > 0 ? data.active_jobs : prev.active_jobs,
+            applications: data.applications || 0,
+          }));
+        }
+      } catch {
+        // Silencieux — on garde les valeurs par défaut
+      }
+    };
+    loadStats();
+  }, []);
 
   // Charger les offres en vedette et les entreprises partenaires
   useEffect(() => {
@@ -1316,10 +1340,10 @@ export default function Home() {
       {/* ═══════════════════════ ANIMATED STATS ═══════════════════════ */}
       <section ref={statsRef} className="py-12 lg:py-16 bg-gradient-to-b from-gray-50/50 to-white border-y border-gray-100">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
-          <AnimatedStat end={10000} suffix="+" label="Candidats actifs" start={statsVisible} />
-          <AnimatedStat end={500} suffix="+" label="Entreprises" start={statsVisible} />
+          <AnimatedStat end={platformStats.candidates} suffix="+" label="Candidats actifs" start={statsVisible} />
+          <AnimatedStat end={platformStats.companies} suffix="+" label="Entreprises" start={statsVisible} />
           <AnimatedStat end={94} suffix="%" label="Taux de matching" start={statsVisible} />
-          <AnimatedStat end={15} suffix="+" label="Pays couverts" start={statsVisible} />
+          <AnimatedStat end={platformStats.active_jobs} suffix="+" label="Offres actives" start={statsVisible} />
         </div>
       </section>
 
