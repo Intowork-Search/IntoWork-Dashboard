@@ -28,10 +28,10 @@ class UserRoleEnum(str, Enum):
 
 
 class JobStatusEnum(str, Enum):
-    DRAFT = "DRAFT"
-    PUBLISHED = "PUBLISHED"
-    CLOSED = "CLOSED"
-    ARCHIVED = "ARCHIVED"
+    DRAFT = "draft"
+    PUBLISHED = "published"
+    CLOSED = "closed"
+    ARCHIVED = "archived"
 
 
 class JobTypeEnum(str, Enum):
@@ -50,7 +50,6 @@ class JobLocationEnum(str, Enum):
 
 class ApplicationStatusEnum(str, Enum):
     APPLIED = "applied"
-    PENDING = "pending"
     VIEWED = "viewed"
     SHORTLISTED = "shortlisted"
     INTERVIEW = "interview"

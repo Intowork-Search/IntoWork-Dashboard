@@ -78,7 +78,7 @@ async def match_jobs_to_criteria(db: AsyncSession, criteria: dict, limit: int = 
     """
     Trouve les jobs correspondant aux critères d'une alerte
     """
-    query = select(Job).where(Job.status == "PUBLISHED")
+    query = select(Job).where(Job.status == "published")
     
     # Filtrer par mots-clés (title, description, requirements)
     if criteria.get("keywords"):
