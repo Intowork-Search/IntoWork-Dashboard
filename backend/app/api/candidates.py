@@ -736,7 +736,7 @@ async def download_cv(
         path=candidate.cv_url,
         media_type="application/pdf",
         headers={
-            "Content-Disposition": f"inline; filename={candidate.cv_filename}"
+            "Content-Disposition": f'inline; filename="{candidate.cv_filename.replace(chr(34), "").replace(chr(10), "").replace(chr(13), "")}"'
         }
     )
 
@@ -819,7 +819,7 @@ async def download_specific_cv(
         path=cv.file_path,
         media_type="application/pdf",
         headers={
-            "Content-Disposition": f"inline; filename={cv.filename}"
+            "Content-Disposition": f'inline; filename="{cv.filename.replace(chr(34), "").replace(chr(10), "").replace(chr(13), "")}"'
         }
     )
 
@@ -915,6 +915,6 @@ async def get_candidate_cv(
         path=candidate.cv_url,
         media_type="application/pdf",
         headers={
-            "Content-Disposition": f"inline; filename={candidate.cv_filename}"
+            "Content-Disposition": f'inline; filename="{candidate.cv_filename.replace(chr(34), "").replace(chr(10), "").replace(chr(13), "")}"'
         }
     )

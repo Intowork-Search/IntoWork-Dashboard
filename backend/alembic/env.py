@@ -111,21 +111,18 @@ def run_migrations_online() -> None:
                 }
                 print(f"   Type: INTERNE - SSL DÉSACTIVÉ", flush=True)
             else:
-                # Connexion externe: SSL avec SSLContext permissif
-                try:
-                    ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS)
-                except AttributeError:
-                    ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+                # Connexion externe: SSL avec vérification serveur
+                ssl_context = ssl.create_default_context()
                 ssl_context.check_hostname = False
-                ssl_context.verify_mode = ssl.CERT_NONE
-                ssl_context.set_ciphers('DEFAULT@SECLEVEL=1')
-                
+                ssl_context.verify_mode = ssl.CERT_REQUIRED
+                ssl_context.load_default_certs()
+
                 connect_args = {
                     "ssl": ssl_context,
                     "timeout": 60,
                     "command_timeout": 120
                 }
-                print(f"   Type: EXTERNE - SSL avec SSLContext permissif", flush=True)
+                print(f"   Type: EXTERNE - SSL avec vérification", flush=True)
         else:
             print(f"🏠 Alembic: Connexion locale détectée", flush=True)
         

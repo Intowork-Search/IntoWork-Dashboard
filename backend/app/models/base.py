@@ -174,9 +174,23 @@ class Company(Base):
 
     # Intégration Targetym
     targetym_tenant_id = Column(Integer, nullable=True, index=True)  # ID du tenant lié sur Targetym
-    targetym_api_key = Column(String, nullable=True)  # Clé API Targetym chiffrée
+    targetym_api_key = Column(String, nullable=True)  # Clé API Targetym — chiffrée via encryption.py
     targetym_linked_at = Column(DateTime(timezone=True), nullable=True)  # Date de liaison
     company_api_key = Column(String, nullable=True, index=True)  # Clé API IntoWork générée pour Targetym
+
+    def set_targetym_api_key(self, plaintext_key: str) -> None:
+        """Stocke la clé API Targetym chiffrée."""
+        from app.services.encryption import encrypt_value
+        self.targetym_api_key = encrypt_value(plaintext_key)
+
+    def get_targetym_api_key(self) -> str | None:
+        """Retourne la clé API Targetym déchiffrée."""
+        if not self.targetym_api_key:
+            return None
+        from app.services.encryption import is_encrypted, decrypt_value
+        if is_encrypted(self.targetym_api_key):
+            return decrypt_value(self.targetym_api_key)
+        return self.targetym_api_key  # Legacy : valeur en clair avant migration
     
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
@@ -246,10 +260,12 @@ class Job(Base):
     job_type = Column(SQLEnum(JobType, native_enum=False, values_callable=lambda x: [e.value for e in x]), nullable=False, default=JobType.FULL_TIME)
     location_type = Column(SQLEnum(JobLocation, native_enum=False, values_callable=lambda x: [e.value for e in x]), nullable=False, default=JobLocation.ON_SITE)
     location = Column(String)  # Ville, région
+    country = Column(String, nullable=True, index=True)  # Code pays ISO (GA, CM, CG)
+    zone = Column(String, nullable=True, index=True)  # Zone économique (UEMOA, CEMAC)
     salary_min = Column(Integer)
     salary_max = Column(Integer)
-    currency = Column(String, default="EUR")
-    
+    currency = Column(String, default="XAF")
+
     # Paramètres
     status = Column(SQLEnum(JobStatus, native_enum=False, values_callable=lambda x: [e.value for e in x]), nullable=False, default=JobStatus.DRAFT)
     is_featured = Column(Boolean, default=False)
@@ -713,10 +729,36 @@ class IntegrationCredential(Base):
     # Provider
     provider = Column(SQLEnum(IntegrationProvider), nullable=False, index=True)
 
-    # OAuth tokens (encryptés en production)
+    # OAuth tokens — chiffrés via encryption.py
     access_token = Column(Text, nullable=False)
     refresh_token = Column(Text, nullable=True)
     token_expires_at = Column(DateTime(timezone=True), nullable=True)
+
+    def set_access_token(self, plaintext: str) -> None:
+        """Stocke l'access_token chiffré."""
+        from app.services.encryption import encrypt_value
+        self.access_token = encrypt_value(plaintext)
+
+    def get_access_token(self) -> str:
+        """Retourne l'access_token déchiffré."""
+        from app.services.encryption import is_encrypted, decrypt_value
+        if is_encrypted(self.access_token):
+            return decrypt_value(self.access_token)
+        return self.access_token  # Legacy : valeur en clair avant migration
+
+    def set_refresh_token(self, plaintext: str) -> None:
+        """Stocke le refresh_token chiffré."""
+        from app.services.encryption import encrypt_value
+        self.refresh_token = encrypt_value(plaintext)
+
+    def get_refresh_token(self) -> str | None:
+        """Retourne le refresh_token déchiffré."""
+        if not self.refresh_token:
+            return None
+        from app.services.encryption import is_encrypted, decrypt_value
+        if is_encrypted(self.refresh_token):
+            return decrypt_value(self.refresh_token)
+        return self.refresh_token  # Legacy
 
     # Métadonnées provider-specific
     provider_data = Column(JSONB)  # Ex: organization_id pour LinkedIn

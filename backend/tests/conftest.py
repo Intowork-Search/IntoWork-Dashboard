@@ -134,9 +134,10 @@ async def employer_user(test_db: AsyncSession) -> User:
     company = Company(
         name="Test Company",
         industry="Technology",
-        company_size="50-200",
-        location="Test Location",
-        website="https://test.com",
+        size="50-200",
+        city="Test City",
+        country="Test Country",
+        website_url="https://test.com",
         description="Test company description"
     )
     test_db.add(company)
@@ -199,6 +200,7 @@ async def test_job(test_db: AsyncSession, employer_user: User) -> Job:
     employer = result.scalar_one()
 
     job = Job(
+        employer_id=employer.id,
         company_id=employer.company_id,
         title="Senior Software Engineer",
         description="Test job description",

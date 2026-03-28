@@ -68,16 +68,17 @@ export default function JobsPage() {
   // Déterminer le rôle
   const isEmployer = user?.role === 'employer';
 
-  // Récupérer les jobs selon le rôle (avec React Query)
+  // Les deux hooks sont toujours appelés (Rules of Hooks) — un seul est enabled
+  const employerQuery = useMyJobs(filters, { enabled: isLoaded && !!user && isEmployer });
+  const candidateQuery = useJobs(filters, { enabled: isLoaded && !isEmployer });
+
   const {
     data: jobsData,
     isLoading,
     isError,
     error,
     refetch
-  } = isEmployer
-    ? useMyJobs(filters, { enabled: isLoaded && !!user })
-    : useJobs(filters, { enabled: isLoaded });
+  } = isEmployer ? employerQuery : candidateQuery;
 
   // Mutation pour postuler
   const applyToJob = useApplyToJob();

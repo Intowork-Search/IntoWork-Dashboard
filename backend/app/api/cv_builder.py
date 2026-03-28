@@ -18,7 +18,7 @@ from app.models.base import User, CVDocument, CVAnalytics, CVTemplate
 from app.auth import require_user
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from loguru import logger
 import json
 import os
@@ -461,7 +461,7 @@ async def generate_pdf(
 
         # Check if we have a cached PDF (less than 24h old)
         if cv.pdf_url and cv.pdf_generated_at:
-            cache_age = datetime.utcnow() - cv.pdf_generated_at.replace(tzinfo=None)
+            cache_age = datetime.now(timezone.utc) - cv.pdf_generated_at.replace(tzinfo=timezone.utc)
             pdf_path = PDF_DIR / f"{cv.slug}.pdf"
             if cache_age < timedelta(hours=24) and pdf_path.exists():
                 logger.info(f"Returning cached PDF for {cv.slug}")
@@ -504,7 +504,7 @@ async def generate_pdf(
 
         # Update cache info
         cv.pdf_url = str(pdf_path)
-        cv.pdf_generated_at = datetime.utcnow()
+        cv.pdf_generated_at = datetime.now(timezone.utc)
 
         # Track download
         analytics = CVAnalytics(
@@ -607,7 +607,7 @@ async def get_analytics(
         total_downloads = cv.downloads_count
 
         # Get views by date (last 30 days)
-        thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+        thirty_days_ago = datetime.now(timezone.utc) - timedelta(days=30)
         result = await db.execute(
             select(
                 func.date(CVAnalytics.created_at).label('date'),

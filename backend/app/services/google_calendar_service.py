@@ -6,7 +6,7 @@ Planification d'entretiens avec Google Calendar
 import os
 import logging
 from typing import Optional, Dict, Any, List
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import httpx
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
@@ -237,7 +237,7 @@ class GoogleCalendarService:
         """
         return {
             'createRequest': {
-                'requestId': f"meet-{datetime.utcnow().timestamp()}",
+                'requestId': f"meet-{datetime.now(timezone.utc).timestamp()}",
                 'conferenceSolutionKey': {
                     'type': 'hangoutsMeet'
                 }

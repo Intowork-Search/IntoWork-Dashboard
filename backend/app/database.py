@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import DeclarativeBase
 import os
 import ssl
 from dotenv import load_dotenv
@@ -21,11 +21,6 @@ is_railway_internal = "railway.internal" in DATABASE_URL.lower()
 is_railway_external = "proxy.rlwy.net" in DATABASE_URL.lower() or ".railway.app" in DATABASE_URL.lower()
 is_railway = is_railway_internal or is_railway_external
 
-# Log de debug pour Railway (masquer le mot de passe)
-
-# NE PAS ajouter ssl dans l'URL pour Railway
-# On gère SSL via connect_args avec un SSLContext personnalisé (voir plus bas)
-
 DATABASE_URL_ASYNC = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
 
 # Configuration pour Railway
@@ -38,38 +33,32 @@ engine_kwargs = {
 
 # Ajouter connect_args pour SSL sur Railway (asyncpg)
 if is_railway:
-    # Railway PostgreSQL FORCE SSL - on ne peut pas le désactiver
-    # Créer un SSLContext avec PROTOCOL_TLS (pas TLS_CLIENT qui peut être trop strict)
-    try:
-        # Essayer PROTOCOL_TLS (plus permissif que TLS_CLIENT)
-        ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS)
-    except AttributeError:
-        # Fallback si PROTOCOL_TLS n'existe pas
-        ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-    
-    ssl_context.check_hostname = False
-    ssl_context.verify_mode = ssl.CERT_NONE
-    # Désactiver toutes les vérifications SSL
-    ssl_context.set_ciphers('DEFAULT@SECLEVEL=1')  # Autoriser les anciens ciphers
-    
     if is_railway_internal:
-        # Connexion interne: moins strict
+        # Connexion interne Railway: pas de SSL nécessaire
         engine_kwargs["connect_args"] = {
-            "ssl": False,  # Pas de SSL pour connexion interne
+            "ssl": False,
             "server_settings": {
                 "application_name": "intowork-backend"
             },
-            "timeout": 60,  # Plus long timeout
+            "timeout": 60,
             "command_timeout": 120
         }
     else:
-        # Connexion externe: SSL obligatoire
+        # Connexion externe Railway: SSL avec vérification serveur
+        ssl_context = ssl.create_default_context()
+        # Railway utilise des certificats auto-signés — vérifier le chiffrement
+        # mais sans exiger un CA de confiance (Railway ne fournit pas de CA bundle)
+        ssl_context.check_hostname = False
+        ssl_context.verify_mode = ssl.CERT_REQUIRED
+        # Charger les CA système pour valider quand possible
+        ssl_context.load_default_certs()
+
         engine_kwargs["connect_args"] = {
-            "ssl": ssl_context,  # SSLContext avec PROTOCOL_TLS
+            "ssl": ssl_context,
             "server_settings": {
                 "application_name": "intowork-backend"
             },
-            "timeout": 60,  # Plus long timeout pour connexion externe
+            "timeout": 60,
             "command_timeout": 120
         }
 
@@ -85,8 +74,11 @@ AsyncSessionLocal = async_sessionmaker(
     autoflush=False
 )
 
-# Base pour les modèles
-Base = declarative_base()
+
+# Base pour les modèles (SQLAlchemy 2.0+ pattern)
+class Base(DeclarativeBase):
+    pass
+
 
 # Dépendance async pour obtenir la DB session
 async def get_db():

@@ -39,7 +39,6 @@ async def notify_candidate_hired(
     """
     payload = {
         "tenant_id": targetym_tenant_id,
-        "api_key": targetym_api_key,
         "employee": {
             "first_name": first_name,
             "last_name": last_name,
@@ -58,6 +57,7 @@ async def notify_candidate_hired(
             resp = await client.post(
                 f"{TARGETYM_API_URL}/api/integrations/intowork/webhook/new-employee",
                 json=payload,
+                headers={"Authorization": f"Bearer {targetym_api_key}"},
             )
         if resp.status_code == 200:
             logger.info(

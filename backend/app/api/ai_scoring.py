@@ -6,13 +6,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_
 from sqlalchemy.orm import selectinload
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 from pydantic import BaseModel
 
 from app.database import get_db
 from app.auth import require_user
 from app.models.base import User, UserRole, Employer, JobApplication, Job, Candidate
-from app.services.ai_scoring import ai_service
+from app.services.ai_scoring import get_ai_service
 
 router = APIRouter()
 
@@ -160,7 +160,7 @@ Années d'expérience: {candidate.years_experience or 0}
     
     # Appeler l'IA pour le scoring
     try:
-        score_result = await ai_service.score_candidate(
+        score_result = await get_ai_service().score_candidate(
             job_title=job.title,
             job_description=job.description,
             job_requirements=job.requirements,
@@ -173,7 +173,7 @@ Années d'expérience: {candidate.years_experience or 0}
         # Mettre à jour la candidature avec le score
         application.ai_score = score_result["score"]
         application.ai_score_details = score_result
-        application.ai_analyzed_at = datetime.utcnow()
+        application.ai_analyzed_at = datetime.now(timezone.utc)
         
         await db.commit()
         
@@ -275,7 +275,7 @@ Années d'expérience: {candidate.years_experience or 0}
             if candidate.skills:
                 candidate_skills = ", ".join([skill.name for skill in candidate.skills])
             
-            score_result = await ai_service.score_candidate(
+            score_result = await get_ai_service().score_candidate(
                 job_title=job.title,
                 job_description=job.description,
                 job_requirements=job.requirements,
@@ -287,7 +287,7 @@ Années d'expérience: {candidate.years_experience or 0}
             
             application.ai_score = score_result["score"]
             application.ai_score_details = score_result
-            application.ai_analyzed_at = datetime.utcnow()
+            application.ai_analyzed_at = datetime.now(timezone.utc)
             
             scored_count += 1
             

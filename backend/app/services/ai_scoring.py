@@ -11,7 +11,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Client synchrone pour les fonctions utilitaires de conversation
-client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+_anthropic_api_key = os.getenv("ANTHROPIC_API_KEY")
+client: Optional[Anthropic] = Anthropic(api_key=_anthropic_api_key) if _anthropic_api_key else None
 model = "claude-sonnet-4-6"
 
 
@@ -29,6 +30,8 @@ def add_assistant_message(messages: List[Dict], text: str) -> None:
 
 def chat(messages: List[Dict]) -> str:
     """Envoie les messages à Claude et retourne la réponse texte."""
+    if client is None:
+        raise RuntimeError("ANTHROPIC_API_KEY non configurée — scoring IA indisponible")
     message = client.messages.create(
         model=model,
         max_tokens=1000,
@@ -41,9 +44,9 @@ class AIEvaluationService:
         self.api_key = os.getenv("ANTHROPIC_API_KEY")
         if not self.api_key:
             raise ValueError("ANTHROPIC_API_KEY n'est pas définie dans les variables d'environnement")
-        
+
         self.client = AsyncAnthropic(api_key=self.api_key)
-        self.model = "claude-3-5-sonnet-20241022"  # Dernier modèle Claude 3.5 Sonnet
+        self.model = "claude-sonnet-4-6"
     
     async def score_candidate(
         self,
@@ -205,5 +208,14 @@ Réponds UNIQUEMENT avec le JSON, rien d'autre.
         return prompt
 
 
-# Instance singleton du service
-ai_service = AIEvaluationService()
+# Instance singleton du service — initialisée à la demande pour ne pas crasher
+# le backend au démarrage si ANTHROPIC_API_KEY est absente
+_ai_service: Optional[AIEvaluationService] = None
+
+
+def get_ai_service() -> AIEvaluationService:
+    """Retourne le singleton AIEvaluationService, initialisé au premier appel."""
+    global _ai_service
+    if _ai_service is None:
+        _ai_service = AIEvaluationService()
+    return _ai_service

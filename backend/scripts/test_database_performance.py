@@ -24,7 +24,7 @@ import time
 import argparse
 from typing import List, Dict, Tuple
 import statistics
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 # Add parent directory to path
 sys.path.insert(0, '/home/jdtkd/IntoWork-Dashboard/backend')
@@ -409,7 +409,7 @@ def generate_test_data(db: Session, num_jobs: int = 100, num_candidates: int = 5
             location_type=JobLocation.REMOTE if i % 3 == 0 else JobLocation.HYBRID,
             job_type=JobType.FULL_TIME,
             status=JobStatus.PUBLISHED,
-            posted_at=datetime.utcnow(),
+            posted_at=datetime.now(timezone.utc),
         )
         db.add(job)
         jobs.append(job)

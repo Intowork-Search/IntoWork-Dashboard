@@ -130,15 +130,19 @@ async def test_forgot_password_success(client: AsyncClient, candidate_user: User
     assert response.status_code == 200
     assert "sent" in response.json()["message"].lower()
 
-    # Verify token was created in database
+    # Verify token was created in database (PasswordResetToken has user_id, not email)
+    user_result = await test_db.execute(
+        select(User).filter(User.email == "candidate@test.com")
+    )
+    user = user_result.scalar_one()
     result = await test_db.execute(
         select(PasswordResetToken).filter(
-            PasswordResetToken.email == "candidate@test.com"
+            PasswordResetToken.user_id == user.id
         )
     )
     token = result.scalar_one_or_none()
     assert token is not None
-    assert token.email == "candidate@test.com"
+    assert token.user_id == user.id
 
 
 @pytest.mark.asyncio
@@ -162,10 +166,10 @@ async def test_reset_password_success(client: AsyncClient, candidate_user: User,
         json={"email": "candidate@test.com"}
     )
 
-    # Get the token from database
+    # Get the token from database (filter by user_id, not email)
     result = await test_db.execute(
         select(PasswordResetToken).filter(
-            PasswordResetToken.email == "candidate@test.com"
+            PasswordResetToken.user_id == candidate_user.id
         )
     )
     token_record = result.scalar_one()
@@ -217,10 +221,10 @@ async def test_reset_password_weak_password(client: AsyncClient, candidate_user:
         json={"email": "candidate@test.com"}
     )
 
-    # Get token
+    # Get token (filter by user_id, not email)
     result = await test_db.execute(
         select(PasswordResetToken).filter(
-            PasswordResetToken.email == "candidate@test.com"
+            PasswordResetToken.user_id == candidate_user.id
         )
     )
     token_record = result.scalar_one()

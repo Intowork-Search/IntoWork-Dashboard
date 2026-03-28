@@ -9,7 +9,7 @@ from sqlalchemy import select, update
 from sqlalchemy.orm import selectinload
 from typing import Annotated, List, Optional
 from pydantic import BaseModel, Field
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.database import get_db
 from app.auth import require_employer, require_employer_or_admin
@@ -134,7 +134,7 @@ async def add_recruiter_note(
         "user_id": employer.user_id,
         "user_name": user.name or f"{user.first_name} {user.last_name}",
         "note": note_data.note,
-        "created_at": datetime.utcnow().isoformat()
+        "created_at": datetime.now(timezone.utc).isoformat()
     }
     
     # Ajouter la note (JSONB append)

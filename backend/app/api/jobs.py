@@ -279,7 +279,7 @@ async def get_recent_jobs_count(
     """
     Récupérer le nombre d'offres d'emploi récentes
     """
-    cutoff_date = datetime.utcnow() - timedelta(days=days)
+    cutoff_date = datetime.now(timezone.utc) - timedelta(days=days)
 
     count_result = await db.execute(
         select(func.count()).select_from(Job).filter(

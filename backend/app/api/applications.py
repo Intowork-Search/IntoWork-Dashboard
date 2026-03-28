@@ -361,7 +361,6 @@ async def create_application(
 
                 webhook_payload = {
                     'tenant_id': company_obj.targetym_tenant_id,
-                    'api_key': company_obj.targetym_api_key,
                     'application': {
                         'targetym_job_posting_id': job.targetym_job_posting_id,
                         'intowork_application_id': application.id,
@@ -378,7 +377,8 @@ async def create_application(
                 async with httpx.AsyncClient(timeout=10) as client:
                     resp = await client.post(
                         f'{targetym_url}/api/integrations/intowork/webhook/new-application',
-                        json=webhook_payload
+                        json=webhook_payload,
+                        headers={'Authorization': f'Bearer {company_obj.targetym_api_key}'}
                     )
                 print(f'[TARGETYM-WEBHOOK] Response: {resp.status_code} — {resp.text[:300]}')
                 logger.info(f'Targetym new-application webhook: {resp.status_code} for application {application.id}')
@@ -811,10 +811,10 @@ async def update_application_status(
                         f'{_targetym_url}/api/integrations/intowork/webhook/update-application-stage',
                         json={
                             'tenant_id': _company.targetym_tenant_id,
-                            'api_key': _company.targetym_api_key,
                             'intowork_application_id': application.id,
                             'intowork_status': new_status.value,
-                        }
+                        },
+                        headers={'Authorization': f'Bearer {_company.targetym_api_key}'}
                     )
                     print(f'[TARGETYM-STAGE-WEBHOOK] {new_status.value} → {_resp.status_code} {_resp.text[:200]}')
         except Exception as _e:
@@ -845,7 +845,7 @@ async def update_application_status(
                         asyncio.create_task(
                             notify_candidate_hired(
                                 targetym_tenant_id=company.targetym_tenant_id,
-                                targetym_api_key=company.targetym_api_key,
+                                targetym_api_key=company.targetym_api_key,  # Passed securely via Authorization header in notify_candidate_hired
                                 first_name=candidate_user.first_name,
                                 last_name=candidate_user.last_name,
                                 email=candidate_user.email,
