@@ -13,6 +13,7 @@ interface ScheduleInterviewModalProps {
   candidateName: string;
   candidateEmail: string;
   jobTitle: string;
+  applicationId: number;
   getToken: () => Promise<string | null>;
 }
 
@@ -22,6 +23,7 @@ export default function ScheduleInterviewModal({
   candidateName,
   candidateEmail,
   jobTitle,
+  applicationId,
   getToken
 }: ScheduleInterviewModalProps) {
   const [provider, setProvider] = useState<'google' | 'outlook'>('google');
@@ -104,27 +106,24 @@ export default function ScheduleInterviewModal({
         .map(email => email.trim())
         .filter(email => email);
 
+      const eventPayload = {
+        application_id: applicationId,
+        title: subject,
+        description,
+        start_time: startDateTime.toISOString(),
+        end_time: endDateTime.toISOString(),
+        attendees: attendeesList,
+        create_meeting_link: true,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+      };
+
       let result;
       if (provider === 'google') {
-        result = await integrationsAPI.createGoogleCalendarEvent(token, {
-          summary: subject,
-          description,
-          start_time: startDateTime.toISOString(),
-          end_time: endDateTime.toISOString(),
-          attendees: attendeesList,
-          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
-        });
-        toast.success('✅ Entretien planifié avec Google Calendar + Meet !');
+        result = await integrationsAPI.createGoogleCalendarEvent(token, eventPayload);
+        toast.success('Entretien planifié avec Google Calendar !');
       } else {
-        result = await integrationsAPI.createOutlookEvent(token, {
-          subject,
-          body: description,
-          start_time: startDateTime.toISOString(),
-          end_time: endDateTime.toISOString(),
-          attendees: attendeesList,
-          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
-        });
-        toast.success('✅ Entretien planifié avec Outlook + Teams !');
+        result = await integrationsAPI.createOutlookEvent(token, eventPayload);
+        toast.success('Entretien planifié avec Outlook !');
       }
 
       // Ouvrir l'événement dans un nouvel onglet

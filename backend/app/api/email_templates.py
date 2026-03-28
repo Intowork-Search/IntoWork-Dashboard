@@ -323,10 +323,10 @@ async def delete_email_template(
             detail="Template not found"
         )
     
-    # Soft delete : désactiver plutôt que supprimer
-    template.is_active = False
+    # Supprimer définitivement le template
+    await db.delete(template)
     await db.commit()
-    
+
     return None
 
 

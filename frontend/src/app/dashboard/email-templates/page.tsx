@@ -183,7 +183,7 @@ export default function EmailTemplatesPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Voulez-vous vraiment désactiver ce template ?')) return;
+    if (!confirm('Voulez-vous vraiment supprimer ce template ?')) return;
     
     try {
       const token = await getToken();
@@ -201,7 +201,7 @@ export default function EmailTemplatesPage() {
       });
       
       if (response.ok) {
-        toast.success('Template désactivé');
+        toast.success('Template supprimé');
         fetchTemplates();
       } else {
         toast.error('Erreur lors de la suppression');
@@ -442,7 +442,7 @@ export default function EmailTemplatesPage() {
                       <button
                         onClick={() => handleDelete(template.id)}
                         className="p-2 rounded-xl text-red-600 bg-red-50 hover:bg-red-100 transition-all"
-                        title="Désactiver"
+                        title="Supprimer"
                       >
                         <TrashIcon className="w-5 h-5" />
                       </button>

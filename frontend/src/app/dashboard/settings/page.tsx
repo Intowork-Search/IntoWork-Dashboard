@@ -356,6 +356,11 @@ export default function SettingsPage() {
   const updateNotifications = async () => {
     try {
       setLoading(true);
+      await candidateAPI.updateProfile({
+        email_notifications: notifications.email_notifications,
+        job_alerts: notifications.job_alerts,
+        push_notifications: notifications.push_notifications,
+      } as unknown as Partial<CandidateProfile>);
       toast.success('Préférences de notification mises à jour !');
     } catch (error) {
       logger.error("Erreur lors de la mise a jour:", error);

@@ -887,11 +887,13 @@ export const integrationsAPI = {
 
   // Créer un événement Google Calendar
   createGoogleCalendarEvent: async (token: string, eventData: {
-    summary: string;
+    application_id: number;
+    title: string;
     description?: string;
     start_time: string;
     end_time: string;
     attendees?: string[];
+    create_meeting_link?: boolean;
     timezone?: string;
   }): Promise<{ event_id: string; event_url: string; meet_link?: string }> => {
     const client = createAuthenticatedClient(token);
@@ -901,11 +903,13 @@ export const integrationsAPI = {
 
   // Créer un événement Outlook
   createOutlookEvent: async (token: string, eventData: {
-    subject: string;
-    body?: string;
+    application_id: number;
+    title: string;
+    description?: string;
     start_time: string;
     end_time: string;
     attendees?: string[];
+    create_meeting_link?: boolean;
     timezone?: string;
   }): Promise<{ event_id: string; event_url: string; teams_link?: string }> => {
     const client = createAuthenticatedClient(token);

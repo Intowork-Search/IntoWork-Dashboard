@@ -66,7 +66,7 @@ export default function CandidatesPage(): React.JSX.Element {
   
   // Interview modal state
   const [interviewModalOpen, setInterviewModalOpen] = useState(false);
-  const [selectedCandidate, setSelectedCandidate] = useState<{ name: string; email: string; jobTitle: string } | null>(null);
+  const [selectedCandidate, setSelectedCandidate] = useState<{ name: string; email: string; jobTitle: string; applicationId: number } | null>(null);
 
   // Utiliser React Query hooks
   const {
@@ -227,11 +227,11 @@ export default function CandidatesPage(): React.JSX.Element {
                 aria-label="Filtrer par statut"
               >
                 <option value="">Tous les statuts</option>
-                <option value="pending">En attente</option>
                 <option value="viewed">Vue</option>
                 <option value="shortlisted">Présélectionné</option>
                 <option value="interview">Entretien</option>
                 <option value="accepted">Accepté</option>
+                <option value="pending">En attente</option>
                 <option value="rejected">Rejeté</option>
               </select>
             </div>
@@ -490,7 +490,8 @@ export default function CandidatesPage(): React.JSX.Element {
                       setSelectedCandidate({
                         name: viewingApplication.candidate_name,
                         email: viewingApplication.candidate_email,
-                        jobTitle: viewingApplication.job_title
+                        jobTitle: viewingApplication.job_title,
+                        applicationId: viewingApplication.id
                       });
                       setInterviewModalOpen(true);
                     }}
@@ -559,6 +560,7 @@ export default function CandidatesPage(): React.JSX.Element {
           candidateName={selectedCandidate.name}
           candidateEmail={selectedCandidate.email}
           jobTitle={selectedCandidate.jobTitle}
+          applicationId={selectedCandidate.applicationId}
           getToken={getToken}
         />
       )}
