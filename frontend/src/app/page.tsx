@@ -228,8 +228,9 @@ const footerLinks: Record<string, Array<{ label: string; href: string }>> = {
     { label: 'Entreprises', href: '/entreprises' },
   ],
   Entreprise: [
-    { label: 'A propos', href: '#testimonials' },
-    { label: 'Contact', href: '/support' },
+    { label: 'A propos', href: '/about' },
+    { label: 'Contact', href: '/contact' },
+    { label: 'Support', href: '/support' },
     { label: 'Espace recruteur', href: '/signup' },
     { label: 'CV Builder', href: '/cv-builder' },
   ],
@@ -241,7 +242,8 @@ const footerLinks: Record<string, Array<{ label: string; href: string }>> = {
   Legal: [
     { label: 'CGU', href: '/terms' },
     { label: 'Confidentialite', href: '/privacy' },
-    { label: 'Mentions legales', href: '/terms' },
+    { label: 'Cookies', href: '/cookies' },
+    { label: 'Mentions legales', href: '/mentions-legales' },
   ],
 };
 
@@ -2586,7 +2588,7 @@ export default function Home() {
               <a href="/privacy" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
                 Confidentialite
               </a>
-              <a href="/privacy" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
+              <a href="/cookies" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
                 Cookies
               </a>
             </div>
