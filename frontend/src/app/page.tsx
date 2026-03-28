@@ -219,11 +219,30 @@ const pricingPlans = [
   },
 ];
 
-const footerLinks = {
-  Produit: ['Fonctionnalites', 'Tarifs', 'Integrations', 'API', 'Changelog'],
-  Entreprise: ['A propos', 'Carrieres', 'Presse', 'Partenaires', 'Contact'],
-  Ressources: ['Blog', 'Guide recrutement', 'Webinaires', 'FAQ', 'Documentation'],
-  Legal: ['CGU', 'Confidentialite', 'Cookies', 'RGPD', 'Mentions legales'],
+const footerLinks: Record<string, Array<{ label: string; href: string }>> = {
+  Produit: [
+    { label: 'Fonctionnalites', href: '#features' },
+    { label: 'Tarifs', href: '#pricing' },
+    { label: 'Comment ca marche', href: '#how-it-works' },
+    { label: 'Offres', href: '/offres' },
+    { label: 'Entreprises', href: '/entreprises' },
+  ],
+  Entreprise: [
+    { label: 'A propos', href: '#testimonials' },
+    { label: 'Contact', href: '/support' },
+    { label: 'Espace recruteur', href: '/signup' },
+    { label: 'CV Builder', href: '/cv-builder' },
+  ],
+  Ressources: [
+    { label: 'FAQ', href: '#faq' },
+    { label: 'Guide recrutement', href: '#how-it-works' },
+    { label: 'Securite', href: '#security' },
+  ],
+  Legal: [
+    { label: 'CGU', href: '/terms' },
+    { label: 'Confidentialite', href: '/privacy' },
+    { label: 'Mentions legales', href: '/terms' },
+  ],
 };
 
 const countries = [
@@ -2541,12 +2560,12 @@ export default function Home() {
                 <h4 className="text-sm font-semibold text-white mb-4">{title}</h4>
                 <ul className="space-y-2.5">
                   {links.map((link) => (
-                    <li key={link}>
+                    <li key={link.label}>
                       <a
-                        href="#"
+                        href={link.href}
                         className="text-sm text-gray-400 hover:text-white transition-colors"
                       >
-                        {link}
+                        {link.label}
                       </a>
                     </li>
                   ))}
@@ -2567,7 +2586,7 @@ export default function Home() {
               <a href="/privacy" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
                 Confidentialite
               </a>
-              <a href="#" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
+              <a href="/privacy" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
                 Cookies
               </a>
             </div>
