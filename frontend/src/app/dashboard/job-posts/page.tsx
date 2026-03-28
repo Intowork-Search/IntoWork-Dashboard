@@ -13,7 +13,10 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useNextAuth';
 import { jobsAPI, Job } from '@/lib/api';
+import { logger } from '@/lib/logger';
+import { getErrorMessage } from '@/types/api';
 import { toast } from 'react-hot-toast';
+import { formatCurrency } from '@/constants/geo';
 import DashboardLayout from '@/components/DashboardLayout';
 import OnboardingTour from '@/components/OnboardingTour';
 import { employerCreateJobTour } from '@/config/onboardingTours';
@@ -106,8 +109,8 @@ export default function JobPostsPage(): React.JSX.Element {
 
       const response = await jobsAPI.getMyJobs(token);
       setJobs(response.jobs || []);
-    } catch (err: any) {
-      console.error('Erreur lors de la récupération des offres:', err);
+    } catch (err: unknown) {
+      logger.error("Erreur lors de la recuperation des offres:", err);
       setError('Erreur lors du chargement des offres');
     } finally {
       setLoading(false);
@@ -124,8 +127,8 @@ export default function JobPostsPage(): React.JSX.Element {
       await jobsAPI.deleteJob(jobId, token);
       setJobs(jobs.filter(job => job.id !== jobId));
       toast.success('Offre supprimée avec succès !');
-    } catch (err: any) {
-      console.error('Erreur lors de la suppression:', err);
+    } catch (err: unknown) {
+      logger.error("Erreur lors de la suppression:", err);
       toast.error('Erreur lors de la suppression');
     }
   };
@@ -196,9 +199,9 @@ export default function JobPostsPage(): React.JSX.Element {
       }
 
       handleCloseModal();
-    } catch (err: any) {
-      console.error('Erreur lors de la sauvegarde:', err);
-      toast.error(err.response?.data?.detail || 'Erreur lors de la sauvegarde');
+    } catch (err: unknown) {
+      logger.error("Erreur lors de la sauvegarde:", err);
+      toast.error(getErrorMessage(err, 'Erreur lors de la sauvegarde'));
     } finally {
       setSaving(false);
     }
@@ -389,7 +392,7 @@ export default function JobPostsPage(): React.JSX.Element {
                           {job.salary_min && job.salary_max && (
                             <span className="inline-flex items-center gap-1.5 text-gray-500">
                               <CurrencyEuroIcon className="w-4 h-4 text-[#6B9B5F]" />
-                              {job.salary_min.toLocaleString()} - {job.salary_max.toLocaleString()} {job.currency}
+                              {formatCurrency(job.salary_min, job.currency || 'XAF')} - {formatCurrency(job.salary_max, job.currency || 'XAF')}
                             </span>
                           )}
                           <span className="inline-flex items-center gap-1.5 text-gray-400">
@@ -456,7 +459,7 @@ export default function JobPostsPage(): React.JSX.Element {
             style={{ animation: 'fadeIn 0.3s ease-out' }}
           >
             {/* Header */}
-            <div className="sticky top-0 z-10 p-6 border-b border-gray-100 bg-gradient-to-r from-[#6B9B5F]/5 to-transparent">
+            <div className="sticky top-0 z-10 p-6 border-b border-gray-100 bg-white">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-[#6B9B5F]/10 flex items-center justify-center">
@@ -661,7 +664,7 @@ export default function JobPostsPage(): React.JSX.Element {
             style={{ animation: 'fadeIn 0.3s ease-out' }}
           >
             {/* Header */}
-            <div className="sticky top-0 z-10 p-6 border-b border-gray-100 bg-gradient-to-r from-[#6B9B5F]/5 to-transparent">
+            <div className="sticky top-0 z-10 p-6 border-b border-gray-100 bg-white">
               <div className="flex items-start justify-between">
                 <div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-2">{viewingJob.title}</h3>
@@ -723,7 +726,7 @@ export default function JobPostsPage(): React.JSX.Element {
                     Rémunération
                   </h4>
                   <p className="text-3xl font-bold text-gray-900">
-                    {viewingJob.salary_min.toLocaleString()} - {viewingJob.salary_max.toLocaleString()} {viewingJob.currency}
+                    {formatCurrency(viewingJob.salary_min, viewingJob.currency || 'XAF')} - {formatCurrency(viewingJob.salary_max, viewingJob.currency || 'XAF')}
                   </p>
                   <p className="text-sm text-gray-500 mt-1">par mois</p>
                 </div>

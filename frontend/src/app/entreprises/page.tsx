@@ -13,6 +13,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { getUploadUrl } from '@/lib/api';
 import { getApiUrl } from '@/lib/getApiUrl';
+import { logger } from '@/lib/logger';
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -68,7 +69,7 @@ export default function EntreprisesPage() {
           const data = await response.json();
 
           // Les données viennent directement de la table Company
-          const companiesArray = data.companies.map((company: any) => {
+          const companiesArray = data.companies.map((company: Company) => {
             const logoUrl = company.logo_url;
             return {
               id: company.id,
@@ -88,10 +89,10 @@ export default function EntreprisesPage() {
           setTotalCompanies(data.total);
         } else {
           setError('Erreur lors du chargement des entreprises. Veuillez réessayer.');
-          console.error('Erreur API:', response.status, response.statusText);
+          logger.error("Erreur API:", response.status, response.statusText);
         }
       } catch (error) {
-        console.error('Erreur:', error);
+        logger.error("Erreur chargement entreprises:", error);
         setError('Impossible de se connecter au serveur. Vérifiez que le backend est démarré.');
       } finally {
         setLoading(false);

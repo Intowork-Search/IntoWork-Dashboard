@@ -19,6 +19,7 @@ import { useAuth } from '@/hooks/useNextAuth';
 import { getApiUrl } from '@/lib/getApiUrl';
 import toast from 'react-hot-toast';
 import { getErrorMessage } from '@/types';
+import { logger } from '@/lib/logger';
 
 // ============================================================
 // QUERIES (Lecture)
@@ -209,7 +210,7 @@ export function useApplyToJob() {
     onError: (error: unknown) => {
       const message = getErrorMessage(error, 'Erreur lors de l\'envoi de la candidature');
       toast.error(`❌ ${message}`);
-      console.error('Erreur apply to job:', error);
+      logger.error("Erreur apply to job:", error);
     },
   });
 }
@@ -278,7 +279,7 @@ export function useWithdrawApplication() {
 
       const message = getErrorMessage(error, 'Erreur lors du retrait de la candidature');
       toast.error(`❌ ${message}`);
-      console.error('Erreur withdraw application:', error);
+      logger.error("Erreur withdraw application:", error);
     },
   });
 }
@@ -335,7 +336,7 @@ export function useUpdateApplicationStatus() {
 
       const message = getErrorMessage(error, 'Erreur lors de la mise à jour du statut');
       toast.error(`❌ ${message}`);
-      console.error('Erreur update application status:', error);
+      logger.error("Erreur update application status:", error);
     },
   });
 }
@@ -386,7 +387,7 @@ export function useUpdateApplicationNotes() {
 
       const message = getErrorMessage(error, 'Erreur lors de la mise à jour des notes');
       toast.error(`❌ ${message}`);
-      console.error('Erreur update application notes:', error);
+      logger.error("Erreur update application notes:", error);
     },
   });
 }

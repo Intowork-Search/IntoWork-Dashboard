@@ -27,7 +27,9 @@ import {
   type CV,
 } from '@/lib/api';
 import { useAuth } from '@/hooks/useNextAuth';
+import { getErrorMessage } from '@/types/api';
 import toast from 'react-hot-toast';
+import { logger } from '@/lib/logger';
 
 // ============================================================
 // QUERIES (Lecture) - PROFIL
@@ -132,15 +134,15 @@ export function useUpdateCandidateProfile() {
 
       toast.success('✅ Profil mis à jour avec succès !');
     },
-    onError: (error: any, _variables, context) => {
+    onError: (error: Error, _variables, context) => {
       // Rollback
       if (context?.previousProfile && context.queryKey) {
         queryClient.setQueryData(context.queryKey, context.previousProfile);
       }
 
-      const message = error.response?.data?.detail || 'Erreur lors de la mise à jour du profil';
+      const message = getErrorMessage(error, 'Erreur lors de la mise à jour du profil');
       toast.error(`❌ ${message}`);
-      console.error('Erreur update profile:', error);
+      logger.error("Erreur update profile:", error);
     },
   });
 }
@@ -187,15 +189,15 @@ export function useDeleteCV() {
 
       toast.success('✅ CV supprimé avec succès !');
     },
-    onError: (error: any, _cvId, context) => {
+    onError: (error: Error, _cvId, context) => {
       // Rollback
       if (context?.previousCVs && context.queryKey) {
         queryClient.setQueryData(context.queryKey, context.previousCVs);
       }
 
-      const message = error.response?.data?.detail || 'Erreur lors de la suppression du CV';
+      const message = getErrorMessage(error, 'Erreur lors de la suppression du CV');
       toast.error(`❌ ${message}`);
-      console.error('Erreur delete CV:', error);
+      logger.error("Erreur delete CV:", error);
     },
   });
 }
@@ -229,10 +231,10 @@ export function useAddExperience() {
 
       toast.success('✅ Expérience ajoutée avec succès !');
     },
-    onError: (error: any) => {
-      const message = error.response?.data?.detail || 'Erreur lors de l\'ajout de l\'expérience';
+    onError: (error: Error) => {
+      const message = getErrorMessage(error, 'Erreur lors de l\'ajout de l\'expérience');
       toast.error(`❌ ${message}`);
-      console.error('Erreur add experience:', error);
+      logger.error("Erreur add experience:", error);
     },
   });
 }
@@ -261,10 +263,10 @@ export function useUpdateExperience() {
 
       toast.success('✅ Expérience mise à jour !');
     },
-    onError: (error: any) => {
-      const message = error.response?.data?.detail || 'Erreur lors de la mise à jour';
+    onError: (error: Error) => {
+      const message = getErrorMessage(error, 'Erreur lors de la mise à jour');
       toast.error(`❌ ${message}`);
-      console.error('Erreur update experience:', error);
+      logger.error("Erreur update experience:", error);
     },
   });
 }
@@ -293,10 +295,10 @@ export function useDeleteExperience() {
 
       toast.success('✅ Expérience supprimée !');
     },
-    onError: (error: any) => {
-      const message = error.response?.data?.detail || 'Erreur lors de la suppression';
+    onError: (error: Error) => {
+      const message = getErrorMessage(error, 'Erreur lors de la suppression');
       toast.error(`❌ ${message}`);
-      console.error('Erreur delete experience:', error);
+      logger.error("Erreur delete experience:", error);
     },
   });
 }
@@ -325,10 +327,10 @@ export function useAddEducation() {
 
       toast.success('✅ Formation ajoutée avec succès !');
     },
-    onError: (error: any) => {
-      const message = error.response?.data?.detail || 'Erreur lors de l\'ajout de la formation';
+    onError: (error: Error) => {
+      const message = getErrorMessage(error, 'Erreur lors de l\'ajout de la formation');
       toast.error(`❌ ${message}`);
-      console.error('Erreur add education:', error);
+      logger.error("Erreur add education:", error);
     },
   });
 }
@@ -353,8 +355,8 @@ export function useUpdateEducation() {
 
       toast.success('✅ Formation mise à jour !');
     },
-    onError: (error: any) => {
-      const message = error.response?.data?.detail || 'Erreur lors de la mise à jour';
+    onError: (error: Error) => {
+      const message = getErrorMessage(error, 'Erreur lors de la mise à jour');
       toast.error(`❌ ${message}`);
     },
   });
@@ -380,8 +382,8 @@ export function useDeleteEducation() {
 
       toast.success('✅ Formation supprimée !');
     },
-    onError: (error: any) => {
-      const message = error.response?.data?.detail || 'Erreur lors de la suppression';
+    onError: (error: Error) => {
+      const message = getErrorMessage(error, 'Erreur lors de la suppression');
       toast.error(`❌ ${message}`);
     },
   });
@@ -411,8 +413,8 @@ export function useAddSkill() {
 
       toast.success('✅ Compétence ajoutée avec succès !');
     },
-    onError: (error: any) => {
-      const message = error.response?.data?.detail || 'Erreur lors de l\'ajout de la compétence';
+    onError: (error: Error) => {
+      const message = getErrorMessage(error, 'Erreur lors de l\'ajout de la compétence');
       toast.error(`❌ ${message}`);
     },
   });
@@ -438,8 +440,8 @@ export function useUpdateSkill() {
 
       toast.success('✅ Compétence mise à jour !');
     },
-    onError: (error: any) => {
-      const message = error.response?.data?.detail || 'Erreur lors de la mise à jour';
+    onError: (error: Error) => {
+      const message = getErrorMessage(error, 'Erreur lors de la mise à jour');
       toast.error(`❌ ${message}`);
     },
   });
@@ -465,8 +467,8 @@ export function useDeleteSkill() {
 
       toast.success('✅ Compétence supprimée !');
     },
-    onError: (error: any) => {
-      const message = error.response?.data?.detail || 'Erreur lors de la suppression';
+    onError: (error: Error) => {
+      const message = getErrorMessage(error, 'Erreur lors de la suppression');
       toast.error(`❌ ${message}`);
     },
   });

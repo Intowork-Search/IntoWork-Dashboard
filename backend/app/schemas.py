@@ -12,7 +12,7 @@ Features:
 """
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Literal
 from datetime import datetime
 from enum import Enum
 
@@ -62,8 +62,6 @@ class SkillCategoryEnum(str, Enum):
     TECHNICAL = "technical"
     SOFT = "soft"
     LANGUAGE = "language"
-    TOOL = "tool"
-    OTHER = "other"
 
 
 # ==============================================================================
@@ -129,7 +127,7 @@ class SignUpRequest(BaseModel):
     password: str
     first_name: str
     last_name: str
-    role: str  # "candidate" or "employer"
+    role: Literal["candidate", "employer"]
 
 
 class SignInRequest(BaseModel):
@@ -476,7 +474,9 @@ class JobCreateRequest(BaseModel):
     job_type: str
     salary_min: Optional[int] = None
     salary_max: Optional[int] = None
-    currency: str = "EUR"
+    currency: str = "XAF"
+    country: Optional[str] = None
+    zone: Optional[str] = None
     requirements: Optional[str] = None
     responsibilities: Optional[str] = None
     benefits: Optional[str] = None
@@ -496,7 +496,9 @@ class JobResponse(BaseModel):
     job_type: str
     salary_min: Optional[int] = None
     salary_max: Optional[int] = None
-    currency: str = "EUR"
+    currency: str = "XAF"
+    country: Optional[str] = None
+    zone: Optional[str] = None
     posted_at: Optional[datetime] = None
     is_featured: bool = False
     views_count: int = 0
@@ -554,6 +556,7 @@ class JobDataInApplication(BaseModel):
     salary_min: Optional[int] = None
     salary_max: Optional[int] = None
     currency: Optional[str] = None
+    country: Optional[str] = None
 
 
 class JobApplicationResponse(BaseModel):
@@ -607,7 +610,7 @@ class EmployerApplicationsListResponse(BaseModel):
 
 class UpdateApplicationStatusRequest(BaseModel):
     """Update application status request"""
-    status: str
+    status: Literal["applied", "viewed", "shortlisted", "interview", "rejected", "accepted"]
 
 
 class UpdateApplicationStatusResponse(BaseModel):

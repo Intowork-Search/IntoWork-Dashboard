@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { integrationsAPI, IntegrationStatus } from '@/lib/api';
 import toast from 'react-hot-toast';
 import { XMarkIcon, CalendarIcon, VideoCameraIcon, UserIcon, ClockIcon } from '@heroicons/react/24/outline';
+import { logger } from '@/lib/logger';
+import { isAPIError, getErrorMessage } from '@/types/api';
 
 interface ScheduleInterviewModalProps {
   isOpen: boolean;
@@ -67,7 +69,7 @@ export default function ScheduleInterviewModal({
         setProvider('outlook');
       }
     } catch (error) {
-      console.error('Error loading integrations:', error);
+      logger.error("Error loading integrations:", error);
     } finally {
       setLoadingIntegrations(false);
     }
@@ -133,13 +135,13 @@ export default function ScheduleInterviewModal({
       // Réinitialiser et fermer
       onClose();
       resetForm();
-    } catch (error: any) {
-      console.error('Error scheduling interview:', error);
-      
-      if (error.response?.status === 403) {
+    } catch (error: unknown) {
+      logger.error("Error scheduling interview:", error);
+
+      if (isAPIError(error) && error.response?.status === 403) {
         toast.error(`${provider === 'google' ? 'Google Calendar' : 'Outlook'} non connecté. Veuillez vous connecter dans Intégrations.`);
       } else {
-        toast.error(error.response?.data?.detail || 'Erreur lors de la planification de l\'entretien');
+        toast.error(getErrorMessage(error, 'Erreur lors de la planification de l\'entretien'));
       }
     } finally {
       setIsCreating(false);

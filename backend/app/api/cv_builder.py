@@ -16,7 +16,7 @@ from sqlalchemy.orm import selectinload
 from app.database import get_db
 from app.models.base import User, CVDocument, CVAnalytics, CVTemplate
 from app.auth import require_user
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from typing import Optional, List, Dict, Any
 from datetime import datetime, timedelta, timezone
 from loguru import logger
@@ -95,6 +95,8 @@ class CVSaveRequest(BaseModel):
 
 
 class CVDocumentResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     title: Optional[str]
     slug: str
@@ -106,9 +108,6 @@ class CVDocumentResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
     public_url: Optional[str] = None
-
-    class Config:
-        from_attributes = True
 
 
 class CVPublicResponse(BaseModel):
@@ -127,6 +126,8 @@ class AnalyticsResponse(BaseModel):
 
 
 class CVListResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     title: Optional[str]
     slug: str
@@ -136,9 +137,6 @@ class CVListResponse(BaseModel):
     downloads_count: int
     created_at: datetime
     updated_at: datetime
-
-    class Config:
-        from_attributes = True
 
 
 # ==================== Helper Functions ====================

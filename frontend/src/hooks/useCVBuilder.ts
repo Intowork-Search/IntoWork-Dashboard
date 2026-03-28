@@ -17,6 +17,7 @@ import { createAuthenticatedClient } from '@/lib/api';
 import { getApiUrl } from '@/lib/getApiUrl';
 import { useAuth } from '@/hooks/useNextAuth';
 import toast from 'react-hot-toast';
+import { logger } from '@/lib/logger';
 
 // ============================================================
 // TYPES
@@ -229,7 +230,7 @@ export function useSaveCV() {
       queryClient.invalidateQueries({ queryKey: cvBuilderKeys.list() });
     },
     onError: (error: Error) => {
-      console.error('Error saving CV:', error);
+      logger.error("Error saving CV:", error);
       toast.error('Erreur lors de la sauvegarde du CV');
     },
   });
@@ -260,7 +261,7 @@ export function useGeneratePDF() {
       toast.success('PDF téléchargé avec succès');
     },
     onError: (error: Error) => {
-      console.error('Error generating PDF:', error);
+      logger.error("Error generating PDF:", error);
       toast.error('Erreur lors de la génération du PDF');
     },
   });
@@ -306,7 +307,7 @@ export function useTogglePublic() {
       }
     },
     onError: (error: Error) => {
-      console.error('Error toggling public:', error);
+      logger.error("Error toggling public:", error);
       toast.error('Erreur lors du changement de visibilité');
     },
   });
@@ -331,7 +332,7 @@ export function useDeleteCV() {
       toast.success('CV supprimé');
     },
     onError: (error: Error) => {
-      console.error('Error deleting CV:', error);
+      logger.error("Error deleting CV:", error);
       toast.error('Erreur lors de la suppression du CV');
     },
   });

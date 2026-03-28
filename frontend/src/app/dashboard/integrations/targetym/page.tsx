@@ -11,6 +11,8 @@ import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/DashboardLayout';
 import { integrationsAPI } from '@/lib/api';
 import toast from 'react-hot-toast';
+import { logger } from '@/lib/logger';
+import { getErrorMessage } from '@/types/api';
 import {
   LinkIcon,
   KeyIcon,
@@ -59,7 +61,7 @@ export default function TargetymIntegrationPage() {
       setApiKeyData(keyData);
       if (employerData?.company_id) setMyCompanyId(employerData.company_id);
     } catch (err) {
-      console.error(err);
+      logger.error("Erreur chargement targetym:", err);
       toast.error('Erreur lors du chargement');
     } finally {
       setIsLoading(false);
@@ -77,8 +79,8 @@ export default function TargetymIntegrationPage() {
       setGeneratedKey(data.api_key);
       setApiKeyData({ has_key: true, api_key_preview: data.api_key.slice(0, 8) + '••••••••', api_key_full: data.api_key });
       toast.success('Clé API générée avec succès !');
-    } catch (err: any) {
-      toast.error(err?.response?.data?.detail || 'Erreur lors de la génération');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err, 'Erreur lors de la génération'));
     } finally {
       setIsGenerating(false);
     }
@@ -106,8 +108,8 @@ export default function TargetymIntegrationPage() {
       toast.success(`✅ Lié au tenant Targetym "${data.targetym_tenant_name}" !`);
       setTenantId('');
       setTargetymApiKey('');
-    } catch (err: any) {
-      toast.error(err?.response?.data?.detail || 'Erreur de liaison');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err, 'Erreur de liaison'));
     } finally {
       setIsLinking(false);
     }
@@ -122,8 +124,8 @@ export default function TargetymIntegrationPage() {
       await integrationsAPI.unlinkTargetym(token);
       setStatus({ linked: false });
       toast.success('Liaison Targetym supprimée');
-    } catch (err: any) {
-      toast.error(err?.response?.data?.detail || 'Erreur');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err, 'Erreur'));
     } finally {
       setIsUnlinking(false);
     }

@@ -29,6 +29,8 @@ engine_kwargs = {
     "pool_size": 20,  # 20 connexions concurrentes
     "max_overflow": 10,  # 10 connexions supplémentaires si nécessaire
     "pool_pre_ping": True,  # Vérifie la connexion avant utilisation
+    "pool_recycle": 3600,  # Recycler les connexions après 1h (évite les stales Railway)
+    "pool_timeout": 30,  # Timeout si pas de connexion disponible
 }
 
 # Ajouter connect_args pour SSL sur Railway (asyncpg)

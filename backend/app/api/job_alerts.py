@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update, delete as sql_delete, func, and_, or_
 from typing import Annotated, List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from datetime import datetime
 
 from app.database import get_db
@@ -48,6 +48,8 @@ class JobAlertUpdate(BaseModel):
 
 class JobAlertResponse(BaseModel):
     """Réponse avec une alerte complète"""
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     candidate_id: int
     name: str
@@ -59,9 +61,6 @@ class JobAlertResponse(BaseModel):
     last_matching_job_id: Optional[int]
     created_at: datetime
     updated_at: datetime
-
-    class Config:
-        from_attributes = True
 
 
 class MatchingJobsResponse(BaseModel):

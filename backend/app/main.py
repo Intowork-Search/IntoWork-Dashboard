@@ -26,6 +26,7 @@ from app.api.email_templates import router as email_templates_router
 from app.api.job_alerts import router as job_alerts_router
 from app.api.collaboration import router as collaboration_router
 from app.api.integrations import router as integrations_router
+from app.api.interviews import router as interviews_router
 from dotenv import load_dotenv
 import os
 from pathlib import Path
@@ -166,7 +167,7 @@ app.add_middleware(RequestIDMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
-    allow_origin_regex=r"https://.*\.vercel\.app",  # Allow all Vercel preview/production URLs
+    allow_origin_regex=r"https://intowork[a-z0-9-]*\.vercel\.app",  # IntoWork Vercel deployments only
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allow_headers=["*"],
@@ -191,32 +192,41 @@ app.include_router(email_templates_router, prefix="/api", tags=["ats-email-templ
 app.include_router(job_alerts_router, prefix="/api", tags=["ats-job-alerts"])
 app.include_router(collaboration_router, prefix="/api", tags=["ats-collaboration"])
 app.include_router(integrations_router, prefix="/api", tags=["ats-integrations"])
+app.include_router(interviews_router, prefix="/api/interviews", tags=["interviews"])
 
 # Servir les fichiers uploadés (CV, photos, etc.) avec CORS
 uploads_path = Path(__file__).parent.parent / "uploads"
 uploads_path.mkdir(exist_ok=True)
 
 # Custom StaticFiles middleware pour ajouter les headers CORS
-from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request as StarletteRequest
 from starlette.responses import Response, FileResponse
 from starlette.staticfiles import StaticFiles as BaseStaticFiles
 
 class CORSStaticFiles(BaseStaticFiles):
-    """Custom StaticFiles with CORS headers for images"""
+    """Custom StaticFiles with CORS headers for uploads (CV, images, etc.)"""
     async def get_response(self, path: str, scope) -> Response:
         response = await super().get_response(path, scope)
-        
-        # Add CORS headers to allow cross-origin image loading
+
+        # Add CORS headers — utiliser les memes origines que le middleware principal
         if isinstance(response, FileResponse):
-            # Restreindre aux origines connues
-            response.headers["Access-Control-Allow-Origin"] = "https://intowork.co"
+            # Extraire l'origin depuis le scope
+            request_headers = dict(scope.get("headers", []))
+            origin = request_headers.get(b"origin", b"").decode("utf-8", errors="ignore")
+
+            import re
+            origin_regex = re.compile(r"https://intowork[a-z0-9-]*\.vercel\.app")
+            if origin in allowed_origins or origin_regex.match(origin):
+                response.headers["Access-Control-Allow-Origin"] = origin
+            else:
+                response.headers["Access-Control-Allow-Origin"] = allowed_origins[0] if allowed_origins else "*"
+
             response.headers["Vary"] = "Origin"
             response.headers["Access-Control-Allow-Methods"] = "GET, HEAD, OPTIONS"
             response.headers["Access-Control-Allow-Headers"] = "*"
             response.headers["Cross-Origin-Resource-Policy"] = "cross-origin"
             response.headers["Cache-Control"] = "public, max-age=31536000"
-        
+
         return response
 
 app.mount("/uploads", CORSStaticFiles(directory=str(uploads_path)), name="uploads")

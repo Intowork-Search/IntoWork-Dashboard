@@ -14,6 +14,8 @@ import {
   ArrowRightIcon,
 } from '@heroicons/react/24/outline';
 import { getApiUrl } from '@/lib/getApiUrl';
+import { COUNTRIES, CURRENCIES, formatCurrency, getCountryLabel } from '@/constants/geo';
+import { logger } from '@/lib/logger';
 
 const API_URL = getApiUrl();
 
@@ -37,6 +39,8 @@ interface Job {
   salary_min?: number;
   salary_max?: number;
   currency: string;
+  country?: string;
+  zone?: string;
   description: string;
   posted_at: string;
   is_featured: boolean;
@@ -50,6 +54,8 @@ export default function OffresPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
+  const [countryFilter, setCountryFilter] = useState('');
+  const [currencyFilter, setCurrencyFilter] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
@@ -67,10 +73,10 @@ export default function OffresPage() {
           setJobs(data.jobs || []);
           setTotalJobs(data.total || 0);
         } else {
-          console.error('Erreur lors du chargement des offres');
+          logger.error("Erreur lors du chargement des offres");
         }
       } catch (error) {
-        console.error('Erreur:', error);
+        logger.error("Erreur chargement offres:", error);
       } finally {
         setLoading(false);
       }
@@ -82,29 +88,22 @@ export default function OffresPage() {
   const filteredJobs = jobs.filter((job) => {
     const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          job.company_name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesLocation = locationFilter === '' || job.location.toLowerCase().includes(locationFilter.toLowerCase());
+    const matchesLocation = locationFilter === '' || job.location?.toLowerCase().includes(locationFilter.toLowerCase());
     const matchesType = typeFilter === 'all' || job.job_type === typeFilter;
-    
-    return matchesSearch && matchesLocation && matchesType;
+    const matchesCountry = countryFilter === '' || job.country === countryFilter;
+    const matchesCurrency = currencyFilter === '' || job.currency === currencyFilter;
+
+    return matchesSearch && matchesLocation && matchesType && matchesCountry && matchesCurrency;
   });
 
   const formatSalary = (job: Job) => {
-    const currency = job.currency === 'XOF' ? 'FCFA' : '€';
+    const cur = job.currency || 'XAF';
     if (job.salary_min && job.salary_max) {
-      if (job.currency === 'XOF') {
-        return `${(job.salary_min / 1000).toFixed(0)}K - ${(job.salary_max / 1000).toFixed(0)}K FCFA`;
-      }
-      return `${job.salary_min / 1000}K - ${job.salary_max / 1000}K ${currency}`;
+      return `${formatCurrency(job.salary_min, cur)} - ${formatCurrency(job.salary_max, cur)}`;
     } else if (job.salary_min) {
-      if (job.currency === 'XOF') {
-        return `À partir de ${(job.salary_min / 1000).toFixed(0)}K FCFA`;
-      }
-      return `À partir de ${job.salary_min / 1000}K ${currency}`;
+      return `À partir de ${formatCurrency(job.salary_min, cur)}`;
     } else if (job.salary_max) {
-      if (job.currency === 'XOF') {
-        return `Jusqu'à ${(job.salary_max / 1000).toFixed(0)}K FCFA`;
-      }
-      return `Jusqu'à ${job.salary_max / 1000}K ${currency}`;
+      return `Jusqu'à ${formatCurrency(job.salary_max, cur)}`;
     }
     return 'Salaire non spécifié';
   };
@@ -245,7 +244,7 @@ export default function OffresPage() {
                   className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all text-slate-900 placeholder:text-slate-400"
                 />
               </div>
-              
+
               <div className="relative">
                 <MapPinIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                 <input
@@ -270,6 +269,33 @@ export default function OffresPage() {
                 <option value="temporary">Temporaire</option>
                 <option value="internship">Stage</option>
                 <option value="freelance">Freelance</option>
+              </select>
+            </div>
+
+            {/* Filtres pays et devise */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <select
+                value={countryFilter}
+                onChange={(e) => setCountryFilter(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all text-slate-900"
+                aria-label="Filtrer par pays"
+              >
+                <option value="">Tous les pays</option>
+                {COUNTRIES.map((c) => (
+                  <option key={c.code} value={c.code}>{c.label}</option>
+                ))}
+              </select>
+
+              <select
+                value={currencyFilter}
+                onChange={(e) => setCurrencyFilter(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all text-slate-900"
+                aria-label="Filtrer par devise"
+              >
+                <option value="">Toutes les devises</option>
+                {CURRENCIES.map((c) => (
+                  <option key={c.code} value={c.code}>{c.label}</option>
+                ))}
               </select>
             </div>
           </div>
@@ -333,6 +359,11 @@ export default function OffresPage() {
                           <CurrencyEuroIcon className="w-4 h-4" />
                           <span>{formatSalary(job)}</span>
                         </div>
+                        {job.country && (
+                          <div className="flex items-center gap-2 text-sm text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg">
+                            <span>{getCountryLabel(job.country)}</span>
+                          </div>
+                        )}
                         <div className="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 px-3 py-1.5 rounded-lg">
                           <ClockIcon className="w-4 h-4" />
                           <span>{formatDate(job.posted_at)}</span>

@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/DashboardLayout';
 import { adminAPI, type AdminEmployer } from '@/lib/api';
+import { logger } from '@/lib/logger';
 import {
   BuildingOfficeIcon,
   MagnifyingGlassIcon,
@@ -51,7 +52,7 @@ export default function AdminEmployersPage() {
         : employersData;
       setEmployers(filtered);
     } catch (error) {
-      console.error('Erreur chargement employeurs:', error);
+      logger.error("Erreur chargement employeurs:", error);
     } finally {
       setLoading(false);
     }

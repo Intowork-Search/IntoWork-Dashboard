@@ -9,7 +9,7 @@ from app.models.base import JobApplication, Job, User, Employer, NotificationTyp
 from app.auth import require_user
 from app.api.notifications import create_notification
 from app.services.email_service import email_service
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime, timezone
 import logging
 
@@ -25,6 +25,8 @@ class JobApplicationCreate(BaseModel):
     cover_letter: Optional[str] = None
 
 class JobApplicationResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     job_id: int
     candidate_id: int
@@ -32,9 +34,6 @@ class JobApplicationResponse(BaseModel):
     applied_at: datetime
     notes: Optional[str] = None
     job: dict  # Sera rempli avec les données du job
-
-    class Config:
-        from_attributes = True
 
 class ApplicationsListResponse(BaseModel):
     applications: List[JobApplicationResponse]
@@ -418,7 +417,7 @@ async def get_application(
 
     result = await db.execute(
         select(JobApplication)
-        .options(selectinload(JobApplication.job))
+        .options(selectinload(JobApplication.job).selectinload(Job.company))
         .filter(
             JobApplication.id == application_id,
             JobApplication.candidate_id == candidate.id
@@ -432,7 +431,7 @@ async def get_application(
     job_data = {
         'id': application.job.id,
         'title': application.job.title,
-        'company_name': application.job.company_name,
+        'company_name': application.job.company.name if application.job.company else None,
         'location': application.job.location,
         'location_type': application.job.location_type,
         'job_type': application.job.job_type,
@@ -507,6 +506,8 @@ async def withdraw_application(
 # ===== ENDPOINTS EMPLOYEUR =====
 
 class CandidateApplicationResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     job_id: int
     job_title: str
@@ -519,9 +520,6 @@ class CandidateApplicationResponse(BaseModel):
     cover_letter: Optional[str] = None
     notes: Optional[str] = None
     cv_url: Optional[str] = None
-
-    class Config:
-        from_attributes = True
 
 class EmployerApplicationsListResponse(BaseModel):
     applications: List[CandidateApplicationResponse]

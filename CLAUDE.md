@@ -1,129 +1,155 @@
-# CLAUDE.md
+# CLAUDE.md — IntoWork
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+> Fichier de contexte injecté automatiquement dans chaque session Claude Code.
+> Propriétaire : AGILITYM | Plateforme : IntoWork (SaaS Recrutement B2B2C)
+> Langue de travail : **Français exclusivement**
 
-## Project Overview
+---
 
-INTOWORK Search is a B2B2C recruitment platform with AI-powered job matching serving candidates and employers.
+## 1. Vue d'ensemble du projet
 
-**Current Status**: Phase 3 (Admin) complete (March 2026)
-- Phases 1-2: Auth, candidate/employer dashboards, job posting, applications, notifications
-- ATS Phase 2: AI scoring, CV builder, email templates, job alerts, calendar integrations (Google/Outlook), LinkedIn, TargetYM, employer collaboration
-- Phase 3: Admin dashboard and platform management (complete)
-- Phase 4 (Next): AI matching, advanced analytics, third-party integrations
+**IntoWork Search** est une plateforme de recrutement B2B2C avec matching IA, servant candidats et employeurs en Afrique Centrale (Gabon, Cameroun, Congo).
 
-## Architecture
+### Statut phases
 
-### Stack
+| Phase | Description | Statut |
+|-------|-------------|--------|
+| 1–2 | Auth, dashboards, offres, candidatures, notifications, ATS (scoring IA, CV builder, alertes, calendriers, LinkedIn, TargetYM, collaboration) | ✅ Complet |
+| 3 | Dashboard admin et gestion plateforme | ✅ Complet (mars 2026) |
+| 4 | **AI matching avancé, analytics, intégrations tierces** | 🔄 En cours |
 
-**Backend** (`/backend`):
-- FastAPI 0.104+ with **full async/await** (AsyncSession, async routes — never use synchronous SQLAlchemy)
-- SQLAlchemy 2.0+ with async engine, declarative models in `backend/app/models/base.py`
-- PostgreSQL 15 (development: port **5433**, not default 5432)
-- Alembic migrations in `backend/alembic/versions/`
-- HS256 JWT via `NEXTAUTH_SECRET` (shared with frontend)
-- SlowAPI rate limiting, Prometheus metrics, Redis cache (optional)
+---
 
-**Frontend** (`/frontend`):
-- Next.js 16 (App Router), TypeScript strict, React Compiler enabled (`reactCompiler: true` in `next.config.ts`) — avoid manual `useMemo`/`useCallback`
-- Tailwind CSS 4 — config is **inline in `src/app/globals.css`** via `@plugin "daisyui/theme"`. **No `tailwind.config.js`** file. All theme tokens live in that CSS file.
-- DaisyUI 5.5+ — use component classes (`btn`, `card`, `modal`) over hand-rolled Tailwind
-- NextAuth v5 (JWT strategy, 24h session)
-- TanStack React Query v5 for all server state
-- Axios via `createAuthenticatedClient(token)` from `lib/api.ts`
-- React Hot Toast for notifications
+## 2. Stack technique
 
-### Authentication
+### Backend (`/backend`)
 
-NextAuth v5 with CredentialsProvider (`frontend/src/auth.ts`):
-1. Sign up → `/signup`, sign in → `/signin` (**not** `/auth/signin`)
-2. Frontend calls `POST /api/auth/signin` → backend returns JWT access token
-3. JWT stored in NextAuth session (`session.accessToken`)
-4. All API calls use `Authorization: Bearer <token>`
-5. Backend verifies JWT using `NEXTAUTH_SECRET` (HS256)
+- **FastAPI 0.104+** — full async/await **obligatoire** (AsyncSession, routes async — jamais de SQLAlchemy synchrone)
+- **SQLAlchemy 2.0+** — async engine, modèles déclaratifs dans `backend/app/models/base.py`
+- **PostgreSQL 15** — dev : port **5433** (pas 5432)
+- **Alembic** — migrations dans `backend/alembic/versions/`
+- **PyJWT** — HS256 via `NEXTAUTH_SECRET` (partagé avec frontend)
+- **SlowAPI** — rate limiting | **Prometheus** — métriques | **Redis** — cache (optionnel)
+- **Pydantic V2** — schémas stricts, jamais V1
 
-**Auth pages (actual routes)**: `/signin`, `/signup`, `/forgot-password`, `/reset-password`, `/onboarding`
+### Frontend (`/frontend`)
 
-**Dashboard auth guard**: `frontend/src/app/dashboard/layout.tsx` is a **client component** using `useUser()` hook — NOT server-side `auth()`. Route protection happens client-side.
+- **Next.js 16** (App Router) + TypeScript strict + React Compiler (`reactCompiler: true` dans `next.config.ts`)
+  - ⚠️ Éviter `useMemo`/`useCallback` manuels — React Compiler s'en charge
+- **Tailwind CSS 4** — config **inline** dans `src/app/globals.css` via `@plugin "daisyui/theme"` — **pas de `tailwind.config.js`**
+- **DaisyUI 5.5+** — classes composants (`btn`, `card`, `modal`) prioritaires sur Tailwind brut
+- **NextAuth v5** — stratégie JWT, session 24h
+- **TanStack React Query v5** — tout l'état serveur
+- **Axios** via `createAuthenticatedClient(token)` depuis `lib/api.ts`
+- **React Hot Toast** — notifications
 
-**Auth hooks** (`frontend/src/hooks/useNextAuth.ts`):
-- `useAuth()` — returns `getToken()`, `isSignedIn`, `userId`
-- `useUser()` — returns `user`, `isLoaded`, `isSignedIn`
+---
 
-**Migration note**: Clerk → NextAuth v5 migration complete. `clerk_id` removed (migration `r9i0j1k2l3m4` applied). `@clerk/nextjs` removed from package.json.
+## 3. Authentification
 
-**`src/middleware.ts`** wraps `auth()` and runs on the Edge runtime — it has NOT been renamed to `proxy.ts`. Do not add Node.js APIs here.
+NextAuth v5 + CredentialsProvider (`frontend/src/auth.ts`) :
 
-### Backend API Routes
+1. Inscription → `/signup` | Connexion → `/signin` (⚠️ **pas** `/auth/signin`)
+2. Frontend → `POST /api/auth/signin` → backend retourne JWT access token
+3. JWT stocké dans session NextAuth (`session.accessToken`)
+4. Tous les appels API : `Authorization: Bearer <token>`
+5. Backend vérifie JWT via `NEXTAUTH_SECRET` (HS256)
 
-All routes prefixed with `/api`:
+**Routes auth** : `/signin`, `/signup`, `/forgot-password`, `/reset-password`, `/onboarding`
 
-| Prefix | File | Description |
-|--------|------|-------------|
-| `/api` | `ping.py`, `users.py` | Health check, user management |
+**Guard dashboard** : `frontend/src/app/dashboard/layout.tsx` est un **client component** utilisant `useUser()` — PAS `auth()` server-side.
+
+**Hooks auth** (`frontend/src/hooks/useNextAuth.ts`) :
+- `useAuth()` → `getToken()`, `isSignedIn`, `userId`
+- `useUser()` → `user`, `isLoaded`, `isSignedIn`
+
+**Note migration** : Clerk → NextAuth v5 complet. `clerk_id` supprimé (migration `r9i0j1k2l3m4`). `@clerk/nextjs` retiré de package.json.
+
+**`src/middleware.ts`** : wraps `auth()` sur Edge runtime — **PAS renommé** en `proxy.ts`. Ne pas y ajouter d'APIs Node.js.
+
+---
+
+## 4. Routes API backend
+
+Toutes préfixées `/api` :
+
+| Préfixe | Fichier | Description |
+|---------|---------|-------------|
+| `/api` | `ping.py`, `users.py` | Health check, gestion utilisateurs |
 | `/api/auth` | `auth_routes.py` | signup, signin, forgot/reset password |
-| `/api/candidates` | `candidates.py` | Profile, CV upload, experiences, education, skills |
-| `/api/employers` | `employers.py` | Employer profile management |
-| `/api/jobs` | `jobs.py` | Job CRUD, search with filters (role-aware) |
-| `/api/applications` | `applications.py` | Job applications, status updates |
-| `/api/companies` | `companies.py` | Company management |
-| `/api/dashboard` | `dashboard.py` | Stats and recent activities |
-| `/api/notifications` | `notifications.py` | Notification CRUD, mark as read |
-| `/api/admin` | `admin.py` | Admin-only (user management, platform stats) |
+| `/api/candidates` | `candidates.py` | Profil, CV upload, expériences, formation, compétences |
+| `/api/employers` | `employers.py` | Gestion profil employeur |
+| `/api/jobs` | `jobs.py` | CRUD offres, recherche filtrée (role-aware) |
+| `/api/applications` | `applications.py` | Candidatures, mises à jour statut |
+| `/api/companies` | `companies.py` | Gestion entreprises |
+| `/api/dashboard` | `dashboard.py` | Stats et activités récentes |
+| `/api/notifications` | `notifications.py` | CRUD notifications, mark as read |
+| `/api/admin` | `admin.py` | Admin uniquement (gestion users, stats plateforme) |
 | `/api/cv-builder` | `cv_builder.py` | CV builder (ATS Phase 2) |
-| `/api/ai-scoring` | `ai_scoring.py` | AI candidate scoring (ATS Phase 2) |
-| `/api` | `email_templates.py` | Email templates (ATS Phase 2) |
-| `/api` | `job_alerts.py` | Job alerts (ATS Phase 2) |
-| `/api` | `collaboration.py` | Employer collaboration (ATS Phase 2) |
-| `/api` | `integrations.py` | External integrations (ATS Phase 2) |
+| `/api/ai-scoring` | `ai_scoring.py` | Scoring IA candidats (ATS Phase 2) |
+| `/api` | `email_templates.py` | Templates email (ATS Phase 2) |
+| `/api` | `job_alerts.py` | Alertes offres (ATS Phase 2) |
+| `/api` | `collaboration.py` | Collaboration employeurs (ATS Phase 2) |
+| `/api` | `integrations.py` | Intégrations externes (ATS Phase 2) |
 
-Static files: `backend/uploads/` served at `/uploads` via FastAPI StaticFiles with CORS headers.
+Fichiers statiques : `backend/uploads/` servis via `/uploads` (FastAPI StaticFiles + CORS).
 
-### Backend Services (`backend/app/services/`)
+---
 
-- `email_service.py` — Resend email (password reset, notifications)
-- `cloudinary_service.py` — Image/media uploads
-- `ai_scoring.py` — AI-powered candidate scoring
-- `targetym_service.py` — TargetYM ATS integration
-- `google_calendar_service.py` / `outlook_calendar_service.py` — Interview scheduling
-- `linkedin_service.py` — LinkedIn profile import
+## 5. Services backend (`backend/app/services/`)
 
-### Frontend Routes (`frontend/src/app`)
+| Service | Description |
+|---------|-------------|
+| `email_service.py` | Emails Resend (reset password, notifications) |
+| `cloudinary_service.py` | Upload images/médias |
+| `ai_scoring.py` | Scoring IA candidats (Anthropic SDK direct) |
+| `targetym_service.py` | Intégration ATS TargetYM (plateforme AGILITYM) |
+| `google_calendar_service.py` | Planification entretiens Google |
+| `outlook_calendar_service.py` | Planification entretiens Outlook |
+| `linkedin_service.py` | Import profil LinkedIn |
+
+---
+
+## 6. Routes frontend (`frontend/src/app`)
 
 ```
-/                         Marketing landing page (page.tsx — Plus Jakarta Sans, green #6B9B5F)
-/signin, /signup          Auth pages
-/forgot-password          Password reset request
-/reset-password           Reset form (with token query param)
-/onboarding               Role selection (candidate/employer)
-/onboarding/employer      Employer-specific onboarding
-/dashboard                Main dashboard (role-aware)
-  /candidates             Candidate profile
-  /cv                     CV management
-  /jobs, /jobs/[id]       Job search and detail
-  /applications           Applications list
-  /job-posts              Employer job management
-  /company                Employer company settings
-  /profile                User profile settings
-  /settings               Account/notifications/privacy
-  /ai-scoring/[jobId]     AI scoring for a job (ATS Phase 2)
-  /email-templates        Email templates manager (ATS Phase 2)
-  /job-alerts             Job alerts (ATS Phase 2)
-  /integrations           External integrations (ATS Phase 2)
-  /admin                  Admin panel
-/cv-builder               Public CV builder
-/cv/[slug]                Public CV viewer
-/offres                   Public job listings
-/entreprises              Public company directory
+/                         Landing page marketing (Plus Jakarta Sans, vert #6B9B5F)
+/signin, /signup          Pages auth
+/forgot-password          Demande reset password
+/reset-password           Formulaire reset (param token dans query)
+/onboarding               Sélection rôle (candidat/employeur)
+/onboarding/employer      Onboarding employeur spécifique
+/dashboard                Dashboard principal (role-aware)
+  /candidates             Profil candidat
+  /cv                     Gestion CV
+  /jobs, /jobs/[id]       Recherche offres et détail
+  /applications           Liste candidatures
+  /job-posts              Gestion offres employeur
+  /company                Paramètres entreprise employeur
+  /profile                Paramètres profil utilisateur
+  /settings               Compte / notifications / confidentialité
+  /ai-scoring/[jobId]     Scoring IA pour une offre (ATS Phase 2)
+  /email-templates        Gestionnaire templates email (ATS Phase 2)
+  /job-alerts             Alertes offres (ATS Phase 2)
+  /integrations           Intégrations externes (ATS Phase 2)
+  /admin                  Panel admin
+/cv-builder               CV builder public
+/cv/[slug]                Viewer CV public
+/offres                   Liste offres publique
+/entreprises              Annuaire entreprises public
 ```
 
-**Landing page design reference**: `frontend/design-system.md` — tokens, colors, components, animations for intowork.co brand. Brand color palette in `frontend/src/styles/brand-colors.css`; candidate profile styles in `frontend/src/styles/profile.css`.
+**Référence design** : `frontend/design-system.md` — tokens, couleurs, composants, animations brand intowork.co.
+Palette brand : `frontend/src/styles/brand-colors.css` | Profil candidat : `frontend/src/styles/profile.css`
 
-### Key Patterns
+---
 
-**Backend async pattern**:
+## 7. Patterns de code
+
+### Pattern async backend (SQLAlchemy)
+
 ```python
-# Query
+# Query simple
 result = await db.execute(select(Model).filter(Model.field == value))
 obj = result.scalar_one_or_none()
 
@@ -137,7 +163,8 @@ result = await db.execute(
 )
 ```
 
-**Auth dependencies** (from `backend/app/auth.py`):
+### Dépendances auth backend (`backend/app/auth.py`)
+
 ```python
 from app.auth import require_user, require_candidate, require_employer, require_admin
 
@@ -145,18 +172,20 @@ async def endpoint(user: Annotated[User, Depends(require_user)]): ...
 async def endpoint(candidate: Annotated[Candidate, Depends(require_candidate)]): ...
 ```
 
-**React Query pattern** (frontend):
+### Pattern React Query (frontend)
+
 ```typescript
-// Use custom hooks — all defined in frontend/src/hooks/
+// Hooks custom — tous dans frontend/src/hooks/
 const { data: jobs, isLoading } = useJobs(filters);
-const createJob = useCreateJob(); // auto-invalidates cache on success
+const createJob = useCreateJob(); // invalide le cache automatiquement
 
 // Query keys
 import { queryKeys } from '@/lib/queryKeys';
 queryClient.invalidateQueries({ queryKey: queryKeys.jobs.all });
 ```
 
-**Authenticated API call**:
+### Appel API authentifié (frontend)
+
 ```typescript
 const { getToken } = useAuth();
 const token = await getToken();
@@ -164,193 +193,260 @@ const client = createAuthenticatedClient(token);
 const response = await client.get('/candidates/profile');
 ```
 
-## Development Commands
+### Gestion d'erreurs — standard AGILITYM
+
+```python
+# Exceptions custom par domaine
+class RecruitmentError(Exception): ...
+class ApplicationStatusError(RecruitmentError): ...
+class CandidateNotFoundError(RecruitmentError): ...
+
+# Logs structurés JSON
+import structlog
+logger = structlog.get_logger()
+logger.error("application_status_error",
+    candidate_id=candidate_id,
+    job_id=job_id,
+    error=str(e)
+)
+
+# HTTPException normalisée
+raise HTTPException(
+    status_code=422,
+    detail={"code": "APPLICATION_STATUS_INVALID", "message": "Statut de candidature invalide"}
+)
+```
+
+---
+
+## 8. Workflow frontend — Claude Code natif
+
+> Claude Code gère le frontend directement en s'appuyant sur `design-system.md`.
+> Aucun outil externe n'est requis pour générer du code UI.
+
+### Règle absolue : vérifier `design-system.md` en premier
+
+**AVANT tout code frontend** → vérifier l'existence de `frontend/design-system.md`.
+
+#### Si `design-system.md` N'EXISTE PAS
+
+1. Lire `frontend/src/styles/brand-colors.css` et `frontend/src/app/globals.css`
+2. Extraire les tokens existants (couleurs, typographie, espacements)
+3. Créer `frontend/design-system.md` à partir des tokens réels du projet
+4. Confirmer avec l'utilisateur avant de continuer
+
+#### Si `design-system.md` EXISTE
+
+1. Le lire intégralement
+2. S'y conformer strictement pour tout nouveau composant/page
+
+### Principes frontend
+
+- **DaisyUI first** : classes composants DaisyUI avant tout Tailwind brut
+- **Cohérence tokens** : CSS variables définies dans `globals.css` uniquement
+- **React Compiler actif** : ne jamais ajouter `useMemo`/`useCallback` manuellement
+- **Pas de `tailwind.config.js`** : tous les tokens dans `globals.css`
+- **TypeScript strict** : aucun `any`, toujours typer props et retours de hooks
+- **Responsive mobile-first** sur toutes les vues dashboard
+
+### Workflow nouveau composant/page
+
+```
+1. Lire design-system.md
+2. Identifier le pattern DaisyUI le plus proche
+3. Créer le composant TypeScript avec types stricts
+4. Ajouter le hook React Query si données serveur
+5. Générer le test Vitest minimal
+6. Commit avec message conventionnel
+```
+
+---
+
+## 9. Contextes métier permanents
+
+> Ces contextes s'appliquent à **chaque** développement, sans exception.
+
+### 9.1 Conformité OHADA / SYSCOHADA
+
+- Plans comptables SYSCOHADA dans tous les modèles financiers
+- Facturation en **FCFA** (XAF/XOF) avec gestion multi-devises implicite
+- Archivage légal conforme aux durées OHADA
+
+### 9.2 Intégration Mobile Money — CinetPay
+
+- **CinetPay** comme gateway principal
+- Airtel Money et Moov Money comme alternatives
+- Gestion des webhooks de confirmation de paiement
+- Exceptions custom : `PaymentGatewayError`, `CinetPayWebhookError`
+
+### 9.3 Multi-tenant UEMOA/CEMAC
+
+- Isolation stricte des données par zone économique
+- Colonne `zone` sur les modèles concernés : `"UEMOA"` | `"CEMAC"`
+- Jamais de fuite de données cross-tenant dans les queries
+
+---
+
+## 10. Actions automatiques systématiques
+
+À inclure dans **chaque** réponse dev quand pertinent :
+
+| Action | Condition de déclenchement |
+|--------|---------------------------|
+| **Migration Alembic** | Dès qu'un modèle SQLAlchemy est modifié |
+| **Tests pytest** | Toute nouvelle route ou service backend |
+| **Tests Vitest** | Tout nouveau hook ou composant avec logique |
+| **Vérification types** | Valider schémas Pydantic V2 + types TypeScript |
+| **Commandes git** | Suggérer commit message conventionnel |
+
+### Format commit (Conventional Commits)
+
+```
+feat(candidates): add CV multi-version support
+fix(auth): correct token expiry on session refresh
+chore(migrations): add zone column to job_application
+refactor(ai-scoring): extract scoring logic to service layer
+```
+
+---
+
+## 11. Commandes de développement
 
 ```bash
-# Start both services
-make dev          # or ./start-dev.sh (Linux/Mac) / start-dev.bat (Windows)
+# Démarrer les deux services
+make dev          # ou ./start-dev.sh (Linux/Mac)
 
-# Backend (activate venv first)
+# Backend (activer venv d'abord)
 cd backend
-source venv/bin/activate      # Windows: venv\Scripts\activate
+source venv/bin/activate
 uvicorn app.main:app --reload --port 8001
 
 # Frontend
 cd frontend && npm run dev    # port 3000
 
-# Database
-docker run --name postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=intowork -p 5433:5432 -d postgres:15
+# Base de données
+docker run --name postgres -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=intowork -p 5433:5432 -d postgres:15
 alembic upgrade head
 alembic revision --autogenerate -m "description"
 
 # Tests
 cd backend
-python test_api.py              # API connectivity
-python test_complete_backend.py # Comprehensive
+python test_api.py              # connectivité API
+python test_complete_backend.py # test complet
 
-# Git (dual GitHub repos — always use make)
-make commit MSG="message"   # commit + push to both repos
-make push                   # push to both repos
-make status-all             # check sync status
+# Git — dépôts duaux GitHub (toujours via make)
+make commit MSG="feat: ..."   # commit + push vers les deux dépôts
+make push                     # push vers les deux dépôts
+make status-all               # vérifier la synchronisation
 ```
 
-## Environment Variables
+---
 
-**`backend/.env`**:
-```
+## 12. Variables d'environnement
+
+**`backend/.env`** :
+```env
 DATABASE_URL=postgresql://postgres:postgres@localhost:5433/intowork
-NEXTAUTH_SECRET=<min 32 chars — must match frontend>
-JWT_SECRET=<jwt signing key>
+NEXTAUTH_SECRET=<min 32 chars — identique au frontend>
+JWT_SECRET=<clé de signature JWT>
 RESEND_API_KEY=re_...
 FROM_EMAIL=INTOWORK <noreply@intowork.com>
 FRONTEND_URL=http://localhost:3000
-ANTHROPIC_API_KEY=<required for AI scoring service>
-CLOUDINARY_CLOUD_NAME=<for image/media uploads>
-CLOUDINARY_API_KEY=<cloudinary>
-CLOUDINARY_API_SECRET=<cloudinary>
+ANTHROPIC_API_KEY=<requis pour ai_scoring.py>
+CLOUDINARY_CLOUD_NAME=<upload images>
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
 ```
 
-**`frontend/.env.local`**:
-```
+**`frontend/.env.local`** :
+```env
 NEXTAUTH_URL=http://localhost:3000
-AUTH_SECRET=<same as backend NEXTAUTH_SECRET>
+AUTH_SECRET=<identique à NEXTAUTH_SECRET backend>
 NEXT_PUBLIC_API_URL=http://localhost:8001/api
 ```
 
-`DATABASE_URL` is auto-converted from `postgresql://` to `postgresql+asyncpg://` for async support.
-
-## Database Schema
-
-Core models (`backend/app/models/base.py`):
-- **User** — email, password_hash, role (candidate/employer/admin), first_name, last_name
-- **Candidate** → User (1:1) — profile, CV fields, relations: experiences, educations, skills, cvs
-- **CandidateCV** → Candidate — multiple CVs with is_active flag
-- **Experience**, **Education**, **Skill** → Candidate (cascade delete)
-- **Company** — company info for employers
-- **Employer** → User + Company (1:1)
-- **Job** → Company — status: draft/active/closed/archived; job_type stored as VARCHAR (not enum, after migration)
-- **JobApplication** → Candidate + Job — status: applied/pending/viewed/shortlisted/interview/accepted/rejected; has `notes` and `cv_id` fields
-- **CVDocument** → Candidate — CV Builder documents (5 templates), with `slug` for public sharing
-- **CVAnalytics** → CVDocument — view/download tracking per public CV
-- **Notification** → User
-- **PasswordResetToken** — single-use, 24h expiry
-- **Account**, **Session** — NextAuth OAuth support
-
-**Note**: `job_type` and `location_type` columns on Job are VARCHAR (enums were converted in migration `q8h9i0j1k2l3`).
-
-## Deployment
-
-- **Frontend**: Vercel — deploy manually with `vercel --prod` from `frontend/` directory. **Note**: Two Vercel projects exist — `frontend` (where deploys go) and `into-work-dashboard` (currently serves `intowork.co`). Git auto-deploy is not configured.
-- **Backend**: Railway → `intowork-dashboard-production-1ede.up.railway.app`, migrations run automatically via `backend/start.sh`
-- CORS: `allowed_origins` in `main.py` + regex `https://.*\.vercel\.app` for preview URLs
-
-### MCP Servers Available
-
-- **Railway MCP**: deploy backend, view logs, manage env vars
-- **Context7 MCP**: query up-to-date docs for FastAPI, Next.js, SQLAlchemy, React Query
-
-## Key Gotchas
-
-1. **Dashboard layout is client-side guard** — uses `useUser()` hook, not `auth()` server-side
-2. **Backend venv required** before any `python` or `uvicorn` commands
-3. **NEXTAUTH_SECRET must be identical** in backend `.env` (`NEXTAUTH_SECRET`) and frontend `.env.local` (`AUTH_SECRET` + `NEXTAUTH_SECRET`)
-4. **Job enums are VARCHAR** in DB (after `q8h9i0j1k2l3` migration) — don't use SQLEnum for new job-related queries
-5. **`/api` prefix required** — `NEXT_PUBLIC_API_URL` must end with `/api`
-6. **React Query cache** — always call `queryClient.invalidateQueries()` after mutations
-7. **Migrations must be reviewed** before applying — check async compatibility in Alembic versions
-8. **File uploads** stored at `backend/uploads/cvs/{candidate_id}/` — served at `/uploads` with public CORS
-9. **Railway startup** runs `alembic upgrade head` automatically — new migrations deploy on next push
-10. **`middleware.ts` is NOT `proxy.ts`** — the Next.js 16 rename to `proxy.ts` has NOT been applied; `middleware.ts` wraps `auth()` on the Edge runtime
-11. **AI scoring requires `ANTHROPIC_API_KEY`** — `ai_scoring.py` uses the Anthropic SDK directly (not the AI Gateway); ensure the key is set in backend `.env`
-12. **Tailwind config is inline** — no `tailwind.config.js`; all tokens (colors, radii) are in `frontend/src/app/globals.css`
-13. **`CandidateProfile` type mismatch** — backend returns merged user+candidate data but `CandidateProfile` type only declares candidate fields (no `first_name`, `last_name`, `email`, etc.). Cast via `as unknown as UserProfile` when consuming in settings/profile pages
-14. **Two Vercel projects** — `frontend` project is where deploys go; `into-work-dashboard` project is what serves `intowork.co`. Domain transfer needed via Vercel Dashboard to point `intowork.co` at the `frontend` project
-15. **Vercel deploys are manual** — Git auto-deploy is not configured. Always run `vercel --prod` from `frontend/` directory after pushing
+`DATABASE_URL` est auto-converti de `postgresql://` vers `postgresql+asyncpg://` pour le support async.
 
 ---
 
-# MCP Gemini Design - MANDATORY UNIQUE WORKFLOW
+## 13. Schéma base de données
 
-## ABSOLUTE RULE
+Modèles core (`backend/app/models/base.py`) :
 
-You NEVER write frontend/UI code yourself. Gemini is your frontend developer.
+| Modèle | Description |
+|--------|-------------|
+| **User** | email, password_hash, role (candidate/employer/admin), first_name, last_name |
+| **Candidate** → User (1:1) | profil, CV fields, relations : experiences, educations, skills, cvs |
+| **CandidateCV** → Candidate | CVs multiples avec flag `is_active` |
+| **Experience**, **Education**, **Skill** → Candidate | cascade delete |
+| **Company** | infos entreprise pour employeurs |
+| **Employer** → User + Company (1:1) | |
+| **Job** → Company | status : draft/active/closed/archived ; `job_type` en VARCHAR |
+| **JobApplication** → Candidate + Job | status : applied/pending/viewed/shortlisted/interview/accepted/rejected ; champs `notes` et `cv_id` |
+| **CVDocument** → Candidate | CV Builder (5 templates), `slug` pour partage public |
+| **CVAnalytics** → CVDocument | tracking vues/téléchargements |
+| **Notification** → User | |
+| **PasswordResetToken** | usage unique, expiry 24h |
+| **Account**, **Session** | support OAuth NextAuth |
 
----
-
-## AVAILABLE TOOLS
-
-### `generate_vibes`
-Generates a visual page with 5 differently styled sections. The user opens the page, sees all 5 vibes, and picks their favorite. The code from the chosen vibe becomes the design-system.md.
-
-### `create_frontend`
-Creates a NEW complete file (page, component, section).
-
-### `modify_frontend`
-Makes ONE design modification to existing code. Returns a FIND/REPLACE block to apply.
-
-### `snippet_frontend`
-Generates a code snippet to INSERT into an existing file. For adding elements without rewriting the entire file.
-
----
-
-## WORKFLOW (NO ALTERNATIVES)
-
-### STEP 1: Check for design-system.md
-
-BEFORE any frontend call → check if `design-system.md` exists at project root.
-
-### STEP 2A: If design-system.md DOES NOT EXIST
-
-1. Call `generate_vibes` with projectDescription, projectType, techStack
-2. Receive the code for a page with 5 visual sections
-3. Ask: "You don't have a design system. Can I create vibes-selection.tsx so you can visually choose your style?"
-4. If yes → Write the page to the file
-5. User chooses: "vibe 3" or "the 5th one"
-6. Extract THE ENTIRE CODE between `<!-- VIBE_X_START -->` and `<!-- VIBE_X_END -->`
-7. Save it to `design-system.md`
-8. Ask: "Delete vibes-selection.tsx?"
-9. Continue normally
-
-### STEP 2B: If design-system.md EXISTS
-
-Read it and use its content for frontend calls.
-
-### STEP 3: Frontend Calls
-
-For EVERY call (create_frontend, modify_frontend, snippet_frontend), you MUST pass:
-
-- `designSystem`: Copy-paste the ENTIRE content of design-system.md (all the code, not a summary)
-- `context`: Functional/business context WITH ALL REAL DATA. Include:
-  - What it does, features, requirements
-  - ALL real text/labels to display (status labels, button text, titles...)
-  - ALL real data values (prices, stats, numbers...)
-  - Enum values and their exact meaning
-  - Any business-specific information
-
-**WHY**: Gemini will use placeholders `[Title]`, `[Price]` for missing info. If you don't provide real data, you'll get placeholders or worse - fake data.
+⚠️ `job_type` et `location_type` sur Job sont **VARCHAR** (enums convertis en migration `q8h9i0j1k2l3`) — ne pas utiliser `SQLEnum` pour ces colonnes.
 
 ---
 
-## FORBIDDEN
+## 14. Déploiement
 
-- Writing frontend without Gemini
-- Skipping the vibes workflow when design-system.md is missing
-- Extracting "rules" instead of THE ENTIRE code
-- Manually creating design-system.md
-- Passing design/styling info in `context` (that goes in `designSystem`)
-- Summarizing the design system instead of copy-pasting it entirely
-- Calling Gemini without providing real data (labels, stats, prices, etc.) → leads to fake info
+| Composant | Plateforme | Notes |
+|-----------|------------|-------|
+| **Frontend** | Vercel — projet `frontend` | Deploy manuel : `vercel --prod` depuis `frontend/`. Git auto-deploy **non configuré** |
+| **Backend** | Railway → `intowork-dashboard-production-1ede.up.railway.app` | `alembic upgrade head` lancé automatiquement via `backend/start.sh` |
+| **CORS** | `main.py` | `allowed_origins` + regex `https://intowork[a-z0-9-]*\.vercel\.app` |
 
-## EXPECTED
+⚠️ **Deux projets Vercel** : `frontend` (cible des deploys) et `into-work-dashboard` (sert `intowork.co`). Transfer de domaine requis via Vercel Dashboard.
 
-- Check for design-system.md BEFORE anything
-- Follow the complete vibes workflow if missing
-- Pass the FULL design-system.md content in `designSystem`
-- Pass functional context in `context` (purpose, features, requirements)
+---
 
-## EXCEPTIONS (you can code these yourself)
+## 15. MCP Servers disponibles
 
-- Text-only changes
-- JS logic without UI
-- Non-visual bug fixes
-- Data wiring (useQuery, etc.)
+| MCP | Usage |
+|-----|-------|
+| **Railway MCP** | Déployer backend, voir logs, gérer env vars |
+| **Context7 MCP** | Docs à jour FastAPI, Next.js, SQLAlchemy, React Query |
+| **Vercel MCP** | Gérer projets et déploiements Vercel |
+
+---
+
+## 16. ECC — Commandes utiles (everything-claude-code)
+
+| Commande | Usage |
+|----------|-------|
+| `/quality-gate .` | Audit qualité du code courant |
+| `/harness-audit` | Vérifier hooks et skills configurés |
+| `/tdd` | Mode TDD : tests avant le code |
+| `/research-first [sujet]` | Chercher avant de coder |
+| `/skill-creator` | Créer un nouveau skill interactivement |
+
+---
+
+## 17. Gotchas critiques
+
+1. **Guard dashboard côté client** — `useUser()`, jamais `auth()` server-side
+2. **venv obligatoire** avant tout `python` ou `uvicorn`
+3. **`NEXTAUTH_SECRET` identique** dans `backend/.env` et `frontend/.env.local` (`AUTH_SECRET`)
+4. **Job enums = VARCHAR** — ne pas utiliser `SQLEnum` pour les colonnes job après migration `q8h9i0j1k2l3`
+5. **Préfixe `/api` obligatoire** — `NEXT_PUBLIC_API_URL` doit finir par `/api`
+6. **React Query cache** — toujours `queryClient.invalidateQueries()` après mutation
+7. **Migrations à relire** avant apply — vérifier compatibilité async dans Alembic
+8. **Uploads** stockés dans `backend/uploads/cvs/{candidate_id}/` — servis via `/uploads` avec CORS public
+9. **Railway** lance `alembic upgrade head` automatiquement au démarrage
+10. **`middleware.ts` ≠ `proxy.ts`** — le rename Next.js 16 n'a PAS été appliqué ; `auth()` tourne sur Edge runtime
+11. **AI scoring** nécessite `ANTHROPIC_API_KEY` — `ai_scoring.py` utilise le SDK Anthropic directement
+12. **Tailwind inline** — tous les tokens dans `frontend/src/app/globals.css`, jamais dans `tailwind.config.js`
+13. **`CandidateProfile` type mismatch** — le backend retourne données user+candidate fusionnées. Caster via `as unknown as UserProfile` dans les pages settings/profil
+14. **Deploy Vercel manuel** — toujours `vercel --prod` depuis `frontend/` après push
+15. **Pydantic V2 strict** — tous les schémas utilisent `model_config = ConfigDict(...)`, jamais de migration silencieuse vers V1
+16. **CI/CD** — GitHub Actions dans `.github/workflows/ci.yml` : syntax check Python, pytest, tsc, ESLint, build Next.js
+17. **pool_recycle=3600** — connexions DB recyclées après 1h pour éviter les stales Railway
+18. **Enums Literal** — `SignUpRequest.role` et `UpdateApplicationStatusRequest.status` utilisent `Literal[...]` au lieu de `str`
+19. **DB constraints** — migration `t2u3v4w5x6y7` : CHECK `salary_min <= salary_max`, index sur `applied_at` et `status`
+20. **Logger frontend** — utiliser `import { logger } from '@/lib/logger'` au lieu de `console.log` (filtré par env)

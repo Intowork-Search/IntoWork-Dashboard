@@ -5,6 +5,8 @@ import { useAuth } from '@/hooks/useNextAuth';
 import { useRouter, useParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import DashboardLayout from '@/components/DashboardLayout';
+import { logger } from '@/lib/logger';
+import { isAPIError } from '@/types/api';
 import { jobsAPI, applicationsAPI } from '@/lib/api';
 import {
   MapPinIcon,
@@ -60,7 +62,7 @@ export default function JobDetailPage() {
       const response = await jobsAPI.getJobById(token, parseInt(jobId));
       setJob(response);
     } catch (error) {
-      console.error('Erreur lors du chargement du job:', error);
+      logger.error("Erreur lors du chargement du job:", error);
     } finally {
       setLoading(false);
     }
@@ -92,9 +94,9 @@ export default function JobDetailPage() {
       
       // Recharger le job pour mettre à jour has_applied
       loadJobDetail();
-    } catch (error: any) {
-      console.error('Erreur lors de la candidature:', error);
-      if (error.response?.status === 400 && error.response?.data?.detail?.includes('déjà postulé')) {
+    } catch (error: unknown) {
+      logger.error("Erreur lors de la candidature:", error);
+      if (isAPIError(error) && error.response?.status === 400 && error.response?.data?.detail?.includes('déjà postulé')) {
         toast.error('❌ Vous avez déjà postulé à cette offre');
       } else {
         toast.error('❌ Erreur lors de l\'envoi de la candidature');

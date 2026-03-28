@@ -21,6 +21,8 @@ import axios from 'axios';
 import PasswordStrengthIndicator from '@/components/PasswordStrengthIndicator';
 import { validatePassword } from '@/lib/passwordValidation';
 import { Plus_Jakarta_Sans } from 'next/font/google';
+import { logger } from '@/lib/logger';
+import { getErrorMessage } from '@/types/api';
 
 import { getApiUrl } from '@/lib/getApiUrl';
 
@@ -91,13 +93,9 @@ function ResetPasswordContent() {
       setTimeout(() => {
         router.push('/signin');
       }, 3000);
-    } catch (error: any) {
-      if (error.response?.data?.detail) {
-        toast.error(error.response.data.detail);
-      } else {
-        toast.error('Une erreur est survenue');
-      }
-      console.error('Reset password error:', error);
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, 'Une erreur est survenue'));
+      logger.error("Reset password error:", error);
     } finally {
       setLoading(false);
     }

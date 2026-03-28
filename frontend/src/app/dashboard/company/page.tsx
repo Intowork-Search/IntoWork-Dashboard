@@ -15,6 +15,8 @@ import { useAuth } from '@/hooks/useNextAuth';
 import { companiesAPI, Company, CompanyStats, getUploadUrl } from '@/lib/api';
 import { toast } from 'react-hot-toast';
 import DashboardLayout from '@/components/DashboardLayout';
+import { logger } from '@/lib/logger';
+import { isAPIError, getErrorMessage } from '@/types/api';
 import {
   BuildingOffice2Icon,
   BriefcaseIcon,
@@ -65,13 +67,13 @@ export default function CompanyPage(): React.JSX.Element {
         setIsEditing(true);
         toast("Créez votre profil d'entreprise pour commencer", { icon: '🏢' });
       }
-    } catch (error: any) {
-      console.error('Erreur lors du chargement:', error);
-      if (error.response?.status === 403 || error.response?.status === 404) {
+    } catch (error: unknown) {
+      logger.error("Erreur lors du chargement:", error);
+      if (isAPIError(error) && (error.response?.status === 403 || error.response?.status === 404)) {
         setIsEditing(true);
         toast("Créez votre profil d'entreprise pour commencer", { icon: '🏢' });
       } else {
-        toast.error(error.response?.data?.detail || 'Erreur lors du chargement des données');
+        toast.error(getErrorMessage(error, 'Erreur lors du chargement des données'));
       }
     } finally {
       setLoading(false);
@@ -88,9 +90,9 @@ export default function CompanyPage(): React.JSX.Element {
       setCompany(updatedCompany);
       setIsEditing(false);
       toast.success('Informations mises à jour avec succès !');
-    } catch (error: any) {
-      console.error('Erreur lors de la sauvegarde:', error);
-      toast.error(error.response?.data?.detail || 'Erreur lors de la sauvegarde');
+    } catch (error: unknown) {
+      logger.error("Erreur lors de la sauvegarde:", error);
+      toast.error(getErrorMessage(error, 'Erreur lors de la sauvegarde'));
     } finally {
       setSaving(false);
     }

@@ -23,6 +23,7 @@ import ToggleButton from '@/components/ToggleButton';
 import DashboardLayout from '@/components/DashboardLayout';
 import ChangePasswordModal from '@/components/settings/ChangePasswordModal';
 import ChangeEmailModal from '@/components/settings/ChangeEmailModal';
+import { logger } from '@/lib/logger';
 
 interface UserProfile {
   id: string;
@@ -190,7 +191,7 @@ export default function SettingsPage() {
           }
         }
       } catch (error) {
-        console.error('Erreur lors du chargement du profil:', error);
+        logger.error("Erreur lors du chargement du profil:", error);
         toast.error('Erreur lors du chargement du profil');
 
         setProfileData({
@@ -231,7 +232,7 @@ export default function SettingsPage() {
       await candidateAPI.updateProfile(profileData as unknown as Partial<CandidateProfile>);
       toast.success('Profil mis à jour avec succès !');
     } catch (error) {
-      console.error('Erreur lors de la mise à jour:', error);
+      logger.error("Erreur lors de la mise a jour:", error);
       toast.error('Erreur lors de la mise à jour du profil');
     } finally {
       setLoading(false);
@@ -262,7 +263,7 @@ export default function SettingsPage() {
         logo_url: updatedCompany.logo_url || ''
       });
     } catch (error) {
-      console.error('Erreur lors de la mise à jour:', error);
+      logger.error("Erreur lors de la mise a jour:", error);
       toast.error('Erreur lors de la mise à jour des informations');
     } finally {
       setLoading(false);
@@ -315,7 +316,7 @@ export default function SettingsPage() {
         toast.error(errorData.detail || 'Erreur lors du téléchargement');
       }
     } catch (error) {
-      console.error('Erreur lors du téléchargement du logo:', error);
+      logger.error("Erreur lors du telechargement du logo:", error);
       toast.error('Erreur lors du téléchargement du logo');
     } finally {
       setIsUploadingLogo(false);
@@ -357,7 +358,7 @@ export default function SettingsPage() {
       setLoading(true);
       toast.success('Préférences de notification mises à jour !');
     } catch (error) {
-      console.error('Erreur lors de la mise à jour:', error);
+      logger.error("Erreur lors de la mise a jour:", error);
       toast.error('Erreur lors de la mise à jour des notifications');
     } finally {
       setLoading(false);
@@ -370,7 +371,7 @@ export default function SettingsPage() {
       await candidateAPI.updateProfile({ is_profile_public: privacy.is_profile_public } as unknown as Partial<CandidateProfile>);
       toast.success('Paramètres de confidentialité mis à jour !');
     } catch (error) {
-      console.error('Erreur lors de la mise à jour:', error);
+      logger.error("Erreur lors de la mise a jour:", error);
       toast.error('Erreur lors de la mise à jour des paramètres de confidentialité');
     } finally {
       setLoading(false);
@@ -410,7 +411,7 @@ export default function SettingsPage() {
         await signOut({ redirect: false });
         globalThis.location.href = '/signin';
       } catch (error) {
-        console.error('Erreur lors de la suppression:', error);
+        logger.error("Erreur lors de la suppression:", error);
         toast.error('Erreur lors de la suppression du compte');
       } finally {
         setLoading(false);

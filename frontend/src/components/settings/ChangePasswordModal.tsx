@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { XMarkIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import PasswordStrengthIndicator from '@/components/PasswordStrengthIndicator';
 import { validatePassword } from '@/lib/passwordValidation';
+import { getErrorMessage } from '@/types/api';
 
 interface ChangePasswordModalProps {
   isOpen: boolean;
@@ -46,8 +47,8 @@ export default function ChangePasswordModal({ isOpen, onClose, onSubmit }: Chang
       setNewPassword('');
       setConfirmPassword('');
       onClose();
-    } catch (err: any) {
-      setError(err.response?.data?.detail || 'Erreur lors du changement de mot de passe');
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'Erreur lors du changement de mot de passe'));
     } finally {
       setLoading(false);
     }

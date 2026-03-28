@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { logger } from '@/lib/logger';
 
 export default function JobsError({
   error,
@@ -13,7 +14,7 @@ export default function JobsError({
   const router = useRouter();
 
   useEffect(() => {
-    console.error(error);
+    logger.error("Jobs error:", error);
   }, [error]);
 
   return (

@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import { integrationsAPI } from '@/lib/api';
 import toast from 'react-hot-toast';
 import { XMarkIcon, LinkIcon } from '@heroicons/react/24/outline';
+import { logger } from '@/lib/logger';
+import { isAPIError, getErrorMessage } from '@/types/api';
 
 interface PublishToLinkedInModalProps {
   isOpen: boolean;
@@ -42,13 +44,13 @@ export default function PublishToLinkedInModal({
       if (result.post_url) {
         window.open(result.post_url, '_blank');
       }
-    } catch (error: any) {
-      console.error('Error publishing to LinkedIn:', error);
-      
-      if (error.response?.status === 403) {
+    } catch (error: unknown) {
+      logger.error("Error publishing to LinkedIn:", error);
+
+      if (isAPIError(error) && error.response?.status === 403) {
         toast.error('LinkedIn non connecté. Veuillez vous connecter dans Intégrations.');
       } else {
-        toast.error(error.response?.data?.detail || 'Erreur lors de la publication sur LinkedIn');
+        toast.error(getErrorMessage(error, 'Erreur lors de la publication sur LinkedIn'));
       }
     } finally {
       setIsPublishing(false);

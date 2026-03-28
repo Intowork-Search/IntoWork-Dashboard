@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { Experience } from '@/lib/api';
+import { logger } from '@/lib/logger';
 
 interface ExperienceModalProps {
   readonly isOpen: boolean;
@@ -39,7 +40,7 @@ export default function ExperienceModal({ isOpen, onClose, onSave }: ExperienceM
       });
       onClose();
     } catch (error) {
-      console.error('Erreur lors de l\'ajout:', error);
+      logger.error("Erreur lors de l'ajout experience:", error);
     } finally {
       setIsSaving(false);
     }

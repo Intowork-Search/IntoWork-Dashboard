@@ -7,6 +7,8 @@ import DashboardLayout from '@/components/DashboardLayout';
 import { adminAPI } from '@/lib/api';
 import { useAdminUsers } from '@/hooks/useAdminData';
 import toast from 'react-hot-toast';
+import { logger } from '@/lib/logger';
+import { getErrorMessage } from '@/types/api';
 import {
   UsersIcon,
   MagnifyingGlassIcon,
@@ -43,7 +45,7 @@ export default function AdminUsersPage() {
       toast.success(currentStatus ? 'Utilisateur désactivé avec succès' : 'Utilisateur activé avec succès');
       refetch(); // Rafraîchit le cache SWR
     } catch (error) {
-      console.error('Erreur toggle status:', error);
+      logger.error("Erreur toggle status:", error);
       toast.error('Erreur lors de la modification du statut');
     }
   };
@@ -56,10 +58,9 @@ export default function AdminUsersPage() {
       await adminAPI.deleteUser(session.accessToken, userId);
       toast.success('Utilisateur supprimé avec succès');
       refetch(); // Rafraîchit le cache SWR
-    } catch (error: any) {
-      console.error('Erreur suppression:', error);
-      const errorMessage = error.response?.data?.detail || 'Erreur lors de la suppression';
-      toast.error(errorMessage);
+    } catch (error: unknown) {
+      logger.error("Erreur suppression:", error);
+      toast.error(getErrorMessage(error, 'Erreur lors de la suppression'));
     }
   };
 

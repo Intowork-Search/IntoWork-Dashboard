@@ -3,6 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import Google from "next-auth/providers/google"
 import axios from "axios"
 import { getApiUrl } from "./lib/getApiUrl"
+import { logger } from "./lib/logger"
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -43,7 +44,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
           return null
         } catch (error) {
-          console.error("Authentication error:", error)
+          logger.error("Authentication error:", error)
           return null
         }
       }
@@ -73,10 +74,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             token.role = data.user.role
             token.accessToken = data.access_token
           } else {
-            console.error("OAuth backend exchange failed:", await res.text())
+            logger.error("OAuth backend exchange failed:", await res.text())
           }
         } catch (error) {
-          console.error("OAuth backend exchange error:", error)
+          logger.error("OAuth backend exchange error:", error)
         }
       } else if (user) {
         // Credentials flow (inchangé)

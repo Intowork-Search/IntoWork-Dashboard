@@ -18,6 +18,7 @@ import { jobsAPI, type JobFilters, type Job, type JobDetail, type JobListRespons
 import { useAuth } from '@/hooks/useNextAuth';
 import toast from 'react-hot-toast';
 import { getErrorMessage } from '@/types';
+import { logger } from '@/lib/logger';
 
 // ============================================================
 // QUERIES (Lecture)
@@ -161,7 +162,7 @@ export function useCreateJob() {
     onError: (error: unknown) => {
       const message = getErrorMessage(error, 'Erreur lors de la création de l\'offre');
       toast.error(`❌ ${message}`);
-      console.error('Erreur création job:', error);
+      logger.error("Erreur creation job:", error);
     },
   });
 }
@@ -222,7 +223,7 @@ export function useUpdateJob() {
 
       const message = getErrorMessage(error, 'Erreur lors de la mise à jour');
       toast.error(`❌ ${message}`);
-      console.error('Erreur update job:', error);
+      logger.error("Erreur update job:", error);
     },
   });
 }
@@ -290,7 +291,7 @@ export function useDeleteJob() {
 
       const message = getErrorMessage(error, 'Erreur lors de la suppression');
       toast.error(`❌ ${message}`);
-      console.error('Erreur delete job:', error);
+      logger.error("Erreur delete job:", error);
     },
   });
 }

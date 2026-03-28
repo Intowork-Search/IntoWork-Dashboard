@@ -9,7 +9,7 @@
  * - Design INTOWORK (vert #6B9B5F, or #F7C700, violet #6B46C1)
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { XMarkIcon, ChevronRightIcon, ChevronLeftIcon, CheckIcon } from '@heroicons/react/24/outline';
 import { SparklesIcon } from '@heroicons/react/24/solid';
 
@@ -39,26 +39,26 @@ export default function OnboardingTour({
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
 
   // Vérifier si le tour a déjà été complété
-  const hasCompletedTour = useCallback(() => {
+  const hasCompletedTour = () => {
     if (typeof window === 'undefined') return true;
     return localStorage.getItem(`onboarding-${tourId}`) === 'completed';
-  }, [tourId]);
+  };
 
   // Marquer le tour comme complété
-  const markAsCompleted = useCallback(() => {
+  const markAsCompleted = () => {
     if (typeof window !== 'undefined') {
       localStorage.setItem(`onboarding-${tourId}`, 'completed');
     }
-  }, [tourId]);
+  };
 
   // Réinitialiser le tour (pour le bouton "Relancer le guide")
-  const resetTour = useCallback(() => {
+  const resetTour = () => {
     if (typeof window !== 'undefined') {
       localStorage.removeItem(`onboarding-${tourId}`);
       setCurrentStep(0);
       setIsActive(true);
     }
-  }, [tourId]);
+  };
 
   // Démarrer le tour automatiquement si c'est la première fois
   useEffect(() => {

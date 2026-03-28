@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useUser, useAuth } from '@/hooks/useNextAuth';
 import { authAPI, CompleteRegistration } from '@/lib/api';
 import { Plus_Jakarta_Sans } from 'next/font/google';
+import { logger } from '@/lib/logger';
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -40,7 +41,7 @@ export default function OnboardingPage() {
       // Rediriger vers le dashboard
       router.push('/dashboard');
     } catch (error) {
-      console.error('Error completing registration:', error);
+      logger.error("Error completing registration:", error);
       alert('Erreur lors de la finalisation de votre inscription. Veuillez réessayer.');
     } finally {
       setLoading(false);

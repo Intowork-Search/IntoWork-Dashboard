@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useUser, useAuth } from '@/hooks/useNextAuth';
 import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/DashboardLayout';
 import { candidatesAPI, jobsAPI } from '@/lib/api';
 import { getApiUrl } from '@/lib/getApiUrl';
 import toast from 'react-hot-toast';
+import { logger } from '@/lib/logger';
 import { dashboardAPI, DashboardData } from '@/lib/api/dashboard';
 import OnboardingTour from '@/components/OnboardingTour';
 import HelpButton from '@/components/HelpButton';
@@ -51,7 +52,7 @@ export default function Dashboard() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fonction pour charger les données du dashboard
-  const loadDashboardData = useCallback(async () => {
+  const loadDashboardData = async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -102,7 +103,7 @@ export default function Dashboard() {
             setProfileCompletion(completion);
           }
         } catch (profileError) {
-          console.warn('Erreur lors du chargement du profil:', profileError);
+          logger.warn("Erreur lors du chargement du profil:", profileError);
         }
       }
 
@@ -124,21 +125,21 @@ export default function Dashboard() {
 
         setRecentJobsCount(recentJobs.count);
       } catch (dashboardError) {
-        console.warn('Erreur lors du chargement du dashboard:', dashboardError);
+        logger.warn("Erreur lors du chargement du dashboard:", dashboardError);
       }
 
       setLastUpdated(new Date());
 
     } catch (error) {
-      console.error('Erreur générale:', error);
+      logger.error("Erreur generale:", error);
       setError('Erreur lors du chargement des données');
     } finally {
       setIsLoading(false);
     }
-  }, [getToken, userRole, user?.id]);
+  };
 
   // Fonction pour gérer le téléchargement de CV
-  const handleCVUpload = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCVUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -189,7 +190,7 @@ export default function Dashboard() {
         fileInputRef.current.value = '';
       }
     }
-  }, [getToken, loadDashboardData, router]);
+  };
 
   const openFileSelector = () => {
     fileInputRef.current?.click();

@@ -1,78 +1,29 @@
-/**
- * Logger sécurisé - Ne log qu'en environnement de développement
- * Évite l'exposition d'informations sensibles en production
- */
+type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
-const isDevelopment = process.env.NODE_ENV === 'development';
+const LOG_LEVEL: LogLevel = (process.env.NODE_ENV === 'production') ? 'warn' : 'debug';
 
-/**
- * Logger sécurisé qui ne fonctionne qu'en développement
- */
+const levels: Record<LogLevel, number> = {
+  debug: 0,
+  info: 1,
+  warn: 2,
+  error: 3,
+};
+
+function shouldLog(level: LogLevel): boolean {
+  return levels[level] >= levels[LOG_LEVEL];
+}
+
 export const logger = {
-  /**
-   * Log d'information (désactivé en production)
-   */
-  log: (...args: any[]) => {
-    if (isDevelopment) {
-      console.log(...args);
-    }
+  debug: (message: string, ...args: unknown[]) => {
+    if (shouldLog('debug')) console.debug(`[DEBUG] ${message}`, ...args);
   },
-
-  /**
-   * Log d'erreur (actif uniquement en développement)
-   * En production, les erreurs doivent être capturées par un service externe (Sentry, etc.)
-   */
-  error: (...args: any[]) => {
-    if (isDevelopment) {
-      console.error(...args);
-    }
-    // En production, vous pouvez envoyer les erreurs à un service de monitoring
-    // comme Sentry, LogRocket, etc.
+  info: (message: string, ...args: unknown[]) => {
+    if (shouldLog('info')) console.info(`[INFO] ${message}`, ...args);
   },
-
-  /**
-   * Log d'avertissement (désactivé en production)
-   */
-  warn: (...args: any[]) => {
-    if (isDevelopment) {
-      console.warn(...args);
-    }
+  warn: (message: string, ...args: unknown[]) => {
+    if (shouldLog('warn')) console.warn(`[WARN] ${message}`, ...args);
   },
-
-  /**
-   * Log d'information de debug (désactivé en production)
-   */
-  info: (...args: any[]) => {
-    if (isDevelopment) {
-      console.info(...args);
-    }
+  error: (message: string, ...args: unknown[]) => {
+    if (shouldLog('error')) console.error(`[ERROR] ${message}`, ...args);
   },
-
-  /**
-   * Log de debug détaillé (désactivé en production)
-   */
-  debug: (...args: any[]) => {
-    if (isDevelopment) {
-      console.debug(...args);
-    }
-  }
-};
-
-/**
- * Helper pour logger les erreurs avec contexte
- */
-export const logError = (context: string, error: any) => {
-  if (isDevelopment) {
-    console.error(`[${context}]`, error);
-  }
-  // En production, envoyer à un service de monitoring
-};
-
-/**
- * Helper pour logger des informations de debug
- */
-export const logDebug = (context: string, ...data: any[]) => {
-  if (isDevelopment) {
-    console.log(`[DEBUG ${context}]`, ...data);
-  }
 };

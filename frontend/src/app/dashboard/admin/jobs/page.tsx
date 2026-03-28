@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/DashboardLayout';
 import { adminAPI, type AdminJob } from '@/lib/api';
+import { logger } from '@/lib/logger';
 import {
   BriefcaseIcon,
   MagnifyingGlassIcon,
@@ -48,7 +49,7 @@ export default function AdminJobsPage() {
       });
       setJobs(jobsData);
     } catch (error) {
-      console.error('Erreur chargement offres:', error);
+      logger.error("Erreur chargement offres:", error);
     } finally {
       setLoading(false);
     }

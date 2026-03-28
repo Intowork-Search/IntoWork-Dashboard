@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { Skill } from '@/lib/api';
+import { logger } from '@/lib/logger';
 
 interface SkillModalProps {
   readonly isOpen: boolean;
@@ -10,10 +11,10 @@ interface SkillModalProps {
 }
 
 export default function SkillModal({ isOpen, onClose, onSave }: SkillModalProps) {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Omit<Skill, 'id'>>({
     name: '',
-    level: 'intermediate' as 'beginner' | 'intermediate' | 'advanced' | 'expert',
-    category: 'technique'
+    level: 3,
+    category: 'technical'
   });
   const [isSaving, setIsSaving] = useState(false);
 
@@ -26,12 +27,12 @@ export default function SkillModal({ isOpen, onClose, onSave }: SkillModalProps)
       // Reset form
       setFormData({
         name: '',
-        level: 'intermediate',
-        category: 'technique'
+        level: 3,
+        category: 'technical'
       });
       onClose();
     } catch (error) {
-      console.error('Erreur lors de l\'ajout:', error);
+      logger.error("Erreur lors de l'ajout skill:", error);
     } finally {
       setIsSaving(false);
     }
@@ -78,14 +79,13 @@ export default function SkillModal({ isOpen, onClose, onSave }: SkillModalProps)
               id="skill-category"
               required
               value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value as Skill['category'] })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
               title="Sélectionnez une catégorie"
             >
-              <option value="technique">Technique</option>
-              <option value="soft-skill">Soft Skills</option>
-              <option value="langue">Langue</option>
-              <option value="autre">Autre</option>
+              <option value="technical">Technique</option>
+              <option value="soft">Soft Skills</option>
+              <option value="language">Langue</option>
             </select>
           </div>
 
@@ -97,14 +97,15 @@ export default function SkillModal({ isOpen, onClose, onSave }: SkillModalProps)
               id="skill-level"
               required
               value={formData.level}
-              onChange={(e) => setFormData({ ...formData, level: e.target.value as any })}
+              onChange={(e) => setFormData({ ...formData, level: Number(e.target.value) })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
               title="Sélectionnez votre niveau"
             >
-              <option value="beginner">Débutant</option>
-              <option value="intermediate">Intermédiaire</option>
-              <option value="advanced">Avancé</option>
-              <option value="expert">Expert</option>
+              <option value={1}>Débutant</option>
+              <option value={2}>Intermédiaire</option>
+              <option value={3}>Avancé</option>
+              <option value={4}>Expert</option>
+              <option value={5}>Maître</option>
             </select>
           </div>
 

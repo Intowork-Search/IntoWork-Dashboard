@@ -16,7 +16,9 @@ import OnboardingTour from '@/components/OnboardingTour';
 import { candidateJobSearchTour } from '@/config/onboardingTours';
 import { JobFilters, candidatesAPI } from '@/lib/api';
 import { useUser, useAuth } from '@/hooks/useNextAuth';
+import { COUNTRIES, CURRENCIES, formatCurrency, getCountryLabel } from '@/constants/geo';
 import { useJobs, useMyJobs, useApplyToJob } from '@/hooks';
+import { logger } from '@/lib/logger';
 import Link from 'next/link';
 import { toast } from 'react-hot-toast';
 import {
@@ -139,7 +141,7 @@ export default function JobsPage() {
         setSelectedCVId(cvsData[0].id);
       }
     } catch (error) {
-      console.error('Erreur lors du chargement des CVs:', error);
+      logger.error("Erreur lors du chargement des CVs:", error);
       toast.error('Erreur lors du chargement de vos CVs');
     } finally {
       setLoadingCVs(false);
@@ -173,12 +175,13 @@ export default function JobsPage() {
     );
   };
 
-  // Formater le salaire
-  const formatSalary = (min?: number, max?: number) => {
+  // Formater le salaire avec devise
+  const formatSalary = (min?: number, max?: number, currency?: string) => {
+    const cur = currency || 'XAF';
     if (!min && !max) return 'Salaire non précisé';
-    if (min && max) return `${min.toLocaleString()} - ${max.toLocaleString()} €`;
-    if (min) return `À partir de ${min.toLocaleString()} €`;
-    return `Jusqu'à ${max?.toLocaleString()} €`;
+    if (min && max) return `${formatCurrency(min, cur)} - ${formatCurrency(max, cur)}`;
+    if (min) return `À partir de ${formatCurrency(min, cur)}`;
+    return `Jusqu'à ${formatCurrency(max!, cur)}`;
   };
 
   // Formater la date relative
@@ -353,8 +356,44 @@ export default function JobsPage() {
               <option value="hybrid">Hybride</option>
             </select>
 
+            {/* Pays */}
+            <select
+              title="Filtrer par pays"
+              value={filters.country || ''}
+              onChange={(e) => setFilters({ ...filters, country: e.target.value || undefined, page: 1 })}
+              className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-700 focus:outline-none focus:border-[#6B9B5F] focus:ring-2 focus:ring-[#6B9B5F]/10 transition-all"
+            >
+              <option value="">Tous les pays</option>
+              {COUNTRIES.map((c) => (
+                <option key={c.code} value={c.code}>{c.label}</option>
+              ))}
+            </select>
+
+            {/* Devise */}
+            <select
+              title="Filtrer par devise"
+              value={filters.currency || ''}
+              onChange={(e) => setFilters({ ...filters, currency: e.target.value || undefined, page: 1 })}
+              className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-700 focus:outline-none focus:border-[#6B9B5F] focus:ring-2 focus:ring-[#6B9B5F]/10 transition-all"
+            >
+              <option value="">Toutes les devises</option>
+              {CURRENCIES.map((c) => (
+                <option key={c.code} value={c.code}>{c.label}</option>
+              ))}
+            </select>
+
+            {/* Salaire minimum */}
+            <input
+              type="number"
+              placeholder="Salaire min"
+              title="Salaire minimum"
+              value={filters.salary_min || ''}
+              onChange={(e) => setFilters({ ...filters, salary_min: e.target.value ? Number(e.target.value) : undefined, page: 1 })}
+              className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-700 focus:outline-none focus:border-[#6B9B5F] focus:ring-2 focus:ring-[#6B9B5F]/10 transition-all w-32"
+            />
+
             {/* Bouton reset */}
-            {(filters.search || filters.location || filters.job_type || filters.location_type) && (
+            {(filters.search || filters.location || filters.job_type || filters.location_type || filters.country || filters.currency || filters.salary_min) && (
               <button
                 onClick={clearFilters}
                 className="px-4 py-2.5 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all flex items-center gap-2"
@@ -460,6 +499,11 @@ export default function JobsPage() {
                       >
                         {jobTypeInfo.label}
                       </span>
+                      {job.country && (
+                        <span className="px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-50 text-blue-600">
+                          {getCountryLabel(job.country)}
+                        </span>
+                      )}
                     </div>
 
                     {/* Détails */}
@@ -470,7 +514,7 @@ export default function JobsPage() {
                       </div>
                       <div className="flex items-center gap-2 text-gray-500">
                         <CurrencyEuroIcon className="w-4 h-4 flex-shrink-0" />
-                        <span>{formatSalary(job.salary_min, job.salary_max)}</span>
+                        <span>{formatSalary(job.salary_min, job.salary_max, job.currency)}</span>
                       </div>
                     </div>
                   </div>

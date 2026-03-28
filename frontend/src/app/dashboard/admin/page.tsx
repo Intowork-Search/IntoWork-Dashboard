@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/DashboardLayout';
 import { adminAPI, type AdminStats } from '@/lib/api';
+import { logger } from '@/lib/logger';
 import {
   BarChart,
   Bar,
@@ -58,7 +59,7 @@ export default function AdminDashboardPage() {
       const statsData = await adminAPI.getStats(session.accessToken);
       setStats(statsData);
     } catch (error) {
-      console.error('Erreur chargement statistiques:', error);
+      logger.error("Erreur chargement statistiques:", error);
     } finally {
       setLoading(false);
     }

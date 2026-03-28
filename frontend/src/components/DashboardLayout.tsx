@@ -59,7 +59,12 @@ export default function DashboardLayout({
       </div>
 
       {/* Sidebar mobile */}
-      <div className={`lg:hidden fixed inset-0 z-50 ${sidebarOpen ? 'block' : 'hidden'}`}>
+      <div
+        className={`lg:hidden fixed inset-0 z-50 ${sidebarOpen ? 'block' : 'hidden'}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menu de navigation"
+      >
         <button 
           className="fixed inset-0 bg-transparent cursor-pointer"
           onClick={() => setSidebarOpen(false)}
@@ -115,7 +120,7 @@ export default function DashboardLayout({
         </header>
 
         {/* Contenu de la page */}
-        <main className="flex-1">
+        <main className="flex-1" role="main" aria-label={title}>
           <div className="px-4 sm:px-6 lg:px-8 py-6">
             {children}
           </div>

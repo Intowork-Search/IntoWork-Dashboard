@@ -2,7 +2,8 @@
 
 import { useUser } from '@/hooks/useNextAuth';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import DashboardLoading from './loading';
 
 export default function DashboardLayout({
   children,
@@ -11,6 +12,7 @@ export default function DashboardLayout({
 }) {
   const { isLoaded, isSignedIn } = useUser();
   const router = useRouter();
+  const [loadingTimeout, setLoadingTimeout] = useState(false);
 
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
@@ -18,8 +20,22 @@ export default function DashboardLayout({
     }
   }, [isLoaded, isSignedIn, router]);
 
+  // Detecter si le chargement prend trop longtemps (session expiree)
+  useEffect(() => {
+    if (!isLoaded) {
+      const timer = setTimeout(() => setLoadingTimeout(true), 5000);
+      return () => clearTimeout(timer);
+    }
+    setLoadingTimeout(false);
+  }, [isLoaded]);
+
   if (!isLoaded) {
-    return <div>Loading...</div>;
+    if (loadingTimeout) {
+      // Session probablement expiree — rediriger vers signin
+      router.push('/signin');
+      return null;
+    }
+    return <DashboardLoading />;
   }
 
   if (!isSignedIn) {

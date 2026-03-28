@@ -124,7 +124,7 @@ export default function CandidatesPage(): React.JSX.Element {
   };
 
   const getStatusBadge = (status: string) => {
-    const statusConfig: { [key: string]: { label: string; className: string; icon: any } } = {
+    const statusConfig: Record<string, { label: string; className: string; icon: React.ComponentType<React.SVGProps<SVGSVGElement>> }> = {
       'applied': { label: 'En attente', className: 'bg-yellow-100 text-yellow-800', icon: ClockIcon },
       'pending': { label: 'En attente', className: 'bg-yellow-100 text-yellow-800', icon: ClockIcon },
       'viewed': { label: 'Vue', className: 'bg-blue-100 text-blue-800', icon: EyeIcon },

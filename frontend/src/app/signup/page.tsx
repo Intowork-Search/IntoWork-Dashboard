@@ -17,6 +17,8 @@ import axios from 'axios';
 import PasswordStrengthIndicator from '@/components/PasswordStrengthIndicator';
 import { validatePassword } from '@/lib/passwordValidation';
 import { Plus_Jakarta_Sans } from 'next/font/google';
+import { logger } from '@/lib/logger';
+import { getErrorMessage } from '@/types/api';
 
 import { getApiUrl } from '@/lib/getApiUrl';
 
@@ -49,7 +51,7 @@ export default function SignUpPage() {
     try {
       await signIn('google', { callbackUrl: '/dashboard' });
     } catch (error) {
-      console.error('Google sign in error:', error);
+      logger.error("Google sign in error:", error);
       toast.error('Erreur lors de la connexion avec Google');
       setSocialLoading(null);
     }
@@ -114,13 +116,9 @@ export default function SignUpPage() {
           router.refresh();
         }
       }
-    } catch (error: any) {
-      if (error.response?.data?.detail) {
-        toast.error(error.response.data.detail);
-      } else {
-        toast.error('Une erreur est survenue lors de l\'inscription');
-      }
-      console.error('Sign up error:', error);
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, 'Une erreur est survenue lors de l\'inscription'));
+      logger.error("Sign up error:", error);
     } finally {
       setLoading(false);
     }

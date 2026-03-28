@@ -7,7 +7,7 @@ from sqlalchemy import select, and_
 from sqlalchemy.orm import selectinload
 from typing import List, Optional
 from datetime import datetime, timezone
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from app.database import get_db
 from app.auth import require_user
@@ -32,6 +32,8 @@ class AIScoreDetails(BaseModel):
 
 class ApplicationWithScore(BaseModel):
     """Candidature avec score IA"""
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     job_id: int
     candidate_id: int
@@ -43,9 +45,6 @@ class ApplicationWithScore(BaseModel):
     ai_score_details: Optional[dict] = None
     ai_analyzed_at: Optional[datetime] = None
     cv_url: Optional[str] = None
-    
-    class Config:
-        from_attributes = True
 
 
 class ScoreApplicationRequest(BaseModel):
@@ -149,7 +148,7 @@ Années d'expérience: {candidate.years_experience or 0}
     candidate_experience = ""
     if candidate.experiences:
         candidate_experience = "\n".join([
-            f"- {exp.job_title} chez {exp.company} ({exp.start_date} - {exp.end_date or 'Présent'})"
+            f"- {exp.title} chez {exp.company} ({exp.start_date} - {exp.end_date or 'Présent'})"
             for exp in candidate.experiences
         ])
     
@@ -267,7 +266,7 @@ Années d'expérience: {candidate.years_experience or 0}
             candidate_experience = ""
             if candidate.experiences:
                 candidate_experience = "\n".join([
-                    f"- {exp.job_title} chez {exp.company} ({exp.start_date} - {exp.end_date or 'Présent'})"
+                    f"- {exp.title} chez {exp.company} ({exp.start_date} - {exp.end_date or 'Présent'})"
                     for exp in candidate.experiences
                 ])
             

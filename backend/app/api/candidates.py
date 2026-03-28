@@ -6,7 +6,7 @@ from sqlalchemy.orm import selectinload
 from app.database import get_db
 from app.models.base import User, Candidate, Experience, Education, Skill, SkillCategory, CandidateCV
 from app.auth import get_current_user, require_user
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from typing import Optional, List
 from datetime import datetime, timezone
 from loguru import logger
@@ -14,14 +14,13 @@ router = APIRouter()
 # Schémas Pydantic pour les données du profil
 
 class CVResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     filename: str
     file_size: Optional[int]
     is_active: bool
     created_at: datetime
-    
-    class Config:
-        from_attributes = True
 
 class ExperienceBase(BaseModel):
     title: str
@@ -39,10 +38,9 @@ class ExperienceUpdate(ExperienceBase):
     pass
 
 class ExperienceResponse(ExperienceBase):
-    id: int
+    model_config = ConfigDict(from_attributes=True)
 
-    class Config:
-        from_attributes = True
+    id: int
 
 class EducationBase(BaseModel):
     degree: str
@@ -59,10 +57,9 @@ class EducationUpdate(EducationBase):
     pass
 
 class EducationResponse(EducationBase):
-    id: int
+    model_config = ConfigDict(from_attributes=True)
 
-    class Config:
-        from_attributes = True
+    id: int
 
 class SkillBase(BaseModel):
     name: str
@@ -76,10 +73,9 @@ class SkillUpdate(SkillBase):
     pass
 
 class SkillResponse(SkillBase):
-    id: int
+    model_config = ConfigDict(from_attributes=True)
 
-    class Config:
-        from_attributes = True
+    id: int
 
 class CandidateProfileBase(BaseModel):
     phone: Optional[str] = None
@@ -99,14 +95,13 @@ class CandidateProfileUpdate(CandidateProfileBase):
     pass
 
 class CandidateProfileResponse(CandidateProfileBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     user_id: int
     experiences: List[ExperienceResponse] = []
     educations: List[EducationResponse] = []
     skills: List[SkillResponse] = []
-
-    class Config:
-        from_attributes = True
 
 # Endpoints
 
@@ -159,7 +154,7 @@ async def get_candidate_profile(
         "phone": candidate.phone,
         "location": candidate.location,
         "title": candidate.title,
-        "bio": candidate.summary,  # Mapping summary -> bio pour le frontend
+        "summary": candidate.summary,
         "linkedin_url": candidate.linkedin_url,
         "website_url": candidate.website_url,
         "years_experience": candidate.years_experience,
@@ -224,7 +219,7 @@ async def update_candidate_profile(
         "phone": candidate.phone,
         "location": candidate.location,
         "title": candidate.title,
-        "bio": candidate.summary,
+        "summary": candidate.summary,
         "linkedin_url": candidate.linkedin_url,
         "website_url": candidate.website_url,
         "years_experience": candidate.years_experience,
@@ -526,6 +521,42 @@ async def update_skill(
     await db.refresh(skill)
 
     return skill
+
+
+@router.delete("/profile/skills/{skill_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_skill(
+    skill_id: int,
+    current_user: User = Depends(require_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Supprimer une compétence"""
+
+    if current_user.role.value != 'candidate':
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+
+    candidate_result = await db.execute(
+        select(Candidate).filter(Candidate.user_id == current_user.id)
+    )
+    candidate = candidate_result.scalar_one_or_none()
+    if not candidate:
+        raise HTTPException(status_code=404, detail="Profil candidat non trouvé")
+
+    skill_result = await db.execute(
+        select(Skill).filter(
+            Skill.id == skill_id,
+            Skill.candidate_id == candidate.id
+        )
+    )
+    skill = skill_result.scalar_one_or_none()
+
+    if not skill:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Compétence non trouvée")
+
+    await db.delete(skill)
+    await db.commit()
+
+    logger.info(f"Compétence {skill_id} supprimée pour candidat {candidate.id}")
+
 
 # Import pour le téléchargement de fichiers
 from fastapi import File, UploadFile

@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
 import { candidatesAPI, jobsAPI, applicationsAPI, companiesAPI, getUploadUrl } from '@/lib/api';
+import { logger } from '@/lib/logger';
 import { 
   HomeIcon, 
   UserIcon, 
@@ -20,8 +21,7 @@ import {
   ArrowRightOnRectangleIcon,
   EnvelopeIcon,
   BellAlertIcon,
-  Square3Stack3DIcon,
-  SparklesIcon
+  Square3Stack3DIcon
 } from '@heroicons/react/24/outline';
 
 interface SidebarProps {
@@ -75,12 +75,6 @@ function getEmployerNavigation(jobsCount: number): NavItem[] {
       href: '/dashboard/integrations',
       icon: Square3Stack3DIcon,
       description: 'Connecter LinkedIn, Google Calendar, Teams'
-    },
-    {
-      name: 'Générateur IA',
-      href: '/dashboard/generate-image',
-      icon: SparklesIcon,
-      description: 'Générer des images avec l\'IA'
     },
     {
       name: 'Paramètres',
@@ -159,7 +153,7 @@ export default function Sidebar({ userRole }: SidebarProps) {
             const companyData = await companiesAPI.getMyCompany(token);
             setCompanyLogoUrl(getUploadUrl(companyData.logo_url));
           } catch (error) {
-            console.log('Logo entreprise non disponible');
+            logger.debug("Logo entreprise non disponible");
           }
           setJobsCount(response.jobs ? response.jobs.length : 0);
         }
@@ -268,7 +262,10 @@ export default function Sidebar({ userRole }: SidebarProps) {
       </div>
 
       {/* Sidebar */}
-      <div className={`fixed top-0 left-0 z-40 h-screen transition-all duration-300 ease-in-out ${
+      <nav
+        role="navigation"
+        aria-label="Menu principal"
+        className={`fixed top-0 left-0 z-40 h-screen transition-all duration-300 ease-in-out ${
         isCollapsed ? 'w-16' : 'w-64'
       } bg-white border-r border-gray-200 shadow-lg flex flex-col`}>
         
@@ -286,7 +283,8 @@ export default function Sidebar({ userRole }: SidebarProps) {
             <button
               onClick={() => setIsCollapsed(!isCollapsed)}
               className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
-              title={isCollapsed ? "Étendre" : "Réduire"}
+              aria-label={isCollapsed ? "Étendre le menu" : "Réduire le menu"}
+              aria-expanded={!isCollapsed}
             >
               {isCollapsed ? (
                 <ChevronRightIcon className="w-5 h-5 text-gray-600" />
@@ -298,19 +296,20 @@ export default function Sidebar({ userRole }: SidebarProps) {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
+        <ul role="list" aria-label="Navigation" className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
           {navigation.map((item) => {
             const isActive = pathname === item.href;
             return (
+              <li key={item.name}>
               <Link
-                key={item.name}
                 href={item.href}
                 className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ${
                   isActive
                     ? 'bg-blue-50 text-blue-700 border-r-4 border-blue-700'
                     : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
                 } ${isCollapsed ? 'justify-center' : ''}`}
-                title={isCollapsed ? item.name : ''}
+                aria-current={isActive ? 'page' : undefined}
+                aria-label={isCollapsed ? item.name : undefined}
               >
                 <item.icon className={`shrink-0 ${
                   isActive ? 'text-blue-700' : 'text-gray-400 group-hover:text-gray-500'
@@ -339,9 +338,10 @@ export default function Sidebar({ userRole }: SidebarProps) {
                   </div>
                 )}
               </Link>
+              </li>
             );
           })}
-        </nav>
+        </ul>
 
         {/* Badge utilisateur */}
         <div className="p-4 border-b border-gray-200">
@@ -388,20 +388,20 @@ export default function Sidebar({ userRole }: SidebarProps) {
             className={`w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 text-red-600 hover:bg-red-50 ${
               isCollapsed ? 'justify-center' : 'gap-3'
             }`}
-            title={isCollapsed ? 'Se déconnecter' : ''}
+            aria-label="Se déconnecter"
           >
             <ArrowRightOnRectangleIcon className={`shrink-0 ${isCollapsed ? 'w-6 h-6' : 'w-5 h-5'}`} />
             {!isCollapsed && <span>Se déconnecter</span>}
             
             {/* Tooltip pour mode collapsed */}
             {isCollapsed && (
-              <div className="absolute left-16 bg-gray-900 text-white px-2 py-1 rounded-lg text-xs opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+              <span className="absolute left-16 bg-gray-900 text-white px-2 py-1 rounded-lg text-xs opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
                 Se déconnecter
-              </div>
+              </span>
             )}
           </button>
         </div>
-      </div>
+      </nav>
     </>
   );
 }

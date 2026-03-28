@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { XMarkIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
+import { getErrorMessage } from '@/types/api';
 
 interface ChangeEmailModalProps {
   isOpen: boolean;
@@ -34,8 +35,8 @@ export default function ChangeEmailModal({ isOpen, onClose, onSubmit, currentEma
       setNewEmail('');
       setPassword('');
       onClose();
-    } catch (err: any) {
-      setError(err.response?.data?.detail || 'Erreur lors du changement d\'email');
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'Erreur lors du changement d\'email'));
     } finally {
       setLoading(false);
     }

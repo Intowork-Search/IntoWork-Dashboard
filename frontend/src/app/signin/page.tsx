@@ -15,6 +15,7 @@ import {
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { Plus_Jakarta_Sans } from 'next/font/google';
+import { logger } from '@/lib/logger';
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -57,7 +58,7 @@ export default function SignInPage() {
     } catch (error) {
       setFormError('Une erreur est survenue');
       toast.error('Une erreur est survenue');
-      console.error('Sign in error:', error);
+      logger.error("Sign in error:", error);
     } finally {
       setLoading(false);
     }
@@ -68,7 +69,7 @@ export default function SignInPage() {
     try {
       await signIn(provider, { callbackUrl: '/dashboard' });
     } catch (error) {
-      console.error(`${provider} sign in error:`, error);
+      logger.error(`${provider} sign in error:`, error);
       toast.error(`Erreur lors de la connexion avec ${provider}`);
       setSocialLoading(null);
     }

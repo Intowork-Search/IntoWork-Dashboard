@@ -18,6 +18,7 @@ import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/DashboardLayout';
 import OnboardingTour from '@/components/OnboardingTour';
 import { employerEmailTemplatesTour } from '@/config/onboardingTours';
+import { logger } from '@/lib/logger';
 import { 
   EnvelopeIcon, 
   PlusIcon, 
@@ -98,15 +99,15 @@ export default function EmailTemplatesPage() {
         const data = await response.json();
         setTemplates(data);
       } else if (response.status === 401) {
-        console.error('❌ 401 Unauthorized - Token invalide');
+        logger.error("401 Unauthorized - Token invalide");
         router.push('/signin');
       } else {
         const errorData = await response.json().catch(() => ({ detail: 'Unknown error' }));
-        console.error('❌ Erreur backend:', response.status, errorData);
+        logger.error("Erreur backend:", response.status, errorData);
         toast.error(`Erreur ${response.status}: ${errorData.detail || 'Erreur lors du chargement des templates'}`);
       }
     } catch (error) {
-      console.error('❌ Error fetching templates:', error);
+      logger.error("Error fetching templates:", error);
       if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
         toast.error('Erreur réseau - Vérifiez votre connexion');
       } else {
@@ -137,7 +138,7 @@ export default function EmailTemplatesPage() {
         const errorData = await response.json().catch(() => ({}));
       }
     } catch (error) {
-      console.error('❌ Error fetching variables:', error);
+      logger.error("Error fetching variables:", error);
     }
   };
 
@@ -176,7 +177,7 @@ export default function EmailTemplatesPage() {
         toast.error(error.detail || 'Erreur lors de la sauvegarde');
       }
     } catch (error) {
-      console.error('Error saving template:', error);
+      logger.error("Error saving template:", error);
       toast.error('Erreur réseau');
     }
   };
@@ -206,7 +207,7 @@ export default function EmailTemplatesPage() {
         toast.error('Erreur lors de la suppression');
       }
     } catch (error) {
-      console.error('Error deleting template:', error);
+      logger.error("Error deleting template:", error);
       toast.error('Erreur lors de la suppression');
     }
   };
@@ -234,7 +235,7 @@ export default function EmailTemplatesPage() {
         toast.error('Erreur lors de la duplication');
       }
     } catch (error) {
-      console.error('Error duplicating template:', error);
+      logger.error("Error duplicating template:", error);
       toast.error('Erreur lors de la duplication');
     }
   };

@@ -43,6 +43,8 @@ LocationParam = Annotated[Optional[str], Query(description="Location filter")]
 JobTypeParam = Annotated[Optional[str], Query(description="Job type filter")]
 LocationTypeParam = Annotated[Optional[str], Query(description="Location type filter")]
 SalaryMinParam = Annotated[Optional[int], Query(description="Minimum salary filter")]
+CountryParam = Annotated[Optional[str], Query(description="Country filter (ISO code: GA, CM, CG)")]
+CurrencyParam = Annotated[Optional[str], Query(description="Currency filter (XAF, XOF, EUR, USD)")]
 StatusFilterParam = Annotated[Optional[str], Query(description="Status filter")]
 DaysParam = Annotated[int, Query(ge=1, le=30, description="Number of days")]
 JobIdPath = Annotated[int, Path(ge=1, description="Job ID")]
@@ -61,6 +63,8 @@ async def get_jobs(
     job_type: JobTypeParam = None,
     location_type: LocationTypeParam = None,
     salary_min: SalaryMinParam = None,
+    country: CountryParam = None,
+    currency: CurrencyParam = None,
     current_user: CurrentUserOptional = None,
     db: DBSession = None
 ) -> JobListResponse:
@@ -86,8 +90,8 @@ async def get_jobs(
 
     # Construire la requête avec join
     stmt = select(Job, Company).join(Company, Job.company_id == Company.id)
-    # Afficher les jobs publiés ET en draft pour la landing page
-    stmt = stmt.filter(Job.status.in_([JobStatus.PUBLISHED, JobStatus.DRAFT]))
+    # Afficher uniquement les jobs publiés (les drafts sont privés)
+    stmt = stmt.filter(Job.status == JobStatus.PUBLISHED)
 
     # Filtres - Using parameterized queries to prevent SQL injection
     if search:
@@ -118,6 +122,12 @@ async def get_jobs(
 
     if salary_min:
         stmt = stmt.filter(Job.salary_min >= salary_min)
+
+    if country:
+        stmt = stmt.filter(Job.country == country)
+
+    if currency:
+        stmt = stmt.filter(Job.currency == currency)
 
     # Pagination - Count total
     count_stmt = select(func.count()).select_from(stmt.subquery())
@@ -156,6 +166,8 @@ async def get_jobs(
             salary_min=job.salary_min,
             salary_max=job.salary_max,
             currency=job.currency,
+            country=job.country or company.country,
+            zone=job.zone,
             posted_at=job.posted_at,
             is_featured=job.is_featured,
             views_count=job.views_count,
@@ -253,6 +265,8 @@ async def get_my_jobs(
             salary_min=job.salary_min,
             salary_max=job.salary_max,
             currency=job.currency,
+            country=job.country or company.country,
+            zone=job.zone,
             posted_at=job.posted_at,
             is_featured=job.is_featured,
             views_count=job.views_count,
@@ -347,6 +361,8 @@ async def create_job(
             salary_min=job.salary_min,
             salary_max=job.salary_max,
             currency=job.currency,
+            country=job.country or company.country,
+            zone=job.zone,
             requirements=job.requirements,
             responsibilities=job.responsibilities,
             benefits=job.benefits,
@@ -378,6 +394,8 @@ async def create_job(
         salary_min=job_obj.salary_min,
         salary_max=job_obj.salary_max,
         currency=job_obj.currency,
+        country=job_obj.country or company.country,
+        zone=job_obj.zone,
         posted_at=job_obj.posted_at,
         is_featured=job_obj.is_featured,
         views_count=job_obj.views_count,
@@ -438,6 +456,8 @@ async def update_job(
         job_obj.salary_min = job.salary_min
         job_obj.salary_max = job.salary_max
         job_obj.currency = job.currency
+        job_obj.country = job.country or job_obj.country
+        job_obj.zone = job.zone or job_obj.zone
         job_obj.requirements = job.requirements
         job_obj.responsibilities = job.responsibilities
         job_obj.benefits = job.benefits
@@ -459,6 +479,8 @@ async def update_job(
             salary_min=job_obj.salary_min,
             salary_max=job_obj.salary_max,
             currency=job_obj.currency,
+            country=job_obj.country or company.country,
+            zone=job_obj.zone,
             posted_at=job_obj.posted_at,
             is_featured=job_obj.is_featured,
             views_count=job_obj.views_count,
@@ -580,6 +602,8 @@ async def get_job(
         salary_min=job.salary_min,
         salary_max=job.salary_max,
         currency=job.currency,
+        country=job.country or company.country,
+        zone=job.zone,
         salary_range=f"{job.salary_min:,} - {job.salary_max:,} {job.currency}" if job.salary_min and job.salary_max else None,
         posted_at=job.posted_at,
         is_featured=job.is_featured,

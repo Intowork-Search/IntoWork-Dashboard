@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { Plus_Jakarta_Sans } from 'next/font/google';
 import toast from 'react-hot-toast';
 import { useAuth } from '@/hooks/useNextAuth';
+import { logger } from '@/lib/logger';
 import { useCVDocument, useSaveCV, useTogglePublic, useCVAnalytics } from '@/hooks/useCVBuilder';
 import type {
   CVTemplate,
@@ -133,13 +134,13 @@ export default function CVBuilder() {
           toast.success('CV restauré depuis votre dernière session', { duration: 2000 });
         }
       } catch (error) {
-        console.error('Error loading saved CV:', error);
+        logger.error("Error loading saved CV:", error);
       }
     }
   }, [authLoaded, isSignedIn, cvDocument, isLoadingCV]);
 
   // Auto-save to localStorage (for non-authenticated users)
-  const saveToLocalStorage = useCallback(() => {
+  const saveToLocalStorage = () => {
     try {
       setIsSaving(true);
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
@@ -150,13 +151,13 @@ export default function CVBuilder() {
       setLastSaved(new Date());
       setIsSaving(false);
     } catch (error) {
-      console.error('Error saving CV:', error);
+      logger.error("Error saving CV:", error);
       setIsSaving(false);
     }
-  }, [cvData, selectedTemplate]);
+  };
 
   // Save to backend (for authenticated users)
-  const saveToBackend = useCallback(async () => {
+  const saveToBackend = async () => {
     if (!isSignedIn) return;
     try {
       setIsSaving(true);
@@ -167,11 +168,11 @@ export default function CVBuilder() {
       });
       setLastSaved(new Date());
     } catch (error) {
-      console.error('Error saving CV to backend:', error);
+      logger.error("Error saving CV to backend:", error);
     } finally {
       setIsSaving(false);
     }
-  }, [cvData, selectedTemplate, isPublic, isSignedIn, saveCV]);
+  };
 
   // Debounced auto-save effect
   useEffect(() => {
@@ -233,7 +234,7 @@ export default function CVBuilder() {
         setShowShareModal(true);
       }
     } catch (error) {
-      console.error('Error toggling public:', error);
+      logger.error("Error toggling public:", error);
     }
   };
 
@@ -266,7 +267,7 @@ export default function CVBuilder() {
       URL.revokeObjectURL(url);
       toast.success('CV exporté avec succès');
     } catch (error) {
-      console.error('Export error:', error);
+      logger.error("Export error:", error);
       toast.error('Erreur lors de l\'export');
     }
   };
@@ -290,7 +291,7 @@ export default function CVBuilder() {
           toast.error('Format de fichier invalide');
         }
       } catch (error) {
-        console.error('Import error:', error);
+        logger.error("Import error:", error);
         toast.error('Erreur lors de l\'import du fichier');
       }
     };
@@ -621,7 +622,7 @@ export default function CVBuilder() {
         setIsGeneratingPDF(false);
       }
     } catch (error) {
-      console.error('Error generating PDF:', error);
+      logger.error("Error generating PDF:", error);
       toast.error('Erreur lors de la génération du PDF');
       setIsGeneratingPDF(false);
     }

@@ -31,6 +31,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { StarIcon } from '@heroicons/react/24/solid';
 import toast from 'react-hot-toast';
+import { getErrorMessage } from '@/types/api';
 
 interface Props {
   params: Promise<{
@@ -74,8 +75,8 @@ export default function AIScoringPage({ params }: Props) {
       setApplications(data.applications);
       setTotal(data.total);
       setTotalPages(data.total_pages);
-    } catch (error: any) {
-      toast.error(error.message || 'Erreur lors du chargement');
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, 'Erreur lors du chargement'));
     } finally {
       setLoading(false);
     }
@@ -98,8 +99,8 @@ export default function AIScoringPage({ params }: Props) {
       
       // Recharger la liste
       loadApplications();
-    } catch (error: any) {
-      toast.error(error.message || 'Erreur lors du scoring', { id: 'scoring' });
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, 'Erreur lors du scoring'), { id: 'scoring' });
     } finally {
       setScoring(false);
     }
@@ -126,8 +127,8 @@ export default function AIScoringPage({ params }: Props) {
       
       // Recharger la liste
       loadApplications();
-    } catch (error: any) {
-      toast.error(error.message || 'Erreur lors du scoring en masse', { id: 'bulk-scoring' });
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, 'Erreur lors du scoring en masse'), { id: 'bulk-scoring' });
     } finally {
       setBulkScoring(false);
     }

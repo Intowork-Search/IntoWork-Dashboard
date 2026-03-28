@@ -61,7 +61,7 @@ export interface APIError {
   /**
    * Original axios config (optional)
    */
-  config?: any;
+  config?: Record<string, unknown>;
 }
 
 /**
@@ -74,9 +74,9 @@ export interface APIError {
  * }
  * ```
  */
-export function isAPIError(error: any): error is APIError {
+export function isAPIError(error: unknown): error is APIError {
   return (
-    error &&
+    !!error &&
     typeof error === 'object' &&
     ('response' in error || 'message' in error)
   );
@@ -95,7 +95,7 @@ export function isAPIError(error: any): error is APIError {
  * toast.error(errorMessage);
  * ```
  */
-export function getErrorMessage(error: any, fallback: string = 'An error occurred'): string {
+export function getErrorMessage(error: unknown, fallback: string = 'An error occurred'): string {
   if (isAPIError(error)) {
     return error.response?.data?.detail || error.response?.data?.message || error.message || fallback;
   }
@@ -112,20 +112,20 @@ export function getErrorMessage(error: any, fallback: string = 'An error occurre
  * }
  * ```
  */
-export function isErrorStatus(error: any, status: number): boolean {
+export function isErrorStatus(error: unknown, status: number): boolean {
   return isAPIError(error) && error.response?.status === status;
 }
 
 /**
  * Check if error is an authentication error (401 or 403)
  */
-export function isAuthError(error: any): boolean {
+export function isAuthError(error: unknown): boolean {
   return isErrorStatus(error, 401) || isErrorStatus(error, 403);
 }
 
 /**
  * Check if error is a validation error (400 with validation details)
  */
-export function isValidationError(error: any): boolean {
-  return isErrorStatus(error, 400) && !!error.response?.data?.errors;
+export function isValidationError(error: unknown): boolean {
+  return isErrorStatus(error, 400) && isAPIError(error) && !!error.response?.data?.errors;
 }

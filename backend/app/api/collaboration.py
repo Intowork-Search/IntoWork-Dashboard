@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update
 from sqlalchemy.orm import selectinload
 from typing import Annotated, List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from datetime import datetime, timezone
 
 from app.database import get_db
@@ -57,14 +57,13 @@ class RatingUpdate(BaseModel):
 
 class ApplicationCollaborationResponse(BaseModel):
     """Réponse avec toutes les données de collaboration"""
+    model_config = ConfigDict(from_attributes=True)
+
     application_id: int
     recruiter_notes: List[RecruiterNote]
     rating: Optional[int]
     tags: List[str]
     scorecard: Optional[dict]
-    
-    class Config:
-        from_attributes = True
 
 
 # ========================================

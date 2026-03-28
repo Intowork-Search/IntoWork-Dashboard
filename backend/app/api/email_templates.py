@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update, delete as sql_delete, func
 from typing import Annotated, List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from datetime import datetime
 
 from app.database import get_db
@@ -68,6 +68,8 @@ class EmailTemplateUpdate(BaseModel):
 
 class EmailTemplateResponse(BaseModel):
     """Réponse avec un template complet"""
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     company_id: int
     created_by_user_id: int
@@ -81,9 +83,6 @@ class EmailTemplateResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
     last_used_at: Optional[datetime]
-
-    class Config:
-        from_attributes = True
 
 
 class TemplateVariablesResponse(BaseModel):

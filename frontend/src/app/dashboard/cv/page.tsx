@@ -10,11 +10,12 @@
  * - Bleu: #3B82F6 (complémentaire)
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useUser, useAuth } from '@/hooks/useNextAuth';
 import DashboardLayout from '@/components/DashboardLayout';
 import { candidatesAPI, CV } from '@/lib/api';
 import { getApiUrl } from '@/lib/getApiUrl';
+import { logger } from '@/lib/logger';
 import {
   DocumentTextIcon,
   EyeIcon,
@@ -64,7 +65,7 @@ export default function MesCVPage() {
 
         setCvs(cvsData);
       } catch (error) {
-        console.error('Erreur lors du chargement du profil:', error);
+        logger.error("Erreur lors du chargement du profil:", error);
         setError('Erreur lors du chargement des données');
       } finally {
         setIsLoading(false);
@@ -101,7 +102,7 @@ export default function MesCVPage() {
         setCvs(legacyCVs);
       }
     } catch (error) {
-      console.error('Erreur lors du rechargement:', error);
+      logger.error("Erreur lors du rechargement:", error);
     }
   };
 
@@ -146,7 +147,7 @@ export default function MesCVPage() {
       setTimeout(() => URL.revokeObjectURL(url), 10000);
 
     } catch (error) {
-      console.error('Erreur lors de la visualisation:', error);
+      logger.error("Erreur lors de la visualisation:", error);
       alert('Erreur lors de l\'ouverture du CV');
     }
   };
@@ -177,7 +178,7 @@ export default function MesCVPage() {
       URL.revokeObjectURL(url);
 
     } catch (error) {
-      console.error('Erreur lors du téléchargement:', error);
+      logger.error("Erreur lors du telechargement:", error);
       alert('Erreur lors du téléchargement du CV');
     }
   };
@@ -228,7 +229,7 @@ export default function MesCVPage() {
         alert(`Erreur lors du téléchargement: ${errorData.detail || 'Erreur inconnue'}`);
       }
     } catch (error) {
-      console.error('Erreur lors du téléchargement du CV:', error);
+      logger.error("Erreur lors du telechargement du CV:", error);
       alert('Erreur lors du téléchargement du CV');
     } finally {
       setIsUploadingCV(false);
@@ -245,24 +246,24 @@ export default function MesCVPage() {
   };
 
   // Drag and drop handlers
-  const handleDragOver = useCallback((e: React.DragEvent) => {
+  const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(true);
-  }, []);
+  };
 
-  const handleDragLeave = useCallback((e: React.DragEvent) => {
+  const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-  }, []);
+  };
 
-  const handleDrop = useCallback(async (e: React.DragEvent) => {
+  const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
     const file = e.dataTransfer.files?.[0];
     if (file) {
       await handleFileUpload(file);
     }
-  }, []);
+  };
 
   const handleDeleteCV = async (cv: CV) => {
     if (!confirm(`Êtes-vous sûr de vouloir supprimer le CV "${cv.filename}" ?`)) {
@@ -290,7 +291,7 @@ export default function MesCVPage() {
       await reloadData();
 
     } catch (error) {
-      console.error('Erreur lors de la suppression:', error);
+      logger.error("Erreur lors de la suppression:", error);
       alert('Erreur lors de la suppression du CV');
     }
   };

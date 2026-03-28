@@ -16,6 +16,8 @@ export interface JobFilters {
   location?: string;
   job_type?: string;
   location_type?: string;
+  country?: string;
+  currency?: string;
 }
 
 export interface ApplicationFilters {
@@ -119,6 +121,33 @@ export const queryKeys = {
   // Auth (Utilisateur connecté)
   auth: {
     currentUser: () => ['auth', 'current-user'] as const,
+  },
+
+  // Collaboration (notes, tags, rating, scorecard)
+  collaboration: {
+    all: ['collaboration'] as const,
+    detail: (applicationId: number) => [...queryKeys.collaboration.all, 'detail', applicationId] as const,
+    notes: (applicationId: number) => [...queryKeys.collaboration.all, 'notes', applicationId] as const,
+    scorecard: (applicationId: number) => [...queryKeys.collaboration.all, 'scorecard', applicationId] as const,
+  },
+
+  // Job Alerts (Alertes emploi)
+  jobAlerts: {
+    all: ['job-alerts'] as const,
+    lists: () => [...queryKeys.jobAlerts.all, 'list'] as const,
+    list: () => [...queryKeys.jobAlerts.lists()] as const,
+    detail: (id: number) => [...queryKeys.jobAlerts.all, 'detail', id] as const,
+    stats: () => [...queryKeys.jobAlerts.all, 'stats'] as const,
+  },
+
+  // Email Templates
+  emailTemplates: {
+    all: ['email-templates'] as const,
+    lists: () => [...queryKeys.emailTemplates.all, 'list'] as const,
+    list: () => [...queryKeys.emailTemplates.lists()] as const,
+    detail: (id: number) => [...queryKeys.emailTemplates.all, 'detail', id] as const,
+    stats: () => [...queryKeys.emailTemplates.all, 'stats'] as const,
+    variables: () => [...queryKeys.emailTemplates.all, 'variables'] as const,
   },
 };
 

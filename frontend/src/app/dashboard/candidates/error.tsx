@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { logger } from '@/lib/logger';
 
 export default function CandidatesError({
   error,
@@ -13,7 +14,7 @@ export default function CandidatesError({
   const router = useRouter();
 
   useEffect(() => {
-    console.error(error);
+    logger.error("Candidates error:", error);
   }, [error]);
 
   return (

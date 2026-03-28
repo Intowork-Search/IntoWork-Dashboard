@@ -25,13 +25,10 @@ export default function EducationSection({ profile, onAdd }: EducationSectionPro
             <div className="flex items-center justify-between mb-3">
               <h4 className="text-lg font-semibold text-gray-900">{edu.degree}</h4>
             </div>
-            <div className="text-sm text-gray-600 mb-2">{edu.institution}</div>
+            <div className="text-sm text-gray-600 mb-2">{edu.school}</div>
             <div className="text-sm text-gray-600 mb-2">
-              {edu.start_date} - {edu.is_current ? 'En cours' : edu.end_date}
+              {edu.start_date} - {edu.end_date}
             </div>
-            {edu.field_of_study && (
-              <div className="text-sm text-gray-600 mb-2">Spécialité: {edu.field_of_study}</div>
-            )}
             {edu.description && (
               <p className="text-gray-700">{edu.description}</p>
             )}

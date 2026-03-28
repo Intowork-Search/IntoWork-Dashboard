@@ -12,7 +12,7 @@ from app.models.base import (
     Notification, PasswordResetToken, CVDocument
 )
 from app.auth import require_admin
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import List, Optional
 from datetime import datetime, timedelta
 
@@ -22,6 +22,8 @@ router = APIRouter(tags=["admin"])
 # ==================== MODELS ====================
 
 class AdminStats(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     total_users: int
     total_candidates: int
     total_employers: int
@@ -33,12 +35,11 @@ class AdminStats(BaseModel):
     inactive_users: int
     jobs_by_status: dict
     recent_signups: int  # derniers 7 jours
-    
-    class Config:
-        from_attributes = True
 
 
 class UserListItem(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     email: str
     first_name: str
@@ -46,12 +47,11 @@ class UserListItem(BaseModel):
     role: str
     is_active: bool
     created_at: datetime
-    
-    class Config:
-        from_attributes = True
 
 
 class EmployerListItem(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     user_id: int
     email: str
@@ -62,12 +62,11 @@ class EmployerListItem(BaseModel):
     phone: Optional[str]
     is_active: bool
     created_at: datetime
-    
-    class Config:
-        from_attributes = True
 
 
 class JobListItem(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     title: str
     company_name: str
@@ -76,9 +75,6 @@ class JobListItem(BaseModel):
     location: Optional[str]
     applications_count: int
     created_at: datetime
-    
-    class Config:
-        from_attributes = True
 
 
 class UserActivationUpdate(BaseModel):

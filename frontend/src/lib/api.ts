@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { getApiUrl } from './getApiUrl';
+import { logger } from './logger';
 
 // Configuration de l'API client
 // NOTE: Ne PAS appeler getApiUrl() ici car c'est évalué UNE FOIS au chargement du module
@@ -93,21 +94,19 @@ export interface Experience {
 
 export interface Education {
   id?: number;
-  institution: string;
+  school: string;
   degree: string;
-  field_of_study?: string;
   location?: string;
   start_date: string;
-  end_date?: string;
-  is_current: boolean;
+  end_date: string;
   description?: string;
 }
 
 export interface Skill {
   id?: number;
   name: string;
-  level: 'beginner' | 'intermediate' | 'advanced' | 'expert';
-  category?: string;
+  level: number; // 1-5 (1=débutant, 2=intermédiaire, 3=avancé, 4=expert, 5=maître)
+  category: 'technical' | 'soft' | 'language';
 }
 
 export interface CV {
@@ -394,6 +393,8 @@ export interface Job {
   salary_min?: number;
   salary_max?: number;
   currency: string;
+  country?: string;
+  zone?: string;
   status: string;
   posted_at?: string;
   is_featured: boolean;
@@ -431,6 +432,8 @@ export interface JobFilters {
   job_type?: string;
   location_type?: string;
   salary_min?: number;
+  country?: string;
+  currency?: string;
 }
 
 // Interface pour les candidatures
@@ -574,7 +577,7 @@ export const applicationsAPI = {
       const response = await client.get('/applications/my/applications?limit=1');
       return response.data.total || 0;
     } catch (error) {
-      console.warn('Erreur lors de la récupération du nombre de candidatures:', error);
+      logger.warn("Erreur lors de la recuperation du nombre de candidatures:", error);
       return 0; // Retourner 0 en cas d'erreur
     }
   },
@@ -909,6 +912,399 @@ export const integrationsAPI = {
     const response = await client.post('/integrations/outlook/create-event', eventData);
     return response.data;
   }
+};
+
+// ============================================
+// COLLABORATION API (Notes, Tags, Rating, Scorecard)
+// ============================================
+
+// Types pour la collaboration
+export interface RecruiterNote {
+  user_id: number;
+  user_name: string;
+  note: string;
+  created_at: string;
+}
+
+export interface ScorecardData {
+  technical_skills?: number;
+  soft_skills?: number;
+  experience?: number;
+  culture_fit?: number;
+  motivation?: number;
+  overall?: number;
+  average?: number;
+}
+
+export interface ScorecardUpdate {
+  technical_skills?: number;
+  soft_skills?: number;
+  experience?: number;
+  culture_fit?: number;
+  motivation?: number;
+  overall?: number;
+}
+
+export interface ApplicationCollaborationData {
+  application_id: number;
+  recruiter_notes: RecruiterNote[];
+  rating: number | null;
+  tags: string[];
+  scorecard: ScorecardData | null;
+}
+
+export interface AddNoteResponse {
+  message: string;
+  note: RecruiterNote;
+  total_notes: number;
+}
+
+export interface RatingResponse {
+  message: string;
+  rating: number;
+}
+
+export interface TagsResponse {
+  message: string;
+  tags: string[];
+}
+
+export interface ScorecardResponse {
+  message: string;
+  scorecard: ScorecardData;
+}
+
+export interface GetScorecardResponse {
+  application_id: number;
+  scorecard: ScorecardData;
+  rating: number | null;
+}
+
+export const collaborationAPI = {
+  // Récupérer toutes les données de collaboration pour une candidature
+  getCollaboration: async (token: string, applicationId: number): Promise<ApplicationCollaborationData> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.get(`/applications/${applicationId}/collaboration`);
+    return response.data;
+  },
+
+  // Récupérer les notes d'une candidature
+  getNotes: async (token: string, applicationId: number): Promise<RecruiterNote[]> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.get(`/applications/${applicationId}/notes`);
+    return response.data;
+  },
+
+  // Ajouter une note à une candidature
+  addNote: async (token: string, applicationId: number, note: string): Promise<AddNoteResponse> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.post(`/applications/${applicationId}/notes`, { note });
+    return response.data;
+  },
+
+  // Supprimer une note (par index)
+  deleteNote: async (token: string, applicationId: number, noteIndex: number): Promise<void> => {
+    const client = createAuthenticatedClient(token);
+    await client.delete(`/applications/${applicationId}/notes/${noteIndex}`);
+  },
+
+  // Mettre à jour la note globale (1-5 étoiles)
+  updateRating: async (token: string, applicationId: number, rating: number): Promise<RatingResponse> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.patch(`/applications/${applicationId}/rating`, { rating });
+    return response.data;
+  },
+
+  // Remplacer tous les tags
+  updateTags: async (token: string, applicationId: number, tags: string[]): Promise<TagsResponse> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.patch(`/applications/${applicationId}/tags`, { tags });
+    return response.data;
+  },
+
+  // Ajouter un tag unique
+  addTag: async (token: string, applicationId: number, tag: string): Promise<TagsResponse> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.post(`/applications/${applicationId}/tags/${encodeURIComponent(tag)}`);
+    return response.data;
+  },
+
+  // Supprimer un tag
+  removeTag: async (token: string, applicationId: number, tag: string): Promise<void> => {
+    const client = createAuthenticatedClient(token);
+    await client.delete(`/applications/${applicationId}/tags/${encodeURIComponent(tag)}`);
+  },
+
+  // Mettre à jour la scorecard
+  updateScorecard: async (token: string, applicationId: number, scorecard: ScorecardUpdate): Promise<ScorecardResponse> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.patch(`/applications/${applicationId}/scorecard`, scorecard);
+    return response.data;
+  },
+
+  // Récupérer la scorecard
+  getScorecard: async (token: string, applicationId: number): Promise<GetScorecardResponse> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.get(`/applications/${applicationId}/scorecard`);
+    return response.data;
+  },
+};
+
+// ============================================
+// JOB ALERTS API (Alertes emploi — Candidat)
+// ============================================
+
+export type JobAlertFrequency = 'INSTANT' | 'DAILY' | 'WEEKLY';
+
+export interface JobAlertCriteria {
+  keywords?: string[];
+  location?: string;
+  job_types?: string[];
+  location_types?: string[];
+  salary_min?: number;
+  salary_max?: number;
+}
+
+export interface JobAlertResponse {
+  id: number;
+  candidate_id: number;
+  name: string;
+  criteria: JobAlertCriteria;
+  frequency: JobAlertFrequency;
+  is_active: boolean;
+  jobs_sent_count: number;
+  last_sent_at: string | null;
+  last_matching_job_id: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface JobAlertCreateData {
+  name: string;
+  criteria: JobAlertCriteria;
+  frequency: JobAlertFrequency;
+}
+
+export interface JobAlertUpdateData {
+  name?: string;
+  criteria?: JobAlertCriteria;
+  frequency?: JobAlertFrequency;
+  is_active?: boolean;
+}
+
+export interface MatchingJobPreview {
+  id: number;
+  title: string;
+  location: string;
+  location_type: string;
+  job_type: string;
+  salary_min: number | null;
+  salary_max: number | null;
+  posted_at: string;
+  company_id: number;
+}
+
+export interface MatchingJobsResponse {
+  alert_id: number;
+  matching_jobs: MatchingJobPreview[];
+  total_matches: number;
+}
+
+export interface JobAlertStatsSummary {
+  total_alerts: number;
+  active_alerts: number;
+  inactive_alerts: number;
+  total_jobs_sent: number;
+}
+
+export const jobAlertsAPI = {
+  // Créer une alerte emploi
+  createAlert: async (token: string, data: JobAlertCreateData): Promise<JobAlertResponse> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.post('/job-alerts/', data);
+    return response.data;
+  },
+
+  // Lister les alertes emploi
+  getAlerts: async (token: string, isActive?: boolean): Promise<JobAlertResponse[]> => {
+    const client = createAuthenticatedClient(token);
+    const params: Record<string, string> = {};
+    if (isActive !== undefined) {
+      params.is_active = String(isActive);
+    }
+    const response = await client.get('/job-alerts/', { params });
+    return response.data;
+  },
+
+  // Récupérer une alerte spécifique
+  getAlert: async (token: string, alertId: number): Promise<JobAlertResponse> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.get(`/job-alerts/${alertId}`);
+    return response.data;
+  },
+
+  // Modifier une alerte
+  updateAlert: async (token: string, alertId: number, data: JobAlertUpdateData): Promise<JobAlertResponse> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.patch(`/job-alerts/${alertId}`, data);
+    return response.data;
+  },
+
+  // Supprimer une alerte
+  deleteAlert: async (token: string, alertId: number): Promise<void> => {
+    const client = createAuthenticatedClient(token);
+    await client.delete(`/job-alerts/${alertId}`);
+  },
+
+  // Activer/désactiver une alerte
+  toggleAlert: async (token: string, alertId: number): Promise<JobAlertResponse> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.post(`/job-alerts/${alertId}/toggle`);
+    return response.data;
+  },
+
+  // Prévisualiser les jobs correspondants
+  previewMatchingJobs: async (token: string, alertId: number, limit: number = 20): Promise<MatchingJobsResponse> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.get(`/job-alerts/${alertId}/preview`, { params: { limit } });
+    return response.data;
+  },
+
+  // Statistiques des alertes
+  getStatsSummary: async (token: string): Promise<JobAlertStatsSummary> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.get('/job-alerts/stats/summary');
+    return response.data;
+  },
+};
+
+// ============================================
+// EMAIL TEMPLATES API (Templates email — Employeur)
+// ============================================
+
+export type EmailTemplateType =
+  | 'welcome_candidate'
+  | 'application_received'
+  | 'application_rejected'
+  | 'interview_invitation'
+  | 'interview_confirmation'
+  | 'interview_reminder'
+  | 'offer_letter'
+  | 'onboarding'
+  | 'custom';
+
+export interface EmailTemplateResponse {
+  id: number;
+  company_id: number;
+  created_by_user_id: number;
+  name: string;
+  type: EmailTemplateType;
+  subject: string;
+  body: string;
+  is_active: boolean;
+  is_default: boolean;
+  usage_count: number;
+  created_at: string;
+  updated_at: string;
+  last_used_at: string | null;
+}
+
+export interface EmailTemplateCreateData {
+  name: string;
+  type: EmailTemplateType;
+  subject: string;
+  body: string;
+  is_default?: boolean;
+}
+
+export interface EmailTemplateUpdateData {
+  name?: string;
+  type?: EmailTemplateType;
+  subject?: string;
+  body?: string;
+  is_active?: boolean;
+  is_default?: boolean;
+}
+
+export interface TemplateVariablesResponse {
+  variables: string[];
+  descriptions: Record<string, string>;
+}
+
+export interface EmailTemplateUsageStats {
+  total_templates: number;
+  active_templates: number;
+  inactive_templates: number;
+  total_usage: number;
+  most_used_template: {
+    id: number;
+    name: string;
+    usage_count: number;
+  } | null;
+}
+
+export const emailTemplatesAPI = {
+  // Créer un template
+  createTemplate: async (token: string, data: EmailTemplateCreateData): Promise<EmailTemplateResponse> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.post('/email-templates', data);
+    return response.data;
+  },
+
+  // Lister les templates
+  getTemplates: async (
+    token: string,
+    params?: { type?: EmailTemplateType; is_active?: boolean }
+  ): Promise<EmailTemplateResponse[]> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.get('/email-templates', { params });
+    return response.data;
+  },
+
+  // Récupérer un template spécifique
+  getTemplate: async (token: string, templateId: number): Promise<EmailTemplateResponse> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.get(`/email-templates/${templateId}`);
+    return response.data;
+  },
+
+  // Modifier un template
+  updateTemplate: async (
+    token: string,
+    templateId: number,
+    data: EmailTemplateUpdateData
+  ): Promise<EmailTemplateResponse> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.patch(`/email-templates/${templateId}`, data);
+    return response.data;
+  },
+
+  // Supprimer (soft delete) un template
+  deleteTemplate: async (token: string, templateId: number): Promise<void> => {
+    const client = createAuthenticatedClient(token);
+    await client.delete(`/email-templates/${templateId}`);
+  },
+
+  // Dupliquer un template
+  duplicateTemplate: async (token: string, templateId: number): Promise<EmailTemplateResponse> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.post(`/email-templates/${templateId}/duplicate`);
+    return response.data;
+  },
+
+  // Variables disponibles pour interpolation
+  getVariables: async (token: string): Promise<TemplateVariablesResponse> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.get('/email-templates/variables');
+    return response.data;
+  },
+
+  // Statistiques d'utilisation
+  getUsageStats: async (token: string): Promise<EmailTemplateUsageStats> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.get('/email-templates/stats/usage');
+    return response.data;
+  },
 };
 
 /**

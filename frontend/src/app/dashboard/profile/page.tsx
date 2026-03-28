@@ -15,7 +15,10 @@ import { useAuth, useUser } from '@/hooks/useNextAuth';
 import DashboardLayout from '@/components/DashboardLayout';
 import OnboardingTour from '@/components/OnboardingTour';
 import { candidateProfileTour } from '@/config/onboardingTours';
-import { candidatesAPI, CandidateProfile } from '@/lib/api';
+import { candidatesAPI, CandidateProfile, Education } from '@/lib/api';
+import { getErrorMessage } from '@/types/api';
+import { logger } from '@/lib/logger';
+import toast from 'react-hot-toast';
 import {
   UserIcon,
   BriefcaseIcon,
@@ -76,21 +79,20 @@ export default function ProfilePage() {
 
   const [newEducation, setNewEducation] = useState({
     degree: '',
-    institution: '',
+    school: '',
     location: '',
     start_date: '',
     end_date: '',
-    description: '',
-    is_current: false
+    description: ''
   });
 
   const [newSkill, setNewSkill] = useState<{
     name: string;
-    level: 'beginner' | 'intermediate' | 'advanced' | 'expert';
-    category: string;
+    level: number;
+    category: 'technical' | 'soft' | 'language';
   }>({
     name: '',
-    level: 'intermediate',
+    level: 3,
     category: 'technical'
   });
 
@@ -109,7 +111,7 @@ export default function ProfilePage() {
         const profileData = await candidatesAPI.getMyProfile(token);
         setProfile(profileData);
       } catch (error) {
-        console.error('Erreur lors du chargement du profil:', error);
+        logger.error("Erreur lors du chargement du profil:", error);
         setError('Erreur lors du chargement du profil');
         setProfile({
           user_id: 0,
@@ -139,7 +141,7 @@ export default function ProfilePage() {
   }, [user?.id]);
 
   // Calculer le pourcentage de complétion
-  const completionPercentage = React.useMemo(() => {
+  const completionPercentage = (() => {
     if (!profile || !user) return 0;
 
     const fields = [
@@ -164,7 +166,7 @@ export default function ProfilePage() {
     if (hasSkills) totalCompletion += 10;
 
     return Math.round(totalCompletion);
-  }, [profile, user]);
+  })();
 
   // Sauvegarder le profil
   const handleSave = async () => {
@@ -184,7 +186,7 @@ export default function ProfilePage() {
       setProfile(updatedProfile);
       setIsEditing(false);
     } catch (error) {
-      console.error('Erreur lors de la sauvegarde:', error);
+      logger.error("Erreur lors de la sauvegarde:", error);
       setError('Erreur lors de la sauvegarde du profil');
     } finally {
       setIsSaving(false);
@@ -213,7 +215,7 @@ export default function ProfilePage() {
         is_current: false
       });
     } catch (error) {
-      console.error('Erreur:', error);
+      logger.error("Erreur ajout experience:", error);
       setError('Erreur lors de l\'ajout de l\'expérience');
     }
   };
@@ -224,7 +226,16 @@ export default function ProfilePage() {
       const token = await getToken();
       if (!token) return;
 
-      const createdEdu = await candidatesAPI.addEducation(token, newEducation);
+      const payload = {
+        degree: newEducation.degree,
+        school: newEducation.school,
+        location: newEducation.location || undefined,
+        start_date: newEducation.start_date,
+        end_date: newEducation.end_date || newEducation.start_date,
+        description: newEducation.description || undefined,
+      };
+
+      const createdEdu = await candidatesAPI.addEducation(token, payload as Omit<Education, 'id'>);
       setProfile(prev => prev ? {
         ...prev,
         education: [...(prev.education || []), createdEdu]
@@ -232,16 +243,17 @@ export default function ProfilePage() {
       setShowEducationModal(false);
       setNewEducation({
         degree: '',
-        institution: '',
+        school: '',
         location: '',
         start_date: '',
         end_date: '',
-        description: '',
-        is_current: false
+        description: ''
       });
+      toast.success('Formation ajoutée avec succès');
     } catch (error) {
-      console.error('Erreur:', error);
-      setError('Erreur lors de l\'ajout de la formation');
+      logger.error("Erreur ajout formation:", error);
+      const message = getErrorMessage(error, 'Erreur lors de l\'ajout de la formation');
+      toast.error(message);
     }
   };
 
@@ -259,12 +271,14 @@ export default function ProfilePage() {
       setShowSkillModal(false);
       setNewSkill({
         name: '',
-        level: 'intermediate',
+        level: 3,
         category: 'technical'
       });
+      toast.success('Compétence ajoutée avec succès');
     } catch (error) {
-      console.error('Erreur:', error);
-      setError('Erreur lors de l\'ajout de la compétence');
+      logger.error("Erreur ajout competence:", error);
+      const message = getErrorMessage(error, 'Erreur lors de l\'ajout de la compétence');
+      toast.error(message);
     }
   };
 
@@ -280,7 +294,7 @@ export default function ProfilePage() {
         experiences: prev.experiences?.filter(e => e.id !== expId) || []
       } : null);
     } catch (error) {
-      console.error('Erreur:', error);
+      logger.error("Erreur suppression experience:", error);
     }
   };
 
@@ -296,7 +310,7 @@ export default function ProfilePage() {
         education: prev.education?.filter(e => e.id !== eduId) || []
       } : null);
     } catch (error) {
-      console.error('Erreur:', error);
+      logger.error("Erreur suppression formation:", error);
     }
   };
 
@@ -312,7 +326,7 @@ export default function ProfilePage() {
         skills: prev.skills?.filter(s => s.id !== skillId) || []
       } : null);
     } catch (error) {
-      console.error('Erreur:', error);
+      logger.error("Erreur suppression competence:", error);
     }
   };
 
@@ -852,7 +866,7 @@ export default function ProfilePage() {
                             </div>
                             <div>
                               <h4 className="font-bold text-gray-900 text-lg">{edu.degree}</h4>
-                              <p className="text-[#6B46C1] font-semibold">{edu.institution}</p>
+                              <p className="text-[#6B46C1] font-semibold">{edu.school}</p>
                               <div className="flex items-center gap-3 mt-2 text-sm text-gray-500">
                                 <span className="flex items-center gap-1">
                                   <MapPinIcon className="w-4 h-4" />
@@ -1108,8 +1122,8 @@ export default function ProfilePage() {
                   <label className="block mb-2 font-semibold text-gray-700">Établissement *</label>
                   <input
                     type="text"
-                    value={newEducation.institution}
-                    onChange={(e) => setNewEducation({ ...newEducation, institution: e.target.value })}
+                    value={newEducation.school}
+                    onChange={(e) => setNewEducation({ ...newEducation, school: e.target.value })}
                     className="w-full px-4 py-3 rounded-xl bg-gray-50 border-2 border-gray-200 focus:border-[#6B46C1] focus:ring-4 focus:ring-[#6B46C1]/10 outline-none transition-all"
                     placeholder="Nom de l'école"
                   />
@@ -1168,7 +1182,7 @@ export default function ProfilePage() {
               </button>
               <button
                 onClick={handleAddEducation}
-                disabled={!newEducation.degree || !newEducation.institution || !newEducation.start_date}
+                disabled={!newEducation.degree || !newEducation.school || !newEducation.start_date}
                 className="flex-1 px-6 py-3 rounded-xl font-semibold bg-gradient-to-r from-[#6B46C1] to-[#5a3ba3] text-white shadow-lg shadow-[#6B46C1]/30 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
                 Ajouter
@@ -1217,7 +1231,7 @@ export default function ProfilePage() {
                   ].map((cat) => (
                     <button
                       key={cat.value}
-                      onClick={() => setNewSkill({ ...newSkill, category: cat.value })}
+                      onClick={() => setNewSkill({ ...newSkill, category: cat.value as 'technical' | 'soft' | 'language' })}
                       className={`px-4 py-3 rounded-xl font-medium transition-all ${
                         newSkill.category === cat.value
                           ? 'text-white shadow-lg'
@@ -1238,13 +1252,14 @@ export default function ProfilePage() {
                 <label className="block mb-2 font-semibold text-gray-700">Niveau</label>
                 <select
                   value={newSkill.level}
-                  onChange={(e) => setNewSkill({ ...newSkill, level: e.target.value as 'beginner' | 'intermediate' | 'advanced' | 'expert' })}
+                  onChange={(e) => setNewSkill({ ...newSkill, level: Number(e.target.value) })}
                   className="w-full px-4 py-3 rounded-xl bg-gray-50 border-2 border-gray-200 focus:border-[#3B82F6] focus:ring-4 focus:ring-[#3B82F6]/10 outline-none transition-all"
                 >
-                  <option value="beginner">Débutant</option>
-                  <option value="intermediate">Intermédiaire</option>
-                  <option value="advanced">Avancé</option>
-                  <option value="expert">Expert</option>
+                  <option value={1}>Débutant</option>
+                  <option value={2}>Intermédiaire</option>
+                  <option value={3}>Avancé</option>
+                  <option value={4}>Expert</option>
+                  <option value={5}>Maître</option>
                 </select>
               </div>
             </div>

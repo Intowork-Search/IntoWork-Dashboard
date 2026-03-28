@@ -13,6 +13,7 @@
 import React, { useState, useEffect } from 'react';
 import { useUser, useAuth } from '@/hooks/useNextAuth';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { logger } from '@/lib/logger';
 import DashboardLayout from '@/components/DashboardLayout';
 import OnboardingTour from '@/components/OnboardingTour';
 import { integrationsTour } from '@/config/onboardingTours';
@@ -54,8 +55,8 @@ export default function IntegrationsPage() {
 
       const status = await integrationsAPI.getStatus(token);
       setIntegrations(status);
-    } catch (error: any) {
-      console.error('Error loading integrations:', error);
+    } catch (error: unknown) {
+      logger.error("Error loading integrations:", error);
       toast.error('Erreur lors du chargement des intégrations');
     } finally {
       setIsLoading(false);
@@ -103,8 +104,8 @@ export default function IntegrationsPage() {
 
       // Rediriger vers l'URL d'autorisation OAuth
       window.location.href = authUrlData.auth_url;
-    } catch (error: any) {
-      console.error(`Error connecting ${provider}:`, error);
+    } catch (error: unknown) {
+      logger.error(`Error connecting ${provider}:`, error);
       toast.error(`Erreur lors de la connexion à ${provider}`);
       setConnectingProvider(null);
     }
@@ -126,8 +127,8 @@ export default function IntegrationsPage() {
       await integrationsAPI.disconnect(token, provider);
       toast.success(`${provider} déconnecté avec succès`);
       await loadIntegrations();
-    } catch (error: any) {
-      console.error(`Error disconnecting ${provider}:`, error);
+    } catch (error: unknown) {
+      logger.error(`Error disconnecting ${provider}:`, error);
       toast.error(`Erreur lors de la déconnexion de ${provider}`);
     }
   };

@@ -7,6 +7,7 @@ import { useUser } from '@/hooks/useNextAuth';
 import { useRouter } from 'next/navigation';
 import { jobsAPI } from '@/lib/api';
 import type { Job } from '@/lib/api';
+import { logger } from '@/lib/logger';
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -513,7 +514,7 @@ export default function Home() {
           );
         }
       } catch (error) {
-        console.error('Erreur chargement offres:', error);
+        logger.error("Erreur chargement offres:", error);
       } finally {
         setLoadingJobs(false);
       }

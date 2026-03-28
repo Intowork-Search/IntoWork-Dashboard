@@ -6,8 +6,10 @@ import { useSession } from 'next-auth/react';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 import { BuildingOfficeIcon } from '@heroicons/react/24/outline';
+import { getErrorMessage } from '@/types/api';
 
 import { getApiUrl } from '@/lib/getApiUrl';
+import { logger } from '@/lib/logger';
 
 const API_URL = getApiUrl();
 
@@ -54,8 +56,8 @@ export default function EmployerOnboardingPage() {
     try {
       const token = session?.accessToken;
       
-      console.log('Session:', session);
-      console.log('Token:', token);
+      logger.debug("Session:", session);
+      logger.debug("Token:", token);
       
       if (!token) {
         toast.error('Session expirée. Veuillez vous reconnecter.');
@@ -91,9 +93,9 @@ export default function EmployerOnboardingPage() {
 
       toast.success('🎉 Profil créé avec succès !');
       router.push('/dashboard');
-    } catch (error: any) {
-      console.error('Onboarding error:', error);
-      toast.error(error.response?.data?.detail || 'Erreur lors de la création du profil');
+    } catch (error: unknown) {
+      logger.error("Onboarding error:", error);
+      toast.error(getErrorMessage(error, 'Erreur lors de la création du profil'));
     } finally {
       setLoading(false);
     }

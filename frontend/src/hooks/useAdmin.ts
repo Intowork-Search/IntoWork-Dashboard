@@ -12,11 +12,13 @@
  * - useDeleteUser: Supprimer un utilisateur
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, type QueryKey } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/queryKeys';
 import { adminAPI, type AdminStats, type AdminUser, type AdminEmployer, type AdminJob } from '@/lib/api';
 import { useAuth } from '@/hooks/useNextAuth';
+import { getErrorMessage } from '@/types/api';
 import toast from 'react-hot-toast';
+import { logger } from '@/lib/logger';
 
 // ============================================================
 // QUERIES (Lecture)
@@ -189,7 +191,7 @@ export function useToggleUserActivation() {
         queryKey: queryKeys.admin.all,
       });
 
-      const previousLists: Array<{ key: any; data: AdminUser[] | undefined }> = [];
+      const previousLists: Array<{ key: QueryKey; data: AdminUser[] | undefined }> = [];
 
       usersQueries.forEach(([key, data]) => {
         previousLists.push({ key, data });
@@ -212,7 +214,7 @@ export function useToggleUserActivation() {
       const action = is_active ? 'activé' : 'désactivé';
       toast.success(`✅ Utilisateur ${action} avec succès !`);
     },
-    onError: (error: any, _variables, context) => {
+    onError: (error: Error, _variables, context) => {
       // Rollback
       if (context?.previousLists) {
         context.previousLists.forEach(({ key, data }) => {
@@ -222,9 +224,9 @@ export function useToggleUserActivation() {
         });
       }
 
-      const message = error.response?.data?.detail || 'Erreur lors de la modification de l\'utilisateur';
+      const message = getErrorMessage(error, 'Erreur lors de la modification de l\'utilisateur');
       toast.error(`❌ ${message}`);
-      console.error('Erreur toggle user activation:', error);
+      logger.error("Erreur toggle user activation:", error);
     },
   });
 }
@@ -254,7 +256,7 @@ export function useDeleteUser() {
         queryKey: queryKeys.admin.all,
       });
 
-      const previousLists: Array<{ key: any; data: AdminUser[] | undefined }> = [];
+      const previousLists: Array<{ key: QueryKey; data: AdminUser[] | undefined }> = [];
 
       usersQueries.forEach(([key, data]) => {
         previousLists.push({ key, data });
@@ -274,7 +276,7 @@ export function useDeleteUser() {
 
       toast.success('✅ Utilisateur supprimé avec succès !');
     },
-    onError: (error: any, _userId, context) => {
+    onError: (error: Error, _userId, context) => {
       // Rollback
       if (context?.previousLists) {
         context.previousLists.forEach(({ key, data }) => {
@@ -284,9 +286,9 @@ export function useDeleteUser() {
         });
       }
 
-      const message = error.response?.data?.detail || 'Erreur lors de la suppression de l\'utilisateur';
+      const message = getErrorMessage(error, 'Erreur lors de la suppression de l\'utilisateur');
       toast.error(`❌ ${message}`);
-      console.error('Erreur delete user:', error);
+      logger.error("Erreur delete user:", error);
     },
   });
 }

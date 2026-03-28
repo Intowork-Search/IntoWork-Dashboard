@@ -10,11 +10,13 @@
  * - useMarkAllAsRead: Marquer toutes les notifications comme lues
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, type QueryKey } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/queryKeys';
 import { notificationsAPI, type Notification, type NotificationListResponse } from '@/lib/api';
 import { useAuth } from '@/hooks/useNextAuth';
+import { getErrorMessage } from '@/types/api';
 import toast from 'react-hot-toast';
+import { logger } from '@/lib/logger';
 
 // ============================================================
 // QUERIES (Lecture)
@@ -118,7 +120,7 @@ export function useMarkNotificationAsRead() {
         queryKey: queryKeys.notifications.all,
       });
 
-      const previousLists: Array<{ key: any; data: NotificationListResponse | undefined }> = [];
+      const previousLists: Array<{ key: QueryKey; data: NotificationListResponse | undefined }> = [];
 
       listQueries.forEach(([key, data]) => {
         previousLists.push({ key, data });
@@ -152,7 +154,7 @@ export function useMarkNotificationAsRead() {
       // Refetch pour synchroniser avec le serveur
       queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all });
     },
-    onError: (error: any, _notificationId, context) => {
+    onError: (error: Error, _notificationId, context) => {
       // Rollback en cas d'erreur
       if (context?.previousLists) {
         context.previousLists.forEach(({ key, data }) => {
@@ -166,9 +168,9 @@ export function useMarkNotificationAsRead() {
         queryClient.setQueryData(queryKeys.notifications.unreadCount(), context.previousCount);
       }
 
-      const message = error.response?.data?.detail || 'Erreur lors du marquage de la notification';
+      const message = getErrorMessage(error, 'Erreur lors du marquage de la notification');
       toast.error(`❌ ${message}`);
-      console.error('Erreur mark as read:', error);
+      logger.error("Erreur mark as read:", error);
     },
   });
 }
@@ -197,7 +199,7 @@ export function useMarkAllNotificationsAsRead() {
         queryKey: queryKeys.notifications.all,
       });
 
-      const previousLists: Array<{ key: any; data: NotificationListResponse | undefined }> = [];
+      const previousLists: Array<{ key: QueryKey; data: NotificationListResponse | undefined }> = [];
 
       listQueries.forEach(([key, data]) => {
         previousLists.push({ key, data });
@@ -227,7 +229,7 @@ export function useMarkAllNotificationsAsRead() {
       queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all });
       toast.success('✅ Toutes les notifications marquées comme lues !');
     },
-    onError: (error: any, _variables, context) => {
+    onError: (error: Error, _variables, context) => {
       // Rollback
       if (context?.previousLists) {
         context.previousLists.forEach(({ key, data }) => {
@@ -237,9 +239,9 @@ export function useMarkAllNotificationsAsRead() {
         });
       }
 
-      const message = error.response?.data?.detail || 'Erreur lors du marquage des notifications';
+      const message = getErrorMessage(error, 'Erreur lors du marquage des notifications');
       toast.error(`❌ ${message}`);
-      console.error('Erreur mark all as read:', error);
+      logger.error("Erreur mark all as read:", error);
     },
   });
 }
@@ -269,7 +271,7 @@ export function useDeleteNotification() {
         queryKey: queryKeys.notifications.all,
       });
 
-      const previousLists: Array<{ key: any; data: NotificationListResponse | undefined }> = [];
+      const previousLists: Array<{ key: QueryKey; data: NotificationListResponse | undefined }> = [];
 
       listQueries.forEach(([key, data]) => {
         previousLists.push({ key, data });
@@ -295,7 +297,7 @@ export function useDeleteNotification() {
       queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all });
       toast.success('✅ Notification supprimée !');
     },
-    onError: (error: any, _notificationId, context) => {
+    onError: (error: Error, _notificationId, context) => {
       // Rollback
       if (context?.previousLists) {
         context.previousLists.forEach(({ key, data }) => {
@@ -305,9 +307,9 @@ export function useDeleteNotification() {
         });
       }
 
-      const message = error.response?.data?.detail || 'Erreur lors de la suppression';
+      const message = getErrorMessage(error, 'Erreur lors de la suppression');
       toast.error(`❌ ${message}`);
-      console.error('Erreur delete notification:', error);
+      logger.error("Erreur delete notification:", error);
     },
   });
 }

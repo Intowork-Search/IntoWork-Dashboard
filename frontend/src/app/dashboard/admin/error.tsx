@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { logger } from '@/lib/logger';
 
 export default function AdminError({
   error,
@@ -13,7 +14,7 @@ export default function AdminError({
   const router = useRouter();
 
   useEffect(() => {
-    console.error(error);
+    logger.error("Admin error:", error);
   }, [error]);
 
   return (

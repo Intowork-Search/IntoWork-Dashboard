@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { logger } from '@/lib/logger';
 
 export default function ApplicationsError({
   error,
@@ -13,7 +14,7 @@ export default function ApplicationsError({
   const router = useRouter();
 
   useEffect(() => {
-    console.error(error);
+    logger.error("Applications error:", error);
   }, [error]);
 
   return (

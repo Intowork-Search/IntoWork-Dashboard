@@ -4,7 +4,7 @@ from sqlalchemy import select, func
 from app.database import get_db
 from app.models.base import User, UserRole
 from app.auth import require_admin
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import List
 
 router = APIRouter()
@@ -17,11 +17,10 @@ class UserBase(BaseModel):
     last_name: str
 
 class UserResponse(UserBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     is_active: bool
-
-    class Config:
-        from_attributes = True
 
 class UserCreate(UserBase):
     pass
