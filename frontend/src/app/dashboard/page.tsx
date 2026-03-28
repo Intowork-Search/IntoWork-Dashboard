@@ -45,6 +45,7 @@ export default function Dashboard() {
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [isUploadingCV, setIsUploadingCV] = useState(false);
+  const [isExportingPDF, setIsExportingPDF] = useState(false);
   const [recentJobsCount, setRecentJobsCount] = useState<number>(0);
   const [experiencesCount, setExperiencesCount] = useState<number>(0);
   const [educationCount, setEducationCount] = useState<number>(0);
@@ -194,6 +195,42 @@ export default function Dashboard() {
 
   const openFileSelector = () => {
     fileInputRef.current?.click();
+  };
+
+  const handleExportPDF = async () => {
+    try {
+      setIsExportingPDF(true);
+      const token = await getToken();
+      if (!token) {
+        toast.error("Authentification requise");
+        return;
+      }
+
+      const endpoint = userRole === 'employer' ? '/reports/employer/pdf' : '/reports/candidate/pdf';
+      const response = await fetch(`${getApiUrl()}${endpoint}`, {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur ${response.status}`);
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `intowork_rapport_${userRole}_${new Date().toISOString().slice(0, 10)}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      toast.success('Rapport PDF telecharge !');
+    } catch (error) {
+      logger.error("Erreur export PDF:", error);
+      toast.error('Erreur lors de la generation du rapport');
+    } finally {
+      setIsExportingPDF(false);
+    }
   };
 
   // Rediriger les admins vers leur dashboard
@@ -546,6 +583,26 @@ export default function Dashboard() {
                   )}
                 </button>
 
+                {/* Exporter mon rapport PDF */}
+                <button
+                  onClick={handleExportPDF}
+                  disabled={isExportingPDF}
+                  className="group w-full flex items-center justify-between p-4 text-left bg-gradient-to-r from-[#3B82F6]/10 to-[#3B82F6]/5 hover:from-[#3B82F6]/20 hover:to-[#3B82F6]/10 rounded-2xl transition-all duration-300 border border-[#3B82F6]/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-[#3B82F6] flex items-center justify-center shadow-md shadow-[#3B82F6]/30">
+                      <ChartBarIcon className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900">
+                        {isExportingPDF ? 'Generation...' : 'Exporter rapport PDF'}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-0.5">Statistiques et profil complet</p>
+                    </div>
+                  </div>
+                  <ArrowRightIcon className="w-5 h-5 text-[#3B82F6] opacity-0 group-hover:opacity-100 transform translate-x-0 group-hover:translate-x-1 transition-all" />
+                </button>
+
                 {/* Voir tous mes CV */}
                 <button
                   data-tour="my-applications"
@@ -635,6 +692,26 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <ArrowRightIcon className="w-5 h-5 text-[#6B46C1] opacity-0 group-hover:opacity-100 transform translate-x-0 group-hover:translate-x-1 transition-all" />
+                </button>
+
+                {/* Exporter rapport recrutement PDF */}
+                <button
+                  onClick={handleExportPDF}
+                  disabled={isExportingPDF}
+                  className="group w-full flex items-center justify-between p-4 text-left bg-gradient-to-r from-[#3B82F6]/10 to-[#3B82F6]/5 hover:from-[#3B82F6]/20 hover:to-[#3B82F6]/10 rounded-2xl transition-all duration-300 border border-[#3B82F6]/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-[#3B82F6] flex items-center justify-center shadow-md shadow-[#3B82F6]/30">
+                      <DocumentTextIcon className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900">
+                        {isExportingPDF ? 'Generation...' : 'Exporter rapport PDF'}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-0.5">Offres, candidatures et KPIs</p>
+                    </div>
+                  </div>
+                  <ArrowRightIcon className="w-5 h-5 text-[#3B82F6] opacity-0 group-hover:opacity-100 transform translate-x-0 group-hover:translate-x-1 transition-all" />
                 </button>
               </>
             )}

@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="header">
+  <div>
+    <div class="brand">INTOWORK</div>
+    <h1>Rapport Candidat</h1>
+  </div>
+  <div class="date">{{ generated_at }}</div>
+</div>
+
+<!-- Profil -->
+<div class="section">
+  <div class="section-title">Profil</div>
+  <div class="info-grid">
+    <div class="info-item">
+      <div class="info-label">Nom</div>
+      <div class="info-value">{{ user_name }}</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label">Email</div>
+      <div class="info-value">{{ email }}</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label">Poste</div>
+      <div class="info-value">{{ title }}</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label">Localisation</div>
+      <div class="info-value">{{ location }}</div>
+    </div>
+  </div>
+  <div style="margin-top: 8px;">
+    <div class="info-label" style="margin-bottom: 4px;">Completion du profil : {{ profile_completion }}%</div>
+    <div class="progress-bar"><div class="progress-fill" style="width: {{ profile_completion }}%;"></div></div>
+  </div>
+</div>
+
+<!-- Statistiques -->
+<div class="section">
+  <div class="section-title">Statistiques</div>
+  <div class="stats-grid">
+    {% for stat in stats %}
+    <div class="stat-card">
+      <div class="stat-value">{{ stat.value }}</div>
+      <div class="stat-label">{{ stat.title }}</div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Competences -->
+{% if skills %}
+<div class="section">
+  <div class="section-title">Competences ({{ skills|length }})</div>
+  <table>
+    <thead><tr><th>Competence</th><th>Categorie</th><th>Niveau</th></tr></thead>
+    <tbody>
+    {% for skill in skills %}
+    <tr>
+      <td>{{ skill.name }}</td>
+      <td>
+        {% if skill.category == 'technical' %}<span class="badge badge-blue">Technique</span>
+        {% elif skill.category == 'soft' %}<span class="badge badge-purple">Soft Skill</span>
+        {% elif skill.category == 'language' %}<span class="badge badge-green">Langue</span>
+        {% else %}<span class="badge badge-yellow">{{ skill.category }}</span>{% endif %}
+      </td>
+      <td>{{ skill.level }}/5</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<!-- Experiences -->
+{% if experiences %}
+<div class="section">
+  <div class="section-title">Experiences professionnelles ({{ experiences|length }})</div>
+  <table>
+    <thead><tr><th>Poste</th><th>Entreprise</th><th>Periode</th></tr></thead>
+    <tbody>
+    {% for exp in experiences %}
+    <tr>
+      <td>{{ exp.title }}</td>
+      <td>{{ exp.company }}</td>
+      <td>{{ exp.start_date }} — {{ exp.end_date or 'En cours' }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<!-- Formations -->
+{% if educations %}
+<div class="section">
+  <div class="section-title">Formations ({{ educations|length }})</div>
+  <table>
+    <thead><tr><th>Diplome</th><th>Etablissement</th><th>Periode</th></tr></thead>
+    <tbody>
+    {% for edu in educations %}
+    <tr>
+      <td>{{ edu.degree }}</td>
+      <td>{{ edu.school }}</td>
+      <td>{{ edu.start_date }} — {{ edu.end_date or '' }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<!-- Activite recente -->
+{% if activities %}
+<div class="section">
+  <div class="section-title">Activite recente</div>
+  <table>
+    <thead><tr><th>Action</th><th>Detail</th><th>Date</th></tr></thead>
+    <tbody>
+    {% for act in activities %}
+    <tr><td>{{ act.action }}</td><td>{{ act.target }}</td><td>{{ act.time }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}

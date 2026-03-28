@@ -27,6 +27,7 @@ from app.api.job_alerts import router as job_alerts_router
 from app.api.collaboration import router as collaboration_router
 from app.api.integrations import router as integrations_router
 from app.api.interviews import router as interviews_router
+from app.api.reports import router as reports_router
 from dotenv import load_dotenv
 import os
 from pathlib import Path
@@ -193,6 +194,7 @@ app.include_router(job_alerts_router, prefix="/api", tags=["ats-job-alerts"])
 app.include_router(collaboration_router, prefix="/api", tags=["ats-collaboration"])
 app.include_router(integrations_router, prefix="/api", tags=["ats-integrations"])
 app.include_router(interviews_router, prefix="/api/interviews", tags=["interviews"])
+app.include_router(reports_router, prefix="/api/reports", tags=["reports"])
 
 # Servir les fichiers uploadés (CV, photos, etc.) avec CORS
 uploads_path = Path(__file__).parent.parent / "uploads"

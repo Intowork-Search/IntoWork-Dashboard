@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="header">
+  <div>
+    <div class="brand">INTOWORK</div>
+    <h1>Rapport Recrutement</h1>
+  </div>
+  <div class="date">{{ generated_at }}</div>
+</div>
+
+<!-- Entreprise -->
+<div class="section">
+  <div class="section-title">Entreprise</div>
+  <div class="info-grid">
+    <div class="info-item">
+      <div class="info-label">Responsable</div>
+      <div class="info-value">{{ user_name }}</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label">Entreprise</div>
+      <div class="info-value">{{ company_name }}</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label">Secteur</div>
+      <div class="info-value">{{ company_industry }}</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label">Taille</div>
+      <div class="info-value">{{ company_size }}</div>
+    </div>
+  </div>
+</div>
+
+<!-- KPI -->
+<div class="section">
+  <div class="section-title">Indicateurs cles</div>
+  <div class="stats-grid">
+    {% for stat in stats %}
+    <div class="stat-card">
+      <div class="stat-value">{{ stat.value }}</div>
+      <div class="stat-label">{{ stat.title }}</div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Offres -->
+{% if jobs_summary %}
+<div class="section">
+  <div class="section-title">Offres d'emploi ({{ jobs_summary|length }})</div>
+  <table>
+    <thead><tr><th>Titre</th><th>Statut</th><th>Candidatures</th><th>Publiee le</th></tr></thead>
+    <tbody>
+    {% for job in jobs_summary %}
+    <tr>
+      <td>{{ job.title }}</td>
+      <td>
+        {% if job.status == 'active' or job.status == 'published' %}<span class="badge badge-green">Active</span>
+        {% elif job.status == 'draft' %}<span class="badge badge-yellow">Brouillon</span>
+        {% elif job.status == 'closed' %}<span class="badge badge-red">Fermee</span>
+        {% else %}<span class="badge badge-blue">{{ job.status }}</span>{% endif %}
+      </td>
+      <td>{{ job.applications_count }}</td>
+      <td>{{ job.posted_at or '-' }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<!-- Activite recente -->
+{% if activities %}
+<div class="section">
+  <div class="section-title">Activite recente</div>
+  <table>
+    <thead><tr><th>Action</th><th>Detail</th><th>Date</th></tr></thead>
+    <tbody>
+    {% for act in activities %}
+    <tr><td>{{ act.action }}</td><td>{{ act.target }}</td><td>{{ act.time }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}

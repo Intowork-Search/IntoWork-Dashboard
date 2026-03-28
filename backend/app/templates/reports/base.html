@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  @page { size: A4; margin: 2cm; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #1f2937; font-size: 11pt; line-height: 1.5; }
+  .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #6B9B5F; padding-bottom: 12px; margin-bottom: 24px; }
+  .header h1 { font-size: 22pt; font-weight: 800; color: #111827; }
+  .header .brand { font-size: 14pt; font-weight: 700; color: #6B9B5F; }
+  .header .date { font-size: 9pt; color: #6b7280; }
+  .section { margin-bottom: 20px; }
+  .section-title { font-size: 13pt; font-weight: 700; color: #6B9B5F; border-bottom: 1px solid #e5e7eb; padding-bottom: 4px; margin-bottom: 10px; }
+  .stats-grid { display: flex; gap: 12px; margin-bottom: 16px; }
+  .stat-card { flex: 1; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; text-align: center; }
+  .stat-value { font-size: 20pt; font-weight: 800; color: #6B9B5F; }
+  .stat-label { font-size: 8pt; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; }
+  table { width: 100%; border-collapse: collapse; font-size: 10pt; margin-bottom: 12px; }
+  th { background: #6B9B5F; color: white; padding: 8px 10px; text-align: left; font-weight: 600; }
+  td { padding: 7px 10px; border-bottom: 1px solid #e5e7eb; }
+  tr:nth-child(even) td { background: #f9fafb; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 8pt; font-weight: 600; }
+  .badge-green { background: #dcfce7; color: #166534; }
+  .badge-blue { background: #dbeafe; color: #1e40af; }
+  .badge-purple { background: #f3e8ff; color: #6b21a8; }
+  .badge-yellow { background: #fef9c3; color: #854d0e; }
+  .badge-red { background: #fee2e2; color: #991b1b; }
+  .footer { margin-top: 30px; padding-top: 12px; border-top: 1px solid #e5e7eb; font-size: 8pt; color: #9ca3af; text-align: center; }
+  .progress-bar { height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; }
+  .progress-fill { height: 100%; background: #6B9B5F; border-radius: 4px; }
+  .info-grid { display: flex; gap: 20px; margin-bottom: 12px; }
+  .info-item { flex: 1; }
+  .info-label { font-size: 8pt; color: #6b7280; text-transform: uppercase; }
+  .info-value { font-size: 11pt; font-weight: 600; color: #111827; }
+</style>
+</head>
+<body>
+{% block content %}{% endblock %}
+<div class="footer">
+  INTOWORK — Plateforme de recrutement | Rapport genere le {{ generated_at }} | Confidentiel
+</div>
+</body>
+</html>

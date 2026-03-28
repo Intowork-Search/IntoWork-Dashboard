@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="header">
+  <div>
+    <div class="brand">INTOWORK</div>
+    <h1>Rapport Plateforme — Admin</h1>
+  </div>
+  <div class="date">{{ generated_at }}</div>
+</div>
+
+<!-- Vue d'ensemble -->
+<div class="section">
+  <div class="section-title">Vue d'ensemble</div>
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-value">{{ total_users }}</div>
+      <div class="stat-label">Utilisateurs</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ total_candidates }}</div>
+      <div class="stat-label">Candidats</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ total_employers }}</div>
+      <div class="stat-label">Recruteurs</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ total_companies }}</div>
+      <div class="stat-label">Entreprises</div>
+    </div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-value">{{ total_jobs }}</div>
+      <div class="stat-label">Offres</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ total_applications }}</div>
+      <div class="stat-label">Candidatures</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ active_users }}</div>
+      <div class="stat-label">Utilisateurs actifs</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ recent_signups }}</div>
+      <div class="stat-label">Inscriptions (7j)</div>
+    </div>
+  </div>
+</div>
+
+<!-- Utilisateurs -->
+<div class="section">
+  <div class="section-title">Repartition utilisateurs</div>
+  <table>
+    <thead><tr><th>Categorie</th><th>Nombre</th><th>Pourcentage</th></tr></thead>
+    <tbody>
+    <tr>
+      <td>Candidats</td>
+      <td>{{ total_candidates }}</td>
+      <td>{{ "%.0f"|format(total_candidates / total_users * 100 if total_users else 0) }}%</td>
+    </tr>
+    <tr>
+      <td>Recruteurs</td>
+      <td>{{ total_employers }}</td>
+      <td>{{ "%.0f"|format(total_employers / total_users * 100 if total_users else 0) }}%</td>
+    </tr>
+    <tr>
+      <td>Actifs</td>
+      <td>{{ active_users }}</td>
+      <td>{{ "%.0f"|format(active_users / total_users * 100 if total_users else 0) }}%</td>
+    </tr>
+    <tr>
+      <td>Inactifs</td>
+      <td>{{ inactive_users }}</td>
+      <td>{{ "%.0f"|format(inactive_users / total_users * 100 if total_users else 0) }}%</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Offres par statut -->
+<div class="section">
+  <div class="section-title">Offres par statut</div>
+  <table>
+    <thead><tr><th>Statut</th><th>Nombre</th></tr></thead>
+    <tbody>
+    {% for status_name, count in jobs_by_status.items() %}
+    <tr>
+      <td>
+        {% if status_name == 'published' %}<span class="badge badge-green">Publiee</span>
+        {% elif status_name == 'draft' %}<span class="badge badge-yellow">Brouillon</span>
+        {% elif status_name == 'closed' %}<span class="badge badge-red">Fermee</span>
+        {% elif status_name == 'archived' %}<span class="badge badge-blue">Archivee</span>
+        {% else %}<span class="badge badge-blue">{{ status_name }}</span>{% endif %}
+      </td>
+      <td>{{ count }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Rapport genere par -->
+<div class="section">
+  <div class="section-title">Informations du rapport</div>
+  <div class="info-grid">
+    <div class="info-item">
+      <div class="info-label">Genere par</div>
+      <div class="info-value">{{ admin_name }}</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label">Date</div>
+      <div class="info-value">{{ generated_at }}</div>
+    </div>
+  </div>
+</div>
+{% endblock %}
