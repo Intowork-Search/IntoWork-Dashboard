@@ -11,11 +11,24 @@ export default function ContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSending(true);
-    // Simuler l'envoi — a connecter a un endpoint backend plus tard
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    toast.success('Message envoye ! Nous vous repondrons sous 48h.');
-    setForm({ name: '', email: '', subject: '', message: '' });
-    setSending(false);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api'}/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      if (res.ok) {
+        toast.success('Message envoye ! Nous vous repondrons sous 48h.');
+        setForm({ name: '', email: '', subject: '', message: '' });
+      } else {
+        toast.error('Erreur lors de l\'envoi. Contactez-nous par email.');
+      }
+    } catch {
+      // Fallback mailto si le backend n'a pas l'endpoint
+      window.location.href = `mailto:contact@intowork.co?subject=${encodeURIComponent(form.subject)}&body=${encodeURIComponent(form.message)}`;
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -46,6 +59,7 @@ export default function ContactPage() {
                 id="contact-name"
                 type="text"
                 required
+                maxLength={100}
                 value={form.name}
                 onChange={e => setForm({ ...form, name: e.target.value })}
                 className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-[#6B9B5F] focus:ring-2 focus:ring-[#6B9B5F]/20 outline-none transition-all"
@@ -58,6 +72,7 @@ export default function ContactPage() {
                 id="contact-email"
                 type="email"
                 required
+                maxLength={254}
                 value={form.email}
                 onChange={e => setForm({ ...form, email: e.target.value })}
                 className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-[#6B9B5F] focus:ring-2 focus:ring-[#6B9B5F]/20 outline-none transition-all"
@@ -87,6 +102,7 @@ export default function ContactPage() {
               <textarea
                 id="contact-message"
                 required
+                maxLength={2000}
                 rows={5}
                 value={form.message}
                 onChange={e => setForm({ ...form, message: e.target.value })}
