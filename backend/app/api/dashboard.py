@@ -170,30 +170,31 @@ async def get_dashboard_data(
                     "profileCompletion": 30  # 30% car profil créé mais pas d'entreprise
                 }
 
-            # Offres actives
-            stmt = select(Job).filter(Job.employer_id == employer.id, Job.status == JobStatus.PUBLISHED)
-            result = await db.execute(stmt)
-            active_jobs = result.scalars().all()
-            active_jobs_count = len(active_jobs)
+            # Offres actives (COUNT en DB)
+            result = await db.execute(
+                select(func.count()).select_from(Job).filter(
+                    Job.employer_id == employer.id, Job.status == JobStatus.PUBLISHED
+                )
+            )
+            active_jobs_count = result.scalar() or 0
 
-            # Candidatures reçues (toutes offres de l'employeur)
-            stmt = select(func.count()).select_from(JobApplication).join(Job).filter(Job.employer_id == employer.id)
-            result = await db.execute(stmt)
-            applications_count = result.scalar()
-
-            # Entretiens prévus (statut interview)
-            stmt = select(func.count()).select_from(JobApplication).join(Job).filter(Job.employer_id == employer.id, JobApplication.status == ApplicationStatus.INTERVIEW)
-            result = await db.execute(stmt)
-            interviews_count = result.scalar()
-
-            # Taux de réponse (candidatures traitées / total)
-            stmt = select(func.count()).select_from(JobApplication).join(Job).filter(Job.employer_id == employer.id)
-            result = await db.execute(stmt)
-            total_applications = result.scalar()
-
-            stmt = select(func.count()).select_from(JobApplication).join(Job).filter(Job.employer_id == employer.id, JobApplication.status.in_([ApplicationStatus.REJECTED, ApplicationStatus.ACCEPTED, ApplicationStatus.INTERVIEW, ApplicationStatus.SHORTLISTED, ApplicationStatus.VIEWED]))
-            result = await db.execute(stmt)
-            responded_applications = result.scalar()
+            # Candidatures + entretiens + taux de réponse en 1 seule requête
+            result = await db.execute(
+                select(
+                    func.count().label("total"),
+                    func.count().filter(JobApplication.status == ApplicationStatus.INTERVIEW).label("interviews"),
+                    func.count().filter(JobApplication.status.in_([
+                        ApplicationStatus.REJECTED, ApplicationStatus.ACCEPTED,
+                        ApplicationStatus.INTERVIEW, ApplicationStatus.SHORTLISTED,
+                        ApplicationStatus.VIEWED
+                    ])).label("responded"),
+                ).select_from(JobApplication).join(Job).filter(Job.employer_id == employer.id)
+            )
+            row = result.one()
+            applications_count = row.total or 0
+            interviews_count = row.interviews or 0
+            responded_applications = row.responded or 0
+            total_applications = applications_count
             response_rate = f"{round((responded_applications / total_applications) * 100) if total_applications else 0}%"
 
             # Statistiques pour employeur

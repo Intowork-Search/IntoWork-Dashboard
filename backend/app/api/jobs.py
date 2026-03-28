@@ -37,7 +37,7 @@ router = APIRouter()
 # ==============================================================================
 
 PageParam = Annotated[int, Query(ge=1, description="Page number")]
-LimitParam = Annotated[int, Query(ge=1, le=1000, description="Items per page")]  # Augmenté pour landing page
+LimitParam = Annotated[int, Query(ge=1, le=100, description="Items per page")]
 SearchParam = Annotated[Optional[str], Query(description="Search term")]
 LocationParam = Annotated[Optional[str], Query(description="Location filter")]
 JobTypeParam = Annotated[Optional[str], Query(description="Job type filter")]
@@ -54,7 +54,7 @@ JobIdPath = Annotated[int, Path(ge=1, description="Job ID")]
 # Routes
 # ==============================================================================
 
-@router.get("/", response_model=JobListResponse)
+@router.get("/", response_model=JobListResponse, response_model_exclude_none=True)
 async def get_jobs(
     page: PageParam = 1,
     limit: LimitParam = 10,
@@ -186,7 +186,7 @@ async def get_jobs(
     )
 
 
-@router.get("/my-jobs", response_model=JobListResponse)
+@router.get("/my-jobs", response_model=JobListResponse, response_model_exclude_none=True)
 async def get_my_jobs(
     page: PageParam = 1,
     limit: LimitParam = 10,

@@ -3,7 +3,7 @@ API endpoints pour le scoring IA des candidatures
 """
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_
+from sqlalchemy import select, and_, func
 from sqlalchemy.orm import selectinload
 from typing import List, Optional
 from datetime import datetime, timezone
@@ -341,10 +341,10 @@ async def get_scored_applications(
     if not job:
         raise HTTPException(status_code=404, detail="Offre introuvable ou non autorisée")
     
-    # Compter le total
-    count_stmt = select(JobApplication).filter(JobApplication.job_id == job_id)
+    # Compter le total (COUNT en DB, pas en mémoire)
+    count_stmt = select(func.count()).select_from(JobApplication).filter(JobApplication.job_id == job_id)
     count_result = await db.execute(count_stmt)
-    total = len(count_result.scalars().all())
+    total = count_result.scalar() or 0
     
     # Construire la query avec tri
     stmt = (
