@@ -127,7 +127,7 @@ export default function ProfilePage() {
           is_remote_ok: false,
           is_relocation_ok: false,
           experiences: [],
-          education: [],
+          educations: [],
           skills: []
         });
       } finally {
@@ -157,7 +157,7 @@ export default function ProfilePage() {
     const profileCompletion = (filledFields.length / fields.length) * 100;
 
     const hasExperience = (profile.experiences?.length || 0) > 0;
-    const hasEducation = (profile.education?.length || 0) > 0;
+    const hasEducation = (profile.educations?.length || 0) > 0;
     const hasSkills = (profile.skills?.length || 0) > 0;
 
     let totalCompletion = profileCompletion * 0.6;
@@ -238,7 +238,7 @@ export default function ProfilePage() {
       const createdEdu = await candidatesAPI.addEducation(token, payload as Omit<Education, 'id'>);
       setProfile(prev => prev ? {
         ...prev,
-        education: [...(prev.education || []), createdEdu]
+        educations: [...(prev.educations || []), createdEdu]
       } : null);
       setShowEducationModal(false);
       setNewEducation({
@@ -307,7 +307,7 @@ export default function ProfilePage() {
       await candidatesAPI.deleteEducation(token, eduId);
       setProfile(prev => prev ? {
         ...prev,
-        education: prev.education?.filter(e => e.id !== eduId) || []
+        educations: prev.educations?.filter(e => e.id !== eduId) || []
       } : null);
     } catch (error) {
       logger.error("Erreur suppression formation:", error);
@@ -490,11 +490,11 @@ export default function ProfilePage() {
                       {profile.experiences.length}
                     </span>
                   ) : null}
-                  {section.id === 'education' && profile.education?.length ? (
+                  {section.id === 'education' && profile.educations?.length ? (
                     <span className={`ml-auto text-xs font-bold px-2 py-1 rounded-full ${
                       isActive ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-600'
                     }`}>
-                      {profile.education.length}
+                      {profile.educations.length}
                     </span>
                   ) : null}
                   {section.id === 'skills' && profile.skills?.length ? (
@@ -542,7 +542,7 @@ export default function ProfilePage() {
                     <p className="text-sm text-gray-500">
                       {activeSection === 'personal' && 'Vos coordonnées et présentation'}
                       {activeSection === 'experience' && `${profile.experiences?.length || 0} expérience(s)`}
-                      {activeSection === 'education' && `${profile.education?.length || 0} formation(s)`}
+                      {activeSection === 'education' && `${profile.educations?.length || 0} formation(s)`}
                       {activeSection === 'skills' && `${profile.skills?.length || 0} compétence(s)`}
                     </p>
                   </div>
@@ -852,8 +852,8 @@ export default function ProfilePage() {
               {/* Section Formation */}
               {activeSection === 'education' && (
                 <div className="space-y-4" data-tour="profile-education">
-                  {profile.education && profile.education.length > 0 ? (
-                    profile.education.map((edu, index) => (
+                  {profile.educations && profile.educations.length > 0 ? (
+                    profile.educations.map((edu, index) => (
                       <div
                         key={edu.id || index}
                         className="group relative p-5 rounded-2xl bg-gradient-to-r from-[#6B46C1]/5 to-[#6B46C1]/0 border border-[#6B46C1]/20 hover:border-[#6B46C1]/40 hover:shadow-lg hover:shadow-[#6B46C1]/10 transition-all"

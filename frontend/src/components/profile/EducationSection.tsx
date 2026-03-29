@@ -19,8 +19,8 @@ export default function EducationSection({ profile, onAdd }: EducationSectionPro
           Ajouter une formation
         </button>
       </div>
-      {profile.education && profile.education.length > 0 ? (
-        profile.education.map((edu, index) => (
+      {profile.educations && profile.educations.length > 0 ? (
+        profile.educations.map((edu, index) => (
           <div key={edu.id || index} className="border border-gray-200 rounded-lg p-4">
             <div className="flex items-center justify-between mb-3">
               <h4 className="text-lg font-semibold text-gray-900">{edu.degree}</h4>

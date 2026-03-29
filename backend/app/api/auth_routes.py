@@ -7,7 +7,8 @@ This module implements authentication endpoints using FastAPI 0.100+ patterns:
 - Centralized Pydantic schemas
 """
 
-from typing import Annotated
+from typing import Annotated, Optional
+from pydantic import BaseModel
 from fastapi import APIRouter, Depends, HTTPException, status, Request, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update
@@ -19,7 +20,7 @@ from slowapi import Limiter
 from slowapi.util import get_remote_address
 
 from app.database import get_db
-from app.models.base import User, UserRole, Candidate, Employer, PasswordResetToken, Session, Account
+from app.models.base import User, UserRole, Candidate, Employer, Company, PasswordResetToken, Session, Account
 from app.auth import (
     PasswordHasher, Auth, CurrentUser, DBSession,
     REFRESH_TOKEN_EXPIRATION_DAYS
@@ -747,4 +748,83 @@ async def reset_password(
 
     return ResetPasswordResponse(
         message="Password reset successfully. You can now sign in with your new password."
+    )
+
+
+# ==================== COMPLETE REGISTRATION (ONBOARDING) ====================
+
+class CompleteRegistrationRequest(BaseModel):
+    role: str  # 'candidate' or 'employer'
+    phone: Optional[str] = None
+    location: Optional[str] = None
+    title: Optional[str] = None
+    company_name: Optional[str] = None
+    company_industry: Optional[str] = None
+    position: Optional[str] = None
+
+
+class CompleteRegistrationResponse(BaseModel):
+    message: str
+    role: str
+
+
+@router.post("/complete-registration", response_model=CompleteRegistrationResponse)
+async def complete_registration(
+    data: CompleteRegistrationRequest,
+    current_user: CurrentUser,
+    db: DBSession,
+):
+    """Finaliser l'inscription apres l'onboarding (creer profil candidat ou employeur)."""
+
+    # Mettre a jour le role utilisateur
+    new_role = UserRole.CANDIDATE if data.role == 'candidate' else UserRole.EMPLOYER
+    current_user.role = new_role
+
+    if data.phone:
+        current_user.phone = data.phone
+
+    if new_role == UserRole.CANDIDATE:
+        # Verifier si un profil candidat existe deja
+        result = await db.execute(select(Candidate).filter(Candidate.user_id == current_user.id))
+        candidate = result.scalar_one_or_none()
+
+        if not candidate:
+            candidate = Candidate(
+                user_id=current_user.id,
+                phone=data.phone,
+                location=data.location,
+                title=data.title,
+            )
+            db.add(candidate)
+
+    elif new_role == UserRole.EMPLOYER:
+        # Creer l'entreprise si company_name fourni
+        company = None
+        if data.company_name:
+            company = Company(
+                name=data.company_name,
+                industry=data.company_industry,
+            )
+            db.add(company)
+            await db.flush()  # obtenir l'ID de la company
+
+        # Verifier si un profil employeur existe deja
+        result = await db.execute(select(Employer).filter(Employer.user_id == current_user.id))
+        employer = result.scalar_one_or_none()
+
+        if not employer:
+            employer = Employer(
+                user_id=current_user.id,
+                company_id=company.id if company else None,
+                position=data.position,
+            )
+            db.add(employer)
+
+    await db.commit()
+
+    logger.info(f"Registration completed for user {current_user.email} as {data.role}")
+
+    return CompleteRegistrationResponse(
+        message="Inscription finalisee avec succes",
+        role=data.role,
     )

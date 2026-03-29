@@ -84,7 +84,7 @@ export default function Dashboard() {
 
             // Compter les éléments
             const experiencesCount = profileData.experiences?.length || 0;
-            const educationCount = profileData.education?.length || 0;
+            const educationCount = profileData.educations?.length || 0;
             const skillsCount = profileData.skills?.length || 0;
 
             setExperiencesCount(experiencesCount);

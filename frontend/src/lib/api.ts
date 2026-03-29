@@ -150,7 +150,7 @@ export interface CandidateProfile {
   is_remote_ok?: boolean;
   is_relocation_ok?: boolean;
   experiences?: Experience[];
-  education?: Education[];
+  educations?: Education[];
   skills?: Skill[];
   created_at?: string;
   updated_at?: string;

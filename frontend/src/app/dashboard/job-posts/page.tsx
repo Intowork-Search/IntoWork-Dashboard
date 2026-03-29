@@ -155,7 +155,7 @@ export default function JobPostsPage(): React.JSX.Element {
 
   const handleCreateNew = () => {
     setIsCreating(true);
-    setFormData({ currency: 'XOF' });
+    setFormData({ currency: 'XAF' });
   };
 
   const handleView = (job: Job) => {
@@ -412,7 +412,7 @@ export default function JobPostsPage(): React.JSX.Element {
                         >
                           <EyeIcon className="w-5 h-5" />
                         </button>
-                        {job.status === 'active' && (
+                        {(job.status === 'published' || job.status === 'active') && (
                           <button
                             type="button"
                             onClick={() => {
@@ -615,7 +615,8 @@ export default function JobPostsPage(): React.JSX.Element {
                     onChange={handleInputChange}
                     className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-[#6B9B5F] focus:ring-4 focus:ring-[#6B9B5F]/10 transition-all"
                   >
-                    <option value="XOF">XOF (Franc CFA)</option>
+                    <option value="XAF">XAF (Franc CFA CEMAC)</option>
+                    <option value="XOF">XOF (Franc CFA UEMOA)</option>
                     <option value="EUR">EUR (Euro)</option>
                     <option value="USD">USD (Dollar)</option>
                   </select>

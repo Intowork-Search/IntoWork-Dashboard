@@ -63,6 +63,7 @@ export default function AdminJobsPage() {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
+      case 'published':
       case 'active':
         return (
           <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold bg-[#6B9B5F]/10 text-[#6B9B5F]">
@@ -70,11 +71,18 @@ export default function AdminJobsPage() {
             Active
           </span>
         );
-      case 'filled':
+      case 'closed':
         return (
           <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold bg-blue-100 text-blue-700">
             <CheckCircleIcon className="w-5 h-5" />
-            Pourvue
+            Fermee
+          </span>
+        );
+      case 'archived':
+        return (
+          <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold bg-gray-100 text-gray-600">
+            <XCircleIcon className="w-5 h-5" />
+            Archivee
           </span>
         );
       case 'draft':
