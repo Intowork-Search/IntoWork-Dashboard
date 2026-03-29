@@ -76,7 +76,7 @@ export default function SignInPage() {
   };
 
   return (
-    <div className={`${plusJakarta.variable} font-sans min-h-screen bg-white`} data-theme="light">
+    <div className={`${plusJakarta.variable} font-sans min-h-screen bg-white`} data-theme="light" suppressHydrationWarning>
       <div className="flex min-h-screen overflow-hidden">
         {/* Left Panel - Branding & Features */}
         <aside className="hidden lg:flex lg:w-1/2 relative overflow-hidden flex-col justify-between p-12 xl:p-16" aria-label="Présentation INTOWORK">
@@ -208,9 +208,9 @@ export default function SignInPage() {
 
                 {/* Separator */}
                 <div className="flex items-center gap-3 mb-6" role="separator" aria-label="ou">
-                  <div className="flex-1 h-px bg-slate-200" aria-hidden="true"></div>
-                  <span className="text-xs text-slate-400 font-medium" aria-hidden="true">ou</span>
-                  <div className="flex-1 h-px bg-slate-200" aria-hidden="true"></div>
+                  <div className="flex-1 h-px bg-slate-200"></div>
+                  <span className="text-xs text-slate-400 font-medium">ou</span>
+                  <div className="flex-1 h-px bg-slate-200"></div>
                 </div>
 
                 <form className="space-y-5 sm:space-y-6" onSubmit={handleSubmit} aria-busy={loading} aria-labelledby="signin-title">
