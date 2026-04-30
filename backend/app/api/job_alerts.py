@@ -133,7 +133,7 @@ async def match_jobs_to_criteria(db: AsyncSession, criteria: dict, limit: int = 
 # API Routes
 # ========================================
 
-@router.post("/", response_model=JobAlertResponse, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=JobAlertResponse, status_code=status.HTTP_201_CREATED)
 async def create_job_alert(
     alert_data: JobAlertCreate,
     candidate: Annotated[Candidate, Depends(require_candidate)],
@@ -158,7 +158,7 @@ async def create_job_alert(
     return new_alert
 
 
-@router.get("/", response_model=List[JobAlertResponse])
+@router.get("", response_model=List[JobAlertResponse])
 async def list_job_alerts(
     candidate: Annotated[Candidate, Depends(require_candidate)],
     db: Annotated[AsyncSession, Depends(get_db)],
