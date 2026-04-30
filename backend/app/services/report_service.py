@@ -8,7 +8,13 @@ from datetime import datetime
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
-from weasyprint import HTML
+
+try:
+    from weasyprint import HTML as _WeasyHTML
+    WEASYPRINT_AVAILABLE = True
+except OSError:
+    _WeasyHTML = None  # type: ignore[assignment]
+    WEASYPRINT_AVAILABLE = False
 
 TEMPLATES_DIR = Path(__file__).parent.parent / "templates" / "reports"
 
@@ -20,9 +26,11 @@ _jinja_env = Environment(
 
 def _render_pdf(template_name: str, context: dict) -> bytes:
     """Rend un template HTML en PDF via WeasyPrint."""
+    if not WEASYPRINT_AVAILABLE or _WeasyHTML is None:
+        raise RuntimeError("WeasyPrint n'est pas disponible sur ce serveur (librairies système manquantes).")
     template = _jinja_env.get_template(template_name)
     html_content = template.render(**context, generated_at=datetime.now().strftime("%d/%m/%Y à %H:%M"))
-    pdf_bytes = HTML(string=html_content).write_pdf()
+    pdf_bytes = _WeasyHTML(string=html_content).write_pdf()
     return pdf_bytes
 
 
