@@ -6,6 +6,7 @@ import { getApiUrl } from '@/lib/getApiUrl';
 import { useConfirmModal } from '@/hooks/useConfirmModal';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { useAuth } from '@/hooks/useNextAuth';
+import DashboardLayout from '@/components/DashboardLayout';
 
 interface JobAlert {
   id: number;
@@ -243,6 +244,7 @@ export default function JobAlertsPage() {
   }
 
   return (
+    <DashboardLayout>
     <div className="max-w-7xl mx-auto p-6">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
@@ -490,5 +492,6 @@ export default function JobAlertsPage() {
         loading={deletingAlert}
       />
     </div>
+    </DashboardLayout>
   );
 }
