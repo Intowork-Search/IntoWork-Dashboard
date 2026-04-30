@@ -14,7 +14,9 @@ import {
   MagnifyingGlassIcon,
   CheckCircleIcon,
   XCircleIcon,
-  ArrowPathIcon
+  ArrowPathIcon,
+  PlusIcon,
+  XMarkIcon,
 } from '@heroicons/react/24/outline';
 
 export default function AdminUsersPage() {
@@ -22,6 +24,17 @@ export default function AdminUsersPage() {
   const router = useRouter();
   const [userSearch, setUserSearch] = useState('');
   const [userRoleFilter, setUserRoleFilter] = useState('');
+
+  // Modal création
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [createForm, setCreateForm] = useState({
+    first_name: '',
+    last_name: '',
+    email: '',
+    role: 'candidate' as 'candidate' | 'employer',
+    company_name: '',
+  });
 
   const { data: users = [], isLoading, refetch } = useAdminUsers(
     { search: userSearch || undefined, role: userRoleFilter || undefined }
@@ -43,7 +56,7 @@ export default function AdminUsersPage() {
     try {
       await adminAPI.toggleUserActivation(session.accessToken, userId, !currentStatus);
       toast.success(currentStatus ? 'Utilisateur désactivé avec succès' : 'Utilisateur activé avec succès');
-      refetch(); // Rafraîchit le cache SWR
+      refetch();
     } catch (error) {
       logger.error("Erreur toggle status:", error);
       toast.error('Erreur lors de la modification du statut');
@@ -57,10 +70,33 @@ export default function AdminUsersPage() {
     try {
       await adminAPI.deleteUser(session.accessToken, userId);
       toast.success('Utilisateur supprimé avec succès');
-      refetch(); // Rafraîchit le cache SWR
+      refetch();
     } catch (error: unknown) {
       logger.error("Erreur suppression:", error);
       toast.error(getErrorMessage(error, 'Erreur lors de la suppression'));
+    }
+  };
+
+  const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!session?.accessToken) return;
+    setCreating(true);
+    try {
+      await adminAPI.createUser(session.accessToken, {
+        email: createForm.email,
+        first_name: createForm.first_name,
+        last_name: createForm.last_name,
+        role: createForm.role,
+        company_name: createForm.role === 'employer' ? createForm.company_name : undefined,
+      });
+      toast.success(`Compte créé et email envoyé à ${createForm.email}`);
+      setShowCreateModal(false);
+      setCreateForm({ first_name: '', last_name: '', email: '', role: 'candidate', company_name: '' });
+      refetch();
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, 'Erreur lors de la création'));
+    } finally {
+      setCreating(false);
     }
   };
 
@@ -110,6 +146,13 @@ export default function AdminUsersPage() {
             >
               <ArrowPathIcon className="w-5 h-5" />
               Actualiser
+            </button>
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="px-6 py-3 bg-gradient-to-r from-[#6B46C1] to-[#5a35b0] text-white rounded-2xl hover:shadow-lg hover:shadow-[#6B46C1]/30 transition-all duration-300 flex items-center gap-2 font-medium"
+            >
+              <PlusIcon className="w-5 h-5" />
+              Créer un utilisateur
             </button>
           </div>
         </div>
@@ -199,6 +242,104 @@ export default function AdminUsersPage() {
           )}
         </div>
       </div>
+
+      {/* Modal création utilisateur */}
+      {showCreateModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-gray-900">Créer un utilisateur</h2>
+              <button onClick={() => setShowCreateModal(false)} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
+                <XMarkIcon className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+            <form onSubmit={handleCreateUser} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Prénom</label>
+                  <input
+                    type="text"
+                    required
+                    value={createForm.first_name}
+                    onChange={(e) => setCreateForm(f => ({ ...f, first_name: e.target.value }))}
+                    className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#6B9B5F] text-gray-900 text-sm"
+                    placeholder="Jean"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Nom</label>
+                  <input
+                    type="text"
+                    required
+                    value={createForm.last_name}
+                    onChange={(e) => setCreateForm(f => ({ ...f, last_name: e.target.value }))}
+                    className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#6B9B5F] text-gray-900 text-sm"
+                    placeholder="Dupont"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input
+                  type="email"
+                  required
+                  value={createForm.email}
+                  onChange={(e) => setCreateForm(f => ({ ...f, email: e.target.value }))}
+                  className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#6B9B5F] text-gray-900 text-sm"
+                  placeholder="jean.dupont@exemple.com"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Rôle</label>
+                <select
+                  value={createForm.role}
+                  onChange={(e) => setCreateForm(f => ({ ...f, role: e.target.value as 'candidate' | 'employer' }))}
+                  className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#6B9B5F] text-gray-900 text-sm"
+                >
+                  <option value="candidate">Candidat</option>
+                  <option value="employer">Employeur</option>
+                </select>
+              </div>
+              {createForm.role === 'employer' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Nom de l&apos;entreprise</label>
+                  <input
+                    type="text"
+                    required
+                    value={createForm.company_name}
+                    onChange={(e) => setCreateForm(f => ({ ...f, company_name: e.target.value }))}
+                    className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#6B9B5F] text-gray-900 text-sm"
+                    placeholder="Nom de l'entreprise"
+                  />
+                </div>
+              )}
+              <p className="text-xs text-gray-500 bg-gray-50 rounded-xl p-3">
+                Un mot de passe temporaire sera généré automatiquement et envoyé par email à l&apos;utilisateur.
+              </p>
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowCreateModal(false)}
+                  className="flex-1 px-4 py-2.5 border-2 border-gray-200 text-gray-700 rounded-xl font-medium text-sm hover:bg-gray-50 transition-colors"
+                >
+                  Annuler
+                </button>
+                <button
+                  type="submit"
+                  disabled={creating}
+                  className="flex-1 px-4 py-2.5 bg-gradient-to-r from-[#6B46C1] to-[#5a35b0] text-white rounded-xl font-medium text-sm hover:shadow-lg transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+                >
+                  {creating ? (
+                    <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Création...</>
+                  ) : (
+                    <><PlusIcon className="w-4 h-4" /> Créer et envoyer</>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 }

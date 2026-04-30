@@ -795,7 +795,17 @@ export const adminAPI = {
     const client = createAuthenticatedClient(token);
     const response = await client.get('/admin/me');
     return response.data;
-  }
+  },
+
+  // Créer un utilisateur (candidat ou employeur) depuis le back-office
+  createUser: async (
+    token: string,
+    data: { email: string; first_name: string; last_name: string; role: 'candidate' | 'employer'; company_name?: string }
+  ): Promise<AdminUser> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.post('/admin/users', data);
+    return response.data;
+  },
 };
 
 // ============================================

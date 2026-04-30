@@ -11,10 +11,13 @@ from app.models.base import (
     User, UserRole, Candidate, Employer, Company, Job, JobApplication, 
     Notification, PasswordResetToken, CVDocument
 )
-from app.auth import require_admin
-from pydantic import BaseModel, ConfigDict
-from typing import List, Optional
+from app.auth import require_admin, PasswordHasher
+from app.services.email_service import email_service
+from pydantic import BaseModel, EmailStr, ConfigDict
+from typing import List, Optional, Literal
 from datetime import datetime, timedelta
+import secrets
+import string
 
 router = APIRouter(tags=["admin"])
 
@@ -79,6 +82,14 @@ class JobListItem(BaseModel):
 
 class UserActivationUpdate(BaseModel):
     is_active: bool
+
+
+class CreateUserRequest(BaseModel):
+    email: EmailStr
+    first_name: str
+    last_name: str
+    role: Literal["candidate", "employer"]
+    company_name: Optional[str] = None  # Requis si role == employer
 
 
 # ==================== ENDPOINTS ====================
@@ -488,3 +499,91 @@ async def get_admin_info(
         "role": current_user.role.value,
         "is_active": current_user.is_active
     }
+
+
+@router.post("/users", response_model=UserListItem, status_code=201)
+async def create_user_by_admin(
+    data: CreateUserRequest,
+    current_user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Créer un utilisateur (candidat ou employeur) depuis le back-office admin.
+    Un mot de passe temporaire est généré et envoyé par email au nouvel utilisateur.
+    """
+    # Vérifier que l'email n'est pas déjà utilisé
+    existing = await db.execute(select(User).filter(User.email == data.email))
+    if existing.scalar_one_or_none():
+        raise HTTPException(status_code=400, detail="Un compte avec cet email existe déjà")
+
+    if data.role == "employer" and not data.company_name:
+        raise HTTPException(status_code=400, detail="Le nom de l'entreprise est requis pour un employeur")
+
+    # Générer un mot de passe temporaire lisible (12 caractères)
+    alphabet = string.ascii_letters + string.digits
+    temporary_password = ''.join(secrets.choice(alphabet) for _ in range(12))
+
+    # Créer l'utilisateur
+    role_enum = UserRole.CANDIDATE if data.role == "candidate" else UserRole.EMPLOYER
+    new_user = User(
+        email=data.email,
+        first_name=data.first_name,
+        last_name=data.last_name,
+        role=role_enum,
+        password_hash=PasswordHasher.hash_password(temporary_password),
+        is_active=True,
+    )
+    db.add(new_user)
+    await db.flush()  # Obtenir l'ID sans commit
+
+    # Créer le profil associé
+    if data.role == "candidate":
+        candidate = Candidate(user_id=new_user.id)
+        db.add(candidate)
+    else:
+        # Créer ou réutiliser l'entreprise
+        company_result = await db.execute(
+            select(Company).filter(Company.name == data.company_name)
+        )
+        company = company_result.scalar_one_or_none()
+        if not company:
+            company = Company(name=data.company_name)
+            db.add(company)
+            await db.flush()
+
+        employer = Employer(user_id=new_user.id, company_id=company.id)
+        db.add(employer)
+
+    await db.commit()
+    await db.refresh(new_user)
+
+    # Envoyer l'email de bienvenue avec les identifiants
+    email_sent = await email_service.send_welcome_credentials_email(
+        email=new_user.email,
+        first_name=new_user.first_name,
+        last_name=new_user.last_name,
+        role=data.role,
+        temporary_password=temporary_password,
+    )
+
+    if not email_sent:
+        # Le compte est créé mais l'email a échoué — on retourne quand même avec un warning
+        return UserListItem(
+            id=new_user.id,
+            email=new_user.email,
+            first_name=new_user.first_name,
+            last_name=new_user.last_name,
+            role=new_user.role.value,
+            is_active=new_user.is_active,
+            created_at=new_user.created_at,
+        )
+
+    return UserListItem(
+        id=new_user.id,
+        email=new_user.email,
+        first_name=new_user.first_name,
+        last_name=new_user.last_name,
+        role=new_user.role.value,
+        is_active=new_user.is_active,
+        created_at=new_user.created_at,
+    )

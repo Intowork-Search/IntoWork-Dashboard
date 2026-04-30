@@ -201,6 +201,116 @@ class EmailService:
             logger.error(f"   Exception type: {type(e).__name__}")
             return False
 
+    async def send_welcome_credentials_email(
+        self,
+        email: str,
+        first_name: str,
+        last_name: str,
+        role: str,
+        temporary_password: str,
+    ) -> bool:
+        """
+        Envoyer un email de bienvenue avec les identifiants de connexion
+        (utilisé lors de la création d'un compte par l'admin)
+        """
+        if not self.enabled:
+            logger.error(f"❌ Cannot send welcome email to {email}: Email service is DISABLED")
+            return False
+
+        signin_link = f"{FRONTEND_URL}/signin"
+        role_label = "Candidat" if role == "candidate" else "Employeur"
+        html_content = self._get_welcome_credentials_template(
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            temporary_password=temporary_password,
+            role_label=role_label,
+            signin_link=signin_link,
+        )
+
+        try:
+            params = {
+                "from": FROM_EMAIL,
+                "to": [email],
+                "subject": f"Bienvenue sur INTOWORK — Vos identifiants de connexion",
+                "html": html_content,
+            }
+            logger.info(f"📧 Sending welcome credentials email to {email}")
+            response = await asyncio.to_thread(resend.Emails.send, params)
+            if response and 'id' in response:
+                logger.info(f"✅ Welcome email sent to {email}. ID: {response.get('id')}")
+                return True
+            else:
+                logger.error(f"❌ Resend API returned unexpected response: {response}")
+                return False
+        except Exception as e:
+            logger.error(f"❌ Failed to send welcome email to {email}: {str(e)}")
+            return False
+
+    def _get_welcome_credentials_template(
+        self,
+        first_name: str,
+        last_name: str,
+        email: str,
+        temporary_password: str,
+        role_label: str,
+        signin_link: str,
+    ) -> str:
+        return f"""
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenue sur INTOWORK</title>
+    <style>
+        body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background-color: #f5f5f5; padding: 20px; margin: 0; }}
+        .container {{ max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }}
+        .header {{ background: linear-gradient(135deg, #6B9B5F 0%, #4a7a40 100%); padding: 40px 30px; text-align: center; color: white; }}
+        .header h1 {{ font-size: 28px; font-weight: 700; margin: 0; }}
+        .header p {{ margin: 8px 0 0; opacity: 0.9; font-size: 15px; }}
+        .body {{ padding: 40px 30px; }}
+        .body p {{ color: #374151; font-size: 15px; line-height: 1.6; margin: 0 0 16px; }}
+        .credentials-box {{ background: #f0f7ee; border: 2px solid #6B9B5F; border-radius: 12px; padding: 24px; margin: 24px 0; }}
+        .credentials-box p {{ margin: 0 0 8px; color: #374151; font-size: 14px; }}
+        .credentials-box strong {{ color: #1f2937; }}
+        .credentials-box .password {{ font-family: monospace; font-size: 18px; font-weight: 700; color: #6B9B5F; letter-spacing: 2px; }}
+        .btn {{ display: inline-block; background: linear-gradient(135deg, #6B9B5F, #4a7a40); color: white !important; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 700; font-size: 15px; margin: 8px 0; }}
+        .warning {{ background: #fffbeb; border-left: 4px solid #F59E0B; border-radius: 8px; padding: 16px; margin: 24px 0; }}
+        .warning p {{ color: #92400e; font-size: 13px; margin: 0; }}
+        .footer {{ background: #f9fafb; padding: 24px 30px; text-align: center; border-top: 1px solid #e5e7eb; }}
+        .footer p {{ color: #9ca3af; font-size: 12px; margin: 0; }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Bienvenue sur INTOWORK</h1>
+            <p>Votre compte {role_label} a été créé</p>
+        </div>
+        <div class="body">
+            <p>Bonjour <strong>{first_name} {last_name}</strong>,</p>
+            <p>Votre compte INTOWORK a été créé par l'équipe d'administration. Voici vos identifiants de connexion :</p>
+            <div class="credentials-box">
+                <p><strong>Email :</strong> {email}</p>
+                <p style="margin-bottom: 12px;"><strong>Mot de passe temporaire :</strong></p>
+                <p class="password">{temporary_password}</p>
+            </div>
+            <div class="warning">
+                <p>⚠️ Pour votre sécurité, changez votre mot de passe dès votre première connexion via <strong>Paramètres → Mot de passe</strong>.</p>
+            </div>
+            <p style="text-align:center;">
+                <a href="{signin_link}" class="btn">Se connecter maintenant</a>
+            </p>
+        </div>
+        <div class="footer">
+            <p>© 2026 INTOWORK — Plateforme de recrutement B2B2C</p>
+        </div>
+    </div>
+</body>
+</html>
+"""
+
     def _get_password_reset_template(self, reset_link: str, user_name: str) -> str:
         """
         Template HTML pour l'email de réinitialisation de mot de passe
