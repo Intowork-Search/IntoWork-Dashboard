@@ -7,6 +7,23 @@ import { useConfirmModal } from '@/hooks/useConfirmModal';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { useAuth } from '@/hooks/useNextAuth';
 import DashboardLayout from '@/components/DashboardLayout';
+import {
+  BellIcon,
+  PlusIcon,
+  PencilIcon,
+  TrashIcon,
+  EyeIcon,
+  MapPinIcon,
+  TagIcon,
+  ClockIcon,
+  BriefcaseIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+  XMarkIcon,
+  BuildingOfficeIcon,
+  CurrencyDollarIcon,
+} from '@heroicons/react/24/outline';
+import { BellIcon as BellSolid } from '@heroicons/react/24/solid';
 
 interface JobAlert {
   id: number;
@@ -237,212 +254,334 @@ export default function JobAlertsPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[400px]">
-        <span className="loading loading-spinner loading-lg"></span>
-      </div>
+      <DashboardLayout>
+        <div className="flex justify-center items-center min-h-[400px]">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-10 h-10 border-3 border-[#6B9B5F] border-t-transparent rounded-full animate-spin" />
+            <p className="text-sm text-gray-500">Chargement des alertes...</p>
+          </div>
+        </div>
+      </DashboardLayout>
     );
   }
 
   return (
     <DashboardLayout>
-    <div className="max-w-7xl mx-auto p-6">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-bold">Alertes emploi</h1>
-          <p className="text-base-content/60 mt-1">
-            Recevez des notifications quand de nouveaux jobs correspondent à vos critères
-          </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#6B9B5F] to-[#93C587] flex items-center justify-center shadow-md">
+            <BellSolid className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Alertes emploi</h1>
+            <p className="text-sm text-gray-500 mt-0.5">
+              Recevez des notifications quand de nouveaux jobs correspondent à vos critères
+            </p>
+          </div>
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="btn btn-primary"
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#6B9B5F] hover:bg-[#5A8A4E] text-white text-sm font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md shrink-0"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-          </svg>
+          <PlusIcon className="w-4 h-4" />
           Nouvelle alerte
         </button>
       </div>
 
-      {/* Alerts List */}
-      <div className="space-y-4">
-        {alerts.map((alert) => (
-          <div key={alert.id} className="card bg-base-100 shadow-md">
-            <div className="card-body">
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3">
-                    <h3 className="card-title">{alert.name}</h3>
-                    <input
-                      type="checkbox"
-                      className="toggle toggle-success"
-                      checked={alert.is_active}
-                      onChange={() => handleToggle(alert.id)}
-                    />
+      {/* Stats bar */}
+      <div className="grid grid-cols-3 gap-4">
+        {[
+          { label: 'Alertes actives', value: alerts.filter(a => a.is_active).length, color: '#6B9B5F' },
+          { label: 'Alertes inactives', value: alerts.filter(a => !a.is_active).length, color: '#9CA3AF' },
+          { label: 'Jobs envoyés', value: alerts.reduce((s, a) => s + a.jobs_sent_count, 0), color: '#7C3AED' },
+        ].map((stat) => (
+          <div key={stat.label} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+            <p className="text-2xl font-extrabold" style={{ color: stat.color }}>{stat.value}</p>
+            <p className="text-xs text-gray-500 font-medium mt-1">{stat.label}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Alerts list */}
+      {alerts.length === 0 ? (
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-16 flex flex-col items-center text-center">
+          <div className="w-20 h-20 rounded-full bg-green-50 flex items-center justify-center mb-5">
+            <BellIcon className="w-10 h-10 text-[#6B9B5F]/50" />
+          </div>
+          <h3 className="text-lg font-bold text-gray-900 mb-2">Aucune alerte configurée</h3>
+          <p className="text-sm text-gray-500 max-w-sm mb-6">
+            Créez votre première alerte pour recevoir automatiquement les offres qui correspondent à votre profil.
+          </p>
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#6B9B5F] hover:bg-[#5A8A4E] text-white text-sm font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md"
+          >
+            <PlusIcon className="w-4 h-4" />
+            Créer ma première alerte
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {alerts.map((alert) => (
+            <div
+              key={alert.id}
+              className={`bg-white rounded-2xl border shadow-sm p-6 transition-all duration-200 hover:shadow-md ${
+                alert.is_active ? 'border-green-100' : 'border-gray-100 opacity-75'
+              }`}
+            >
+              <div className="flex items-start justify-between gap-4">
+                {/* Left: info */}
+                <div className="flex items-start gap-4 flex-1 min-w-0">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                    alert.is_active ? 'bg-green-50' : 'bg-gray-100'
+                  }`}>
+                    <BellIcon className={`w-5 h-5 ${alert.is_active ? 'text-[#6B9B5F]' : 'text-gray-400'}`} />
                   </div>
-                  
-                  <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {alert.criteria.keywords && (
-                      <div>
-                        <p className="text-sm font-semibold">Mots-clés:</p>
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {alert.criteria.keywords.map((keyword, i) => (
-                            <span key={i} className="badge badge-sm">{keyword}</span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    
-                    {alert.criteria.location && (
-                      <div>
-                        <p className="text-sm font-semibold">Localisation:</p>
-                        <p className="text-sm">{alert.criteria.location}</p>
-                      </div>
-                    )}
-                    
-                    <div>
-                      <p className="text-sm font-semibold">Fréquence:</p>
-                      <p className="text-sm">
-                        {FREQUENCIES.find(f => f.value === alert.frequency)?.label}
-                      </p>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="font-bold text-gray-900 truncate">{alert.name}</h3>
+                      {alert.is_active ? (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-50 border border-green-200 text-xs font-semibold text-[#6B9B5F]">
+                          <CheckCircleIcon className="w-3 h-3" /> Active
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gray-100 border border-gray-200 text-xs font-semibold text-gray-500">
+                          <XCircleIcon className="w-3 h-3" /> Inactive
+                        </span>
+                      )}
                     </div>
-                    
-                    <div>
-                      <p className="text-sm font-semibold">Jobs envoyés:</p>
-                      <p className="text-sm">{alert.jobs_sent_count}</p>
+
+                    {/* Criteria chips */}
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {alert.criteria.keywords && alert.criteria.keywords.length > 0 && (
+                        alert.criteria.keywords.slice(0, 4).map((kw, i) => (
+                          <span key={i} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#6B9B5F]/8 text-[#6B9B5F] text-xs font-medium">
+                            <TagIcon className="w-3 h-3" />{kw}
+                          </span>
+                        ))
+                      )}
+                      {alert.criteria.location && (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-50 text-blue-600 text-xs font-medium">
+                          <MapPinIcon className="w-3 h-3" />{alert.criteria.location}
+                        </span>
+                      )}
+                      {alert.criteria.job_types && alert.criteria.job_types.map((jt, i) => (
+                        <span key={i} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-purple-50 text-purple-600 text-xs font-medium">
+                          <BriefcaseIcon className="w-3 h-3" />
+                          {JOB_TYPES.find(j => j.value === jt)?.label ?? jt}
+                        </span>
+                      ))}
+                      {alert.criteria.salary_min && (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-600 text-xs font-medium">
+                          <CurrencyDollarIcon className="w-3 h-3" />
+                          {alert.criteria.salary_min.toLocaleString()} FCFA min
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Meta */}
+                    <div className="flex items-center gap-4 mt-3 text-xs text-gray-400">
+                      <span className="inline-flex items-center gap-1">
+                        <ClockIcon className="w-3.5 h-3.5" />
+                        {FREQUENCIES.find(f => f.value === alert.frequency)?.label ?? alert.frequency}
+                      </span>
+                      <span className="inline-flex items-center gap-1">
+                        <BuildingOfficeIcon className="w-3.5 h-3.5" />
+                        {alert.jobs_sent_count} job{alert.jobs_sent_count !== 1 ? 's' : ''} envoyé{alert.jobs_sent_count !== 1 ? 's' : ''}
+                      </span>
+                      {alert.last_sent_at && (
+                        <span>Dernière alerte : {new Date(alert.last_sent_at).toLocaleDateString('fr-FR')}</span>
+                      )}
                     </div>
                   </div>
                 </div>
-                
-                <div className="dropdown dropdown-end">
-                  <button tabIndex={0} className="btn btn-ghost btn-sm">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
-                    </svg>
+
+                {/* Right: toggle + actions */}
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={() => handleToggle(alert.id)}
+                    className={`relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none ${
+                      alert.is_active ? 'bg-[#6B9B5F]' : 'bg-gray-200'
+                    }`}
+                    title={alert.is_active ? 'Désactiver' : 'Activer'}
+                  >
+                    <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${
+                      alert.is_active ? 'translate-x-5' : 'translate-x-0'
+                    }`} />
                   </button>
-                  <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
-                    <li><a onClick={() => handlePreview(alert)}>Prévisualiser</a></li>
-                    <li><a onClick={() => startEdit(alert)}>Modifier</a></li>
-                    <li><a onClick={() => handleDelete(alert.id)} className="text-error">Supprimer</a></li>
-                  </ul>
+                  <button
+                    onClick={() => handlePreview(alert)}
+                    className="p-2 rounded-xl text-gray-400 hover:text-[#6B9B5F] hover:bg-green-50 transition-colors"
+                    title="Prévisualiser"
+                  >
+                    <EyeIcon className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => startEdit(alert)}
+                    className="p-2 rounded-xl text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                    title="Modifier"
+                  >
+                    <PencilIcon className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(alert.id)}
+                    className="p-2 rounded-xl text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                    title="Supprimer"
+                  >
+                    <TrashIcon className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
-        
-        {alerts.length === 0 && (
-          <div className="text-center py-12">
-            <svg className="w-16 h-16 mx-auto text-base-content/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-            </svg>
-            <p className="text-base-content/60 mt-4">Aucune alerte configurée</p>
-            <button onClick={() => setShowCreateModal(true)} className="btn btn-primary mt-4">
-              Créer votre première alerte
-            </button>
-          </div>
-        )}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Create/Edit Modal */}
       {showCreateModal && (
-        <div className="modal modal-open">
-          <div className="modal-box max-w-2xl">
-            <h3 className="font-bold text-lg mb-4">
-              {editingAlert ? 'Modifier l\'alerte' : 'Nouvelle alerte'}
-            </h3>
-            
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text">Nom de l&apos;alerte</span>
-                </label>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white rounded-t-3xl z-10">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-green-50 flex items-center justify-center">
+                  <BellIcon className="w-5 h-5 text-[#6B9B5F]" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900">
+                  {editingAlert ? 'Modifier l\'alerte' : 'Nouvelle alerte emploi'}
+                </h3>
+              </div>
+              <button onClick={resetForm} className="p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+                <XMarkIcon className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="p-6 space-y-5">
+              {/* Nom */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Nom de l&apos;alerte</label>
                 <input
                   type="text"
-                  className="input input-bordered"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/30 focus:border-[#6B9B5F] transition-colors"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="Ex: Jobs Python à Paris"
+                  placeholder="Ex: Développeur Python à Libreville"
                   required
                 />
               </div>
 
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text">Mots-clés (séparés par des virgules)</span>
-                </label>
+              {/* Mots-clés */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Mots-clés <span className="text-gray-400 font-normal">(séparés par des virgules)</span></label>
                 <input
                   type="text"
-                  className="input input-bordered"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/30 focus:border-[#6B9B5F] transition-colors"
                   value={formData.keywords}
                   onChange={(e) => setFormData({ ...formData, keywords: e.target.value })}
-                  placeholder="python, backend, django"
+                  placeholder="python, backend, développeur"
                 />
               </div>
 
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text">Localisation</span>
-                </label>
+              {/* Localisation */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Localisation</label>
                 <input
                   type="text"
-                  className="input input-bordered"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/30 focus:border-[#6B9B5F] transition-colors"
                   value={formData.location}
                   onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                  placeholder="Paris, France"
+                  placeholder="Libreville, Gabon"
                 />
               </div>
 
+              {/* Types de contrat */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Types de contrat</label>
+                <div className="flex flex-wrap gap-2">
+                  {JOB_TYPES.map((jt) => (
+                    <button
+                      key={jt.value}
+                      type="button"
+                      onClick={() => {
+                        const cur = formData.job_types;
+                        setFormData({
+                          ...formData,
+                          job_types: cur.includes(jt.value) ? cur.filter(v => v !== jt.value) : [...cur, jt.value],
+                        });
+                      }}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all duration-150 ${
+                        formData.job_types.includes(jt.value)
+                          ? 'bg-[#6B9B5F] border-[#6B9B5F] text-white'
+                          : 'bg-white border-gray-200 text-gray-600 hover:border-[#6B9B5F] hover:text-[#6B9B5F]'
+                      }`}
+                    >
+                      {jt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Salaire */}
               <div className="grid grid-cols-2 gap-4">
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">Salaire min (€/an)</span>
-                  </label>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">Salaire min (FCFA)</label>
                   <input
                     type="number"
-                    className="input input-bordered"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/30 focus:border-[#6B9B5F] transition-colors"
                     value={formData.salary_min}
                     onChange={(e) => setFormData({ ...formData, salary_min: e.target.value })}
+                    placeholder="300 000"
                   />
                 </div>
-
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">Salaire max (€/an)</span>
-                  </label>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">Salaire max (FCFA)</label>
                   <input
                     type="number"
-                    className="input input-bordered"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/30 focus:border-[#6B9B5F] transition-colors"
                     value={formData.salary_max}
                     onChange={(e) => setFormData({ ...formData, salary_max: e.target.value })}
+                    placeholder="800 000"
                   />
                 </div>
               </div>
 
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text">Fréquence d&apos;envoi</span>
-                </label>
-                <select
-                  className="select select-bordered"
-                  value={formData.frequency}
-                  onChange={(e) => setFormData({ ...formData, frequency: e.target.value })}
-                >
+              {/* Fréquence */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Fréquence d&apos;envoi</label>
+                <div className="flex gap-2">
                   {FREQUENCIES.map((freq) => (
-                    <option key={freq.value} value={freq.value}>
+                    <button
+                      key={freq.value}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, frequency: freq.value })}
+                      className={`flex-1 py-2.5 rounded-xl text-xs font-semibold border transition-all duration-150 ${
+                        formData.frequency === freq.value
+                          ? 'bg-[#6B9B5F] border-[#6B9B5F] text-white shadow-sm'
+                          : 'bg-white border-gray-200 text-gray-600 hover:border-[#6B9B5F] hover:text-[#6B9B5F]'
+                      }`}
+                    >
                       {freq.label}
-                    </option>
+                    </button>
                   ))}
-                </select>
+                </div>
               </div>
 
-              <div className="modal-action">
-                <button type="button" className="btn" onClick={resetForm}>
+              {/* Actions */}
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={resetForm}
+                  className="flex-1 px-4 py-2.5 border-2 border-gray-200 text-gray-700 rounded-xl font-semibold text-sm hover:bg-gray-50 transition-colors"
+                >
                   Annuler
                 </button>
-                <button type="submit" className="btn btn-primary">
-                  {editingAlert ? 'Mettre à jour' : 'Créer'}
+                <button
+                  type="submit"
+                  className="flex-1 px-4 py-2.5 bg-[#6B9B5F] hover:bg-[#5A8A4E] text-white rounded-xl font-semibold text-sm transition-colors shadow-sm"
+                >
+                  {editingAlert ? 'Mettre à jour' : 'Créer l\'alerte'}
                 </button>
               </div>
             </form>
@@ -452,38 +591,53 @@ export default function JobAlertsPage() {
 
       {/* Preview Modal */}
       {showPreview && (
-        <div className="modal modal-open">
-          <div className="modal-box max-w-4xl">
-            <h3 className="font-bold text-lg mb-4">
-              Jobs correspondants ({previewJobs.length})
-            </h3>
-            
-            <div className="space-y-3 max-h-96 overflow-y-auto">
-              {previewJobs.map((job) => (
-                <div key={job.id} className="card bg-base-200">
-                  <div className="card-body p-4">
-                    <h4 className="font-semibold">{job.title}</h4>
-                    <p className="text-sm text-base-content/60">
-                      {job.location} • {job.location_type} • {job.job_type}
-                    </p>
-                    {job.salary_min && (
-                      <p className="text-sm">
-                        {job.salary_min}€ - {job.salary_max}€/an
-                      </p>
-                    )}
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-purple-50 flex items-center justify-center">
+                  <EyeIcon className="w-5 h-5 text-purple-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900">Offres correspondantes</h3>
+                  <p className="text-xs text-gray-500">{previewJobs.length} résultat{previewJobs.length !== 1 ? 's' : ''} trouvé{previewJobs.length !== 1 ? 's' : ''}</p>
+                </div>
+              </div>
+              <button onClick={() => setShowPreview(false)} className="p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+                <XMarkIcon className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-4 overflow-y-auto space-y-3">
+              {previewJobs.length === 0 ? (
+                <div className="text-center py-10 text-gray-500">
+                  <BriefcaseIcon className="w-10 h-10 mx-auto text-gray-300 mb-3" />
+                  <p className="font-medium">Aucune offre correspondante</p>
+                  <p className="text-sm text-gray-400 mt-1">Essayez d&apos;élargir vos critères</p>
+                </div>
+              ) : previewJobs.map((job) => (
+                <div key={job.id} className="p-4 rounded-2xl border border-gray-100 bg-gray-50 hover:bg-green-50/30 transition-colors">
+                  <p className="font-semibold text-gray-900">{job.title}</p>
+                  <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
+                    {job.location && <span className="flex items-center gap-1"><MapPinIcon className="w-3.5 h-3.5" />{job.location}</span>}
+                    {job.job_type && <span className="flex items-center gap-1"><BriefcaseIcon className="w-3.5 h-3.5" />{job.job_type}</span>}
                   </div>
+                  {job.salary_min && (
+                    <p className="text-xs text-[#6B9B5F] font-semibold mt-1.5">
+                      {job.salary_min.toLocaleString()} – {job.salary_max?.toLocaleString()} FCFA/mois
+                    </p>
+                  )}
                 </div>
               ))}
             </div>
-            
-            <div className="modal-action">
-              <button className="btn" onClick={() => setShowPreview(false)}>
+            <div className="p-4 border-t border-gray-100">
+              <button onClick={() => setShowPreview(false)} className="w-full py-2.5 border-2 border-gray-200 text-gray-700 rounded-xl font-semibold text-sm hover:bg-gray-50 transition-colors">
                 Fermer
               </button>
             </div>
           </div>
         </div>
       )}
+
       <ConfirmDialog
         isOpen={isConfirmOpen}
         options={confirmOptions}
