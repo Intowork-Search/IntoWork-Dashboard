@@ -1,7 +1,6 @@
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import DeclarativeBase
 import os
-import ssl
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -46,17 +45,9 @@ if is_railway:
             "command_timeout": 120
         }
     else:
-        # Connexion externe Railway: SSL avec vérification serveur
-        ssl_context = ssl.create_default_context()
-        # Railway utilise des certificats auto-signés — vérifier le chiffrement
-        # mais sans exiger un CA de confiance (Railway ne fournit pas de CA bundle)
-        ssl_context.check_hostname = False
-        ssl_context.verify_mode = ssl.CERT_REQUIRED
-        # Charger les CA système pour valider quand possible
-        ssl_context.load_default_certs()
-
+        # Connexion externe Railway: SSL requis sans vérification du certificat
         engine_kwargs["connect_args"] = {
-            "ssl": ssl_context,
+            "ssl": "require",
             "server_settings": {
                 "application_name": "intowork-backend"
             },
