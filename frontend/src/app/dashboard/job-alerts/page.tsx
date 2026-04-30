@@ -1,8 +1,11 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
 import { getApiUrl } from '@/lib/getApiUrl';
+import { useConfirmModal } from '@/hooks/useConfirmModal';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import { useAuth } from '@/hooks/useNextAuth';
 
 interface JobAlert {
   id: number;
@@ -43,12 +46,15 @@ const LOCATION_TYPES = [
 ];
 
 export default function JobAlertsPage() {
+  const { getToken } = useAuth();
   const [alerts, setAlerts] = useState<JobAlert[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingAlert, setEditingAlert] = useState<JobAlert | null>(null);
   const [previewJobs, setPreviewJobs] = useState<any[]>([]);
   const [showPreview, setShowPreview] = useState(false);
+  const [deletingAlert, setDeletingAlert] = useState(false);
+  const { confirm, isOpen: isConfirmOpen, options: confirmOptions, handleConfirm, handleCancel } = useConfirmModal();
   
   // Form state
   const [formData, setFormData] = useState({
@@ -64,12 +70,15 @@ export default function JobAlertsPage() {
 
   useEffect(() => {
     fetchAlerts();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const fetchAlerts = async () => {
+  const fetchAlerts = useCallback(async () => {
     try {
+      const token = await getToken();
+      if (!token) return;
       const response = await fetch(`${getApiUrl()}/job-alerts`, {
-        credentials: 'include',
+        headers: { 'Authorization': `Bearer ${token}` },
       });
       
       if (response.ok) {
@@ -81,7 +90,8 @@ export default function JobAlertsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,6 +113,8 @@ export default function JobAlertsPage() {
     };
     
     try {
+      const token = await getToken();
+      if (!token) return;
       const url = editingAlert
         ? `${getApiUrl()}/job-alerts/${editingAlert.id}`
         : `${getApiUrl()}/job-alerts/`;
@@ -111,8 +123,7 @@ export default function JobAlertsPage() {
       
       const response = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify(editingAlert ? { ...payload, is_active: true } : payload),
       });
       
@@ -130,9 +141,11 @@ export default function JobAlertsPage() {
 
   const handleToggle = async (id: number) => {
     try {
+      const token = await getToken();
+      if (!token) return;
       const response = await fetch(`${getApiUrl()}/job-alerts/${id}/toggle`, {
         method: 'POST',
-        credentials: 'include',
+        headers: { 'Authorization': `Bearer ${token}` },
       });
       
       if (response.ok) {
@@ -145,12 +158,20 @@ export default function JobAlertsPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Voulez-vous vraiment supprimer cette alerte ?')) return;
-    
+    const ok = await confirm({
+      title: 'Supprimer cette alerte ?',
+      message: 'Cette alerte sera définitivement supprimée et vous ne recevrez plus ces notifications.',
+      confirmLabel: 'Supprimer',
+    });
+    if (!ok) return;
+
+    setDeletingAlert(true);
     try {
+      const token = await getToken();
+      if (!token) return;
       const response = await fetch(`${getApiUrl()}/job-alerts/${id}`, {
         method: 'DELETE',
-        credentials: 'include',
+        headers: { 'Authorization': `Bearer ${token}` },
       });
       
       if (response.ok) {
@@ -159,14 +180,18 @@ export default function JobAlertsPage() {
       }
     } catch (error) {
       toast.error('Erreur lors de la suppression');
+    } finally {
+      setDeletingAlert(false);
     }
   };
 
   const handlePreview = async (alert: JobAlert) => {
     try {
+      const token = await getToken();
+      if (!token) return;
       const response = await fetch(
         `${getApiUrl()}/job-alerts/${alert.id}/preview?limit=10`,
-        { credentials: 'include' }
+        { headers: { 'Authorization': `Bearer ${token}` } }
       );
       
       if (response.ok) {
@@ -458,5 +483,13 @@ export default function JobAlertsPage() {
         </div>
       )}
     </div>
+
+    <ConfirmDialog
+      isOpen={isConfirmOpen}
+      options={confirmOptions}
+      onConfirm={handleConfirm}
+      onCancel={handleCancel}
+      loading={deletingAlert}
+    />
   );
 }

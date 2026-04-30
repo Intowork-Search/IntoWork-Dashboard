@@ -14,6 +14,8 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import DashboardLayout from '@/components/DashboardLayout';
 import { useMyApplications, useWithdrawApplication } from '@/hooks';
+import { useConfirmModal } from '@/hooks/useConfirmModal';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import {
   CalendarDaysIcon,
   MapPinIcon,
@@ -53,6 +55,7 @@ export default function ApplicationsPage() {
 
   // Mutation pour retirer une candidature
   const withdrawMutation = useWithdrawApplication();
+  const { confirm, isOpen: isConfirmOpen, options: confirmOptions, handleConfirm, handleCancel } = useConfirmModal();
 
   // Extraire les données
   const applications = data?.applications || [];
@@ -76,9 +79,12 @@ export default function ApplicationsPage() {
 
   // Retirer une candidature
   const handleWithdrawApplication = async (applicationId: number) => {
-    if (!confirm('Êtes-vous sûr de vouloir retirer cette candidature ?')) {
-      return;
-    }
+    const ok = await confirm({
+      title: 'Retirer cette candidature ?',
+      message: 'Vous allez retirer votre candidature. Vous ne pourrez pas la rétablir.',
+      confirmLabel: 'Retirer',
+    });
+    if (!ok) return;
 
     withdrawMutation.mutate(applicationId, {
       onSuccess: () => {
@@ -543,5 +549,13 @@ export default function ApplicationsPage() {
         }
       `}</style>
     </DashboardLayout>
+
+    <ConfirmDialog
+      isOpen={isConfirmOpen}
+      options={confirmOptions}
+      onConfirm={handleConfirm}
+      onCancel={handleCancel}
+      loading={withdrawMutation.isPending}
+    />
   );
 }

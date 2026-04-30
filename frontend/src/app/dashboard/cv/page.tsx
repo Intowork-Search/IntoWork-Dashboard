@@ -16,6 +16,9 @@ import DashboardLayout from '@/components/DashboardLayout';
 import { candidatesAPI, CV } from '@/lib/api';
 import { getApiUrl } from '@/lib/getApiUrl';
 import { logger } from '@/lib/logger';
+import toast from 'react-hot-toast';
+import { useConfirmModal } from '@/hooks/useConfirmModal';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import {
   DocumentTextIcon,
   EyeIcon,
@@ -41,7 +44,9 @@ export default function MesCVPage() {
   const [cvs, setCvs] = useState<CV[]>([]);
   const [isUploadingCV, setIsUploadingCV] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [deletingCV, setDeletingCV] = useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const { confirm, isOpen: isConfirmOpen, options: confirmOptions, handleConfirm, handleCancel } = useConfirmModal();
 
   // Charger le profil et les CV
   useEffect(() => {
@@ -148,7 +153,7 @@ export default function MesCVPage() {
 
     } catch (error) {
       logger.error("Erreur lors de la visualisation:", error);
-      alert('Erreur lors de l\'ouverture du CV');
+      toast.error('Erreur lors de l\'ouverture du CV');
     }
   };
 
@@ -179,18 +184,18 @@ export default function MesCVPage() {
 
     } catch (error) {
       logger.error("Erreur lors du telechargement:", error);
-      alert('Erreur lors du téléchargement du CV');
+      toast.error('Erreur lors du téléchargement du CV');
     }
   };
 
   const handleFileUpload = async (file: File) => {
     if (file.type !== 'application/pdf') {
-      alert('Veuillez sélectionner un fichier PDF.');
+      toast.error('Veuillez sélectionner un fichier PDF.');
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      alert('Le fichier ne peut pas dépasser 5MB.');
+      toast.error('Le fichier ne peut pas dépasser 5MB.');
       return;
     }
 
@@ -198,7 +203,7 @@ export default function MesCVPage() {
       setIsUploadingCV(true);
       const token = await getToken();
       if (!token) {
-        alert('Erreur d\'authentification');
+        toast.error('Erreur d\'authentification');
         return;
       }
 
@@ -215,7 +220,7 @@ export default function MesCVPage() {
       });
 
       if (response.ok) {
-        alert('CV téléchargé avec succès !');
+        toast.success('CV téléchargé avec succès !');
         await reloadData();
 
         try {
@@ -226,11 +231,11 @@ export default function MesCVPage() {
         }
       } else {
         const errorData = await response.json();
-        alert(`Erreur lors du téléchargement: ${errorData.detail || 'Erreur inconnue'}`);
+        toast.error(`Erreur lors du téléchargement: ${errorData.detail || 'Erreur inconnue'}`);
       }
     } catch (error) {
       logger.error("Erreur lors du telechargement du CV:", error);
-      alert('Erreur lors du téléchargement du CV');
+      toast.error('Erreur lors du téléchargement du CV');
     } finally {
       setIsUploadingCV(false);
       if (fileInputRef.current) {
@@ -266,10 +271,15 @@ export default function MesCVPage() {
   };
 
   const handleDeleteCV = async (cv: CV) => {
-    if (!confirm(`Êtes-vous sûr de vouloir supprimer le CV "${cv.filename}" ?`)) {
-      return;
-    }
+    const ok = await confirm({
+      title: 'Supprimer ce CV ?',
+      message: `Le fichier "${cv.filename}" sera définitivement supprimé.`,
+      detail: 'Cette action est irréversible.',
+      confirmLabel: 'Supprimer',
+    });
+    if (!ok) return;
 
+    setDeletingCV(true);
     try {
       const token = await getToken();
       if (!token) return;
@@ -284,15 +294,14 @@ export default function MesCVPage() {
         });
       }
 
-      alert('CV supprimé avec succès');
-
+      toast.success('CV supprimé avec succès');
       setCvs(cvs.filter(existingCV => existingCV.id !== cv.id));
-
       await reloadData();
-
     } catch (error) {
       logger.error("Erreur lors de la suppression:", error);
-      alert('Erreur lors de la suppression du CV');
+      toast.error('Erreur lors de la suppression du CV');
+    } finally {
+      setDeletingCV(false);
     }
   };
 
@@ -601,5 +610,13 @@ export default function MesCVPage() {
         }
       `}</style>
     </DashboardLayout>
+
+    <ConfirmDialog
+      isOpen={isConfirmOpen}
+      options={confirmOptions}
+      onConfirm={handleConfirm}
+      onCancel={handleCancel}
+      loading={deletingCV}
+    />
   );
 }

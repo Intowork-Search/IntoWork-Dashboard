@@ -20,6 +20,8 @@ import { formatCurrency } from '@/constants/geo';
 import DashboardLayout from '@/components/DashboardLayout';
 import OnboardingTour from '@/components/OnboardingTour';
 import { employerCreateJobTour } from '@/config/onboardingTours';
+import { useConfirmModal } from '@/hooks/useConfirmModal';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import {
   PlusIcon,
   PencilIcon,
@@ -57,6 +59,8 @@ export default function JobPostsPage(): React.JSX.Element {
   // LinkedIn modal state
   const [linkedInModalOpen, setLinkedInModalOpen] = useState(false);
   const [selectedJobForLinkedIn, setSelectedJobForLinkedIn] = useState<{ id: number; title: string } | null>(null);
+  const [deletingJob, setDeletingJob] = useState(false);
+  const { confirm, isOpen: isConfirmOpen, options: confirmOptions, handleConfirm, handleCancel } = useConfirmModal();
 
   // Helper functions
   const getJobTypeInfo = (type: string) => {
@@ -118,8 +122,15 @@ export default function JobPostsPage(): React.JSX.Element {
   };
 
   const handleDelete = async (jobId: number) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cette offre ?')) return;
+    const ok = await confirm({
+      title: 'Supprimer cette offre ?',
+      message: 'Cette offre sera définitivement supprimée.',
+      detail: 'Cette action est irréversible.',
+      confirmLabel: 'Supprimer',
+    });
+    if (!ok) return;
 
+    setDeletingJob(true);
     try {
       const token = await getToken();
       if (!token) return;
@@ -130,6 +141,8 @@ export default function JobPostsPage(): React.JSX.Element {
     } catch (err: unknown) {
       logger.error("Erreur lors de la suppression:", err);
       toast.error('Erreur lors de la suppression');
+    } finally {
+      setDeletingJob(false);
     }
   };
 
@@ -826,5 +839,13 @@ export default function JobPostsPage(): React.JSX.Element {
         />
       )}
     </DashboardLayout>
+
+    <ConfirmDialog
+      isOpen={isConfirmOpen}
+      options={confirmOptions}
+      onConfirm={handleConfirm}
+      onCancel={handleCancel}
+      loading={deletingJob}
+    />
   );
 }

@@ -32,6 +32,8 @@ import {
 } from '@heroicons/react/24/outline';
 import { CheckCircleIcon, XCircleIcon, ClockIcon } from '@heroicons/react/24/solid';
 import ScheduleInterviewModal from '@/components/ScheduleInterviewModal';
+import { useConfirmModal } from '@/hooks/useConfirmModal';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 interface CandidateApplication {
   id: number;
@@ -67,6 +69,7 @@ export default function CandidatesPage(): React.JSX.Element {
   // Interview modal state
   const [interviewModalOpen, setInterviewModalOpen] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState<{ name: string; email: string; jobTitle: string; applicationId: number } | null>(null);
+  const { confirm, isOpen: isConfirmOpen, options: confirmOptions, handleConfirm, handleCancel } = useConfirmModal();
 
   // Utiliser React Query hooks
   const {
@@ -522,10 +525,13 @@ export default function CandidatesPage(): React.JSX.Element {
                     Présélectionner
                   </button>
                   <button
-                    onClick={() => {
-                      if (confirm('Êtes-vous sûr de vouloir rejeter cette candidature ?')) {
-                        handleStatusChange(viewingApplication.id, 'rejected');
-                      }
+                    onClick={async () => {
+                      const ok = await confirm({
+                        title: 'Rejeter cette candidature ?',
+                        message: `Vous allez rejeter la candidature de ${viewingApplication.candidate_name}.`,
+                        confirmLabel: 'Rejeter',
+                      });
+                      if (ok) handleStatusChange(viewingApplication.id, 'rejected');
                     }}
                     disabled={updatingStatus}
                     className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
@@ -571,5 +577,12 @@ export default function CandidatesPage(): React.JSX.Element {
         steps={employerApplicationsTour}
       />
     </DashboardLayout>
+
+    <ConfirmDialog
+      isOpen={isConfirmOpen}
+      options={confirmOptions}
+      onConfirm={handleConfirm}
+      onCancel={handleCancel}
+    />
   );
 }

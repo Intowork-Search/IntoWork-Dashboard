@@ -7,6 +7,8 @@ import toast from 'react-hot-toast';
 import { useAuth } from '@/hooks/useNextAuth';
 import { logger } from '@/lib/logger';
 import { useCVDocument, useSaveCV, useTogglePublic, useCVAnalytics } from '@/hooks/useCVBuilder';
+import { useConfirmModal } from '@/hooks/useConfirmModal';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import type {
   CVTemplate,
   CVData,
@@ -106,6 +108,7 @@ export default function CVBuilder() {
   const [isPublic, setIsPublic] = useState(false);
   const [publicSlug, setPublicSlug] = useState<string | null>(null);
   const [showShareModal, setShowShareModal] = useState(false);
+  const { confirm, isOpen: isConfirmOpen, options: confirmOptions, handleConfirm, handleCancel } = useConfirmModal();
 
   // Load data from backend (if authenticated) or localStorage
   useEffect(() => {
@@ -210,15 +213,21 @@ export default function CVBuilder() {
   };
 
   // Clear/Reset CV
-  const handleClearCV = () => {
-    if (window.confirm('Êtes-vous sûr de vouloir effacer toutes les données du CV ? Cette action est irréversible.')) {
-      setCvData(initialCvData);
-      setSelectedTemplate('elegance');
-      setCurrentStep(0);
-      setValidationErrors({});
-      localStorage.removeItem(STORAGE_KEY);
-      toast.success('CV réinitialisé avec succès');
-    }
+  const handleClearCV = async () => {
+    const ok = await confirm({
+      title: 'Réinitialiser le CV ?',
+      message: 'Toutes les données saisies seront effacées et le CV reviendra à son état initial.',
+      detail: 'Cette action est irréversible.',
+      confirmLabel: 'Réinitialiser',
+    });
+    if (!ok) return;
+
+    setCvData(initialCvData);
+    setSelectedTemplate('elegance');
+    setCurrentStep(0);
+    setValidationErrors({});
+    localStorage.removeItem(STORAGE_KEY);
+    toast.success('CV réinitialisé avec succès');
   };
 
   // Toggle public sharing
@@ -1998,5 +2007,12 @@ export default function CVBuilder() {
         }
       `}</style>
     </div>
+
+    <ConfirmDialog
+      isOpen={isConfirmOpen}
+      options={confirmOptions}
+      onConfirm={handleConfirm}
+      onCancel={handleCancel}
+    />
   );
 }

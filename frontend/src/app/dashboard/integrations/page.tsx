@@ -19,6 +19,8 @@ import OnboardingTour from '@/components/OnboardingTour';
 import { integrationsTour } from '@/config/onboardingTours';
 import { integrationsAPI, Integration, IntegrationStatus } from '@/lib/api';
 import toast from 'react-hot-toast';
+import { useConfirmModal } from '@/hooks/useConfirmModal';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import {
   LinkIcon,
   CalendarIcon,
@@ -42,6 +44,7 @@ export default function IntegrationsPage() {
   const [integrations, setIntegrations] = useState<IntegrationStatus | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [connectingProvider, setConnectingProvider] = useState<string | null>(null);
+  const { confirm, isOpen: isConfirmOpen, options: confirmOptions, handleConfirm, handleCancel } = useConfirmModal();
 
   // Charger le statut des intégrations
   const loadIntegrations = async () => {
@@ -113,9 +116,14 @@ export default function IntegrationsPage() {
 
   // Déconnecter une intégration
   const handleDisconnect = async (provider: 'linkedin' | 'google-calendar' | 'outlook') => {
-    if (!confirm(`Êtes-vous sûr de vouloir déconnecter ${provider} ?`)) {
-      return;
-    }
+    const providerLabel = provider === 'google-calendar' ? 'Google Calendar' : provider === 'linkedin' ? 'LinkedIn' : 'Outlook';
+    const ok = await confirm({
+      title: `Déconnecter ${providerLabel} ?`,
+      message: `Vous allez supprimer l’intégration avec ${providerLabel}. Vous pourrez la reconnecter à tout moment.`,
+      confirmLabel: 'Déconnecter',
+      variant: 'warning',
+    });
+    if (!ok) return;
 
     try {
       const token = await getToken();
@@ -430,6 +438,13 @@ export default function IntegrationsPage() {
         steps={integrationsTour}
       />
     </DashboardLayout>
+
+    <ConfirmDialog
+      isOpen={isConfirmOpen}
+      options={confirmOptions}
+      onConfirm={handleConfirm}
+      onCancel={handleCancel}
+    />
   );
 }
 

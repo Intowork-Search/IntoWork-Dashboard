@@ -32,6 +32,8 @@ import {
 import { StarIcon } from '@heroicons/react/24/solid';
 import toast from 'react-hot-toast';
 import { getErrorMessage } from '@/types/api';
+import { useConfirmModal } from '@/hooks/useConfirmModal';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 interface Props {
   params: Promise<{
@@ -54,6 +56,8 @@ export default function AIScoringPage({ params }: Props) {
   const [totalPages, setTotalPages] = useState(0);
   const [sortByScore, setSortByScore] = useState(true);
   const [expandedDetails, setExpandedDetails] = useState<number | null>(null);
+  const [bulkConfirmLoading, setBulkConfirmLoading] = useState(false);
+  const { confirm, isOpen: isConfirmOpen, options: confirmOptions, handleConfirm, handleCancel } = useConfirmModal();
 
   const limit = 20;
 
@@ -108,9 +112,14 @@ export default function AIScoringPage({ params }: Props) {
 
   // Scorer toutes les candidatures non scorées
   const handleBulkScore = async () => {
-    if (!confirm('Voulez-vous analyser toutes les candidatures non scorées avec l\'IA ? Cela peut prendre quelques minutes.')) {
-      return;
-    }
+    const ok = await confirm({
+      title: 'Analyser toutes les candidatures ?',
+      message: 'L\'IA va analyser toutes les candidatures non scorées pour cette offre.',
+      detail: 'Cette opération peut prendre quelques minutes.',
+      confirmLabel: 'Lancer l\'analyse',
+      variant: 'warning',
+    });
+    if (!ok) return;
 
     try {
       setBulkScoring(true);
@@ -441,5 +450,13 @@ export default function AIScoringPage({ params }: Props) {
         )}
       </div>
     </DashboardLayout>
+
+    <ConfirmDialog
+      isOpen={isConfirmOpen}
+      options={confirmOptions}
+      onConfirm={handleConfirm}
+      onCancel={handleCancel}
+      loading={bulkConfirmLoading}
+    />
   );
 }

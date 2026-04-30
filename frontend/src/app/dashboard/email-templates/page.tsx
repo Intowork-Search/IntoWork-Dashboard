@@ -19,6 +19,8 @@ import DashboardLayout from '@/components/DashboardLayout';
 import OnboardingTour from '@/components/OnboardingTour';
 import { employerEmailTemplatesTour } from '@/config/onboardingTours';
 import { logger } from '@/lib/logger';
+import { useConfirmModal } from '@/hooks/useConfirmModal';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { 
   EnvelopeIcon, 
   PlusIcon, 
@@ -63,6 +65,8 @@ export default function EmailTemplatesPage() {
   const [editingTemplate, setEditingTemplate] = useState<EmailTemplate | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [variables, setVariables] = useState<string[]>([]);
+  const [deletingTemplate, setDeletingTemplate] = useState(false);
+  const { confirm, isOpen: isConfirmOpen, options: confirmOptions, handleConfirm, handleCancel } = useConfirmModal();
   
   // Form state
   const [formData, setFormData] = useState({
@@ -183,8 +187,14 @@ export default function EmailTemplatesPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Voulez-vous vraiment supprimer ce template ?')) return;
-    
+    const ok = await confirm({
+      title: 'Supprimer ce template ?',
+      message: 'Ce template d\'email sera définitivement supprimé.',
+      confirmLabel: 'Supprimer',
+    });
+    if (!ok) return;
+
+    setDeletingTemplate(true);
     try {
       const token = await getToken();
       if (!token) {
@@ -208,8 +218,8 @@ export default function EmailTemplatesPage() {
       }
     } catch (error) {
       logger.error("Error deleting template:", error);
-      toast.error('Erreur lors de la suppression');
-    }
+      toast.error('Erreur lors de la suppression');    } finally {
+      setDeletingTemplate(false);    }
   };
 
   const handleDuplicate = async (id: number) => {
@@ -631,5 +641,13 @@ export default function EmailTemplatesPage() {
         steps={employerEmailTemplatesTour}
       />
     </DashboardLayout>
+
+    <ConfirmDialog
+      isOpen={isConfirmOpen}
+      options={confirmOptions}
+      onConfirm={handleConfirm}
+      onCancel={handleCancel}
+      loading={deletingTemplate}
+    />
   );
 }

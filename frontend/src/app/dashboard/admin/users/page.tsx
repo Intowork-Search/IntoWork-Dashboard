@@ -17,6 +17,8 @@ import {
   ArrowPathIcon,
   PlusIcon,
   XMarkIcon,
+  ExclamationTriangleIcon,
+  TrashIcon,
 } from '@heroicons/react/24/outline';
 
 export default function AdminUsersPage() {
@@ -24,6 +26,12 @@ export default function AdminUsersPage() {
   const router = useRouter();
   const [userSearch, setUserSearch] = useState('');
   const [userRoleFilter, setUserRoleFilter] = useState('');
+
+  // Modal confirmation suppression
+  const [deleteConfirm, setDeleteConfirm] = useState<{ open: boolean; userId: number | null; userEmail: string }>({
+    open: false, userId: null, userEmail: '',
+  });
+  const [deleting, setDeleting] = useState(false);
 
   // Modal création
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -64,16 +72,22 @@ export default function AdminUsersPage() {
   };
 
   const handleDeleteUser = async (userId: number, userEmail: string) => {
-    if (!confirm(`⚠️ ATTENTION ⚠️\n\nÊtes-vous sûr de vouloir supprimer définitivement l'utilisateur ${userEmail} ?\n\nCette action est IRRÉVERSIBLE et supprimera toutes les données associées.`)) return;
-    if (!session?.accessToken) return;
+    setDeleteConfirm({ open: true, userId, userEmail });
+  };
 
+  const confirmDeleteUser = async () => {
+    if (!deleteConfirm.userId || !session?.accessToken) return;
+    setDeleting(true);
     try {
-      await adminAPI.deleteUser(session.accessToken, userId);
+      await adminAPI.deleteUser(session.accessToken, deleteConfirm.userId);
       toast.success('Utilisateur supprimé avec succès');
+      setDeleteConfirm({ open: false, userId: null, userEmail: '' });
       refetch();
     } catch (error: unknown) {
       logger.error("Erreur suppression:", error);
       toast.error(getErrorMessage(error, 'Erreur lors de la suppression'));
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -337,6 +351,49 @@ export default function AdminUsersPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal confirmation suppression */}
+      {deleteConfirm.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-8 animate-fade-in">
+            <div className="flex flex-col items-center text-center gap-4">
+              <div className="w-16 h-16 rounded-2xl bg-red-100 flex items-center justify-center">
+                <ExclamationTriangleIcon className="w-8 h-8 text-red-600" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-gray-900 mb-2">Supprimer cet utilisateur ?</h2>
+                <p className="text-sm text-gray-500 leading-relaxed">
+                  Vous êtes sur le point de supprimer définitivement le compte de
+                </p>
+                <p className="text-sm font-semibold text-gray-800 mt-1 break-all">{deleteConfirm.userEmail}</p>
+                <p className="text-xs text-red-500 mt-2 font-medium">
+                  Cette action est irréversible et supprimera toutes les données associées.
+                </p>
+              </div>
+              <div className="flex gap-3 w-full pt-2">
+                <button
+                  onClick={() => setDeleteConfirm({ open: false, userId: null, userEmail: '' })}
+                  disabled={deleting}
+                  className="flex-1 px-4 py-2.5 border-2 border-gray-200 text-gray-700 rounded-xl font-medium text-sm hover:bg-gray-50 transition-colors disabled:opacity-50"
+                >
+                  Annuler
+                </button>
+                <button
+                  onClick={confirmDeleteUser}
+                  disabled={deleting}
+                  className="flex-1 px-4 py-2.5 bg-gradient-to-r from-red-600 to-red-500 text-white rounded-xl font-medium text-sm hover:shadow-lg hover:shadow-red-200 transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+                >
+                  {deleting ? (
+                    <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Suppression...</>
+                  ) : (
+                    <><TrashIcon className="w-4 h-4" /> Supprimer</>
+                  )}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

@@ -13,6 +13,8 @@ import { integrationsAPI } from '@/lib/api';
 import toast from 'react-hot-toast';
 import { logger } from '@/lib/logger';
 import { getErrorMessage } from '@/types/api';
+import { useConfirmModal } from '@/hooks/useConfirmModal';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import {
   LinkIcon,
   KeyIcon,
@@ -38,6 +40,7 @@ export default function TargetymIntegrationPage() {
   const [isUnlinking, setIsUnlinking] = useState(false);
   const [generatedKey, setGeneratedKey] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const { confirm, isOpen: isConfirmOpen, options: confirmOptions, handleConfirm, handleCancel } = useConfirmModal();
 
   // Formulaire de liaison
   const [tenantId, setTenantId] = useState('');
@@ -116,7 +119,13 @@ export default function TargetymIntegrationPage() {
   };
 
   const handleUnlink = async () => {
-    if (!confirm('Confirmer la suppression de la liaison avec Targetym ?')) return;
+    const ok = await confirm({
+      title: 'Supprimer la liaison Targetym ?',
+      message: 'La connexion entre IntoWork et votre compte Targetym sera supprimée.',
+      confirmLabel: 'Supprimer la liaison',
+      variant: 'warning',
+    });
+    if (!ok) return;
     try {
       setIsUnlinking(true);
       const token = await getToken();
@@ -341,5 +350,13 @@ export default function TargetymIntegrationPage() {
         )}
       </div>
     </DashboardLayout>
+
+    <ConfirmDialog
+      isOpen={isConfirmOpen}
+      options={confirmOptions}
+      onConfirm={handleConfirm}
+      onCancel={handleCancel}
+      loading={isUnlinking}
+    />
   );
 }
