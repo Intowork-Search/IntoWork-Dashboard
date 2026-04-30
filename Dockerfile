@@ -10,11 +10,19 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1
 
-# Install system dependencies required for PostgreSQL and Python packages
+# Install system dependencies required for PostgreSQL, WeasyPrint (PDF) and Python packages
 RUN apt-get update && apt-get install -y \
     gcc \
     postgresql-client \
     libpq-dev \
+    libgobject-2.0-0 \
+    libpango-1.0-0 \
+    libpangocairo-1.0-0 \
+    libcairo2 \
+    libgdk-pixbuf2.0-0 \
+    libffi-dev \
+    shared-mime-info \
+    fonts-liberation \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
