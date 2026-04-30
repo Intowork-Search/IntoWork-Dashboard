@@ -576,13 +576,12 @@ export default function CandidatesPage(): React.JSX.Element {
         tourId="employer-applications"
         steps={employerApplicationsTour}
       />
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        options={confirmOptions}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+      />
     </DashboardLayout>
-
-    <ConfirmDialog
-      isOpen={isConfirmOpen}
-      options={confirmOptions}
-      onConfirm={handleConfirm}
-      onCancel={handleCancel}
-    />
   );
 }

@@ -349,14 +349,13 @@ export default function TargetymIntegrationPage() {
           </div>
         )}
       </div>
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        options={confirmOptions}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+        loading={isUnlinking}
+      />
     </DashboardLayout>
-
-    <ConfirmDialog
-      isOpen={isConfirmOpen}
-      options={confirmOptions}
-      onConfirm={handleConfirm}
-      onCancel={handleCancel}
-      loading={isUnlinking}
-    />
   );
 }

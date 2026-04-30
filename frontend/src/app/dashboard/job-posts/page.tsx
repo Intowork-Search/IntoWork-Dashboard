@@ -838,14 +838,13 @@ export default function JobPostsPage(): React.JSX.Element {
           getToken={getToken}
         />
       )}
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        options={confirmOptions}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+        loading={deletingJob}
+      />
     </DashboardLayout>
-
-    <ConfirmDialog
-      isOpen={isConfirmOpen}
-      options={confirmOptions}
-      onConfirm={handleConfirm}
-      onCancel={handleCancel}
-      loading={deletingJob}
-    />
   );
 }

@@ -437,14 +437,13 @@ export default function IntegrationsPage() {
         tourId="integrations"
         steps={integrationsTour}
       />
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        options={confirmOptions}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+      />
     </DashboardLayout>
-
-    <ConfirmDialog
-      isOpen={isConfirmOpen}
-      options={confirmOptions}
-      onConfirm={handleConfirm}
-      onCancel={handleCancel}
-    />
   );
 }
 

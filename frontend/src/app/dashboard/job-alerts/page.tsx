@@ -482,14 +482,13 @@ export default function JobAlertsPage() {
           </div>
         </div>
       )}
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        options={confirmOptions}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+        loading={deletingAlert}
+      />
     </div>
-
-    <ConfirmDialog
-      isOpen={isConfirmOpen}
-      options={confirmOptions}
-      onConfirm={handleConfirm}
-      onCancel={handleCancel}
-      loading={deletingAlert}
-    />
   );
 }

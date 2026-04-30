@@ -640,14 +640,13 @@ export default function EmailTemplatesPage() {
         tourId="employer-email-templates"
         steps={employerEmailTemplatesTour}
       />
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        options={confirmOptions}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+        loading={deletingTemplate}
+      />
     </DashboardLayout>
-
-    <ConfirmDialog
-      isOpen={isConfirmOpen}
-      options={confirmOptions}
-      onConfirm={handleConfirm}
-      onCancel={handleCancel}
-      loading={deletingTemplate}
-    />
   );
 }

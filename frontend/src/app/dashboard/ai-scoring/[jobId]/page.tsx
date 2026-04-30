@@ -449,14 +449,13 @@ export default function AIScoringPage({ params }: Props) {
           </div>
         )}
       </div>
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        options={confirmOptions}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+        loading={bulkConfirmLoading}
+      />
     </DashboardLayout>
-
-    <ConfirmDialog
-      isOpen={isConfirmOpen}
-      options={confirmOptions}
-      onConfirm={handleConfirm}
-      onCancel={handleCancel}
-      loading={bulkConfirmLoading}
-    />
   );
 }

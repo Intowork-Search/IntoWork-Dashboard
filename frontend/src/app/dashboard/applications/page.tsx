@@ -548,14 +548,13 @@ export default function ApplicationsPage() {
           }
         }
       `}</style>
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        options={confirmOptions}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+        loading={withdrawMutation.isPending}
+      />
     </DashboardLayout>
-
-    <ConfirmDialog
-      isOpen={isConfirmOpen}
-      options={confirmOptions}
-      onConfirm={handleConfirm}
-      onCancel={handleCancel}
-      loading={withdrawMutation.isPending}
-    />
   );
 }

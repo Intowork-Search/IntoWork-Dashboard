@@ -2006,13 +2006,12 @@ export default function CVBuilder() {
           animation: fade-in 0.2s ease-out forwards;
         }
       `}</style>
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        options={confirmOptions}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+      />
     </div>
-
-    <ConfirmDialog
-      isOpen={isConfirmOpen}
-      options={confirmOptions}
-      onConfirm={handleConfirm}
-      onCancel={handleCancel}
-    />
   );
 }
