@@ -82,7 +82,6 @@ def run_migrations_online() -> None:
 
     async def run_async_migrations() -> None:
         """Create async engine and run migrations."""
-        import ssl
         from sqlalchemy.ext.asyncio import create_async_engine
         
         # Get the database URL and ensure it uses asyncpg
@@ -111,18 +110,13 @@ def run_migrations_online() -> None:
                 }
                 print(f"   Type: INTERNE - SSL DÉSACTIVÉ", flush=True)
             else:
-                # Connexion externe: SSL avec vérification serveur
-                ssl_context = ssl.create_default_context()
-                ssl_context.check_hostname = False
-                ssl_context.verify_mode = ssl.CERT_REQUIRED
-                ssl_context.load_default_certs()
-
+                # Connexion externe: SSL requis sans vérification du certificat serveur
                 connect_args = {
-                    "ssl": ssl_context,
+                    "ssl": "require",
                     "timeout": 60,
                     "command_timeout": 120
                 }
-                print(f"   Type: EXTERNE - SSL avec vérification", flush=True)
+                print(f"   Type: EXTERNE - SSL requis (sans vérification cert)", flush=True)
         else:
             print(f"🏠 Alembic: Connexion locale détectée", flush=True)
         
