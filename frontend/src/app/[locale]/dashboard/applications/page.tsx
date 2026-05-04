@@ -65,7 +65,7 @@ export default function ApplicationsPage() {
   const applications = data?.applications || [];
   const totalPages = data?.total_pages || 0;
   const totalApplications = data?.total || 0;
-  const error = isError ? (queryError as any)?.message || 'Erreur lors du chargement' : null;
+  const error = isError ? (queryError as any)?.message || t('errorLoading') : null;
 
   // Filtrer par statut
   const filteredApplications = selectedStatus
@@ -84,9 +84,9 @@ export default function ApplicationsPage() {
   // Retirer une candidature
   const handleWithdrawApplication = async (applicationId: number) => {
     const ok = await confirm({
-      title: 'Retirer cette candidature ?',
-      message: 'Vous allez retirer votre candidature. Vous ne pourrez pas la rétablir.',
-      confirmLabel: 'Retirer',
+      title: t('removeTitle'),
+      message: t('removeMessage'),
+      confirmLabel: t('remove'),
     });
     if (!ok) return;
 
@@ -166,8 +166,8 @@ export default function ApplicationsPage() {
     const now = new Date();
     const diff = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
 
-    if (diff === 0) return "Aujourd'hui";
-    if (diff === 1) return 'Hier';
+    if (diff === 0) return tc('today');
+    if (diff === 1) return tc('yesterday');
     if (diff < 7) return `Il y a ${diff} jours`;
     if (diff < 30) return `Il y a ${Math.floor(diff / 7)} semaine(s)`;
     return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -244,10 +244,10 @@ export default function ApplicationsPage() {
                 <div>
                   <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-1.5 mb-2">
                     <SparklesIcon className="w-4 h-4 text-[#F7C700]" />
-                    <span className="text-white/90 text-sm font-medium">Suivi des candidatures</span>
+                    <span className="text-white/90 text-sm font-medium">{t('trackingTitle')}</span>
                   </div>
                   <h2 className="text-2xl lg:text-3xl font-bold text-white">
-                    {totalApplications} candidature{totalApplications > 1 ? 's' : ''}
+                    {t('applicationCount', { count: totalApplications })}
                   </h2>
                 </div>
               </div>
@@ -299,7 +299,7 @@ export default function ApplicationsPage() {
                 <stat.icon className="w-6 h-6" style={{ color: stat.color }} />
               </div>
               <p className="text-3xl font-bold text-gray-900">{stat.count}</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">{stat.label}</p>
+              <p className="text-sm text-gray-500 font-medium">{stat.label}</p>
             </button>
           ))}
         </div>
@@ -307,7 +307,7 @@ export default function ApplicationsPage() {
         {/* Filtres actifs */}
         {selectedStatus && (
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500 dark:text-gray-400">Filtre actif:</span>
+            <span className="text-sm text-gray-500">Filtre actif:</span>
             <button
               onClick={() => setSelectedStatus('')}
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium bg-[#6B46C1]/10 text-[#6B46C1] hover:bg-[#6B46C1]/20 transition-colors"
@@ -323,7 +323,7 @@ export default function ApplicationsPage() {
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
               <div className="w-16 h-16 border-4 border-[#6B46C1] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-gray-500">Chargement de vos candidatures...</p>
+              <p className="text-gray-500">{t('loading')}</p>
             </div>
           </div>
         ) : filteredApplications.length === 0 ? (
@@ -335,19 +335,19 @@ export default function ApplicationsPage() {
               <DocumentTextIcon className="w-12 h-12 text-[#6B46C1]" />
             </div>
             <h3 className="text-2xl font-bold text-gray-900 mb-3">
-              {selectedStatus ? 'Aucune candidature avec ce statut' : 'Aucune candidature'}
+              {selectedStatus ? t('noneWithStatus') : t('empty')}
             </h3>
             <p className="text-gray-500 mb-8 max-w-md mx-auto">
               {selectedStatus
-                ? 'Essayez de retirer le filtre pour voir toutes vos candidatures.'
+                ? t('tryRemoveFilter')
                 : t('empty')}
             </p>
             {selectedStatus ? (
               <button
                 onClick={() => setSelectedStatus('')}
-                className="px-8 py-4 rounded-xl font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
+                className="px-8 py-4 rounded-xl font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all"
               >
-                Voir toutes les candidatures
+                {t('viewAll')}
               </button>
             ) : (
               <Link
@@ -355,7 +355,7 @@ export default function ApplicationsPage() {
                 className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-semibold bg-gradient-to-r from-[#6B46C1] to-[#5b3aa1] text-white shadow-lg shadow-[#6B46C1]/30 hover:shadow-xl hover:shadow-[#6B46C1]/40 transition-all"
               >
                 <BriefcaseIcon className="w-5 h-5" />
-                <span>Découvrir les offres</span>
+                <span>{t('discoverJobs')}</span>
               </Link>
             )}
           </div>
@@ -395,7 +395,7 @@ export default function ApplicationsPage() {
                             </span>
                           </div>
 
-                          <p className="text-sm text-gray-600 dark:text-gray-400 font-medium dark:text-gray-300 mb-3 flex items-center gap-1">
+                          <p className="text-sm text-gray-600 font-medium mb-3 flex items-center gap-1">
                             {application.job.company_name}
                             {application.job.company_is_verified && (
                               <CheckBadgeIcon className="w-4 h-4 text-[#6B9B5F]" title="Entreprise vérifiée" />
@@ -476,7 +476,7 @@ export default function ApplicationsPage() {
                     {/* Notes */}
                     {application.notes && (
                       <div className="mt-3 pt-3 border-t border-gray-100">
-                        <p className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 rounded-xl p-4">
+                        <p className="text-sm text-gray-600 bg-gray-50 rounded-xl p-4">
                           <span className="font-semibold text-gray-700">Notes:</span> {application.notes}
                         </p>
                       </div>

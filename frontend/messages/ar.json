@@ -178,7 +178,26 @@
       "keepGoing": "واصل!",
       "toComplete": "للإكمال",
       "addedCount": "تمت إضافة {count}"
-    }
+    },
+    "completeProfile": "استكمال ملفي الشخصي",
+    "processingCV": "جارٍ المعالجة...",
+    "uploadCVHint": "PDF فقط (الحد الأقصى 5 ميغابايت)",
+    "newJobsCount": "{count} وظيفة(وظائف) جديدة",
+    "browseOpportunities": "تصفح الفرص",
+    "exporting": "جارٍ الإنشاء...",
+    "exportReport": "تصدير تقرير PDF",
+    "exportReportHint": "الإحصائيات والملف الكامل",
+    "exportReportEmployerHint": "الوظائف والطلبات ومؤشرات الأداء",
+    "myCV": "عرض جميع سيرتي الذاتية",
+    "manageDocsHint": "إدارة وثائقي",
+    "createCV": "إنشاء سيرة ذاتية",
+    "cvBuilderHint": "منشئ السيرة الذاتية الاحترافي",
+    "postJob": "نشر وظيفة",
+    "postJobHint": "إنشاء منصب جديد",
+    "viewApplications": "عرض الطلبات",
+    "viewApplicationsHint": "الطلبات المستلمة",
+    "manageInterviews": "إدارة المقابلات",
+    "manageInterviewsHint": "المقابلات المجدولة"
   },
   "jobs": {
     "title": "فرص العمل",
@@ -257,7 +276,18 @@
     "subtitle": "تتبع طلباتك",
     "viewJob": "عرض الوظيفة",
     "addNote": "أضف ملاحظة...",
-    "yourApplications": "طلباتك"
+    "yourApplications": "طلباتك",
+    "trackingTitle": "تتبع الطلبات",
+    "applicationCount": "{count} طلب(طلبات)",
+    "loading": "جارٍ تحميل طلباتك...",
+    "noneWithStatus": "لا توجد طلبات بهذا الحالة",
+    "tryRemoveFilter": "حاول إزالة الفلتر لرؤية جميع طلباتك.",
+    "viewAll": "عرض جميع الطلبات",
+    "discoverJobs": "اكتشف الوظائف",
+    "removeTitle": "سحب هذا الطلب؟",
+    "removeMessage": "أنت على وشك سحب طلبك. لا يمكن التراجع عن هذا الإجراء.",
+    "remove": "سحب",
+    "errorLoading": "خطأ في تحميل الطلبات"
   },
   "profile": {
     "title": "ملفي الشخصي",

@@ -178,7 +178,26 @@
       "keepGoing": "Continue!",
       "toComplete": "A completar",
       "addedCount": "{count} adicionado(s)"
-    }
+    },
+    "completeProfile": "Completar meu perfil",
+    "processingCV": "Processando...",
+    "uploadCVHint": "Apenas PDF (máx 5 MB)",
+    "newJobsCount": "{count} nova(s) vaga(s)",
+    "browseOpportunities": "Explorar oportunidades",
+    "exporting": "Gerando...",
+    "exportReport": "Exportar relatório PDF",
+    "exportReportHint": "Estatísticas e perfil completo",
+    "exportReportEmployerHint": "Vagas, candidaturas e KPIs",
+    "myCV": "Ver todos os meus CVs",
+    "manageDocsHint": "Gerenciar meus documentos",
+    "createCV": "Criar um CV",
+    "cvBuilderHint": "CV Builder profissional",
+    "postJob": "Publicar uma vaga",
+    "postJobHint": "Criar uma nova posição",
+    "viewApplications": "Ver candidaturas",
+    "viewApplicationsHint": "Candidaturas recebidas",
+    "manageInterviews": "Gerenciar entrevistas",
+    "manageInterviewsHint": "Entrevistas agendadas"
   },
   "jobs": {
     "title": "Vagas de emprego",
@@ -257,7 +276,18 @@
     "subtitle": "Acompanhe as suas candidaturas",
     "viewJob": "Ver vaga",
     "addNote": "Adicionar nota...",
-    "yourApplications": "As suas candidaturas"
+    "yourApplications": "As suas candidaturas",
+    "trackingTitle": "Acompanhamento de candidaturas",
+    "applicationCount": "{count} candidatura(s)",
+    "loading": "Carregando suas candidaturas...",
+    "noneWithStatus": "Nenhuma candidatura com este status",
+    "tryRemoveFilter": "Tente remover o filtro para ver todas as suas candidaturas.",
+    "viewAll": "Ver todas as candidaturas",
+    "discoverJobs": "Descobrir vagas",
+    "removeTitle": "Retirar esta candidatura?",
+    "removeMessage": "Você está prestes a retirar sua candidatura. Esta ação não pode ser desfeita.",
+    "remove": "Retirar",
+    "errorLoading": "Erro ao carregar candidaturas"
   },
   "profile": {
     "title": "Meu perfil",

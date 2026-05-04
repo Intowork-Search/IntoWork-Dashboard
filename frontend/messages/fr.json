@@ -178,7 +178,26 @@
       "keepGoing": "Continuez !",
       "toComplete": "À compléter",
       "addedCount": "{count} ajouté(s)"
-    }
+    },
+    "completeProfile": "Compléter mon profil",
+    "processingCV": "Traitement en cours",
+    "uploadCVHint": "PDF uniquement (max 5 Mo)",
+    "newJobsCount": "{count} nouvelle(s) offre(s)",
+    "browseOpportunities": "Parcourir les opportunités",
+    "exporting": "Génération...",
+    "exportReport": "Exporter rapport PDF",
+    "exportReportHint": "Statistiques et profil complet",
+    "exportReportEmployerHint": "Offres, candidatures et KPIs",
+    "myCV": "Voir tous mes CV",
+    "manageDocsHint": "Gérer mes documents",
+    "createCV": "Créer un CV",
+    "cvBuilderHint": "CV Builder professionnel",
+    "postJob": "Publier une offre",
+    "postJobHint": "Créer un nouveau poste",
+    "viewApplications": "Voir les candidatures",
+    "viewApplicationsHint": "Candidatures reçues",
+    "manageInterviews": "Gérer les entretiens",
+    "manageInterviewsHint": "Entretiens planifiés"
   },
   "jobs": {
     "title": "Offres d'emploi",
@@ -257,7 +276,18 @@
     "subtitle": "Suivez vos candidatures",
     "viewJob": "Voir l'offre",
     "addNote": "Ajouter une note...",
-    "yourApplications": "Vos candidatures"
+    "yourApplications": "Vos candidatures",
+    "trackingTitle": "Suivi des candidatures",
+    "applicationCount": "{count} candidature(s)",
+    "loading": "Chargement de vos candidatures...",
+    "noneWithStatus": "Aucune candidature avec ce statut",
+    "tryRemoveFilter": "Essayez de retirer le filtre pour voir toutes vos candidatures.",
+    "viewAll": "Voir toutes les candidatures",
+    "discoverJobs": "Découvrir les offres",
+    "removeTitle": "Retirer cette candidature ?",
+    "removeMessage": "Vous allez retirer votre candidature. Vous ne pourrez pas la rétablir.",
+    "remove": "Retirer",
+    "errorLoading": "Erreur lors du chargement"
   },
   "profile": {
     "title": "Mon profil",

@@ -178,7 +178,26 @@
       "keepGoing": "Keep going!",
       "toComplete": "To complete",
       "addedCount": "{count} added"
-    }
+    },
+    "completeProfile": "Complete my profile",
+    "processingCV": "Processing...",
+    "uploadCVHint": "PDF only (max 5 MB)",
+    "newJobsCount": "{count} new job(s)",
+    "browseOpportunities": "Browse opportunities",
+    "exporting": "Generating...",
+    "exportReport": "Export PDF report",
+    "exportReportHint": "Statistics and full profile",
+    "exportReportEmployerHint": "Jobs, applications and KPIs",
+    "myCV": "View all my CVs",
+    "manageDocsHint": "Manage my documents",
+    "createCV": "Create a CV",
+    "cvBuilderHint": "Professional CV Builder",
+    "postJob": "Post a job",
+    "postJobHint": "Create a new position",
+    "viewApplications": "View applications",
+    "viewApplicationsHint": "Received applications",
+    "manageInterviews": "Manage interviews",
+    "manageInterviewsHint": "Scheduled interviews"
   },
   "jobs": {
     "title": "Job Offers",
@@ -257,7 +276,18 @@
     "subtitle": "Track your applications",
     "viewJob": "View job",
     "addNote": "Add a note...",
-    "yourApplications": "Your applications"
+    "yourApplications": "Your applications",
+    "trackingTitle": "Application tracking",
+    "applicationCount": "{count} application(s)",
+    "loading": "Loading your applications...",
+    "noneWithStatus": "No applications with this status",
+    "tryRemoveFilter": "Try removing the filter to see all your applications.",
+    "viewAll": "View all applications",
+    "discoverJobs": "Discover jobs",
+    "removeTitle": "Withdraw this application?",
+    "removeMessage": "You are about to withdraw your application. This cannot be undone.",
+    "remove": "Withdraw",
+    "errorLoading": "Error loading applications"
   },
   "profile": {
     "title": "My Profile",

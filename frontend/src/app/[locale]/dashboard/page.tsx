@@ -499,7 +499,7 @@ export default function Dashboard() {
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#F7C700] to-[#e5b800] flex items-center justify-center shadow-lg shadow-[#F7C700]/20">
                 <RocketLaunchIcon className="w-5 h-5 text-white" />
               </div>
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white">Actions rapides</h2>
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white">{t('quickActions')}</h2>
             </div>
           </div>
 
@@ -517,7 +517,7 @@ export default function Dashboard() {
                       <UserIcon className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900 dark:text-white">Compléter mon profil</p>
+                      <p className="font-semibold text-gray-900 dark:text-white">{t('completeProfile')}</p>
                       <div className="flex items-center gap-2 mt-1">
                         <div className="w-20 h-1.5 bg-gray-200 rounded-full overflow-hidden">
                           <div
@@ -545,10 +545,10 @@ export default function Dashboard() {
                     </div>
                     <div>
                       <p className="font-semibold text-gray-900 dark:text-white">
-                        {isUploadingCV ? 'Téléchargement...' : 'Télécharger un CV'}
+                        {isUploadingCV ? t('uploading') : t('uploadCV')}
                       </p>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                        {isUploadingCV ? 'Traitement en cours' : 'PDF uniquement (max 5MB)'}
+                        {isUploadingCV ? t('processingCV') : t('uploadCVHint')}
                       </p>
                     </div>
                   </div>
@@ -566,11 +566,11 @@ export default function Dashboard() {
                       <BriefcaseIcon className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900 dark:text-white">Rechercher des emplois</p>
+                      <p className="font-semibold text-gray-900 dark:text-white">{t('searchJobs')}</p>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                         {recentJobsCount > 0
-                          ? <span className="text-[#6B46C1] font-medium">{recentJobsCount} nouvelle{recentJobsCount > 1 ? 's' : ''} offre{recentJobsCount > 1 ? 's' : ''}</span>
-                          : 'Parcourir les opportunités'
+                          ? <span className="text-[#6B46C1] font-medium">{t('newJobsCount', { count: recentJobsCount })}</span>
+                          : t('browseOpportunities')
                         }
                       </p>
                     </div>
@@ -597,9 +597,9 @@ export default function Dashboard() {
                     </div>
                     <div>
                       <p className="font-semibold text-gray-900 dark:text-white">
-                        {isExportingPDF ? 'Generation...' : 'Exporter rapport PDF'}
+                        {isExportingPDF ? t('exporting') : t('exportReport')}
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Statistiques et profil complet</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{t('exportReportHint')}</p>
                     </div>
                   </div>
                   <ArrowRightIcon className="w-5 h-5 text-[#3B82F6] opacity-0 group-hover:opacity-100 transform translate-x-0 group-hover:translate-x-1 transition-all" />
@@ -616,8 +616,8 @@ export default function Dashboard() {
                       <DocumentTextIcon className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900 dark:text-white">Voir tous mes CV</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Gérer mes documents</p>
+                      <p className="font-semibold text-gray-900 dark:text-white">{t('myCV')}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{t('manageDocsHint')}</p>
                     </div>
                   </div>
                   <ArrowRightIcon className="w-5 h-5 text-gray-400 dark:text-gray-500 opacity-0 group-hover:opacity-100 transform translate-x-0 group-hover:translate-x-1 transition-all" />
@@ -633,8 +633,8 @@ export default function Dashboard() {
                       <PlusCircleIcon className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <p className="font-semibold text-white">Créer un CV</p>
-                      <p className="text-xs text-white/70 mt-0.5">CV Builder professionnel</p>
+                      <p className="font-semibold text-white">{t('createCV')}</p>
+                      <p className="text-xs text-white/70 mt-0.5">{t('cvBuilderHint')}</p>
                     </div>
                   </div>
                   <ArrowRightIcon className="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transform translate-x-0 group-hover:translate-x-1 transition-all" />
@@ -653,8 +653,8 @@ export default function Dashboard() {
                       <PlusCircleIcon className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900 dark:text-white">Publier une offre</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Créer un nouveau poste</p>
+                      <p className="font-semibold text-gray-900 dark:text-white">{t('postJob')}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{t('postJobHint')}</p>
                     </div>
                   </div>
                   <ArrowRightIcon className="w-5 h-5 text-[#6B9B5F] opacity-0 group-hover:opacity-100 transform translate-x-0 group-hover:translate-x-1 transition-all" />
@@ -671,8 +671,8 @@ export default function Dashboard() {
                       <UserIcon className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900 dark:text-white">Voir les candidatures</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Candidatures reçues</p>
+                      <p className="font-semibold text-gray-900 dark:text-white">{t('viewApplications')}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{t('viewApplicationsHint')}</p>
                     </div>
                   </div>
                   <ArrowRightIcon className="w-5 h-5 text-[#F7C700] opacity-0 group-hover:opacity-100 transform translate-x-0 group-hover:translate-x-1 transition-all" />
@@ -689,8 +689,8 @@ export default function Dashboard() {
                       <ChartBarIcon className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900 dark:text-white">Gérer les entretiens</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Entretiens planifiés</p>
+                      <p className="font-semibold text-gray-900 dark:text-white">{t('manageInterviews')}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{t('manageInterviewsHint')}</p>
                     </div>
                   </div>
                   <ArrowRightIcon className="w-5 h-5 text-[#6B46C1] opacity-0 group-hover:opacity-100 transform translate-x-0 group-hover:translate-x-1 transition-all" />
@@ -708,9 +708,9 @@ export default function Dashboard() {
                     </div>
                     <div>
                       <p className="font-semibold text-gray-900 dark:text-white">
-                        {isExportingPDF ? 'Generation...' : 'Exporter rapport PDF'}
+                        {isExportingPDF ? t('exporting') : t('exportReport')}
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Offres, candidatures et KPIs</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{t('exportReportEmployerHint')}</p>
                     </div>
                   </div>
                   <ArrowRightIcon className="w-5 h-5 text-[#3B82F6] opacity-0 group-hover:opacity-100 transform translate-x-0 group-hover:translate-x-1 transition-all" />

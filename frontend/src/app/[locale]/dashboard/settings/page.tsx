@@ -534,7 +534,7 @@ export default function SettingsPage() {
                       type="text"
                       value={profileData.first_name}
                       onChange={(e) => setProfileData(prev => ({ ...prev, first_name: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                       placeholder="Votre prénom"
                     />
                   </div>
@@ -548,7 +548,7 @@ export default function SettingsPage() {
                       type="text"
                       value={profileData.last_name}
                       onChange={(e) => setProfileData(prev => ({ ...prev, last_name: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                       placeholder="Votre nom"
                     />
                   </div>
@@ -562,7 +562,7 @@ export default function SettingsPage() {
                       type="tel"
                       value={profileData.phone}
                       onChange={(e) => setProfileData(prev => ({ ...prev, phone: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                       placeholder="Votre numéro de téléphone"
                     />
                   </div>
@@ -576,7 +576,7 @@ export default function SettingsPage() {
                       type="text"
                       value={profileData.location}
                       onChange={(e) => setProfileData(prev => ({ ...prev, location: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                       placeholder="Votre ville ou région"
                     />
                   </div>
@@ -590,7 +590,7 @@ export default function SettingsPage() {
                       rows={4}
                       value={profileData.bio}
                       onChange={(e) => setProfileData(prev => ({ ...prev, bio: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 resize-none text-gray-900 placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 resize-none text-gray-900 placeholder-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                       placeholder="Décrivez votre profil professionnel, vos compétences et vos objectifs..."
                     />
                   </div>
@@ -604,7 +604,7 @@ export default function SettingsPage() {
                       type="url"
                       value={profileData.website}
                       onChange={(e) => setProfileData(prev => ({ ...prev, website: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                       placeholder="https://monsite.com"
                     />
                   </div>
@@ -618,7 +618,7 @@ export default function SettingsPage() {
                       type="url"
                       value={profileData.linkedin_url}
                       onChange={(e) => setProfileData(prev => ({ ...prev, linkedin_url: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                       placeholder="https://linkedin.com/in/monprofil"
                     />
                   </div>
@@ -632,7 +632,7 @@ export default function SettingsPage() {
                       type="url"
                       value={profileData.github_url}
                       onChange={(e) => setProfileData(prev => ({ ...prev, github_url: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                       placeholder="https://github.com/monprofil"
                     />
                   </div>
@@ -674,7 +674,7 @@ export default function SettingsPage() {
                       type="text"
                       value={companyData.name}
                       onChange={(e) => setCompanyData(prev => ({ ...prev, name: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                       placeholder="Nom de votre entreprise"
                     />
                   </div>
@@ -688,7 +688,7 @@ export default function SettingsPage() {
                       value={companyData.description}
                       onChange={(e) => setCompanyData(prev => ({ ...prev, description: e.target.value }))}
                       rows={4}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                       placeholder="Décrivez votre entreprise, votre mission et votre culture..."
                     />
                   </div>
@@ -702,7 +702,7 @@ export default function SettingsPage() {
                       type="text"
                       value={companyData.industry}
                       onChange={(e) => setCompanyData(prev => ({ ...prev, industry: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                       placeholder="ex: Technologie, Finance, Santé..."
                     />
                   </div>
@@ -736,7 +736,7 @@ export default function SettingsPage() {
                       type="url"
                       value={companyData.website_url}
                       onChange={(e) => setCompanyData(prev => ({ ...prev, website_url: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                       placeholder="https://www.votresite.com"
                     />
                   </div>
@@ -750,7 +750,7 @@ export default function SettingsPage() {
                       type="url"
                       value={companyData.linkedin_url}
                       onChange={(e) => setCompanyData(prev => ({ ...prev, linkedin_url: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                       placeholder="https://linkedin.com/company/..."
                     />
                   </div>
@@ -764,7 +764,7 @@ export default function SettingsPage() {
                       type="text"
                       value={companyData.address}
                       onChange={(e) => setCompanyData(prev => ({ ...prev, address: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                       placeholder="Adresse complète"
                     />
                   </div>
@@ -778,7 +778,7 @@ export default function SettingsPage() {
                       type="text"
                       value={companyData.city}
                       onChange={(e) => setCompanyData(prev => ({ ...prev, city: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                       placeholder="Ville"
                     />
                   </div>
@@ -792,7 +792,7 @@ export default function SettingsPage() {
                       type="text"
                       value={companyData.country}
                       onChange={(e) => setCompanyData(prev => ({ ...prev, country: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                       placeholder="Pays"
                     />
                   </div>
