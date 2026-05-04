@@ -37,7 +37,8 @@ import {
   ArrowTrendingUpIcon,
   ChatBubbleLeftRightIcon,
 } from '@heroicons/react/24/outline';
-import { StarIcon } from '@heroicons/react/24/solid';
+import { StarIcon, CheckBadgeIcon } from '@heroicons/react/24/solid';
+import ApplicationTimeline from '@/components/ui/ApplicationTimeline';
 
 export default function ApplicationsPage() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -391,8 +392,11 @@ export default function ApplicationsPage() {
                             </span>
                           </div>
 
-                          <p className="text-sm text-gray-600 font-medium mb-3">
+                          <p className="text-sm text-gray-600 font-medium mb-3 flex items-center gap-1">
                             {application.job.company_name}
+                            {application.job.company_is_verified && (
+                              <CheckBadgeIcon className="w-4 h-4 text-[#6B9B5F]" title="Entreprise vérifiée" />
+                            )}
                           </p>
 
                           {/* Tags et infos */}
@@ -463,9 +467,12 @@ export default function ApplicationsPage() {
                       </div>
                     </div>
 
+                    {/* Timeline de progression */}
+                    <ApplicationTimeline status={application.status} />
+
                     {/* Notes */}
                     {application.notes && (
-                      <div className="mt-4 pt-4 border-t border-gray-100">
+                      <div className="mt-3 pt-3 border-t border-gray-100">
                         <p className="text-sm text-gray-600 bg-gray-50 rounded-xl p-4">
                           <span className="font-semibold text-gray-700">Notes:</span> {application.notes}
                         </p>

@@ -43,6 +43,14 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} dir={dir}>
+      <head>
+        {/* Script anti-flash : applique le thème avant le premier rendu */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('intowork-theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})()`
+          }}
+        />
+      </head>
       <body className={`${inter.variable} font-sans antialiased bg-gray-50`}>
         <NextIntlClientProvider messages={messages}>
           <QueryProvider>

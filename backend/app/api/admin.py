@@ -587,3 +587,39 @@ async def create_user_by_admin(
         is_active=new_user.is_active,
         created_at=new_user.created_at,
     )
+
+
+# ==================== COMPANY VERIFICATION ====================
+
+class CompanyVerifyResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    name: str
+    is_verified: bool
+    verified_at: Optional[datetime]
+
+
+@router.patch("/companies/{company_id}/verify", response_model=CompanyVerifyResponse)
+async def toggle_company_verification(
+    company_id: int,
+    db: AsyncSession = Depends(get_db),
+    admin: User = Depends(require_admin)
+) -> CompanyVerifyResponse:
+    """Toggle le statut de vérification d'une entreprise."""
+    result = await db.execute(select(Company).filter(Company.id == company_id))
+    company = result.scalar_one_or_none()
+    if not company:
+        raise HTTPException(status_code=404, detail="Entreprise introuvable")
+
+    company.is_verified = not company.is_verified
+    company.verified_at = datetime.utcnow() if company.is_verified else None
+    await db.commit()
+    await db.refresh(company)
+
+    return CompanyVerifyResponse(
+        id=company.id,
+        name=company.name,
+        is_verified=company.is_verified,
+        verified_at=company.verified_at,
+    )

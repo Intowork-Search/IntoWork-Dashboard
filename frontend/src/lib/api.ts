@@ -387,6 +387,7 @@ export interface Job {
   description: string;
   company_name: string;
   company_logo_url?: string;
+  company_is_verified?: boolean;
   location?: string;
   location_type: 'on_site' | 'remote' | 'hybrid';
   job_type: 'full_time' | 'part_time' | 'contract' | 'temporary' | 'internship';

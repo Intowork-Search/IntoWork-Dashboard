@@ -172,6 +172,10 @@ class Company(Base):
     logo_url = Column(String)
     cloudinary_id = Column(String)  # Cloudinary public_id pour gestion optimisée des images
 
+    # Vérification
+    is_verified = Column(Boolean, default=False, nullable=False)
+    verified_at = Column(DateTime(timezone=True), nullable=True)
+
     # Intégration Targetym
     targetym_tenant_id = Column(Integer, nullable=True, index=True)  # ID du tenant lié sur Targetym
     targetym_api_key = Column(String, nullable=True)  # Clé API Targetym — chiffrée via encryption.py

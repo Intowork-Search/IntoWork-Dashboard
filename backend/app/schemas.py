@@ -490,9 +490,7 @@ class JobResponse(BaseModel):
     description: str
     company_name: str
     company_logo_url: Optional[str] = None
-    location: Optional[str] = None
-    location_type: str
-    job_type: str
+    company_is_verified: bool = False
     salary_min: Optional[int] = None
     salary_max: Optional[int] = None
     currency: str = "XAF"
@@ -549,6 +547,7 @@ class JobDataInApplication(BaseModel):
     id: int
     title: str
     company_name: str
+    company_is_verified: bool = False
     location: Optional[str] = None
     location_type: Optional[str] = None
     job_type: Optional[str] = None

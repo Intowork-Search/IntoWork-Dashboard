@@ -17,6 +17,7 @@ import {
   ArrowLeftIcon,
   CheckCircleIcon
 } from '@heroicons/react/24/outline';
+import { CheckBadgeIcon } from '@heroicons/react/24/solid';
 
 interface JobDetail {
   id: number;
@@ -24,6 +25,7 @@ interface JobDetail {
   description: string;
   company_name: string;
   company_logo_url?: string;
+  company_is_verified?: boolean;
   location?: string;
   location_type: 'on_site' | 'remote' | 'hybrid';
   job_type: 'full_time' | 'part_time' | 'contract' | 'temporary' | 'internship';
@@ -197,6 +199,9 @@ export default function JobDetailPage() {
                   <div className="flex items-center gap-1">
                     <BuildingOfficeIcon className="w-5 h-5" />
                     <span className="font-medium">{job.company_name}</span>
+                    {job.company_is_verified && (
+                      <CheckBadgeIcon className="w-5 h-5 text-[#6B9B5F]" title="Entreprise vérifiée" />
+                    )}
                   </div>
                   {job.location && (
                     <div className="flex items-center gap-1">

@@ -472,7 +472,12 @@ export default function JobsPage() {
                             </div>
                           )}
                         </div>
-                        <p className="text-sm text-gray-500 mt-0.5">{job.company_name}</p>
+                        <p className="text-sm text-gray-500 mt-0.5 flex items-center gap-1">
+                          {job.company_name}
+                          {job.company_is_verified && (
+                            <CheckBadgeIcon className="w-4 h-4 text-[#6B9B5F]" title="Entreprise vérifiée" />
+                          )}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -661,7 +666,12 @@ export default function JobsPage() {
                     Postuler pour ce poste
                   </h2>
                   <p className="text-gray-500">{selectedJob.title}</p>
-                  <p className="text-[#6B9B5F] font-medium">{selectedJob.company_name}</p>
+                  <p className="text-[#6B9B5F] font-medium flex items-center gap-1">
+                    {selectedJob.company_name}
+                    {selectedJob.company_is_verified && (
+                      <CheckBadgeIcon className="w-4 h-4 text-[#6B9B5F]" title="Entreprise vérifiée" />
+                    )}
+                  </p>
                 </div>
               </div>
             </div>
