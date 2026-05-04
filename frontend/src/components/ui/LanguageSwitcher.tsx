@@ -2,8 +2,8 @@
 
 import { useTransition } from 'react';
 import { useLocale } from 'next-intl';
-import { useRouter, usePathname } from 'next/navigation';
-import { routing, type Locale } from '@/i18n/routing';
+import { useRouter, usePathname } from '@/i18n/navigation';
+import { type Locale } from '@/i18n/routing';
 
 const LANGUAGE_LABELS: Record<Locale, { label: string; flag: string }> = {
   fr: { label: 'Français', flag: '🇫🇷' },
@@ -24,27 +24,7 @@ export default function LanguageSwitcher() {
     if (newLocale === locale) return;
 
     startTransition(() => {
-      // Construire le nouveau chemin en remplaçant le préfixe de locale
-      const nonDefault = routing.locales.filter(l => l !== routing.defaultLocale);
-
-      let pathWithoutLocale = pathname;
-      // Retirer le préfixe de la locale actuelle si présent
-      for (const l of nonDefault) {
-        if (pathname.startsWith(`/${l}/`)) {
-          pathWithoutLocale = pathname.slice(`/${l}`.length);
-          break;
-        } else if (pathname === `/${l}`) {
-          pathWithoutLocale = '/';
-          break;
-        }
-      }
-
-      // Ajouter le préfixe de la nouvelle locale (sauf si c'est le défaut)
-      const newPath = newLocale === routing.defaultLocale
-        ? pathWithoutLocale
-        : `/${newLocale}${pathWithoutLocale}`;
-
-      router.push(newPath);
+      router.replace(pathname, { locale: newLocale });
     });
   }
 
