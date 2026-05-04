@@ -255,9 +255,9 @@ export default function Dashboard() {
   // Fonction pour obtenir l'heure de la journée
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return 'Bonjour';
-    if (hour < 18) return 'Bon après-midi';
-    return 'Bonsoir';
+    if (hour < 12) return t('greetMorning');
+    if (hour < 18) return t('greetAfternoon');
+    return t('greetEvening');
   };
 
   // Configuration des stats cards
@@ -294,27 +294,27 @@ export default function Dashboard() {
   // Stats pour candidats
   const candidateStats = [
     {
-      title: 'Profil complété',
+      title: t('stats.profileCompletion'),
       value: `${profileCompletion}%`,
-      subtitle: profileCompletion === 100 ? 'Excellent !' : 'Continuez !',
+      subtitle: profileCompletion === 100 ? t('stats.excellent') : t('stats.keepGoing'),
       icon: UserIcon
     },
     {
-      title: 'Expériences',
+      title: t('stats.experiences'),
       value: experiencesCount.toString(),
-      subtitle: experiencesCount > 0 ? `${experiencesCount} ajoutée${experiencesCount > 1 ? 's' : ''}` : 'À compléter',
+      subtitle: experiencesCount > 0 ? t('stats.addedCount', { count: experiencesCount }) : t('stats.toComplete'),
       icon: BriefcaseIcon
     },
     {
-      title: 'Formations',
+      title: t('stats.education'),
       value: educationCount.toString(),
-      subtitle: educationCount > 0 ? `${educationCount} ajoutée${educationCount > 1 ? 's' : ''}` : 'À compléter',
+      subtitle: educationCount > 0 ? t('stats.addedCount', { count: educationCount }) : t('stats.toComplete'),
       icon: AcademicCapIcon
     },
     {
-      title: 'Compétences',
+      title: t('stats.skills'),
       value: skillsCount.toString(),
-      subtitle: skillsCount > 0 ? `${skillsCount} ajoutée${skillsCount > 1 ? 's' : ''}` : 'À compléter',
+      subtitle: skillsCount > 0 ? t('stats.addedCount', { count: skillsCount }) : t('stats.toComplete'),
       icon: WrenchScrewdriverIcon
     }
   ];
@@ -325,7 +325,7 @@ export default function Dashboard() {
   return (
     <DashboardLayout
       title={t('title')}
-      subtitle={userRole === 'candidate' ? 'Votre espace candidat' : 'Votre espace employeur'}
+      subtitle={userRole === 'candidate' ? t('candidateSubtitle') : t('employerSubtitle')}
     >
       {/* Hero Section avec message de bienvenue */}
       <div
@@ -342,16 +342,16 @@ export default function Dashboard() {
             <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 mb-4">
               <SparklesIcon className="w-5 h-5 text-[#F7C700]" />
               <span className="text-white/90 text-sm font-medium">
-                {userRole === 'candidate' ? 'Espace Candidat' : 'Espace Employeur'}
+                {userRole === 'candidate' ? t('candidateSpace') : t('employerSpace')}
               </span>
             </div>
             <h2 className="text-3xl lg:text-4xl font-bold text-white mb-3">
-              Bienvenue sur votre Dashboard
+              {t('welcomeTitle')}
             </h2>
             <p className="text-white/80 text-lg max-w-xl">
               {userRole === 'candidate'
-                ? 'Gérez votre profil, explorez les opportunités et décrochez le poste de vos rêves.'
-                : 'Gérez vos offres d\'emploi et trouvez les meilleurs talents pour votre entreprise.'
+                ? t('candidateDescription')
+                : t('employerDescription')
               }
             </p>
           </div>
@@ -384,7 +384,7 @@ export default function Dashboard() {
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <span className="text-3xl font-bold text-white">{profileCompletion}%</span>
-                  <span className="text-white/70 text-sm">Profil</span>
+                  <span className="text-white/70 text-sm">{t('profileLabel')}</span>
                 </div>
               </div>
             </div>
@@ -426,20 +426,20 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Activité récente */}
         <div
-          className="lg:col-span-2 bg-white rounded-3xl shadow-lg shadow-gray-200/50 border border-gray-100 overflow-hidden"
+          className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-3xl shadow-lg shadow-gray-200/50 border border-gray-100 dark:border-gray-700 overflow-hidden"
           style={{ animation: 'fadeIn 0.6s ease-out 0.5s both' }}
         >
-          <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+          <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#6B46C1] to-[#5a3ba3] flex items-center justify-center shadow-lg shadow-[#6B46C1]/20">
                   <ClockIcon className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-gray-900">Activité récente</h2>
+                  <h2 className="text-lg font-bold text-gray-900 dark:text-white">{t('recentActivity')}</h2>
                   {lastUpdated && (
-                    <p className="text-xs text-gray-500">
-                      Mis à jour à {lastUpdated.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {t('updatedAt', { time: lastUpdated.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }) })}
                     </p>
                   )}
                 </div>
@@ -453,14 +453,14 @@ export default function Dashboard() {
                 {recentActivities.map((activity, index) => (
                   <div
                     key={activity.id}
-                    className="flex items-start gap-4 p-4 rounded-2xl bg-gray-50 hover:bg-gray-100 transition-colors"
+                    className="flex items-start gap-4 p-4 rounded-2xl bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 transition-colors"
                     style={{ animation: `fadeIn 0.4s ease-out ${0.1 * index}s both` }}
                   >
                     <div className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center ${
                       activity.type === 'application' ? 'bg-blue-100 text-blue-600' :
                       activity.type === 'view' ? 'bg-green-100 text-green-600' :
                       activity.type === 'interview' ? 'bg-purple-100 text-purple-600' :
-                      'bg-gray-100 text-gray-600'
+                      'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
                     }`}>
                       {activity.type === 'application' && <DocumentTextIcon className="w-5 h-5" />}
                       {activity.type === 'view' && <EyeIcon className="w-5 h-5" />}
@@ -468,22 +468,22 @@ export default function Dashboard() {
                       {(activity.type === 'update' || activity.type === 'job_post') && <BellIcon className="w-5 h-5" />}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm text-gray-900">
+                      <p className="text-sm text-gray-900 dark:text-white">
                         <span className="font-semibold">{activity.action}</span>
-                        <span className="text-gray-600 ml-1">{activity.target}</span>
+                        <span className="text-gray-600 dark:text-gray-400 ml-1">{activity.target}</span>
                       </p>
-                      <p className="text-xs text-gray-500 mt-1">{activity.time}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{activity.time}</p>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-center">
-                <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mb-4">
-                  <ClockIcon className="w-8 h-8 text-gray-400" />
+                <div className="w-16 h-16 rounded-2xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center mb-4">
+                  <ClockIcon className="w-8 h-8 text-gray-400 dark:text-gray-500" />
                 </div>
-                <p className="text-gray-500 font-medium">Aucune activité récente</p>
-                <p className="text-gray-400 text-sm mt-1">Vos actions apparaîtront ici</p>
+                <p className="text-gray-500 dark:text-gray-400 font-medium">{t('noActivity')}</p>
+                <p className="text-gray-400 dark:text-gray-500 text-sm mt-1">{t('actionsHint')}</p>
               </div>
             )}
           </div>
@@ -491,15 +491,15 @@ export default function Dashboard() {
 
         {/* Actions rapides */}
         <div
-          className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 border border-gray-100 overflow-hidden"
+          className="bg-white dark:bg-gray-800 rounded-3xl shadow-lg shadow-gray-200/50 border border-gray-100 dark:border-gray-700 overflow-hidden"
           style={{ animation: 'fadeIn 0.6s ease-out 0.6s both' }}
         >
-          <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+          <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#F7C700] to-[#e5b800] flex items-center justify-center shadow-lg shadow-[#F7C700]/20">
                 <RocketLaunchIcon className="w-5 h-5 text-white" />
               </div>
-              <h2 className="text-lg font-bold text-gray-900">Actions rapides</h2>
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white">Actions rapides</h2>
             </div>
           </div>
 
@@ -517,7 +517,7 @@ export default function Dashboard() {
                       <UserIcon className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900">Compléter mon profil</p>
+                      <p className="font-semibold text-gray-900 dark:text-white">Compléter mon profil</p>
                       <div className="flex items-center gap-2 mt-1">
                         <div className="w-20 h-1.5 bg-gray-200 rounded-full overflow-hidden">
                           <div
@@ -544,10 +544,10 @@ export default function Dashboard() {
                       <DocumentTextIcon className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900">
+                      <p className="font-semibold text-gray-900 dark:text-white">
                         {isUploadingCV ? 'Téléchargement...' : 'Télécharger un CV'}
                       </p>
-                      <p className="text-xs text-gray-500 mt-0.5">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                         {isUploadingCV ? 'Traitement en cours' : 'PDF uniquement (max 5MB)'}
                       </p>
                     </div>
@@ -566,8 +566,8 @@ export default function Dashboard() {
                       <BriefcaseIcon className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900">Rechercher des emplois</p>
-                      <p className="text-xs text-gray-500 mt-0.5">
+                      <p className="font-semibold text-gray-900 dark:text-white">Rechercher des emplois</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                         {recentJobsCount > 0
                           ? <span className="text-[#6B46C1] font-medium">{recentJobsCount} nouvelle{recentJobsCount > 1 ? 's' : ''} offre{recentJobsCount > 1 ? 's' : ''}</span>
                           : 'Parcourir les opportunités'
@@ -596,10 +596,10 @@ export default function Dashboard() {
                       <ChartBarIcon className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900">
+                      <p className="font-semibold text-gray-900 dark:text-white">
                         {isExportingPDF ? 'Generation...' : 'Exporter rapport PDF'}
                       </p>
-                      <p className="text-xs text-gray-500 mt-0.5">Statistiques et profil complet</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Statistiques et profil complet</p>
                     </div>
                   </div>
                   <ArrowRightIcon className="w-5 h-5 text-[#3B82F6] opacity-0 group-hover:opacity-100 transform translate-x-0 group-hover:translate-x-1 transition-all" />
@@ -609,18 +609,18 @@ export default function Dashboard() {
                 <button
                   data-tour="my-applications"
                   onClick={() => router.push('/dashboard/cv')}
-                  className="group w-full flex items-center justify-between p-4 text-left bg-gradient-to-r from-gray-100 to-gray-50 hover:from-gray-200 hover:to-gray-100 rounded-2xl transition-all duration-300 border border-gray-200"
+                  className="group w-full flex items-center justify-between p-4 text-left bg-gradient-to-r from-gray-100 to-gray-50 hover:from-gray-200 hover:to-gray-100 rounded-2xl transition-all duration-300 border border-gray-200 dark:border-gray-600"
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-gray-600 flex items-center justify-center shadow-md shadow-gray-400/30">
                       <DocumentTextIcon className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900">Voir tous mes CV</p>
-                      <p className="text-xs text-gray-500 mt-0.5">Gérer mes documents</p>
+                      <p className="font-semibold text-gray-900 dark:text-white">Voir tous mes CV</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Gérer mes documents</p>
                     </div>
                   </div>
-                  <ArrowRightIcon className="w-5 h-5 text-gray-400 opacity-0 group-hover:opacity-100 transform translate-x-0 group-hover:translate-x-1 transition-all" />
+                  <ArrowRightIcon className="w-5 h-5 text-gray-400 dark:text-gray-500 opacity-0 group-hover:opacity-100 transform translate-x-0 group-hover:translate-x-1 transition-all" />
                 </button>
 
                 {/* Créer un CV */}
@@ -653,8 +653,8 @@ export default function Dashboard() {
                       <PlusCircleIcon className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900">Publier une offre</p>
-                      <p className="text-xs text-gray-500 mt-0.5">Créer un nouveau poste</p>
+                      <p className="font-semibold text-gray-900 dark:text-white">Publier une offre</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Créer un nouveau poste</p>
                     </div>
                   </div>
                   <ArrowRightIcon className="w-5 h-5 text-[#6B9B5F] opacity-0 group-hover:opacity-100 transform translate-x-0 group-hover:translate-x-1 transition-all" />
@@ -671,8 +671,8 @@ export default function Dashboard() {
                       <UserIcon className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900">Voir les candidatures</p>
-                      <p className="text-xs text-gray-500 mt-0.5">Candidatures reçues</p>
+                      <p className="font-semibold text-gray-900 dark:text-white">Voir les candidatures</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Candidatures reçues</p>
                     </div>
                   </div>
                   <ArrowRightIcon className="w-5 h-5 text-[#F7C700] opacity-0 group-hover:opacity-100 transform translate-x-0 group-hover:translate-x-1 transition-all" />
@@ -689,8 +689,8 @@ export default function Dashboard() {
                       <ChartBarIcon className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900">Gérer les entretiens</p>
-                      <p className="text-xs text-gray-500 mt-0.5">Entretiens planifiés</p>
+                      <p className="font-semibold text-gray-900 dark:text-white">Gérer les entretiens</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Entretiens planifiés</p>
                     </div>
                   </div>
                   <ArrowRightIcon className="w-5 h-5 text-[#6B46C1] opacity-0 group-hover:opacity-100 transform translate-x-0 group-hover:translate-x-1 transition-all" />
@@ -707,10 +707,10 @@ export default function Dashboard() {
                       <DocumentTextIcon className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900">
+                      <p className="font-semibold text-gray-900 dark:text-white">
                         {isExportingPDF ? 'Generation...' : 'Exporter rapport PDF'}
                       </p>
-                      <p className="text-xs text-gray-500 mt-0.5">Offres, candidatures et KPIs</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Offres, candidatures et KPIs</p>
                     </div>
                   </div>
                   <ArrowRightIcon className="w-5 h-5 text-[#3B82F6] opacity-0 group-hover:opacity-100 transform translate-x-0 group-hover:translate-x-1 transition-all" />

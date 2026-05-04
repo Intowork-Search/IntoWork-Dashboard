@@ -449,7 +449,7 @@ export default function SettingsPage() {
               <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#6B9B5F]/20 border-t-[#6B9B5F] mx-auto"></div>
               <Cog6ToothIcon className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-6 h-6 text-[#6B9B5F]" />
             </div>
-            <p className="mt-4 text-gray-600 font-medium">Chargement des paramètres...</p>
+            <p className="mt-4 text-gray-600 dark:text-gray-400 font-medium">Chargement des paramètres...</p>
           </div>
         </div>
       </DashboardLayout>
@@ -463,9 +463,9 @@ export default function SettingsPage() {
         <div className="relative overflow-hidden bg-gradient-to-br from-[#6B9B5F] via-[#5a8a4f] to-[#6B46C1] rounded-b-[3rem] px-6 py-10 mb-8">
           {/* Decorative patterns */}
           <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-10 left-10 w-32 h-32 rounded-full bg-white"></div>
-            <div className="absolute bottom-10 right-20 w-48 h-48 rounded-full bg-white"></div>
-            <div className="absolute top-1/2 left-1/3 w-24 h-24 rounded-full bg-white"></div>
+            <div className="absolute top-10 left-10 w-32 h-32 rounded-full bg-white dark:bg-gray-800"></div>
+            <div className="absolute bottom-10 right-20 w-48 h-48 rounded-full bg-white dark:bg-gray-800"></div>
+            <div className="absolute top-1/2 left-1/3 w-24 h-24 rounded-full bg-white dark:bg-gray-800"></div>
           </div>
 
           <div className="relative z-10 max-w-4xl">
@@ -488,7 +488,7 @@ export default function SettingsPage() {
 
         <div className="px-6 pb-10 animate-fadeIn">
           {/* Tabs */}
-          <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-2 mb-8 border border-gray-100">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 p-2 mb-8 border border-gray-100 dark:border-gray-700">
             <nav className="flex gap-2">
               {tabs.map((tab) => (
                 <button
@@ -498,7 +498,7 @@ export default function SettingsPage() {
                   className={`flex-1 py-4 px-6 font-semibold text-sm flex items-center justify-center gap-2 rounded-2xl transition-all duration-300 ${
                     activeTab === tab.id
                       ? 'bg-gradient-to-r from-[#6B9B5F] to-[#6B46C1] text-white shadow-lg shadow-[#6B9B5F]/30'
-                      : 'text-gray-600 hover:bg-gray-50'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50'
                   }`}
                 >
                   <tab.icon className="w-5 h-5" />
@@ -509,7 +509,7 @@ export default function SettingsPage() {
           </div>
 
           {/* Content */}
-          <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 overflow-hidden border border-gray-100">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 overflow-hidden border border-gray-100 dark:border-gray-700">
             {/* Profile Tab */}
             {activeTab === 'profile' && (
               <div className="p-8 space-y-8">
@@ -518,14 +518,14 @@ export default function SettingsPage() {
                     <UserIcon className="w-8 h-8 text-[#6B9B5F]" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-gray-900">Informations personnelles</h3>
-                    <p className="text-gray-600">Mettez à jour vos informations de profil pour améliorer votre visibilité</p>
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Informations personnelles</h3>
+                    <p className="text-gray-600 dark:text-gray-400">Mettez à jour vos informations de profil pour améliorer votre visibilité</p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label htmlFor="first_name" className="block text-sm font-bold text-gray-800 mb-2">
+                    <label htmlFor="first_name" className="block text-sm font-bold text-gray-800 dark:text-gray-200 mb-2">
                       Prénom
                     </label>
                     <input
@@ -533,13 +533,13 @@ export default function SettingsPage() {
                       type="text"
                       value={profileData.first_name}
                       onChange={(e) => setProfileData(prev => ({ ...prev, first_name: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-400"
                       placeholder="Votre prénom"
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="last_name" className="block text-sm font-bold text-gray-800 mb-2">
+                    <label htmlFor="last_name" className="block text-sm font-bold text-gray-800 dark:text-gray-200 mb-2">
                       Nom
                     </label>
                     <input
@@ -547,13 +547,13 @@ export default function SettingsPage() {
                       type="text"
                       value={profileData.last_name}
                       onChange={(e) => setProfileData(prev => ({ ...prev, last_name: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-400"
                       placeholder="Votre nom"
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="phone" className="block text-sm font-bold text-gray-800 mb-2">
+                    <label htmlFor="phone" className="block text-sm font-bold text-gray-800 dark:text-gray-200 mb-2">
                       Téléphone
                     </label>
                     <input
@@ -561,13 +561,13 @@ export default function SettingsPage() {
                       type="tel"
                       value={profileData.phone}
                       onChange={(e) => setProfileData(prev => ({ ...prev, phone: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-400"
                       placeholder="Votre numéro de téléphone"
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="location" className="block text-sm font-bold text-gray-800 mb-2">
+                    <label htmlFor="location" className="block text-sm font-bold text-gray-800 dark:text-gray-200 mb-2">
                       Localisation
                     </label>
                     <input
@@ -575,13 +575,13 @@ export default function SettingsPage() {
                       type="text"
                       value={profileData.location}
                       onChange={(e) => setProfileData(prev => ({ ...prev, location: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-400"
                       placeholder="Votre ville ou région"
                     />
                   </div>
 
                   <div className="md:col-span-2">
-                    <label htmlFor="bio" className="block text-sm font-bold text-gray-800 mb-2">
+                    <label htmlFor="bio" className="block text-sm font-bold text-gray-800 dark:text-gray-200 mb-2">
                       Bio professionnelle
                     </label>
                     <textarea
@@ -589,13 +589,13 @@ export default function SettingsPage() {
                       rows={4}
                       value={profileData.bio}
                       onChange={(e) => setProfileData(prev => ({ ...prev, bio: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 resize-none text-gray-900 placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 resize-none text-gray-900 dark:text-white placeholder-gray-400"
                       placeholder="Décrivez votre profil professionnel, vos compétences et vos objectifs..."
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="website" className="block text-sm font-bold text-gray-800 mb-2">
+                    <label htmlFor="website" className="block text-sm font-bold text-gray-800 dark:text-gray-200 mb-2">
                       Site web personnel
                     </label>
                     <input
@@ -603,13 +603,13 @@ export default function SettingsPage() {
                       type="url"
                       value={profileData.website}
                       onChange={(e) => setProfileData(prev => ({ ...prev, website: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-400"
                       placeholder="https://monsite.com"
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="linkedin" className="block text-sm font-bold text-gray-800 mb-2">
+                    <label htmlFor="linkedin" className="block text-sm font-bold text-gray-800 dark:text-gray-200 mb-2">
                       Profil LinkedIn
                     </label>
                     <input
@@ -617,13 +617,13 @@ export default function SettingsPage() {
                       type="url"
                       value={profileData.linkedin_url}
                       onChange={(e) => setProfileData(prev => ({ ...prev, linkedin_url: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-400"
                       placeholder="https://linkedin.com/in/monprofil"
                     />
                   </div>
 
                   <div className="md:col-span-2">
-                    <label htmlFor="github" className="block text-sm font-bold text-gray-800 mb-2">
+                    <label htmlFor="github" className="block text-sm font-bold text-gray-800 dark:text-gray-200 mb-2">
                       Profil GitHub
                     </label>
                     <input
@@ -631,13 +631,13 @@ export default function SettingsPage() {
                       type="url"
                       value={profileData.github_url}
                       onChange={(e) => setProfileData(prev => ({ ...prev, github_url: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-400"
                       placeholder="https://github.com/monprofil"
                     />
                   </div>
                 </div>
 
-                <div className="pt-6 border-t border-gray-100 flex justify-end">
+                <div className="pt-6 border-t border-gray-100 dark:border-gray-700 flex justify-end">
                   <button
                     type="button"
                     onClick={updateProfile}
@@ -658,14 +658,14 @@ export default function SettingsPage() {
                     <BuildingOfficeIcon className="w-8 h-8 text-[#F7C700]" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-gray-900">Informations de l'entreprise</h3>
-                    <p className="text-gray-600">Mettez à jour les informations pour attirer les meilleurs talents</p>
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Informations de l'entreprise</h3>
+                    <p className="text-gray-600 dark:text-gray-400">Mettez à jour les informations pour attirer les meilleurs talents</p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="md:col-span-2">
-                    <label htmlFor="company_name" className="block text-sm font-bold text-gray-800 mb-2">
+                    <label htmlFor="company_name" className="block text-sm font-bold text-gray-800 dark:text-gray-200 mb-2">
                       Nom de l'entreprise *
                     </label>
                     <input
@@ -673,13 +673,13 @@ export default function SettingsPage() {
                       type="text"
                       value={companyData.name}
                       onChange={(e) => setCompanyData(prev => ({ ...prev, name: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-400"
                       placeholder="Nom de votre entreprise"
                     />
                   </div>
 
                   <div className="md:col-span-2">
-                    <label htmlFor="company_description" className="block text-sm font-bold text-gray-800 mb-2">
+                    <label htmlFor="company_description" className="block text-sm font-bold text-gray-800 dark:text-gray-200 mb-2">
                       Description
                     </label>
                     <textarea
@@ -687,13 +687,13 @@ export default function SettingsPage() {
                       value={companyData.description}
                       onChange={(e) => setCompanyData(prev => ({ ...prev, description: e.target.value }))}
                       rows={4}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-400"
                       placeholder="Décrivez votre entreprise, votre mission et votre culture..."
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="industry" className="block text-sm font-bold text-gray-800 mb-2">
+                    <label htmlFor="industry" className="block text-sm font-bold text-gray-800 dark:text-gray-200 mb-2">
                       Secteur d'activité
                     </label>
                     <input
@@ -701,20 +701,20 @@ export default function SettingsPage() {
                       type="text"
                       value={companyData.industry}
                       onChange={(e) => setCompanyData(prev => ({ ...prev, industry: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-400"
                       placeholder="ex: Technologie, Finance, Santé..."
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="size" className="block text-sm font-bold text-gray-800 mb-2">
+                    <label htmlFor="size" className="block text-sm font-bold text-gray-800 dark:text-gray-200 mb-2">
                       Taille de l'entreprise
                     </label>
                     <select
                       id="size"
                       value={companyData.size}
                       onChange={(e) => setCompanyData(prev => ({ ...prev, size: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900"
+                      className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 dark:text-white"
                     >
                       <option value="">Sélectionnez une taille</option>
                       <option value="1-10">1-10 employés</option>
@@ -727,7 +727,7 @@ export default function SettingsPage() {
                   </div>
 
                   <div>
-                    <label htmlFor="website_url" className="block text-sm font-bold text-gray-800 mb-2">
+                    <label htmlFor="website_url" className="block text-sm font-bold text-gray-800 dark:text-gray-200 mb-2">
                       Site web
                     </label>
                     <input
@@ -735,13 +735,13 @@ export default function SettingsPage() {
                       type="url"
                       value={companyData.website_url}
                       onChange={(e) => setCompanyData(prev => ({ ...prev, website_url: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-400"
                       placeholder="https://www.votresite.com"
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="company_linkedin" className="block text-sm font-bold text-gray-800 mb-2">
+                    <label htmlFor="company_linkedin" className="block text-sm font-bold text-gray-800 dark:text-gray-200 mb-2">
                       LinkedIn
                     </label>
                     <input
@@ -749,13 +749,13 @@ export default function SettingsPage() {
                       type="url"
                       value={companyData.linkedin_url}
                       onChange={(e) => setCompanyData(prev => ({ ...prev, linkedin_url: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-400"
                       placeholder="https://linkedin.com/company/..."
                     />
                   </div>
 
                   <div className="md:col-span-2">
-                    <label htmlFor="address" className="block text-sm font-bold text-gray-800 mb-2">
+                    <label htmlFor="address" className="block text-sm font-bold text-gray-800 dark:text-gray-200 mb-2">
                       Adresse
                     </label>
                     <input
@@ -763,13 +763,13 @@ export default function SettingsPage() {
                       type="text"
                       value={companyData.address}
                       onChange={(e) => setCompanyData(prev => ({ ...prev, address: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-400"
                       placeholder="Adresse complète"
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="city" className="block text-sm font-bold text-gray-800 mb-2">
+                    <label htmlFor="city" className="block text-sm font-bold text-gray-800 dark:text-gray-200 mb-2">
                       Ville
                     </label>
                     <input
@@ -777,13 +777,13 @@ export default function SettingsPage() {
                       type="text"
                       value={companyData.city}
                       onChange={(e) => setCompanyData(prev => ({ ...prev, city: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-400"
                       placeholder="Ville"
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="country" className="block text-sm font-bold text-gray-800 mb-2">
+                    <label htmlFor="country" className="block text-sm font-bold text-gray-800 dark:text-gray-200 mb-2">
                       Pays
                     </label>
                     <input
@@ -791,13 +791,13 @@ export default function SettingsPage() {
                       type="text"
                       value={companyData.country}
                       onChange={(e) => setCompanyData(prev => ({ ...prev, country: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-400"
                       placeholder="Pays"
                     />
                   </div>
 
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-bold text-gray-800 mb-2">
+                    <label className="block text-sm font-bold text-gray-800 dark:text-gray-200 mb-2">
                       Logo de l'entreprise
                     </label>
                     
@@ -807,11 +807,11 @@ export default function SettingsPage() {
                         <img
                           src={getUploadUrl(companyData.logo_url)}
                           alt="Logo actuel"
-                          className="w-20 h-20 object-contain rounded-lg border-2 border-gray-200"
+                          className="w-20 h-20 object-contain rounded-lg border-2 border-gray-200 dark:border-gray-600"
                         />
-                        <div className="text-sm text-gray-600">
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
                           <p className="font-medium">Logo actuel</p>
-                          <p className="text-xs text-gray-500">Téléchargez un nouveau logo pour le remplacer</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">Téléchargez un nouveau logo pour le remplacer</p>
                         </div>
                       </div>
                     )}
@@ -839,20 +839,20 @@ export default function SettingsPage() {
                       
                       <div className="flex flex-col items-center gap-3">
                         <div className={`w-14 h-14 rounded-full flex items-center justify-center ${
-                          isDraggingLogo ? 'bg-[#F7C700]' : 'bg-gray-100'
+                          isDraggingLogo ? 'bg-[#F7C700]' : 'bg-gray-100 dark:bg-gray-700'
                         } transition-colors`}>
                           {isUploadingLogo ? (
                             <div className="w-7 h-7 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
                           ) : (
-                            <ArrowUpTrayIcon className={`w-7 h-7 ${isDraggingLogo ? 'text-white' : 'text-gray-400'}`} />
+                            <ArrowUpTrayIcon className={`w-7 h-7 ${isDraggingLogo ? 'text-white' : 'text-gray-400 dark:text-gray-500'}`} />
                           )}
                         </div>
                         
                         <div>
-                          <p className="text-gray-700 font-medium mb-1">
+                          <p className="text-gray-700 dark:text-gray-300 font-medium mb-1">
                             {isUploadingLogo ? 'Téléchargement...' : isDraggingLogo ? 'Déposez le logo ici' : 'Cliquez ou déposez un logo'}
                           </p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
                             PNG, JPG, SVG, WebP (max 5MB)
                           </p>
                         </div>
@@ -861,12 +861,12 @@ export default function SettingsPage() {
                   </div>
                 </div>
 
-                <div className="pt-6 border-t border-gray-100 flex justify-end">
+                <div className="pt-6 border-t border-gray-100 dark:border-gray-700 flex justify-end">
                   <button
                     type="button"
                     onClick={updateCompany}
                     disabled={loading}
-                    className="px-8 py-3 bg-gradient-to-r from-[#F7C700] to-[#e0b400] text-gray-900 rounded-2xl hover:shadow-lg hover:shadow-[#F7C700]/30 transition-all duration-300 font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-8 py-3 bg-gradient-to-r from-[#F7C700] to-[#e0b400] text-gray-900 dark:text-white rounded-2xl hover:shadow-lg hover:shadow-[#F7C700]/30 transition-all duration-300 font-bold disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {loading ? 'Enregistrement...' : 'Enregistrer les modifications'}
                   </button>
@@ -882,20 +882,20 @@ export default function SettingsPage() {
                     <BellIcon className="w-8 h-8 text-[#3B82F6]" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-gray-900">Préférences de notification</h3>
-                    <p className="text-gray-600">Choisissez comment vous souhaitez être informé</p>
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Préférences de notification</h3>
+                    <p className="text-gray-600 dark:text-gray-400">Choisissez comment vous souhaitez être informé</p>
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 hover:shadow-md transition-all duration-300">
+                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 dark:border-gray-700 hover:shadow-md transition-all duration-300">
                     <div className="flex items-center gap-4">
                       <div className="bg-[#6B9B5F]/10 p-3 rounded-xl">
                         <BellIcon className="w-6 h-6 text-[#6B9B5F]" />
                       </div>
                       <div>
-                        <h4 className="text-base font-bold text-gray-900">Notifications par email</h4>
-                        <p className="text-sm text-gray-600 mt-1">Recevez des notifications importantes par email</p>
+                        <h4 className="text-base font-bold text-gray-900 dark:text-white">Notifications par email</h4>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Recevez des notifications importantes par email</p>
                       </div>
                     </div>
                     <ToggleButton
@@ -905,14 +905,14 @@ export default function SettingsPage() {
                     />
                   </div>
 
-                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 hover:shadow-md transition-all duration-300">
+                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 dark:border-gray-700 hover:shadow-md transition-all duration-300">
                     <div className="flex items-center gap-4">
                       <div className="bg-[#6B46C1]/10 p-3 rounded-xl">
                         <SparklesIcon className="w-6 h-6 text-[#6B46C1]" />
                       </div>
                       <div>
-                        <h4 className="text-base font-bold text-gray-900">Alertes d&apos;emploi</h4>
-                        <p className="text-sm text-gray-600 mt-1">Soyez notifié des nouveaux emplois correspondant à vos critères</p>
+                        <h4 className="text-base font-bold text-gray-900 dark:text-white">Alertes d&apos;emploi</h4>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Soyez notifié des nouveaux emplois correspondant à vos critères</p>
                       </div>
                     </div>
                     <ToggleButton
@@ -922,14 +922,14 @@ export default function SettingsPage() {
                     />
                   </div>
 
-                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 hover:shadow-md transition-all duration-300">
+                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 dark:border-gray-700 hover:shadow-md transition-all duration-300">
                     <div className="flex items-center gap-4">
                       <div className="bg-[#F7C700]/10 p-3 rounded-xl">
                         <BellIcon className="w-6 h-6 text-[#F7C700]" />
                       </div>
                       <div>
-                        <h4 className="text-base font-bold text-gray-900">Emails marketing</h4>
-                        <p className="text-sm text-gray-600 mt-1">Recevez des conseils carrière et des mises à jour</p>
+                        <h4 className="text-base font-bold text-gray-900 dark:text-white">Emails marketing</h4>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Recevez des conseils carrière et des mises à jour</p>
                       </div>
                     </div>
                     <ToggleButton
@@ -939,14 +939,14 @@ export default function SettingsPage() {
                     />
                   </div>
 
-                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 hover:shadow-md transition-all duration-300">
+                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 dark:border-gray-700 hover:shadow-md transition-all duration-300">
                     <div className="flex items-center gap-4">
                       <div className="bg-[#3B82F6]/10 p-3 rounded-xl">
                         <BellIcon className="w-6 h-6 text-[#3B82F6]" />
                       </div>
                       <div>
-                        <h4 className="text-base font-bold text-gray-900">Notifications push</h4>
-                        <p className="text-sm text-gray-600 mt-1">Recevez des notifications dans votre navigateur</p>
+                        <h4 className="text-base font-bold text-gray-900 dark:text-white">Notifications push</h4>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Recevez des notifications dans votre navigateur</p>
                       </div>
                     </div>
                     <ToggleButton
@@ -957,7 +957,7 @@ export default function SettingsPage() {
                   </div>
                 </div>
 
-                <div className="pt-6 border-t border-gray-100 flex justify-end">
+                <div className="pt-6 border-t border-gray-100 dark:border-gray-700 flex justify-end">
                   <button
                     type="button"
                     onClick={updateNotifications}
@@ -978,20 +978,20 @@ export default function SettingsPage() {
                     <ShieldCheckIcon className="w-8 h-8 text-[#F7C700]" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-gray-900">Paramètres de confidentialité</h3>
-                    <p className="text-gray-600">Contrôlez la visibilité de vos informations personnelles</p>
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Paramètres de confidentialité</h3>
+                    <p className="text-gray-600 dark:text-gray-400">Contrôlez la visibilité de vos informations personnelles</p>
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 hover:shadow-md transition-all duration-300">
+                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 dark:border-gray-700 hover:shadow-md transition-all duration-300">
                     <div className="flex items-center gap-4">
                       <div className="bg-[#6B9B5F]/10 p-3 rounded-xl">
                         <UserIcon className="w-6 h-6 text-[#6B9B5F]" />
                       </div>
                       <div>
-                        <h4 className="text-base font-bold text-gray-900">Profil public</h4>
-                        <p className="text-sm text-gray-600 mt-1">Rendez votre profil visible aux recruteurs</p>
+                        <h4 className="text-base font-bold text-gray-900 dark:text-white">Profil public</h4>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Rendez votre profil visible aux recruteurs</p>
                       </div>
                     </div>
                     <ToggleButton
@@ -1001,14 +1001,14 @@ export default function SettingsPage() {
                     />
                   </div>
 
-                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 hover:shadow-md transition-all duration-300">
+                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 dark:border-gray-700 hover:shadow-md transition-all duration-300">
                     <div className="flex items-center gap-4">
                       <div className="bg-[#6B46C1]/10 p-3 rounded-xl">
                         <BellIcon className="w-6 h-6 text-[#6B46C1]" />
                       </div>
                       <div>
-                        <h4 className="text-base font-bold text-gray-900">Afficher l&apos;email</h4>
-                        <p className="text-sm text-gray-600 mt-1">Permettre aux recruteurs de voir votre adresse email</p>
+                        <h4 className="text-base font-bold text-gray-900 dark:text-white">Afficher l&apos;email</h4>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Permettre aux recruteurs de voir votre adresse email</p>
                       </div>
                     </div>
                     <ToggleButton
@@ -1018,14 +1018,14 @@ export default function SettingsPage() {
                     />
                   </div>
 
-                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 hover:shadow-md transition-all duration-300">
+                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 dark:border-gray-700 hover:shadow-md transition-all duration-300">
                     <div className="flex items-center gap-4">
                       <div className="bg-[#F7C700]/10 p-3 rounded-xl">
                         <BellIcon className="w-6 h-6 text-[#F7C700]" />
                       </div>
                       <div>
-                        <h4 className="text-base font-bold text-gray-900">Afficher le téléphone</h4>
-                        <p className="text-sm text-gray-600 mt-1">Permettre aux recruteurs de voir votre numéro</p>
+                        <h4 className="text-base font-bold text-gray-900 dark:text-white">Afficher le téléphone</h4>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Permettre aux recruteurs de voir votre numéro</p>
                       </div>
                     </div>
                     <ToggleButton
@@ -1035,14 +1035,14 @@ export default function SettingsPage() {
                     />
                   </div>
 
-                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 hover:shadow-md transition-all duration-300">
+                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 dark:border-gray-700 hover:shadow-md transition-all duration-300">
                     <div className="flex items-center gap-4">
                       <div className="bg-[#3B82F6]/10 p-3 rounded-xl">
                         <ShieldCheckIcon className="w-6 h-6 text-[#3B82F6]" />
                       </div>
                       <div>
-                        <h4 className="text-base font-bold text-gray-900">Contact par les recruteurs</h4>
-                        <p className="text-sm text-gray-600 mt-1">Autoriser les recruteurs à vous contacter directement</p>
+                        <h4 className="text-base font-bold text-gray-900 dark:text-white">Contact par les recruteurs</h4>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Autoriser les recruteurs à vous contacter directement</p>
                       </div>
                     </div>
                     <ToggleButton
@@ -1053,12 +1053,12 @@ export default function SettingsPage() {
                   </div>
                 </div>
 
-                <div className="pt-6 border-t border-gray-100 flex justify-end">
+                <div className="pt-6 border-t border-gray-100 dark:border-gray-700 flex justify-end">
                   <button
                     type="button"
                     onClick={updatePrivacy}
                     disabled={loading}
-                    className="px-8 py-3 bg-gradient-to-r from-[#F7C700] to-[#e0b400] text-gray-900 rounded-2xl hover:shadow-lg hover:shadow-[#F7C700]/30 transition-all duration-300 font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-8 py-3 bg-gradient-to-r from-[#F7C700] to-[#e0b400] text-gray-900 dark:text-white rounded-2xl hover:shadow-lg hover:shadow-[#F7C700]/30 transition-all duration-300 font-bold disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {loading ? 'Enregistrement...' : 'Enregistrer les paramètres'}
                   </button>
@@ -1074,25 +1074,25 @@ export default function SettingsPage() {
                     <KeyIcon className="w-8 h-8 text-[#6B46C1]" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-gray-900">Gestion du compte</h3>
-                    <p className="text-gray-600">Consultez et gérez les paramètres de votre compte</p>
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Gestion du compte</h3>
+                    <p className="text-gray-600 dark:text-gray-400">Consultez et gérez les paramètres de votre compte</p>
                   </div>
                 </div>
 
                 {/* Account Info */}
-                <div className="bg-gradient-to-r from-[#6B9B5F]/5 to-[#6B46C1]/5 p-6 rounded-2xl border border-gray-100">
-                  <h4 className="text-lg font-bold text-gray-900 mb-4">Informations du compte</h4>
+                <div className="bg-gradient-to-r from-[#6B9B5F]/5 to-[#6B46C1]/5 p-6 rounded-2xl border border-gray-100 dark:border-gray-700">
+                  <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Informations du compte</h4>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
-                      <p className="text-sm font-medium text-gray-500 mb-1">Adresse email</p>
-                      <p className="text-sm font-bold text-gray-900">{user?.email}</p>
+                    <div className="bg-white dark:bg-gray-800 p-4 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
+                      <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Adresse email</p>
+                      <p className="text-sm font-bold text-gray-900 dark:text-white">{user?.email}</p>
                     </div>
-                    <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
-                      <p className="text-sm font-medium text-gray-500 mb-1">Nom complet</p>
-                      <p className="text-sm font-bold text-gray-900">{user?.fullName || 'N/A'}</p>
+                    <div className="bg-white dark:bg-gray-800 p-4 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
+                      <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Nom complet</p>
+                      <p className="text-sm font-bold text-gray-900 dark:text-white">{user?.fullName || 'N/A'}</p>
                     </div>
-                    <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
-                      <p className="text-sm font-medium text-gray-500 mb-1">Rôle</p>
+                    <div className="bg-white dark:bg-gray-800 p-4 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
+                      <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Rôle</p>
                       <span className={`inline-flex px-3 py-1 text-xs font-bold rounded-full ${
                         user?.role === 'admin' ? 'bg-[#6B46C1]/10 text-[#6B46C1]' :
                         user?.role === 'candidate' ? 'bg-[#3B82F6]/10 text-[#3B82F6]' :
@@ -1105,20 +1105,20 @@ export default function SettingsPage() {
                 </div>
 
                 {/* Security Section */}
-                <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-                  <h4 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl p-6 shadow-sm">
+                  <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                     <ShieldCheckIcon className="w-5 h-5 text-[#6B9B5F]" />
                     Sécurité
                   </h4>
-                  <p className="text-sm text-gray-600 mb-6">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
                     Gérez votre mot de passe et les paramètres de sécurité de votre compte.
                   </p>
 
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between py-4 border-b border-gray-100">
+                    <div className="flex items-center justify-between py-4 border-b border-gray-100 dark:border-gray-700">
                       <div>
-                        <h5 className="text-base font-bold text-gray-900">Mot de passe</h5>
-                        <p className="text-sm text-gray-500 mt-1">Dernière modification: Il y a 30 jours</p>
+                        <h5 className="text-base font-bold text-gray-900 dark:text-white">Mot de passe</h5>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Dernière modification: Il y a 30 jours</p>
                       </div>
                       <button
                         type="button"
@@ -1129,10 +1129,10 @@ export default function SettingsPage() {
                       </button>
                     </div>
 
-                    <div className="flex items-center justify-between py-4 border-b border-gray-100">
+                    <div className="flex items-center justify-between py-4 border-b border-gray-100 dark:border-gray-700">
                       <div>
-                        <h5 className="text-base font-bold text-gray-900">Adresse email</h5>
-                        <p className="text-sm text-gray-500 mt-1">Actuellement: {user?.email}</p>
+                        <h5 className="text-base font-bold text-gray-900 dark:text-white">Adresse email</h5>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Actuellement: {user?.email}</p>
                       </div>
                       <button
                         type="button"
@@ -1145,13 +1145,13 @@ export default function SettingsPage() {
 
                     <div className="flex items-center justify-between py-4">
                       <div>
-                        <h5 className="text-base font-bold text-gray-900">Authentification à deux facteurs</h5>
-                        <p className="text-sm text-gray-500 mt-1">Ajoutez une couche de sécurité supplémentaire</p>
+                        <h5 className="text-base font-bold text-gray-900 dark:text-white">Authentification à deux facteurs</h5>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Ajoutez une couche de sécurité supplémentaire</p>
                       </div>
                       <button
                         type="button"
                         onClick={() => toast('Fonctionnalité 2FA à venir')}
-                        className="px-5 py-2.5 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all duration-200 text-sm font-bold"
+                        className="px-5 py-2.5 text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 rounded-xl transition-all duration-200 text-sm font-bold"
                       >
                         Activer la 2FA
                       </button>

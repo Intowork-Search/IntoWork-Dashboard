@@ -160,7 +160,7 @@ export default function IntegrationsPage() {
         <div className="flex items-center justify-center py-20">
           <div className="text-center">
             <div className="w-16 h-16 border-4 border-[#F7C700] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-500">Chargement des intégrations...</p>
+            <p className="text-gray-500 dark:text-gray-400">Chargement des intégrations...</p>
           </div>
         </div>
       </DashboardLayout>
@@ -265,8 +265,8 @@ export default function IntegrationsPage() {
               </div>
             </div>
             <div>
-              <h3 className="font-semibold text-gray-800 mb-1">Gagnez du temps avec les intégrations</h3>
-              <p className="text-sm text-gray-600">
+              <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-1">Gagnez du temps avec les intégrations</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 Publiez automatiquement vos offres d'emploi sur LinkedIn, planifiez des entretiens avec Google Calendar ou Microsoft Teams. 
                 Toutes vos actions synchronisées en un clic.
               </p>
@@ -278,7 +278,7 @@ export default function IntegrationsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Targetym - Plateforme RH */}
           <div
-            className="group relative bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border-2 border-[#6B9B5F]/30 cursor-pointer"
+            className="group relative bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border-2 border-[#6B9B5F]/30 cursor-pointer"
             onClick={() => router.push('/dashboard/integrations/targetym')}
             style={{ animation: 'fadeIn 0.4s ease-out' }}
           >
@@ -288,12 +288,12 @@ export default function IntegrationsPage() {
                 <div className="p-4 rounded-2xl bg-[#6B9B5F]/10 shadow-md">
                   <span className="text-3xl">🎯</span>
                 </div>
-                <div className="flex items-center gap-1.5 bg-gradient-to-r from-[#F7C700] to-[#e6b800] text-gray-900 px-3 py-1.5 rounded-full text-xs font-bold shadow-md">
+                <div className="flex items-center gap-1.5 bg-gradient-to-r from-[#F7C700] to-[#e6b800] text-gray-900 dark:text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-md">
                   ✨ Natif
                 </div>
               </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-2">Targetym RH</h3>
-              <p className="text-sm text-gray-600 mb-5 leading-relaxed">
+              <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">Targetym RH</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-5 leading-relaxed">
                 Connectez votre plateforme RH Targetym pour automatiser l'intégration des candidats embauchés
               </p>
               <div className="space-y-2.5 mb-5">
@@ -302,13 +302,13 @@ export default function IntegrationsPage() {
                   'Offres internes Targetym → publiées sur IntoWork',
                   'Flux RH et recrutement unifiés',
                 ].map((f, i) => (
-                  <div key={i} className="flex items-start gap-2.5 text-sm text-gray-700">
+                  <div key={i} className="flex items-start gap-2.5 text-sm text-gray-700 dark:text-gray-300">
                     <CheckCircleIcon className="h-4 w-4 text-[#6B9B5F] flex-shrink-0 mt-0.5" />
                     <span>{f}</span>
                   </div>
                 ))}
               </div>
-              <div className="pt-4 border-t border-gray-100">
+              <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
                 <button
                   onClick={(e) => { e.stopPropagation(); router.push('/dashboard/integrations/targetym'); }}
                   className="w-full px-4 py-2.5 bg-gradient-to-r from-[#6B9B5F] to-[#5a8450] text-white rounded-xl font-medium text-sm flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all duration-200"
@@ -387,15 +387,15 @@ export default function IntegrationsPage() {
         </div>
 
         {/* Section d'aide */}
-        <div className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
-          <div className="bg-gradient-to-r from-[#6B9B5F]/10 to-[#F7C700]/10 p-6 border-b border-gray-100">
-            <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 overflow-hidden">
+          <div className="bg-gradient-to-r from-[#6B9B5F]/10 to-[#F7C700]/10 p-6 border-b border-gray-100 dark:border-gray-700">
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
               <InformationCircleIcon className="w-5 h-5 text-[#6B9B5F]" />
               Besoin d'aide ?
             </h3>
           </div>
           <div className="p-6">
-            <p className="text-gray-600 mb-4">
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
               Les intégrations utilisent OAuth 2.0 pour sécuriser la connexion à vos comptes.
               Vous pouvez révoquer l'accès à tout moment depuis cette page.
             </p>
@@ -403,8 +403,8 @@ export default function IntegrationsPage() {
               <div className="flex gap-3 p-3 bg-[#0A66C2]/5 rounded-xl border border-[#0A66C2]/10">
                 <LinkIcon className="w-5 h-5 text-[#0A66C2] flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-medium text-gray-800 text-sm">LinkedIn</p>
-                  <p className="text-sm text-gray-600">
+                  <p className="font-medium text-gray-800 dark:text-gray-200 text-sm">LinkedIn</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
                     Assurez-vous d'avoir les permissions administrateur sur votre page entreprise
                   </p>
                 </div>
@@ -412,8 +412,8 @@ export default function IntegrationsPage() {
               <div className="flex gap-3 p-3 bg-[#4285F4]/5 rounded-xl border border-[#4285F4]/10">
                 <CalendarIcon className="w-5 h-5 text-[#4285F4] flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-medium text-gray-800 text-sm">Google Calendar</p>
-                  <p className="text-sm text-gray-600">
+                  <p className="font-medium text-gray-800 dark:text-gray-200 text-sm">Google Calendar</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
                     Vous aurez besoin d'un compte Google avec accès à Calendar
                   </p>
                 </div>
@@ -421,8 +421,8 @@ export default function IntegrationsPage() {
               <div className="flex gap-3 p-3 bg-[#0078D4]/5 rounded-xl border border-[#0078D4]/10">
                 <VideoCameraIcon className="w-5 h-5 text-[#0078D4] flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-medium text-gray-800 text-sm">Outlook / Teams</p>
-                  <p className="text-sm text-gray-600">
+                  <p className="font-medium text-gray-800 dark:text-gray-200 text-sm">Outlook / Teams</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
                     Nécessite un compte Microsoft 365 avec Teams activé
                   </p>
                 </div>
@@ -481,7 +481,7 @@ function IntegrationCard({
 
   return (
     <div
-      className="group relative bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100"
+      className="group relative bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-700"
       style={{ animation: 'fadeIn 0.6s ease-out' }}
     >
       {/* Gradient de fond subtil */}
@@ -504,13 +504,13 @@ function IntegrationCard({
         </div>
 
         {/* Titre et description */}
-        <h3 className="text-xl font-bold text-gray-800 mb-2">{title}</h3>
-        <p className="text-sm text-gray-600 mb-5 leading-relaxed">{description}</p>
+        <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">{title}</h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-5 leading-relaxed">{description}</p>
 
         {/* Fonctionnalités */}
         <div className="space-y-2.5 mb-5">
           {features.map((feature, index) => (
-            <div key={index} className="flex items-start gap-2.5 text-sm text-gray-700">
+            <div key={index} className="flex items-start gap-2.5 text-sm text-gray-700 dark:text-gray-300">
               <div className="flex-shrink-0 mt-0.5">
                 <CheckCircleIcon className="h-4 w-4 text-[#6B9B5F]" />
               </div>
@@ -521,15 +521,15 @@ function IntegrationCard({
 
         {/* Statut et dates */}
         {isConnected && (
-          <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-4 mb-5 border border-gray-200">
-            <div className="space-y-2 text-xs text-gray-600">
+          <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-4 mb-5 border border-gray-200 dark:border-gray-600">
+            <div className="space-y-2 text-xs text-gray-600 dark:text-gray-400">
               <div className="flex items-center gap-2">
                 <CheckCircleSolid className="h-3.5 w-3.5 text-[#6B9B5F]" />
                 <span className="font-medium">Connecté le :</span>
                 <span>{formatDate(integration?.connected_at)}</span>
               </div>
               <div className="flex items-center gap-2">
-                <CalendarIcon className="h-3.5 w-3.5 text-gray-500" />
+                <CalendarIcon className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400" />
                 <span className="font-medium">Dernière utilisation :</span>
                 <span>{formatDate(integration?.last_used_at)}</span>
               </div>
@@ -538,7 +538,7 @@ function IntegrationCard({
         )}
 
         {/* Actions */}
-        <div className="pt-4 border-t border-gray-100">
+        <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
           {isConnected ? (
             <button
               onClick={onDisconnect}

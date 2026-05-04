@@ -137,7 +137,7 @@ export default function CandidatesPage(): React.JSX.Element {
       'rejected': { label: 'Rejeté', className: 'bg-red-100 text-red-800', icon: XCircleIcon },
     };
 
-    const config = statusConfig[status] || { label: status, className: 'bg-gray-100 text-gray-800', icon: ClockIcon };
+    const config = statusConfig[status] || { label: status, className: 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200', icon: ClockIcon };
     const Icon = config.icon;
 
     return (
@@ -180,24 +180,24 @@ export default function CandidatesPage(): React.JSX.Element {
       <div className="space-y-6">
         {/* Header avec stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-            <p className="text-sm text-gray-600">Total candidatures</p>
-            <p className="text-2xl font-bold text-gray-900">{total}</p>
+          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+            <p className="text-sm text-gray-600 dark:text-gray-400">Total candidatures</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">{total}</p>
           </div>
-          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-            <p className="text-sm text-gray-600">En attente</p>
+          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+            <p className="text-sm text-gray-600 dark:text-gray-400">En attente</p>
             <p className="text-2xl font-bold text-yellow-600">
               {applications.filter((a: CandidateApplication) => a.status === 'applied' || a.status === 'pending').length}
             </p>
           </div>
-          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-            <p className="text-sm text-gray-600">Entretiens</p>
+          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+            <p className="text-sm text-gray-600 dark:text-gray-400">Entretiens</p>
             <p className="text-2xl font-bold text-indigo-600">
               {applications.filter((a: CandidateApplication) => a.status === 'interview').length}
             </p>
           </div>
-          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-            <p className="text-sm text-gray-600">Acceptés</p>
+          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+            <p className="text-sm text-gray-600 dark:text-gray-400">Acceptés</p>
             <p className="text-2xl font-bold text-green-600">
               {applications.filter((a: CandidateApplication) => a.status === 'accepted').length}
             </p>
@@ -205,28 +205,28 @@ export default function CandidatesPage(): React.JSX.Element {
         </div>
 
         {/* Barre de recherche et filtres */}
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200" data-tour="application-filters">
+        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600" data-tour="application-filters">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Recherche */}
             <div className="relative">
-              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
               <input
                 type="text"
                 placeholder="Rechercher un candidat..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
               />
             </div>
 
             {/* Filtre par statut */}
             <div className="relative">
-              <FunnelIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <FunnelIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
               <select
                 id="status-filter"
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                 aria-label="Filtrer par statut"
               >
                 <option value="">Tous les statuts</option>
@@ -254,37 +254,37 @@ export default function CandidatesPage(): React.JSX.Element {
 
         {/* Liste des candidatures */}
         {filteredApplications.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-            <UserGroupIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Aucune candidature</h3>
-            <p className="text-gray-600">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-12 text-center">
+            <UserGroupIcon className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Aucune candidature</h3>
+            <p className="text-gray-600 dark:text-gray-400">
               {searchTerm || statusFilter ? 'Aucun résultat pour ces filtres' : 'Les candidatures apparaîtront ici'}
             </p>
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+                <thead className="bg-gray-50 dark:bg-gray-900">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Candidat
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Offre
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Statut
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Date
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200">
                   {filteredApplications.map((application: CandidateApplication, index: number) => (
                     <tr key={application.id} className="hover:bg-gray-50 transition" data-tour={index === 0 ? "candidate-card" : undefined}>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -295,8 +295,8 @@ export default function CandidatesPage(): React.JSX.Element {
                             </span>
                           </div>
                           <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">{application.candidate_name}</div>
-                            <div className="text-sm text-gray-500 flex items-center space-x-2">
+                            <div className="text-sm font-medium text-gray-900 dark:text-white">{application.candidate_name}</div>
+                            <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center space-x-2">
                               <EnvelopeIcon className="w-4 h-4" />
                               <span>{application.candidate_email}</span>
                             </div>
@@ -304,12 +304,12 @@ export default function CandidatesPage(): React.JSX.Element {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="text-sm text-gray-900">{application.job_title}</div>
+                        <div className="text-sm text-gray-900 dark:text-white">{application.job_title}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {getStatusBadge(application.status)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                         {formatDate(application.applied_at)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -335,17 +335,17 @@ export default function CandidatesPage(): React.JSX.Element {
             <button
               onClick={() => setPage(Math.max(1, page - 1))}
               disabled={page === 1}
-              className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 text-gray-900"
+              className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 text-gray-900 dark:text-white"
             >
               Précédent
             </button>
-            <span className="px-4 py-2 text-gray-700">
+            <span className="px-4 py-2 text-gray-700 dark:text-gray-300">
               Page {page} sur {totalPages}
             </span>
             <button
               onClick={() => setPage(Math.min(totalPages, page + 1))}
               disabled={page === totalPages}
-              className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 text-gray-900"
+              className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 text-gray-900 dark:text-white"
             >
               Suivant
             </button>
@@ -356,12 +356,12 @@ export default function CandidatesPage(): React.JSX.Element {
       {/* Modal de détail */}
       {viewingApplication && (
         <div className="fixed inset-0 bg-white/40 flex items-center justify-center z-50 p-4 backdrop-blur-md">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center z-10">
-              <h3 className="text-xl font-bold text-gray-900">Détails de la candidature</h3>
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="sticky top-0 bg-white dark:bg-gray-800 border-b px-6 py-4 flex justify-between items-center z-10">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">Détails de la candidature</h3>
               <button
                 onClick={() => setViewingApplication(null)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 dark:text-gray-500 hover:text-gray-600"
                 aria-label="Fermer"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -373,15 +373,15 @@ export default function CandidatesPage(): React.JSX.Element {
             <div className="p-6 space-y-6">
               {/* Informations candidat */}
               <div>
-                <h4 className="text-lg font-semibold text-gray-900 mb-3">👤 Candidat</h4>
-                <div className="bg-gray-50 rounded-lg p-4 space-y-2">
-                  <p className="text-gray-900"><strong>Nom:</strong> {viewingApplication.candidate_name}</p>
-                  <p className="text-gray-900 flex items-center space-x-2">
+                <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">👤 Candidat</h4>
+                <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 space-y-2">
+                  <p className="text-gray-900 dark:text-white"><strong>Nom:</strong> {viewingApplication.candidate_name}</p>
+                  <p className="text-gray-900 dark:text-white flex items-center space-x-2">
                     <EnvelopeIcon className="w-4 h-4" />
                     <span><strong>Email:</strong> {viewingApplication.candidate_email}</span>
                   </p>
                   {viewingApplication.candidate_phone && (
-                    <p className="text-gray-900 flex items-center space-x-2">
+                    <p className="text-gray-900 dark:text-white flex items-center space-x-2">
                       <PhoneIcon className="w-4 h-4" />
                       <span><strong>Téléphone:</strong> {viewingApplication.candidate_phone}</span>
                     </p>
@@ -391,20 +391,20 @@ export default function CandidatesPage(): React.JSX.Element {
 
               {/* Offre */}
               <div>
-                <h4 className="text-lg font-semibold text-gray-900 mb-3">💼 Offre</h4>
-                <p className="text-gray-900">{viewingApplication.job_title}</p>
+                <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">💼 Offre</h4>
+                <p className="text-gray-900 dark:text-white">{viewingApplication.job_title}</p>
               </div>
 
               {/* Statut et date */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <h4 className="text-lg font-semibold text-gray-900 mb-3">📊 Statut</h4>
+                  <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">📊 Statut</h4>
                   <div className="relative" data-tour="change-status">
                     <select
                       value={viewingApplication.status}
                       onChange={(e) => handleStatusChange(viewingApplication.id, e.target.value)}
                       disabled={updatingStatus}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                       aria-label="Changer le statut"
                     >
                       <option value="applied">En attente</option>
@@ -422,17 +422,17 @@ export default function CandidatesPage(): React.JSX.Element {
                   </div>
                 </div>
                 <div>
-                  <h4 className="text-lg font-semibold text-gray-900 mb-3">📅 Date de candidature</h4>
-                  <p className="text-gray-900">{formatDate(viewingApplication.applied_at)}</p>
+                  <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">📅 Date de candidature</h4>
+                  <p className="text-gray-900 dark:text-white">{formatDate(viewingApplication.applied_at)}</p>
                 </div>
               </div>
 
               {/* Lettre de motivation */}
               {viewingApplication.cover_letter && (
                 <div>
-                  <h4 className="text-lg font-semibold text-gray-900 mb-3">✉️ Lettre de motivation</h4>
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <p className="text-gray-700 whitespace-pre-wrap">{viewingApplication.cover_letter}</p>
+                  <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">✉️ Lettre de motivation</h4>
+                  <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+                    <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{viewingApplication.cover_letter}</p>
                   </div>
                 </div>
               )}
@@ -440,7 +440,7 @@ export default function CandidatesPage(): React.JSX.Element {
               {/* CV */}
               {viewingApplication.cv_url && (
                 <div data-tour="download-cv">
-                  <h4 className="text-lg font-semibold text-gray-900 mb-3">📄 CV</h4>
+                  <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">📄 CV</h4>
                   <a
                     href={viewingApplication.cv_url.startsWith('http') 
                       ? viewingApplication.cv_url 
@@ -458,7 +458,7 @@ export default function CandidatesPage(): React.JSX.Element {
 
               {/* Notes */}
               <div data-tour="add-notes">
-                <h4 className="text-lg font-semibold text-gray-900 mb-3">📝 Notes internes</h4>
+                <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">📝 Notes internes</h4>
                 <div className="relative">
                   <textarea
                     value={viewingApplication.notes || ''}
@@ -471,7 +471,7 @@ export default function CandidatesPage(): React.JSX.Element {
                     disabled={updatingNotes}
                     placeholder="Ajouter des notes sur ce candidat..."
                     rows={4}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                   />
                   {updatingNotes && (
                     <div className="absolute right-3 top-3">
@@ -479,14 +479,14 @@ export default function CandidatesPage(): React.JSX.Element {
                     </div>
                   )}
                 </div>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                   {updatingNotes ? 'Sauvegarde en cours...' : 'Les notes se sauvegardent automatiquement'}
                 </p>
               </div>
 
               {/* Actions rapides */}
               <div>
-                <h4 className="text-lg font-semibold text-gray-900 mb-3">⚡ Actions rapides</h4>
+                <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">⚡ Actions rapides</h4>
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     onClick={() => {
@@ -545,7 +545,7 @@ export default function CandidatesPage(): React.JSX.Element {
               <div className="flex justify-end space-x-3 pt-4 border-t">
                 <button
                   onClick={() => setViewingApplication(null)}
-                  className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+                  className="px-6 py-2 border border-gray-300 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 transition"
                 >
                   Fermer
                 </button>

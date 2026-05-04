@@ -80,7 +80,7 @@ export default function AdminJobsPage() {
         );
       case 'archived':
         return (
-          <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold bg-gray-100 text-gray-600">
+          <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
             <XCircleIcon className="w-5 h-5" />
             Archivee
           </span>
@@ -101,14 +101,14 @@ export default function AdminJobsPage() {
         );
       case 'closed':
         return (
-          <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold bg-gray-100 text-gray-700">
+          <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
             <XCircleIcon className="w-5 h-5" />
             Fermée
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold bg-gray-100 text-gray-700">
+          <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
             {status}
           </span>
         );
@@ -134,16 +134,16 @@ export default function AdminJobsPage() {
     >
       <div className="space-y-6">
         {/* En-tête avec recherche */}
-        <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-6 border border-gray-100">
+        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 p-6 border border-gray-100 dark:border-gray-700">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
-              <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
               <input
                 type="text"
                 placeholder="Rechercher une offre..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] text-gray-900 placeholder:text-gray-400 transition-all duration-200"
+                className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] text-gray-900 dark:text-white placeholder:text-gray-400 transition-all duration-200"
               />
             </div>
             <button
@@ -161,7 +161,7 @@ export default function AdminJobsPage() {
           {jobs.map((job) => (
             <div 
               key={job.id} 
-              className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-8 border border-gray-100 hover:shadow-2xl hover:shadow-gray-300/50 transition-all duration-300"
+              className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 p-8 border border-gray-100 dark:border-gray-700 hover:shadow-2xl hover:shadow-gray-300/50 transition-all duration-300"
             >
               <div className="flex flex-col lg:flex-row gap-6">
                 {/* Icône */}
@@ -173,8 +173,8 @@ export default function AdminJobsPage() {
                 <div className="flex-1">
                   <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-4">
                     <div>
-                      <h3 className="font-bold text-xl text-gray-900 mb-2">{job.title}</h3>
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                      <h3 className="font-bold text-xl text-gray-900 dark:text-white mb-2">{job.title}</h3>
+                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                         <div className="flex items-center gap-2">
                           <BuildingOfficeIcon className="w-5 h-5 text-[#6B9B5F]" />
                           <span className="font-medium">{job.company_name}</span>
@@ -189,15 +189,15 @@ export default function AdminJobsPage() {
                   </div>
 
                   {/* Statistiques */}
-                  <div className="flex flex-col gap-4 pt-4 border-t border-gray-100">
+                  <div className="flex flex-col gap-4 pt-4 border-t border-gray-100 dark:border-gray-700">
                     <div className="flex items-center gap-6 text-sm">
                       <div className="flex items-center gap-2">
-                        <UsersIcon className="w-5 h-5 text-gray-400" />
-                        <span className="text-gray-600 font-medium">
+                        <UsersIcon className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+                        <span className="text-gray-600 dark:text-gray-400 font-medium">
                           {job.applications_count} candidature{job.applications_count > 1 ? 's' : ''}
                         </span>
                       </div>
-                      <span className="text-gray-500">
+                      <span className="text-gray-500 dark:text-gray-400">
                         Publié le {new Date(job.created_at).toLocaleDateString('fr-FR')}
                       </span>
                     </div>
@@ -209,31 +209,31 @@ export default function AdminJobsPage() {
         </div>
 
         {jobs.length === 0 && (
-          <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-12 text-center border border-gray-100">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 p-12 text-center border border-gray-100 dark:border-gray-700">
             <BriefcaseIcon className="w-20 h-20 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500 text-lg">Aucune offre trouvée</p>
+            <p className="text-gray-500 dark:text-gray-400 text-lg">Aucune offre trouvée</p>
           </div>
         )}
 
         {/* Pagination */}
         {jobs.length > 0 && totalPages > 1 && (
-          <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-6 border border-gray-100">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 p-6 border border-gray-100 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <button
                 onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                 disabled={currentPage === 1}
-                className="px-5 py-2.5 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-medium"
+                className="px-5 py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-medium"
               >
                 <ChevronLeftIcon className="w-5 h-5" />
                 Précédent
               </button>
-              <span className="text-gray-600 font-medium">
+              <span className="text-gray-600 dark:text-gray-400 font-medium">
                 Page {currentPage} sur {totalPages}
               </span>
               <button
                 onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                 disabled={currentPage === totalPages}
-                className="px-5 py-2.5 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-medium"
+                className="px-5 py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-medium"
               >
                 Suivant
                 <ChevronRightIcon className="w-5 h-5" />

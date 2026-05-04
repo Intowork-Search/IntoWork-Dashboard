@@ -149,18 +149,18 @@ export default function TargetymIntegrationPage() {
             onClick={() => router.push('/dashboard/integrations')}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
           >
-            <ArrowLeftIcon className="h-5 w-5 text-gray-500" />
+            <ArrowLeftIcon className="h-5 w-5 text-gray-500 dark:text-gray-400" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Intégration Targetym</h1>
-            <p className="text-sm text-gray-500 mt-0.5">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Intégration Targetym</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
               Connectez votre compte IntoWork à votre plateforme RH Targetym
             </p>
             {myCompanyId && (
               <div className="mt-2 flex items-center gap-2">
-                <span className="text-xs text-gray-500">Votre Company ID IntoWork :</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">Votre Company ID IntoWork :</span>
                 <span className="font-mono font-bold text-[#6B9B5F] bg-green-50 px-2 py-0.5 rounded text-sm select-all">#{myCompanyId}</span>
-                <span className="text-xs text-gray-400">(à donner au RH Targetym)</span>
+                <span className="text-xs text-gray-400 dark:text-gray-500">(à donner au RH Targetym)</span>
               </div>
             )}
           </div>
@@ -176,26 +176,26 @@ export default function TargetymIntegrationPage() {
             {/* Statut de la liaison */}
             <div className={`rounded-2xl p-6 border-2 ${status?.linked
               ? 'bg-green-50 border-green-200'
-              : 'bg-gray-50 border-gray-200'}`}
+              : 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-600'}`}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   {status?.linked ? (
                     <CheckCircleSolid className="h-8 w-8 text-green-500" />
                   ) : (
-                    <XCircleIcon className="h-8 w-8 text-gray-400" />
+                    <XCircleIcon className="h-8 w-8 text-gray-400 dark:text-gray-500" />
                   )}
                   <div>
-                    <p className="font-semibold text-gray-900">
+                    <p className="font-semibold text-gray-900 dark:text-white">
                       {status?.linked ? 'Comptes liés' : 'Comptes non liés'}
                     </p>
                     {status?.linked ? (
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
                         Tenant Targetym #{status.targetym_tenant_id} · Lié le{' '}
                         {status.linked_at ? new Date(status.linked_at).toLocaleDateString('fr-FR') : '—'}
                       </p>
                     ) : (
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
                         Suivez les étapes ci-dessous pour lier les deux plateformes
                       </p>
                     )}
@@ -214,14 +214,14 @@ export default function TargetymIntegrationPage() {
             </div>
 
             {/* Étape 1 : Générer la clé API */}
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-600 shadow-sm p-6">
               <div className="flex items-start gap-4 mb-5">
                 <div className="w-8 h-8 rounded-full bg-[#6B9B5F] text-white flex items-center justify-center font-bold text-sm flex-shrink-0">
                   1
                 </div>
                 <div>
-                  <h2 className="font-semibold text-gray-900">Générez votre clé API IntoWork</h2>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <h2 className="font-semibold text-gray-900 dark:text-white">Générez votre clé API IntoWork</h2>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                     Cette clé permet à Targetym de s'authentifier auprès d'IntoWork. Partagez-la avec votre admin Targetym.
                   </p>
                 </div>
@@ -229,9 +229,9 @@ export default function TargetymIntegrationPage() {
 
               <div className="ml-12">
                 {apiKeyData?.has_key && (
-                  <div className="flex items-center gap-3 mb-4 p-3 bg-gray-50 rounded-xl border border-gray-200">
-                    <KeyIcon className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                    <span className="font-mono text-sm text-gray-700 flex-1 break-all">
+                  <div className="flex items-center gap-3 mb-4 p-3 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-600">
+                    <KeyIcon className="h-4 w-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
+                    <span className="font-mono text-sm text-gray-700 dark:text-gray-300 flex-1 break-all">
                       {generatedKey || apiKeyData.api_key_full || apiKeyData.api_key_preview}
                     </span>
                     <button
@@ -272,14 +272,14 @@ export default function TargetymIntegrationPage() {
 
             {/* Étape 2 : Lier le compte Targetym */}
             {!status?.linked && (
-              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-600 shadow-sm p-6">
                 <div className="flex items-start gap-4 mb-5">
                   <div className="w-8 h-8 rounded-full bg-[#6B9B5F] text-white flex items-center justify-center font-bold text-sm flex-shrink-0">
                     2
                   </div>
                   <div>
-                    <h2 className="font-semibold text-gray-900">Liez votre tenant Targetym</h2>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <h2 className="font-semibold text-gray-900 dark:text-white">Liez votre tenant Targetym</h2>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                       Entrez l'ID de votre tenant Targetym et la clé API Targetym (fournie par votre admin Targetym).
                     </p>
                   </div>
@@ -287,7 +287,7 @@ export default function TargetymIntegrationPage() {
 
                 <div className="ml-12 grid md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                       ID Tenant Targetym
                     </label>
                     <input
@@ -299,7 +299,7 @@ export default function TargetymIntegrationPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                       Clé API Targetym
                     </label>
                     <input
@@ -330,15 +330,15 @@ export default function TargetymIntegrationPage() {
 
             {/* Info fonctionnalités activées */}
             {status?.linked && (
-              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
-                <h2 className="font-semibold text-gray-900 mb-4">Fonctionnalités activées</h2>
+              <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-600 shadow-sm p-6">
+                <h2 className="font-semibold text-gray-900 dark:text-white mb-4">Fonctionnalités activées</h2>
                 <div className="space-y-3">
                   {[
                     { label: 'Candidat embauché → Employé créé automatiquement dans Targetym', active: true },
                     { label: 'Offres internes Targetym synchronisées sur IntoWork', active: true },
                     { label: 'Tableau de bord unifié recrutement + RH', active: true },
                   ].map((f, i) => (
-                    <div key={i} className="flex items-center gap-3 text-sm text-gray-700">
+                    <div key={i} className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300">
                       <CheckCircleIcon className="h-5 w-5 text-[#6B9B5F] flex-shrink-0" />
                       {f.label}
                     </div>

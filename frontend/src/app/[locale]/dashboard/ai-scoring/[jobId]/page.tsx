@@ -185,12 +185,12 @@ export default function AIScoringPage({ params }: Props) {
         <div className="bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-xl border border-green-200">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="bg-white p-3 rounded-xl shadow-sm">
+              <div className="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm">
                 <SparklesIcon className="w-8 h-8 text-green-600" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">Scoring IA avec Claude</h2>
-                <p className="text-gray-600">Analyse automatique de {total} candidature{total > 1 ? 's' : ''}</p>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Scoring IA avec Claude</h2>
+                <p className="text-gray-600 dark:text-gray-400">Analyse automatique de {total} candidature{total > 1 ? 's' : ''}</p>
               </div>
             </div>
             
@@ -216,60 +216,60 @@ export default function AIScoringPage({ params }: Props) {
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-600">
             <div className="flex items-center gap-3">
               <div className="bg-blue-100 p-3 rounded-lg">
                 <ChartBarIcon className="w-6 h-6 text-blue-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Analysées</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.scored}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Analysées</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.scored}</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-600">
             <div className="flex items-center gap-3">
               <div className="bg-yellow-100 p-3 rounded-lg">
                 <ExclamationTriangleIcon className="w-6 h-6 text-yellow-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">En attente</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.unscored}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">En attente</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.unscored}</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-600">
             <div className="flex items-center gap-3">
               <div className="bg-green-100 p-3 rounded-lg">
                 <TrophyIcon className="w-6 h-6 text-green-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Excellents</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.excellent}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Excellents</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.excellent}</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-600">
             <div className="flex items-center gap-3">
               <div className="bg-blue-100 p-3 rounded-lg">
                 <CheckCircleIcon className="w-6 h-6 text-blue-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Bons profils</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.good}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Bons profils</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.good}</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Tri */}
-        <div className="flex items-center justify-between bg-white p-4 rounded-xl border border-gray-200">
+        <div className="flex items-center justify-between bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-600">
           <div className="flex items-center gap-2">
-            <ChartBarIcon className="w-5 h-5 text-gray-400" />
-            <span className="text-sm font-medium text-gray-700">Trier par:</span>
+            <ChartBarIcon className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Trier par:</span>
           </div>
           <button
             onClick={() => setSortByScore(!sortByScore)}
@@ -285,15 +285,15 @@ export default function AIScoringPage({ params }: Props) {
         {/* Liste des candidatures */}
         <div className="space-y-4">
           {applications.length === 0 ? (
-            <div className="bg-white p-12 rounded-xl text-center border border-gray-200">
+            <div className="bg-white dark:bg-gray-800 p-12 rounded-xl text-center border border-gray-200 dark:border-gray-600">
               <UserGroupIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500">Aucune candidature pour cette offre</p>
+              <p className="text-gray-500 dark:text-gray-400">Aucune candidature pour cette offre</p>
             </div>
           ) : (
             applications.map((app) => (
               <div
                 key={app.id}
-                className="bg-white p-6 rounded-xl border border-gray-200 hover:shadow-md transition-shadow"
+                className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-600 hover:shadow-md transition-shadow"
               >
                 <div className="flex items-start justify-between">
                   {/* Infos candidat */}
@@ -303,8 +303,8 @@ export default function AIScoringPage({ params }: Props) {
                         <UserGroupIcon className="w-6 h-6 text-green-600" />
                       </div>
                       <div>
-                        <h3 className="text-lg font-bold text-gray-900">{app.candidate_name}</h3>
-                        <p className="text-sm text-gray-600">{app.candidate_email}</p>
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">{app.candidate_name}</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{app.candidate_email}</p>
                       </div>
                     </div>
 
@@ -340,7 +340,7 @@ export default function AIScoringPage({ params }: Props) {
 
                         {/* Détails du scoring */}
                         {expandedDetails === app.id && app.ai_score_details && (
-                          <div className="mt-4 p-4 bg-gray-50 rounded-lg space-y-4">
+                          <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg space-y-4">
                             {/* Forces */}
                             <div>
                               <h4 className="font-semibold text-green-700 mb-2 flex items-center gap-2">
@@ -349,7 +349,7 @@ export default function AIScoringPage({ params }: Props) {
                               </h4>
                               <ul className="space-y-1">
                                 {app.ai_score_details.strengths.map((strength, idx) => (
-                                  <li key={idx} className="text-sm text-gray-700 flex items-start gap-2">
+                                  <li key={idx} className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2">
                                     <span className="text-green-500">✓</span>
                                     <span>{strength}</span>
                                   </li>
@@ -365,7 +365,7 @@ export default function AIScoringPage({ params }: Props) {
                               </h4>
                               <ul className="space-y-1">
                                 {app.ai_score_details.weaknesses.map((weakness, idx) => (
-                                  <li key={idx} className="text-sm text-gray-700 flex items-start gap-2">
+                                  <li key={idx} className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2">
                                     <span className="text-orange-500">⚠</span>
                                     <span>{weakness}</span>
                                   </li>
@@ -388,9 +388,9 @@ export default function AIScoringPage({ params }: Props) {
                             </div>
 
                             {/* Recommandation */}
-                            <div className="pt-3 border-t border-gray-200">
-                              <h4 className="font-semibold text-gray-900 mb-2">Recommandation IA</h4>
-                              <p className="text-sm text-gray-700">{app.ai_score_details.recommendation}</p>
+                            <div className="pt-3 border-t border-gray-200 dark:border-gray-600">
+                              <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Recommandation IA</h4>
+                              <p className="text-sm text-gray-700 dark:text-gray-300">{app.ai_score_details.recommendation}</p>
                             </div>
                           </div>
                         )}
@@ -410,7 +410,7 @@ export default function AIScoringPage({ params }: Props) {
                   </div>
 
                   {/* Date */}
-                  <div className="text-right text-sm text-gray-500">
+                  <div className="text-right text-sm text-gray-500 dark:text-gray-400">
                     <p>Candidature:</p>
                     <p>{new Date(app.applied_at).toLocaleDateString('fr-FR')}</p>
                     {app.ai_analyzed_at && (
@@ -436,7 +436,7 @@ export default function AIScoringPage({ params }: Props) {
             >
               Précédent
             </button>
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-gray-600 dark:text-gray-400">
               Page {page} sur {totalPages}
             </span>
             <button

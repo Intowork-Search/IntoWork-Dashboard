@@ -81,16 +81,16 @@ export default function AdminEmployersPage() {
     >
       <div className="space-y-6">
         {/* En-tête avec recherche */}
-        <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-6 border border-gray-100">
+        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 p-6 border border-gray-100 dark:border-gray-700">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
-              <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
               <input
                 type="text"
                 placeholder="Rechercher une entreprise..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] text-gray-900 placeholder:text-gray-400 transition-all duration-200"
+                className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] text-gray-900 dark:text-white placeholder:text-gray-400 transition-all duration-200"
               />
             </div>
             <button
@@ -108,7 +108,7 @@ export default function AdminEmployersPage() {
           {employers.map((employer) => (
             <div 
               key={employer.id} 
-              className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-8 border border-gray-100 hover:shadow-2xl hover:shadow-gray-300/50 transition-all duration-300"
+              className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 p-8 border border-gray-100 dark:border-gray-700 hover:shadow-2xl hover:shadow-gray-300/50 transition-all duration-300"
             >
               {/* En-tête */}
               <div className="flex items-start gap-5 mb-6">
@@ -116,8 +116,8 @@ export default function AdminEmployersPage() {
                   {employer.company_name?.[0] || 'E'}
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-bold text-xl text-gray-900 mb-1">{employer.company_name}</h3>
-                  <p className="text-gray-600 font-medium">
+                  <h3 className="font-bold text-xl text-gray-900 dark:text-white mb-1">{employer.company_name}</h3>
+                  <p className="text-gray-600 dark:text-gray-400 font-medium">
                     {employer.first_name} {employer.last_name}
                   </p>
                 </div>
@@ -126,27 +126,27 @@ export default function AdminEmployersPage() {
               {/* Informations */}
               <div className="space-y-3 mb-6">
                 {employer.position && (
-                  <div className="flex items-center gap-3 px-4 py-2.5 bg-gray-50 rounded-xl">
+                  <div className="flex items-center gap-3 px-4 py-2.5 bg-gray-50 dark:bg-gray-900 rounded-xl">
                     <BriefcaseIcon className="w-5 h-5 text-[#6B9B5F]" />
-                    <span className="text-sm text-gray-700 font-medium">{employer.position}</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">{employer.position}</span>
                   </div>
                 )}
                 
                 {employer.phone && (
-                  <div className="flex items-center gap-3 px-4 py-2.5 bg-gray-50 rounded-xl">
+                  <div className="flex items-center gap-3 px-4 py-2.5 bg-gray-50 dark:bg-gray-900 rounded-xl">
                     <PhoneIcon className="w-5 h-5 text-[#6B9B5F]" />
-                    <span className="text-sm text-gray-700 font-medium">{employer.phone}</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">{employer.phone}</span>
                   </div>
                 )}
                 
-                <div className="flex items-center gap-3 px-4 py-2.5 bg-gray-50 rounded-xl">
+                <div className="flex items-center gap-3 px-4 py-2.5 bg-gray-50 dark:bg-gray-900 rounded-xl">
                   <EnvelopeIcon className="w-5 h-5 text-[#6B9B5F]" />
-                  <span className="text-sm text-gray-700 font-medium truncate">{employer.email}</span>
+                  <span className="text-sm text-gray-700 dark:text-gray-300 font-medium truncate">{employer.email}</span>
                 </div>
               </div>
 
               {/* Statut et date */}
-              <div className="flex items-center justify-between mb-6 pb-6 border-b border-gray-100">
+              <div className="flex items-center justify-between mb-6 pb-6 border-b border-gray-100 dark:border-gray-700">
                 {employer.is_active ? (
                   <span className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold bg-[#6B9B5F]/10 text-[#6B9B5F]">
                     <CheckCircleIcon className="w-5 h-5" />
@@ -158,7 +158,7 @@ export default function AdminEmployersPage() {
                     Inactif
                   </span>
                 )}
-                <span className="text-sm text-gray-500 font-medium">
+                <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">
                   Inscrit le {new Date(employer.created_at).toLocaleDateString('fr-FR')}
                 </span>
               </div>
@@ -167,9 +167,9 @@ export default function AdminEmployersPage() {
         </div>
 
         {employers.length === 0 && (
-          <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-12 text-center border border-gray-100">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 p-12 text-center border border-gray-100 dark:border-gray-700">
             <BuildingOfficeIcon className="w-20 h-20 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500 text-lg">Aucune entreprise trouvée</p>
+            <p className="text-gray-500 dark:text-gray-400 text-lg">Aucune entreprise trouvée</p>
           </div>
         )}
       </div>

@@ -131,23 +131,23 @@ export default function AdminUsersPage() {
     >
       <div className="space-y-6">
         {/* Filtres */}
-        <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-6 border border-gray-100">
+        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 p-6 border border-gray-100 dark:border-gray-700">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
-              <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
               <input
                 type="text"
                 placeholder="Rechercher un utilisateur..."
                 value={userSearch}
                 onChange={(e) => setUserSearch(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] text-gray-900 placeholder:text-gray-400 transition-all duration-200"
+                className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] text-gray-900 dark:text-white placeholder:text-gray-400 transition-all duration-200"
               />
             </div>
             <select
               title="Filtrer par rôle"
               value={userRoleFilter}
               onChange={(e) => setUserRoleFilter(e.target.value)}
-              className="px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] text-gray-900 transition-all duration-200"
+              className="px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] text-gray-900 dark:text-white transition-all duration-200"
             >
               <option value="">Tous les rôles</option>
               <option value="candidate">Candidats</option>
@@ -172,17 +172,17 @@ export default function AdminUsersPage() {
         </div>
 
         {/* Table des utilisateurs */}
-        <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 overflow-hidden border border-gray-100">
+        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 overflow-hidden border border-gray-100 dark:border-gray-700">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
+              <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 dark:border-gray-600">
                 <tr>
-                  <th className="px-6 py-5 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Utilisateur</th>
-                  <th className="px-6 py-5 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Email</th>
-                  <th className="px-6 py-5 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Rôle</th>
-                  <th className="px-6 py-5 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Statut</th>
-                  <th className="px-6 py-5 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Inscription</th>
-                  <th className="px-6 py-5 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Actions</th>
+                  <th className="px-6 py-5 text-left text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Utilisateur</th>
+                  <th className="px-6 py-5 text-left text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Email</th>
+                  <th className="px-6 py-5 text-left text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Rôle</th>
+                  <th className="px-6 py-5 text-left text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Statut</th>
+                  <th className="px-6 py-5 text-left text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Inscription</th>
+                  <th className="px-6 py-5 text-right text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -194,11 +194,11 @@ export default function AdminUsersPage() {
                           {user.first_name?.[0]}{user.last_name?.[0]}
                         </div>
                         <div>
-                          <p className="font-semibold text-gray-900">{user.first_name} {user.last_name}</p>
+                          <p className="font-semibold text-gray-900 dark:text-white">{user.first_name} {user.last_name}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-5 text-sm text-gray-600">{user.email}</td>
+                    <td className="px-6 py-5 text-sm text-gray-600 dark:text-gray-400">{user.email}</td>
                     <td className="px-6 py-5">
                       <span className={`inline-flex px-4 py-1.5 text-xs font-bold rounded-full ${
                         user.role === 'admin' ? 'bg-[#6B46C1]/10 text-[#6B46C1]' :
@@ -219,7 +219,7 @@ export default function AdminUsersPage() {
                         )}
                       </span>
                     </td>
-                    <td className="px-6 py-5 text-sm text-gray-600">
+                    <td className="px-6 py-5 text-sm text-gray-600 dark:text-gray-400">
                       {new Date(user.created_at).toLocaleDateString('fr-FR')}
                     </td>
                     <td className="px-6 py-5 text-right">
@@ -251,7 +251,7 @@ export default function AdminUsersPage() {
           {users.length === 0 && (
             <div className="text-center py-12">
               <UsersIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500">Aucun utilisateur trouvé</p>
+              <p className="text-gray-500 dark:text-gray-400">Aucun utilisateur trouvé</p>
             </div>
           )}
         </div>
@@ -260,55 +260,55 @@ export default function AdminUsersPage() {
       {/* Modal création utilisateur */}
       {showCreateModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-md p-8">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900">Créer un utilisateur</h2>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Créer un utilisateur</h2>
               <button onClick={() => setShowCreateModal(false)} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
-                <XMarkIcon className="w-5 h-5 text-gray-500" />
+                <XMarkIcon className="w-5 h-5 text-gray-500 dark:text-gray-400" />
               </button>
             </div>
             <form onSubmit={handleCreateUser} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Prénom</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Prénom</label>
                   <input
                     type="text"
                     required
                     value={createForm.first_name}
                     onChange={(e) => setCreateForm(f => ({ ...f, first_name: e.target.value }))}
-                    className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#6B9B5F] text-gray-900 text-sm"
+                    className="w-full px-4 py-2.5 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:border-[#6B9B5F] text-gray-900 dark:text-white text-sm"
                     placeholder="Jean"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Nom</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nom</label>
                   <input
                     type="text"
                     required
                     value={createForm.last_name}
                     onChange={(e) => setCreateForm(f => ({ ...f, last_name: e.target.value }))}
-                    className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#6B9B5F] text-gray-900 text-sm"
+                    className="w-full px-4 py-2.5 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:border-[#6B9B5F] text-gray-900 dark:text-white text-sm"
                     placeholder="Dupont"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
                 <input
                   type="email"
                   required
                   value={createForm.email}
                   onChange={(e) => setCreateForm(f => ({ ...f, email: e.target.value }))}
-                  className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#6B9B5F] text-gray-900 text-sm"
+                  className="w-full px-4 py-2.5 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:border-[#6B9B5F] text-gray-900 dark:text-white text-sm"
                   placeholder="jean.dupont@exemple.com"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Rôle</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Rôle</label>
                 <select
                   value={createForm.role}
                   onChange={(e) => setCreateForm(f => ({ ...f, role: e.target.value as 'candidate' | 'employer' }))}
-                  className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#6B9B5F] text-gray-900 text-sm"
+                  className="w-full px-4 py-2.5 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:border-[#6B9B5F] text-gray-900 dark:text-white text-sm"
                 >
                   <option value="candidate">Candidat</option>
                   <option value="employer">Employeur</option>
@@ -316,25 +316,25 @@ export default function AdminUsersPage() {
               </div>
               {createForm.role === 'employer' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Nom de l&apos;entreprise</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nom de l&apos;entreprise</label>
                   <input
                     type="text"
                     required
                     value={createForm.company_name}
                     onChange={(e) => setCreateForm(f => ({ ...f, company_name: e.target.value }))}
-                    className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#6B9B5F] text-gray-900 text-sm"
+                    className="w-full px-4 py-2.5 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:border-[#6B9B5F] text-gray-900 dark:text-white text-sm"
                     placeholder="Nom de l'entreprise"
                   />
                 </div>
               )}
-              <p className="text-xs text-gray-500 bg-gray-50 rounded-xl p-3">
+              <p className="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 rounded-xl p-3">
                 Un mot de passe temporaire sera généré automatiquement et envoyé par email à l&apos;utilisateur.
               </p>
               <div className="flex gap-3 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowCreateModal(false)}
-                  className="flex-1 px-4 py-2.5 border-2 border-gray-200 text-gray-700 rounded-xl font-medium text-sm hover:bg-gray-50 transition-colors"
+                  className="flex-1 px-4 py-2.5 border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-medium text-sm hover:bg-gray-50 transition-colors"
                 >
                   Annuler
                 </button>
@@ -358,17 +358,17 @@ export default function AdminUsersPage() {
       {/* Modal confirmation suppression */}
       {deleteConfirm.open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-8 animate-fade-in">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-sm p-8 animate-fade-in">
             <div className="flex flex-col items-center text-center gap-4">
               <div className="w-16 h-16 rounded-2xl bg-red-100 flex items-center justify-center">
                 <ExclamationTriangleIcon className="w-8 h-8 text-red-600" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-gray-900 mb-2">Supprimer cet utilisateur ?</h2>
-                <p className="text-sm text-gray-500 leading-relaxed">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Supprimer cet utilisateur ?</h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
                   Vous êtes sur le point de supprimer définitivement le compte de
                 </p>
-                <p className="text-sm font-semibold text-gray-800 mt-1 break-all">{deleteConfirm.userEmail}</p>
+                <p className="text-sm font-semibold text-gray-800 dark:text-gray-200 mt-1 break-all">{deleteConfirm.userEmail}</p>
                 <p className="text-xs text-red-500 mt-2 font-medium">
                   Cette action est irréversible et supprimera toutes les données associées.
                 </p>
@@ -377,7 +377,7 @@ export default function AdminUsersPage() {
                 <button
                   onClick={() => setDeleteConfirm({ open: false, userId: null, userEmail: '' })}
                   disabled={deleting}
-                  className="flex-1 px-4 py-2.5 border-2 border-gray-200 text-gray-700 rounded-xl font-medium text-sm hover:bg-gray-50 transition-colors disabled:opacity-50"
+                  className="flex-1 px-4 py-2.5 border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-medium text-sm hover:bg-gray-50 transition-colors disabled:opacity-50"
                 >
                   Annuler
                 </button>

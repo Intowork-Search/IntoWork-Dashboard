@@ -198,7 +198,7 @@ export default function AdminDashboardPage() {
           {statCards.map((card) => (
             <div 
               key={card.title}
-              className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-6 border border-gray-100 hover:shadow-2xl hover:shadow-gray-300/50 transition-all duration-300"
+              className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 p-6 border border-gray-100 dark:border-gray-700 hover:shadow-2xl hover:shadow-gray-300/50 transition-all duration-300"
             >
               <div className="flex items-start justify-between mb-4">
                 <div className={`p-3 rounded-2xl bg-gradient-to-br ${card.color} shadow-lg`}>
@@ -220,10 +220,10 @@ export default function AdminDashboardPage() {
                 )}
               </div>
               
-              <h3 className="text-gray-600 text-sm font-medium mb-2">{card.title}</h3>
-              <p className="text-3xl font-bold text-gray-900 mb-1">{card.value.toLocaleString()}</p>
+              <h3 className="text-gray-600 dark:text-gray-400 text-sm font-medium mb-2">{card.title}</h3>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">{card.value.toLocaleString()}</p>
               {card.subtitle && (
-                <p className="text-sm text-gray-500 font-medium">{card.subtitle}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">{card.subtitle}</p>
               )}
             </div>
           ))}
@@ -232,48 +232,48 @@ export default function AdminDashboardPage() {
         {/* Statistiques détaillées */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Candidats */}
-          <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-8 border border-gray-100">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 p-8 border border-gray-100 dark:border-gray-700">
             <div className="flex items-center gap-4 mb-6">
               <div className="p-3 rounded-2xl bg-gradient-to-br from-[#6B46C1] to-[#5a3aaa] shadow-lg">
                 <UsersIcon className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="font-bold text-xl text-gray-900">Candidats</h3>
-                <p className="text-gray-600 text-sm">Utilisateurs cherchant un emploi</p>
+                <h3 className="font-bold text-xl text-gray-900 dark:text-white">Candidats</h3>
+                <p className="text-gray-600 dark:text-gray-400 text-sm">Utilisateurs cherchant un emploi</p>
               </div>
             </div>
             
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
-                <span className="text-gray-700 font-medium">Total candidats</span>
+              <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-2xl">
+                <span className="text-gray-700 dark:text-gray-300 font-medium">Total candidats</span>
                 <span className="text-2xl font-bold text-[#6B46C1]">{stats?.total_candidates || 0}</span>
               </div>
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
-                <span className="text-gray-700 font-medium">Candidatures envoyées</span>
+              <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-2xl">
+                <span className="text-gray-700 dark:text-gray-300 font-medium">Candidatures envoyées</span>
                 <span className="text-2xl font-bold text-[#6B46C1]">{stats?.total_applications || 0}</span>
               </div>
             </div>
           </div>
 
           {/* Employeurs */}
-          <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-8 border border-gray-100">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 p-8 border border-gray-100 dark:border-gray-700">
             <div className="flex items-center gap-4 mb-6">
               <div className="p-3 rounded-2xl bg-gradient-to-br from-[#F7C700] to-[#e0b400] shadow-lg">
                 <BuildingOfficeIcon className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="font-bold text-xl text-gray-900">Employeurs</h3>
-                <p className="text-gray-600 text-sm">Entreprises publiant des offres</p>
+                <h3 className="font-bold text-xl text-gray-900 dark:text-white">Employeurs</h3>
+                <p className="text-gray-600 dark:text-gray-400 text-sm">Entreprises publiant des offres</p>
               </div>
             </div>
             
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
-                <span className="text-gray-700 font-medium">Total entreprises</span>
+              <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-2xl">
+                <span className="text-gray-700 dark:text-gray-300 font-medium">Total entreprises</span>
                 <span className="text-2xl font-bold text-[#b39200]">{stats?.total_employers || 0}</span>
               </div>
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
-                <span className="text-gray-700 font-medium">Offres publiées</span>
+              <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-2xl">
+                <span className="text-gray-700 dark:text-gray-300 font-medium">Offres publiées</span>
                 <span className="text-2xl font-bold text-[#b39200]">{stats?.total_jobs || 0}</span>
               </div>
             </div>
@@ -283,14 +283,14 @@ export default function AdminDashboardPage() {
         {/* Graphiques */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Distribution des utilisateurs (Pie Chart) */}
-          <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-8 border border-gray-100">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 p-8 border border-gray-100 dark:border-gray-700">
             <div className="flex items-center gap-4 mb-6">
               <div className="p-3 rounded-2xl bg-gradient-to-br from-[#6B46C1] to-[#5a3aaa] shadow-lg">
                 <UsersIcon className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="font-bold text-xl text-gray-900">Distribution des utilisateurs</h3>
-                <p className="text-gray-600 text-sm">Par type de compte</p>
+                <h3 className="font-bold text-xl text-gray-900 dark:text-white">Distribution des utilisateurs</h3>
+                <p className="text-gray-600 dark:text-gray-400 text-sm">Par type de compte</p>
               </div>
             </div>
             
@@ -298,7 +298,7 @@ export default function AdminDashboardPage() {
               <div className="flex items-center justify-center h-64">
                 <div className="text-center">
                   <UsersIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500">Aucune donnée disponible</p>
+                  <p className="text-gray-500 dark:text-gray-400">Aucune donnée disponible</p>
                 </div>
               </div>
             ) : (
@@ -342,14 +342,14 @@ export default function AdminDashboardPage() {
           </div>
 
           {/* Statut des offres (Pie Chart) */}
-          <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-8 border border-gray-100">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 p-8 border border-gray-100 dark:border-gray-700">
             <div className="flex items-center gap-4 mb-6">
               <div className="p-3 rounded-2xl bg-gradient-to-br from-[#6B9B5F] to-[#5a8a4f] shadow-lg">
                 <BriefcaseIcon className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="font-bold text-xl text-gray-900">Statut des offres</h3>
-                <p className="text-gray-600 text-sm">Répartition par statut</p>
+                <h3 className="font-bold text-xl text-gray-900 dark:text-white">Statut des offres</h3>
+                <p className="text-gray-600 dark:text-gray-400 text-sm">Répartition par statut</p>
               </div>
             </div>
             
@@ -357,7 +357,7 @@ export default function AdminDashboardPage() {
               <div className="flex items-center justify-center h-64">
                 <div className="text-center">
                   <BriefcaseIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500">Aucune donnée disponible</p>
+                  <p className="text-gray-500 dark:text-gray-400">Aucune donnée disponible</p>
                 </div>
               </div>
             ) : (
@@ -402,14 +402,14 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Graphique à barres - Vue d'ensemble */}
-        <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-8 border border-gray-100">
+        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 p-8 border border-gray-100 dark:border-gray-700">
           <div className="flex items-center gap-4 mb-6">
             <div className="p-3 rounded-2xl bg-gradient-to-br from-[#3B82F6] to-[#2563EB] shadow-lg">
               <DocumentTextIcon className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h3 className="font-bold text-xl text-gray-900">Vue d'ensemble de la plateforme</h3>
-              <p className="text-gray-600 text-sm">Totaux globaux</p>
+              <h3 className="font-bold text-xl text-gray-900 dark:text-white">Vue d'ensemble de la plateforme</h3>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">Totaux globaux</p>
             </div>
           </div>
           
@@ -417,7 +417,7 @@ export default function AdminDashboardPage() {
             <div className="flex items-center justify-center h-64">
               <div className="text-center">
                 <DocumentTextIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-500">Aucune donnée disponible</p>
+                <p className="text-gray-500 dark:text-gray-400">Aucune donnée disponible</p>
               </div>
             </div>
           ) : (

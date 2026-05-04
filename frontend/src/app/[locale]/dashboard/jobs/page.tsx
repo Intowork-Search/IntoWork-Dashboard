@@ -307,7 +307,7 @@ export default function JobsPage() {
                 <div className="md:col-span-3">
                   <button
                     onClick={handleSearch}
-                    className="w-full py-3.5 rounded-xl font-semibold bg-white text-[#6B9B5F] hover:bg-white/90 transition-all flex items-center justify-center gap-2"
+                    className="w-full py-3.5 rounded-xl font-semibold bg-white dark:bg-gray-800 text-[#6B9B5F] hover:bg-white/90 transition-all flex items-center justify-center gap-2"
                   >
                     <MagnifyingGlassIcon className="w-5 h-5" />
                     <span>Rechercher</span>
@@ -321,11 +321,11 @@ export default function JobsPage() {
         {/* Filtres */}
         <div
           data-tour="job-filters"
-          className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 border border-gray-100 p-6"
+          className="bg-white dark:bg-gray-800 rounded-3xl shadow-lg shadow-gray-200/50 border border-gray-100 dark:border-gray-700 p-6"
           style={{ animation: 'fadeIn 0.6s ease-out 0.1s both' }}
         >
           <div className="flex flex-wrap items-center gap-4">
-            <div className="flex items-center gap-2 text-gray-700 font-medium">
+            <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 font-medium">
               <AdjustmentsHorizontalIcon className="w-5 h-5" />
               <span>Filtres</span>
             </div>
@@ -335,7 +335,7 @@ export default function JobsPage() {
               title="Filtrer par type de contrat"
               value={filters.job_type || ''}
               onChange={(e) => handleJobTypeFilter(e.target.value)}
-              className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-700 focus:outline-none focus:border-[#6B9B5F] focus:ring-2 focus:ring-[#6B9B5F]/10 transition-all"
+              className="px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-700 dark:text-gray-300 focus:outline-none focus:border-[#6B9B5F] focus:ring-2 focus:ring-[#6B9B5F]/10 transition-all"
             >
               <option value="">Tous les contrats</option>
               <option value="full_time">CDI</option>
@@ -350,7 +350,7 @@ export default function JobsPage() {
               title="Filtrer par mode de travail"
               value={filters.location_type || ''}
               onChange={(e) => handleLocationTypeFilter(e.target.value)}
-              className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-700 focus:outline-none focus:border-[#6B9B5F] focus:ring-2 focus:ring-[#6B9B5F]/10 transition-all"
+              className="px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-700 dark:text-gray-300 focus:outline-none focus:border-[#6B9B5F] focus:ring-2 focus:ring-[#6B9B5F]/10 transition-all"
             >
               <option value="">Tous les modes</option>
               <option value="on_site">Présentiel</option>
@@ -363,7 +363,7 @@ export default function JobsPage() {
               title="Filtrer par pays"
               value={filters.country || ''}
               onChange={(e) => setFilters({ ...filters, country: e.target.value || undefined, page: 1 })}
-              className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-700 focus:outline-none focus:border-[#6B9B5F] focus:ring-2 focus:ring-[#6B9B5F]/10 transition-all"
+              className="px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-700 dark:text-gray-300 focus:outline-none focus:border-[#6B9B5F] focus:ring-2 focus:ring-[#6B9B5F]/10 transition-all"
             >
               <option value="">Tous les pays</option>
               {COUNTRIES.map((c) => (
@@ -376,7 +376,7 @@ export default function JobsPage() {
               title="Filtrer par devise"
               value={filters.currency || ''}
               onChange={(e) => setFilters({ ...filters, currency: e.target.value || undefined, page: 1 })}
-              className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-700 focus:outline-none focus:border-[#6B9B5F] focus:ring-2 focus:ring-[#6B9B5F]/10 transition-all"
+              className="px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-700 dark:text-gray-300 focus:outline-none focus:border-[#6B9B5F] focus:ring-2 focus:ring-[#6B9B5F]/10 transition-all"
             >
               <option value="">Toutes les devises</option>
               {CURRENCIES.map((c) => (
@@ -391,14 +391,14 @@ export default function JobsPage() {
               title="Salaire minimum"
               value={filters.salary_min || ''}
               onChange={(e) => setFilters({ ...filters, salary_min: e.target.value ? Number(e.target.value) : undefined, page: 1 })}
-              className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-700 focus:outline-none focus:border-[#6B9B5F] focus:ring-2 focus:ring-[#6B9B5F]/10 transition-all w-32"
+              className="px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-700 dark:text-gray-300 focus:outline-none focus:border-[#6B9B5F] focus:ring-2 focus:ring-[#6B9B5F]/10 transition-all w-32"
             />
 
             {/* Bouton reset */}
             {(filters.search || filters.location || filters.job_type || filters.location_type || filters.country || filters.currency || filters.salary_min) && (
               <button
                 onClick={clearFilters}
-                className="px-4 py-2.5 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all flex items-center gap-2"
+                className="px-4 py-2.5 text-gray-500 dark:text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all flex items-center gap-2"
               >
                 <XMarkIcon className="w-4 h-4" />
                 <span>Réinitialiser</span>
@@ -412,19 +412,19 @@ export default function JobsPage() {
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
               <div className="w-16 h-16 border-4 border-[#6B9B5F] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-gray-500">Chargement des offres d'emploi...</p>
+              <p className="text-gray-500 dark:text-gray-400">Chargement des offres d'emploi...</p>
             </div>
           </div>
         ) : jobs.length === 0 ? (
           <div
-            className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 border border-gray-100 p-16 text-center"
+            className="bg-white dark:bg-gray-800 rounded-3xl shadow-lg shadow-gray-200/50 border border-gray-100 dark:border-gray-700 p-16 text-center"
             style={{ animation: 'fadeIn 0.6s ease-out 0.2s both' }}
           >
             <div className="w-24 h-24 mx-auto mb-6 rounded-3xl bg-[#6B9B5F]/10 flex items-center justify-center">
               <MagnifyingGlassIcon className="w-12 h-12 text-[#6B9B5F]" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">Aucune offre trouvée</h3>
-            <p className="text-gray-500 mb-8 max-w-md mx-auto">
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">Aucune offre trouvée</h3>
+            <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-md mx-auto">
               Aucune offre d'emploi ne correspond à vos critères actuels. Essayez de modifier vos filtres.
             </p>
             <button
@@ -445,13 +445,13 @@ export default function JobsPage() {
                 <div
                   key={job.id}
                   data-tour={index === 0 ? "job-card" : undefined}
-                  className="group bg-white rounded-3xl shadow-lg shadow-gray-200/50 border border-gray-100 overflow-hidden hover:shadow-xl hover:shadow-[#6B9B5F]/10 hover:border-[#6B9B5F]/20 transition-all"
+                  className="group bg-white dark:bg-gray-800 rounded-3xl shadow-lg shadow-gray-200/50 border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl hover:shadow-[#6B9B5F]/10 hover:border-[#6B9B5F]/20 transition-all"
                   style={{ animation: `fadeIn 0.4s ease-out ${0.05 * index}s both` }}
                 >
                   {/* Header avec logo */}
                   <div className="p-6 pb-0">
                     <div className="flex items-start gap-4">
-                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center flex-shrink-0 border border-gray-200 group-hover:border-[#6B9B5F]/30 transition-all">
+                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center flex-shrink-0 border border-gray-200 dark:border-gray-600 group-hover:border-[#6B9B5F]/30 transition-all">
                         {job.company_logo_url ? (
                           <img
                             src={job.company_logo_url}
@@ -459,12 +459,12 @@ export default function JobsPage() {
                             className="w-10 h-10 object-contain"
                           />
                         ) : (
-                          <BuildingOfficeIcon className="w-7 h-7 text-gray-400" />
+                          <BuildingOfficeIcon className="w-7 h-7 text-gray-400 dark:text-gray-500" />
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2">
-                          <h3 className="text-lg font-bold text-gray-900 group-hover:text-[#6B9B5F] transition-colors line-clamp-1">
+                          <h3 className="text-lg font-bold text-gray-900 dark:text-white group-hover:text-[#6B9B5F] transition-colors line-clamp-1">
                             {job.title}
                           </h3>
                           {job.is_featured && (
@@ -474,7 +474,7 @@ export default function JobsPage() {
                             </div>
                           )}
                         </div>
-                        <p className="text-sm text-gray-500 mt-0.5 flex items-center gap-1">
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 flex items-center gap-1">
                           {job.company_name}
                           {job.company_is_verified && (
                             <CheckBadgeIcon className="w-4 h-4 text-[#6B9B5F]" title="Entreprise vérifiée" />
@@ -487,7 +487,7 @@ export default function JobsPage() {
                   {/* Content */}
                   <div className="p-6">
                     {/* Description */}
-                    <p className="text-sm text-gray-600 line-clamp-2 mb-4">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-4">
                       {job.description}
                     </p>
 
@@ -515,11 +515,11 @@ export default function JobsPage() {
 
                     {/* Détails */}
                     <div className="space-y-2 text-sm">
-                      <div className="flex items-center gap-2 text-gray-500">
+                      <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
                         <MapPinIcon className="w-4 h-4 flex-shrink-0" />
                         <span className="truncate">{job.location || 'Localisation non précisée'}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-gray-500">
+                      <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
                         <CurrencyEuroIcon className="w-4 h-4 flex-shrink-0" />
                         <span>{formatSalary(job.salary_min, job.salary_max, job.currency)}</span>
                       </div>
@@ -527,9 +527,9 @@ export default function JobsPage() {
                   </div>
 
                   {/* Footer */}
-                  <div className="px-6 py-4 bg-gray-50/50 border-t border-gray-100">
+                  <div className="px-6 py-4 bg-gray-50/50 border-t border-gray-100 dark:border-gray-700">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4 text-xs text-gray-400">
+                      <div className="flex items-center gap-4 text-xs text-gray-400 dark:text-gray-500">
                         <span className="flex items-center gap-1">
                           <EyeIcon className="w-4 h-4" />
                           {job.views_count}
@@ -551,7 +551,7 @@ export default function JobsPage() {
                         {job.has_applied ? (
                           <button
                             disabled
-                            className="w-full py-3 rounded-xl font-semibold bg-gray-100 text-gray-400 cursor-not-allowed flex items-center justify-center gap-2"
+                            className="w-full py-3 rounded-xl font-semibold bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed flex items-center justify-center gap-2"
                           >
                             <CheckBadgeIcon className="w-5 h-5" />
                             <span>{t('applied')}</span>
@@ -603,7 +603,7 @@ export default function JobsPage() {
             <button
               onClick={() => setFilters({ ...filters, page: Math.max(1, (filters.page || 1) - 1) })}
               disabled={filters.page === 1}
-              className="flex items-center gap-2 px-5 py-3 rounded-xl font-medium bg-white border border-gray-200 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:border-[#6B9B5F] hover:text-[#6B9B5F] transition-all"
+              className="flex items-center gap-2 px-5 py-3 rounded-xl font-medium bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:border-[#6B9B5F] hover:text-[#6B9B5F] transition-all"
             >
               <ChevronLeftIcon className="w-5 h-5" />
               <span>Précédent</span>
@@ -629,7 +629,7 @@ export default function JobsPage() {
                     className={`w-10 h-10 rounded-xl font-semibold transition-all ${
                       filters.page === pageNum
                         ? 'bg-gradient-to-r from-[#6B9B5F] to-[#5a8a4f] text-white shadow-lg shadow-[#6B9B5F]/30'
-                        : 'bg-white border border-gray-200 text-gray-700 hover:border-[#6B9B5F] hover:text-[#6B9B5F]'
+                        : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-[#6B9B5F] hover:text-[#6B9B5F]'
                     }`}
                   >
                     {pageNum}
@@ -641,7 +641,7 @@ export default function JobsPage() {
             <button
               onClick={() => setFilters({ ...filters, page: Math.min(totalPages, (filters.page || 1) + 1) })}
               disabled={filters.page === totalPages}
-              className="flex items-center gap-2 px-5 py-3 rounded-xl font-medium bg-white border border-gray-200 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:border-[#6B9B5F] hover:text-[#6B9B5F] transition-all"
+              className="flex items-center gap-2 px-5 py-3 rounded-xl font-medium bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:border-[#6B9B5F] hover:text-[#6B9B5F] transition-all"
             >
               <span>Suivant</span>
               <ChevronRightIcon className="w-5 h-5" />
@@ -654,20 +654,20 @@ export default function JobsPage() {
       {showApplicationModal && selectedJob && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div
-            className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
             style={{ animation: 'fadeIn 0.3s ease-out' }}
           >
             {/* Header */}
-            <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-[#6B9B5F]/5 to-transparent">
+            <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-[#6B9B5F]/5 to-transparent">
               <div className="flex items-start gap-4">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#6B9B5F] to-[#5a8a4f] flex items-center justify-center shadow-lg shadow-[#6B9B5F]/30">
                   <PaperAirplaneIcon className="w-8 h-8 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-1">
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
                     Postuler pour ce poste
                   </h2>
-                  <p className="text-gray-500">{selectedJob.title}</p>
+                  <p className="text-gray-500 dark:text-gray-400">{selectedJob.title}</p>
                   <p className="text-[#6B9B5F] font-medium flex items-center gap-1">
                     {selectedJob.company_name}
                     {selectedJob.company_is_verified && (
@@ -684,14 +684,14 @@ export default function JobsPage() {
               <div className="bg-[#F7C700]/10 rounded-2xl p-4 mb-6 flex items-start gap-3">
                 <CheckCircleIcon className="w-6 h-6 text-[#F7C700] flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm text-gray-700 font-medium">Votre profil sera automatiquement partagé</p>
-                  <p className="text-sm text-gray-500">Les recruteurs verront votre CV et vos informations de profil.</p>
+                  <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">Votre profil sera automatiquement partagé</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Les recruteurs verront votre CV et vos informations de profil.</p>
                 </div>
               </div>
 
               {/* Sélection du CV */}
               <div className="mb-6">
-                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
                   📄 Sélectionnez un CV
                 </label>
                 
@@ -719,7 +719,7 @@ export default function JobsPage() {
                         className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
                           selectedCVId === cv.id 
                             ? 'border-[#6B9B5F] bg-[#6B9B5F]/5 shadow-md' 
-                            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                            : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 hover:bg-gray-50'
                         }`}
                       >
                         <input
@@ -730,8 +730,8 @@ export default function JobsPage() {
                           className="w-5 h-5 text-[#6B9B5F] focus:ring-[#6B9B5F] cursor-pointer"
                         />
                         <div className="flex-1">
-                          <p className="font-medium text-gray-900">{cv.filename}</p>
-                          <p className="text-sm text-gray-500">
+                          <p className="font-medium text-gray-900 dark:text-white">{cv.filename}</p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
                             Uploadé le {new Date(cv.created_at).toLocaleDateString('fr-FR', {
                               day: 'numeric',
                               month: 'long',
@@ -752,7 +752,7 @@ export default function JobsPage() {
 
               {/* Cover letter */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                   Lettre de motivation (optionnel)
                 </label>
                 <textarea
@@ -760,13 +760,13 @@ export default function JobsPage() {
                   onChange={(e) => setCoverLetter(e.target.value)}
                   rows={8}
                   placeholder="Expliquez pourquoi vous êtes le candidat idéal pour ce poste..."
-                  className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-[#6B9B5F] focus:ring-4 focus:ring-[#6B9B5F]/10 transition-all resize-none"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:outline-none focus:border-[#6B9B5F] focus:ring-4 focus:ring-[#6B9B5F]/10 transition-all resize-none"
                 />
               </div>
             </div>
 
             {/* Footer */}
-            <div className="p-6 border-t border-gray-100 flex gap-4">
+            <div className="p-6 border-t border-gray-100 dark:border-gray-700 flex gap-4">
               <button
                 onClick={() => {
                   setShowApplicationModal(false);
@@ -774,7 +774,7 @@ export default function JobsPage() {
                   setCoverLetter('');
                 }}
                 disabled={applyToJob.isPending}
-                className="flex-1 px-6 py-3 rounded-xl font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all disabled:opacity-50"
+                className="flex-1 px-6 py-3 rounded-xl font-semibold bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 transition-all disabled:opacity-50"
               >
                 Annuler
               </button>

@@ -407,7 +407,7 @@ export default function MesCVPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* CV téléchargés */}
           <div
-            className="bg-white rounded-3xl p-6 shadow-lg shadow-gray-200/50 border border-gray-100 hover:shadow-xl hover:shadow-[#6B9B5F]/10 transition-all"
+            className="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-lg shadow-gray-200/50 border border-gray-100 dark:border-gray-700 hover:shadow-xl hover:shadow-[#6B9B5F]/10 transition-all"
             style={{ animation: 'fadeIn 0.6s ease-out 0.1s both' }}
           >
             <div className="flex items-center gap-4">
@@ -415,15 +415,15 @@ export default function MesCVPage() {
                 <DocumentTextSolid className="w-7 h-7 text-white" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500 mb-1">CV téléchargés</p>
-                <p className="text-3xl font-bold text-gray-900">{cvs.length}</p>
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">CV téléchargés</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white">{cvs.length}</p>
               </div>
             </div>
           </div>
 
           {/* Vues */}
           <div
-            className="bg-white rounded-3xl p-6 shadow-lg shadow-gray-200/50 border border-gray-100 hover:shadow-xl hover:shadow-[#F7C700]/10 transition-all"
+            className="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-lg shadow-gray-200/50 border border-gray-100 dark:border-gray-700 hover:shadow-xl hover:shadow-[#F7C700]/10 transition-all"
             style={{ animation: 'fadeIn 0.6s ease-out 0.2s both' }}
           >
             <div className="flex items-center gap-4">
@@ -431,15 +431,15 @@ export default function MesCVPage() {
                 <ChartBarIcon className="w-7 h-7 text-white" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500 mb-1">Vues par recruteurs</p>
-                <p className="text-3xl font-bold text-gray-900">0</p>
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Vues par recruteurs</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white">0</p>
               </div>
             </div>
           </div>
 
           {/* Dernier téléchargement */}
           <div
-            className="bg-white rounded-3xl p-6 shadow-lg shadow-gray-200/50 border border-gray-100 hover:shadow-xl hover:shadow-[#6B46C1]/10 transition-all"
+            className="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-lg shadow-gray-200/50 border border-gray-100 dark:border-gray-700 hover:shadow-xl hover:shadow-[#6B46C1]/10 transition-all"
             style={{ animation: 'fadeIn 0.6s ease-out 0.3s both' }}
           >
             <div className="flex items-center gap-4">
@@ -447,8 +447,8 @@ export default function MesCVPage() {
                 <CalendarDaysIcon className="w-7 h-7 text-white" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500 mb-1">Dernier ajout</p>
-                <p className="text-sm font-semibold text-gray-900">
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Dernier ajout</p>
+                <p className="text-sm font-semibold text-gray-900 dark:text-white">
                   {cvs.length > 0 ? formatDate(cvs[0].created_at) : 'Aucun'}
                 </p>
               </div>
@@ -458,19 +458,19 @@ export default function MesCVPage() {
 
         {/* Liste des CV */}
         <div
-          className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 border border-gray-100 overflow-hidden"
+          className="bg-white dark:bg-gray-800 rounded-3xl shadow-lg shadow-gray-200/50 border border-gray-100 dark:border-gray-700 overflow-hidden"
           style={{ animation: 'fadeIn 0.6s ease-out 0.4s both' }}
         >
           {/* Header */}
-          <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+          <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#3B82F6] to-[#2563eb] flex items-center justify-center shadow-lg shadow-[#3B82F6]/30">
                   <DocumentTextIcon className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900">Mes CV</h3>
-                  <p className="text-sm text-gray-500">Gérez vos documents et suivez leur utilisation</p>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">Mes CV</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Gérez vos documents et suivez leur utilisation</p>
                 </div>
               </div>
               <button
@@ -489,8 +489,8 @@ export default function MesCVPage() {
               <div className="w-24 h-24 mx-auto mb-6 rounded-3xl bg-gradient-to-br from-[#3B82F6]/10 to-[#3B82F6]/5 flex items-center justify-center">
                 <DocumentPlusIcon className="w-12 h-12 text-[#3B82F6]" />
               </div>
-              <h4 className="text-xl font-bold text-gray-900 mb-2">Aucun CV téléchargé</h4>
-              <p className="text-gray-500 mb-8 max-w-md mx-auto">
+              <h4 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Aucun CV téléchargé</h4>
+              <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-md mx-auto">
                 Téléchargez votre premier CV pour commencer à postuler aux offres d'emploi et attirer l'attention des recruteurs.
               </p>
               <button
@@ -515,16 +515,16 @@ export default function MesCVPage() {
                       <DocumentTextSolid className="w-7 h-7 text-red-500" />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-900 group-hover:text-[#6B9B5F] transition-colors">
+                      <h4 className="font-semibold text-gray-900 dark:text-white group-hover:text-[#6B9B5F] transition-colors">
                         {cv.filename}
                       </h4>
-                      <div className="flex items-center gap-3 mt-1 text-sm text-gray-500">
+                      <div className="flex items-center gap-3 mt-1 text-sm text-gray-500 dark:text-gray-400">
                         <span className="flex items-center gap-1">
                           <CalendarDaysIcon className="w-4 h-4" />
                           {formatDate(cv.created_at)}
                         </span>
                         {cv.file_size && (
-                          <span className="px-2 py-0.5 bg-gray-100 rounded-full text-xs">
+                          <span className="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded-full text-xs">
                             {formatFileSize(cv.file_size)}
                           </span>
                         )}
@@ -542,21 +542,21 @@ export default function MesCVPage() {
                     <button
                       title="Prévisualiser le CV"
                       onClick={() => handleViewCV(cv)}
-                      className="p-3 rounded-xl text-gray-400 hover:text-[#3B82F6] hover:bg-[#3B82F6]/10 transition-all"
+                      className="p-3 rounded-xl text-gray-400 dark:text-gray-500 hover:text-[#3B82F6] hover:bg-[#3B82F6]/10 transition-all"
                     >
                       <EyeIcon className="w-5 h-5" />
                     </button>
                     <button
                       title="Télécharger le CV"
                       onClick={() => handleDownloadCV(cv)}
-                      className="p-3 rounded-xl text-gray-400 hover:text-[#6B9B5F] hover:bg-[#6B9B5F]/10 transition-all"
+                      className="p-3 rounded-xl text-gray-400 dark:text-gray-500 hover:text-[#6B9B5F] hover:bg-[#6B9B5F]/10 transition-all"
                     >
                       <ArrowDownTrayIcon className="w-5 h-5" />
                     </button>
                     <button
                       title="Supprimer le CV"
                       onClick={() => handleDeleteCV(cv)}
-                      className="p-3 rounded-xl text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all"
+                      className="p-3 rounded-xl text-gray-400 dark:text-gray-500 hover:text-red-500 hover:bg-red-50 transition-all"
                     >
                       <TrashIcon className="w-5 h-5" />
                     </button>
@@ -577,7 +577,7 @@ export default function MesCVPage() {
               <CheckCircleIcon className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h3 className="font-bold text-gray-900 mb-3">Conseils pour optimiser votre CV</h3>
+              <h3 className="font-bold text-gray-900 dark:text-white mb-3">Conseils pour optimiser votre CV</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {[
                   { text: 'Utilisez un format PDF pour une meilleure compatibilité', color: '#6B9B5F' },
@@ -585,7 +585,7 @@ export default function MesCVPage() {
                   { text: 'Adaptez votre CV en fonction du poste visé', color: '#6B46C1' },
                   { text: 'Vérifiez régulièrement les statistiques de consultation', color: '#3B82F6' },
                 ].map((tip, i) => (
-                  <div key={i} className="flex items-center gap-2 text-sm text-gray-600">
+                  <div key={i} className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                     <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: tip.color }} />
                     <span>{tip.text}</span>
                   </div>
