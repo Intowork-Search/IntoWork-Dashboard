@@ -479,7 +479,7 @@ export default function EmailTemplatesPage() {
                 </h3>
                 <button
                   onClick={resetForm}
-                  className="p-2 rounded-xl hover:bg-gray-100 transition-colors"
+                  className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
                 >
                   <XMarkIcon className="w-6 h-6 text-gray-500 dark:text-gray-400" />
                 </button>
@@ -500,7 +500,7 @@ export default function EmailTemplatesPage() {
                   placeholder="Ex: Bienvenue nouveau candidat"
                   required
                 />
-                <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+                <p className="text-sm text-gray-500 dark:text-gray-400 italic dark:text-gray-500">
                   Donnez un nom descriptif pour identifier facilement ce template
                 </p>
               </div>
@@ -528,7 +528,7 @@ export default function EmailTemplatesPage() {
                     </svg>
                   </div>
                 </div>
-                <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+                <p className="text-sm text-gray-500 dark:text-gray-400 italic dark:text-gray-500">
                   Choisissez le type d'email correspondant à votre besoin
                 </p>
               </div>
@@ -546,7 +546,7 @@ export default function EmailTemplatesPage() {
                   placeholder="Ex: Bienvenue chez {company_name} !"
                   required
                 />
-                <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+                <p className="text-sm text-gray-500 dark:text-gray-400 italic dark:text-gray-500">
                   Le sujet qui apparaîtra dans la boîte mail du destinataire
                 </p>
               </div>
@@ -619,7 +619,7 @@ export default function EmailTemplatesPage() {
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="flex-1 px-8 py-4 rounded-xl text-base font-bold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 border-2 border-gray-300 hover:border-gray-400 shadow-sm hover:shadow-md transition-all"
+                  className="flex-1 px-8 py-4 rounded-xl text-base font-bold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 border-2 border-gray-300 hover:border-gray-400 shadow-sm hover:shadow-md transition-all"
                 >
                   Annuler
                 </button>

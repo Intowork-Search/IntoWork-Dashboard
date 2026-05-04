@@ -455,7 +455,7 @@ export default function JobAlertsPage() {
                   {editingAlert ? 'Modifier l\'alerte' : 'Nouvelle alerte emploi'}
                 </h3>
               </div>
-              <button onClick={resetForm} className="p-2 rounded-xl text-gray-400 dark:text-gray-500 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+              <button onClick={resetForm} className="p-2 rounded-xl text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
                 <XMarkIcon className="w-5 h-5" />
               </button>
             </div>
@@ -575,7 +575,7 @@ export default function JobAlertsPage() {
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="flex-1 px-4 py-2.5 border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-semibold text-sm hover:bg-gray-50 transition-colors"
+                  className="flex-1 px-4 py-2.5 border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-semibold text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
                   Annuler
                 </button>
@@ -605,7 +605,7 @@ export default function JobAlertsPage() {
                   <p className="text-xs text-gray-500 dark:text-gray-400">{previewJobs.length} résultat{previewJobs.length !== 1 ? 's' : ''} trouvé{previewJobs.length !== 1 ? 's' : ''}</p>
                 </div>
               </div>
-              <button onClick={() => setShowPreview(false)} className="p-2 rounded-xl text-gray-400 dark:text-gray-500 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+              <button onClick={() => setShowPreview(false)} className="p-2 rounded-xl text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
                 <XMarkIcon className="w-5 h-5" />
               </button>
             </div>
@@ -632,7 +632,7 @@ export default function JobAlertsPage() {
               ))}
             </div>
             <div className="p-4 border-t border-gray-100 dark:border-gray-700">
-              <button onClick={() => setShowPreview(false)} className="w-full py-2.5 border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-semibold text-sm hover:bg-gray-50 transition-colors">
+              <button onClick={() => setShowPreview(false)} className="w-full py-2.5 border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-semibold text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                 Fermer
               </button>
             </div>

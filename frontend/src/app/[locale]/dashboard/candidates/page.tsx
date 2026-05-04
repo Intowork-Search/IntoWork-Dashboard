@@ -286,7 +286,7 @@ export default function CandidatesPage(): React.JSX.Element {
                 </thead>
                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200">
                   {filteredApplications.map((application: CandidateApplication, index: number) => (
-                    <tr key={application.id} className="hover:bg-gray-50 transition" data-tour={index === 0 ? "candidate-card" : undefined}>
+                    <tr key={application.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition" data-tour={index === 0 ? "candidate-card" : undefined}>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
@@ -335,7 +335,7 @@ export default function CandidatesPage(): React.JSX.Element {
             <button
               onClick={() => setPage(Math.max(1, page - 1))}
               disabled={page === 1}
-              className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 text-gray-900 dark:text-white"
+              className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
             >
               Précédent
             </button>
@@ -345,7 +345,7 @@ export default function CandidatesPage(): React.JSX.Element {
             <button
               onClick={() => setPage(Math.min(totalPages, page + 1))}
               disabled={page === totalPages}
-              className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 text-gray-900 dark:text-white"
+              className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
             >
               Suivant
             </button>
@@ -361,7 +361,7 @@ export default function CandidatesPage(): React.JSX.Element {
               <h3 className="text-xl font-bold text-gray-900 dark:text-white">Détails de la candidature</h3>
               <button
                 onClick={() => setViewingApplication(null)}
-                className="text-gray-400 dark:text-gray-500 hover:text-gray-600"
+                className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-400"
                 aria-label="Fermer"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -545,7 +545,7 @@ export default function CandidatesPage(): React.JSX.Element {
               <div className="flex justify-end space-x-3 pt-4 border-t">
                 <button
                   onClick={() => setViewingApplication(null)}
-                  className="px-6 py-2 border border-gray-300 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 transition"
+                  className="px-6 py-2 border border-gray-300 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition"
                 >
                   Fermer
                 </button>

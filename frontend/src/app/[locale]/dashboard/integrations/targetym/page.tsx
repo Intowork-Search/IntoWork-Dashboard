@@ -147,7 +147,7 @@ export default function TargetymIntegrationPage() {
         <div className="flex items-center gap-3 mb-8">
           <button
             onClick={() => router.push('/dashboard/integrations')}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors"
           >
             <ArrowLeftIcon className="h-5 w-5 text-gray-500 dark:text-gray-400" />
           </button>

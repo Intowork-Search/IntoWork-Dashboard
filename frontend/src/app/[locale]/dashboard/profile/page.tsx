@@ -366,7 +366,7 @@ export default function ProfilePage() {
             onClick={() => globalThis.location.reload()}
             className="mt-4 px-6 py-3 rounded-xl font-semibold bg-red-600 text-white hover:bg-red-700 transition-colors"
           >
-            Réessayer
+            {t('retry')}
           </button>
         </div>
       </DashboardLayout>
@@ -411,7 +411,7 @@ export default function ProfilePage() {
             <div>
               <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-1.5 mb-3">
                 <CheckCircleSolid className="w-4 h-4 text-[#F7C700]" />
-                <span className="text-white/90 text-sm font-medium">Profil actif</span>
+                <span className="text-white/90 text-sm font-medium">{t('profileActive')}</span>
               </div>
               <h2 className="text-3xl font-bold text-white mb-1">
                 {user?.firstName} {user?.lastName}
@@ -448,7 +448,7 @@ export default function ProfilePage() {
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-3xl font-bold text-white">{completionPercentage}%</span>
-                <span className="text-white/70 text-sm">Complété</span>
+                <span className="text-white/70 text-sm">{t('completed')}</span>
               </div>
             </div>
           </div>
@@ -559,7 +559,7 @@ export default function ProfilePage() {
                       className="group flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold bg-gradient-to-r from-[#6B9B5F]/10 to-[#6B9B5F]/5 text-[#6B9B5F] border border-[#6B9B5F]/20 hover:from-[#6B9B5F]/20 hover:to-[#6B9B5F]/10 transition-all"
                     >
                       <PencilIcon className="w-5 h-5" />
-                      <span>Modifier</span>
+                      <span>{tc('edit')}</span>
                     </button>
                   )}
                   {activeSection === 'personal' && isEditing && (
@@ -587,7 +587,7 @@ export default function ProfilePage() {
                       className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold bg-gradient-to-r from-[#F7C700] to-[#e5b800] text-white shadow-lg shadow-[#F7C700]/30 hover:shadow-xl hover:shadow-[#F7C700]/40 transition-all"
                     >
                       <PlusIcon className="w-5 h-5" />
-                      <span>Ajouter</span>
+                      <span>{tc('add')}</span>
                     </button>
                   )}
                   {activeSection === 'education' && (
@@ -596,7 +596,7 @@ export default function ProfilePage() {
                       className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold bg-gradient-to-r from-[#6B46C1] to-[#5a3ba3] text-white shadow-lg shadow-[#6B46C1]/30 hover:shadow-xl hover:shadow-[#6B46C1]/40 transition-all"
                     >
                       <PlusIcon className="w-5 h-5" />
-                      <span>Ajouter</span>
+                      <span>{tc('add')}</span>
                     </button>
                   )}
                   {activeSection === 'skills' && (
@@ -605,7 +605,7 @@ export default function ProfilePage() {
                       className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold bg-gradient-to-r from-[#3B82F6] to-[#2563eb] text-white shadow-lg shadow-[#3B82F6]/30 hover:shadow-xl hover:shadow-[#3B82F6]/40 transition-all"
                     >
                       <PlusIcon className="w-5 h-5" />
-                      <span>Ajouter</span>
+                      <span>{tc('add')}</span>
                     </button>
                   )}
                 </div>
@@ -624,7 +624,7 @@ export default function ProfilePage() {
                         <div className="w-8 h-8 bg-[#6B9B5F]/10 rounded-lg flex items-center justify-center">
                           <PhoneIcon className="w-4 h-4 text-[#6B9B5F]" />
                         </div>
-                        Téléphone
+                        {t('phone')}
                       </label>
                       {isEditing ? (
                         <input
@@ -649,7 +649,7 @@ export default function ProfilePage() {
                         <div className="w-8 h-8 bg-[#6B46C1]/10 rounded-lg flex items-center justify-center">
                           <MapPinIcon className="w-4 h-4 text-[#6B46C1]" />
                         </div>
-                        Localisation
+                        {t('location')}
                       </label>
                       {isEditing ? (
                         <input
@@ -675,7 +675,7 @@ export default function ProfilePage() {
                       <div className="w-8 h-8 bg-[#F7C700]/10 rounded-lg flex items-center justify-center">
                         <BriefcaseIcon className="w-4 h-4 text-[#F7C700]" />
                       </div>
-                      Titre professionnel
+                      {t('jobTitle')}
                     </label>
                     {isEditing ? (
                       <input
@@ -700,7 +700,7 @@ export default function ProfilePage() {
                       <div className="w-8 h-8 bg-[#3B82F6]/10 rounded-lg flex items-center justify-center">
                         <EnvelopeIcon className="w-4 h-4 text-[#3B82F6]" />
                       </div>
-                      Résumé professionnel
+                      {t('summary')}
                     </label>
                     {isEditing ? (
                       <textarea
@@ -759,7 +759,7 @@ export default function ProfilePage() {
                         <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
                           <GlobeAltIcon className="w-4 h-4 text-purple-600" />
                         </div>
-                        Site web / Portfolio
+                        {t('website')}
                       </label>
                       {isEditing ? (
                         <input
@@ -995,7 +995,7 @@ export default function ProfilePage() {
 
             <div className="space-y-5">
               <div>
-                <label className="block mb-2 font-semibold text-gray-700">Titre du poste *</label>
+                <label className="block mb-2 font-semibold text-gray-700">{t('positionTitle')} *</label>
                 <input
                   type="text"
                   value={newExperience.title}
@@ -1007,7 +1007,7 @@ export default function ProfilePage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block mb-2 font-semibold text-gray-700">Entreprise *</label>
+                  <label className="block mb-2 font-semibold text-gray-700">{t('company')} *</label>
                   <input
                     type="text"
                     value={newExperience.company}
@@ -1030,7 +1030,7 @@ export default function ProfilePage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block mb-2 font-semibold text-gray-700">Date de début *</label>
+                  <label className="block mb-2 font-semibold text-gray-700">{t('startDate')} *</label>
                   <input
                     type="date"
                     value={newExperience.start_date}
@@ -1039,7 +1039,7 @@ export default function ProfilePage() {
                   />
                 </div>
                 <div>
-                  <label className="block mb-2 font-semibold text-gray-700">Date de fin</label>
+                  <label className="block mb-2 font-semibold text-gray-700">{t('endDate')}</label>
                   <input
                     type="date"
                     value={newExperience.end_date}
@@ -1057,7 +1057,7 @@ export default function ProfilePage() {
                   onChange={(e) => setNewExperience({ ...newExperience, is_current: e.target.checked, end_date: '' })}
                   className="w-5 h-5 rounded border-gray-300 text-[#F7C700] focus:ring-[#F7C700]"
                 />
-                <span className="font-medium text-gray-700">Poste actuel</span>
+                <span className="font-medium text-gray-700">{t('currentPosition')}</span>
               </label>
 
               <div>
@@ -1084,7 +1084,7 @@ export default function ProfilePage() {
                 disabled={!newExperience.title || !newExperience.company || !newExperience.start_date}
                 className="flex-1 px-6 py-3 rounded-xl font-semibold bg-gradient-to-r from-[#F7C700] to-[#e5b800] text-white shadow-lg shadow-[#F7C700]/30 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
-                Ajouter
+                {tc('add')}
               </button>
             </div>
           </div>
@@ -1110,7 +1110,7 @@ export default function ProfilePage() {
 
             <div className="space-y-5">
               <div>
-                <label className="block mb-2 font-semibold text-gray-700">Diplôme / Formation *</label>
+                <label className="block mb-2 font-semibold text-gray-700">{t('degree')} *</label>
                 <input
                   type="text"
                   value={newEducation.degree}
@@ -1122,7 +1122,7 @@ export default function ProfilePage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block mb-2 font-semibold text-gray-700">Établissement *</label>
+                  <label className="block mb-2 font-semibold text-gray-700">{t('school')} *</label>
                   <input
                     type="text"
                     value={newEducation.school}
@@ -1145,7 +1145,7 @@ export default function ProfilePage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block mb-2 font-semibold text-gray-700">Année de début *</label>
+                  <label className="block mb-2 font-semibold text-gray-700">{t('startDate')} *</label>
                   <input
                     type="date"
                     value={newEducation.start_date}
@@ -1154,7 +1154,7 @@ export default function ProfilePage() {
                   />
                 </div>
                 <div>
-                  <label className="block mb-2 font-semibold text-gray-700">Année de fin</label>
+                  <label className="block mb-2 font-semibold text-gray-700">{t('endDate')}</label>
                   <input
                     type="date"
                     value={newEducation.end_date}
@@ -1188,7 +1188,7 @@ export default function ProfilePage() {
                 disabled={!newEducation.degree || !newEducation.school || !newEducation.start_date}
                 className="flex-1 px-6 py-3 rounded-xl font-semibold bg-gradient-to-r from-[#6B46C1] to-[#5a3ba3] text-white shadow-lg shadow-[#6B46C1]/30 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
-                Ajouter
+                {tc('add')}
               </button>
             </div>
           </div>
@@ -1214,7 +1214,7 @@ export default function ProfilePage() {
 
             <div className="space-y-5">
               <div>
-                <label className="block mb-2 font-semibold text-gray-700">Nom de la compétence *</label>
+                <label className="block mb-2 font-semibold text-gray-700">{t('skillName')} *</label>
                 <input
                   type="text"
                   value={newSkill.name}
@@ -1225,12 +1225,12 @@ export default function ProfilePage() {
               </div>
 
               <div>
-                <label className="block mb-2 font-semibold text-gray-700">Catégorie</label>
+                <label className="block mb-2 font-semibold text-gray-700">{t('category')}</label>
                 <div className="grid grid-cols-3 gap-2">
                   {[
-                    { value: 'technical', label: 'Technique', color: '#3B82F6' },
-                    { value: 'soft', label: 'Soft skill', color: '#6B9B5F' },
-                    { value: 'language', label: 'Langue', color: '#6B46C1' },
+                    { value: 'technical', label: t('technical'), color: '#3B82F6' },
+                    { value: 'soft', label: t('soft'), color: '#6B9B5F' },
+                    { value: 'language', label: t('language'), color: '#6B46C1' },
                   ].map((cat) => (
                     <button
                       key={cat.value}
@@ -1252,7 +1252,7 @@ export default function ProfilePage() {
               </div>
 
               <div>
-                <label className="block mb-2 font-semibold text-gray-700">Niveau</label>
+                <label className="block mb-2 font-semibold text-gray-700">{t('level')}</label>
                 <select
                   value={newSkill.level}
                   onChange={(e) => setNewSkill({ ...newSkill, level: Number(e.target.value) })}
@@ -1279,7 +1279,7 @@ export default function ProfilePage() {
                 disabled={!newSkill.name}
                 className="flex-1 px-6 py-3 rounded-xl font-semibold bg-gradient-to-r from-[#3B82F6] to-[#2563eb] text-white shadow-lg shadow-[#3B82F6]/30 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
-                Ajouter
+                {tc('add')}
               </button>
             </div>
           </div>

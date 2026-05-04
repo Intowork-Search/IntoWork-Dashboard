@@ -352,7 +352,7 @@ export default function JobDetailPage() {
                     setShowApplicationModal(false);
                     setCoverLetter('');
                   }}
-                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 dark:text-gray-300 font-medium rounded-lg hover:bg-gray-50 transition-colors"
+                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 dark:text-gray-300 font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                   disabled={applying}
                 >
                   Annuler

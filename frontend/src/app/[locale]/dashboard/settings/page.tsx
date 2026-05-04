@@ -428,14 +428,14 @@ export default function SettingsPage() {
   };
 
   const tabs = userRole === 'admin' ? [
-    { id: 'profile', name: 'Profil', icon: UserIcon, color: '#6B9B5F' },
+    { id: 'profile', name: t('profile'), icon: UserIcon, color: '#6B9B5F' },
     { id: 'account', name: t('account'), icon: KeyIcon, color: '#6B46C1' }
   ] : userRole === 'employer' ? [
-    { id: 'company', name: 'Entreprise', icon: BuildingOfficeIcon, color: '#F7C700' },
+    { id: 'company', name: t('companyTab'), icon: BuildingOfficeIcon, color: '#F7C700' },
     { id: 'notifications', name: t('notifications'), icon: BellIcon, color: '#3B82F6' },
     { id: 'account', name: t('account'), icon: KeyIcon, color: '#6B46C1' }
   ] : [
-    { id: 'profile', name: 'Profil', icon: UserIcon, color: '#6B9B5F' },
+    { id: 'profile', name: t('profile'), icon: UserIcon, color: '#6B9B5F' },
     { id: 'notifications', name: t('notifications'), icon: BellIcon, color: '#3B82F6' },
     { id: 'privacy', name: t('privacy'), icon: ShieldCheckIcon, color: '#F7C700' },
     { id: 'account', name: t('account'), icon: KeyIcon, color: '#6B46C1' }
@@ -459,7 +459,7 @@ export default function SettingsPage() {
 
   return (
     <DashboardLayout>
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
         {/* Hero Section */}
         <div className="relative overflow-hidden bg-gradient-to-br from-[#6B9B5F] via-[#5a8a4f] to-[#6B46C1] rounded-b-[3rem] px-6 py-10 mb-8">
           {/* Decorative patterns */}
@@ -475,7 +475,7 @@ export default function SettingsPage() {
                 <Cog6ToothIcon className="w-8 h-8 text-white" />
               </div>
               <span className="bg-white/20 backdrop-blur-sm text-white px-4 py-1.5 rounded-full text-sm font-medium">
-                Paramètres
+                {t('title')}
               </span>
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
@@ -519,7 +519,7 @@ export default function SettingsPage() {
                     <UserIcon className="w-8 h-8 text-[#6B9B5F]" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-gray-900">Informations personnelles</h3>
+                    <h3 className="text-2xl font-bold text-gray-900">{t('personalInfo')}</h3>
                     <p className="text-gray-600">Mettez à jour vos informations de profil pour améliorer votre visibilité</p>
                   </div>
                 </div>
@@ -527,7 +527,7 @@ export default function SettingsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label htmlFor="first_name" className="block text-sm font-bold text-gray-800 mb-2">
-                      Prénom
+                      {t('firstName')}
                     </label>
                     <input
                       id="first_name"
@@ -541,7 +541,7 @@ export default function SettingsPage() {
 
                   <div>
                     <label htmlFor="last_name" className="block text-sm font-bold text-gray-800 mb-2">
-                      Nom
+                      {t('lastName')}
                     </label>
                     <input
                       id="last_name"
@@ -555,7 +555,7 @@ export default function SettingsPage() {
 
                   <div>
                     <label htmlFor="phone" className="block text-sm font-bold text-gray-800 mb-2">
-                      Téléphone
+                      {t('phone')}
                     </label>
                     <input
                       id="phone"
@@ -569,7 +569,7 @@ export default function SettingsPage() {
 
                   <div>
                     <label htmlFor="location" className="block text-sm font-bold text-gray-800 mb-2">
-                      Localisation
+                      {t('location')}
                     </label>
                     <input
                       id="location"
@@ -583,7 +583,7 @@ export default function SettingsPage() {
 
                   <div className="md:col-span-2">
                     <label htmlFor="bio" className="block text-sm font-bold text-gray-800 mb-2">
-                      Bio professionnelle
+                      {t('bio')}
                     </label>
                     <textarea
                       id="bio"
@@ -597,7 +597,7 @@ export default function SettingsPage() {
 
                   <div>
                     <label htmlFor="website" className="block text-sm font-bold text-gray-800 mb-2">
-                      Site web personnel
+                      {t('websitePersonal')}
                     </label>
                     <input
                       id="website"
@@ -611,7 +611,7 @@ export default function SettingsPage() {
 
                   <div>
                     <label htmlFor="linkedin" className="block text-sm font-bold text-gray-800 mb-2">
-                      Profil LinkedIn
+                      {t('linkedinProfile')}
                     </label>
                     <input
                       id="linkedin"
@@ -625,7 +625,7 @@ export default function SettingsPage() {
 
                   <div className="md:col-span-2">
                     <label htmlFor="github" className="block text-sm font-bold text-gray-800 mb-2">
-                      Profil GitHub
+                      {t('githubProfile')}
                     </label>
                     <input
                       id="github"
@@ -659,7 +659,7 @@ export default function SettingsPage() {
                     <BuildingOfficeIcon className="w-8 h-8 text-[#F7C700]" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-gray-900">Informations de l'entreprise</h3>
+                    <h3 className="text-2xl font-bold text-gray-900">{t('companyInfo')}</h3>
                     <p className="text-gray-600">Mettez à jour les informations pour attirer les meilleurs talents</p>
                   </div>
                 </div>
@@ -667,7 +667,7 @@ export default function SettingsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="md:col-span-2">
                     <label htmlFor="company_name" className="block text-sm font-bold text-gray-800 mb-2">
-                      Nom de l'entreprise *
+                      {t('companyName')} *
                     </label>
                     <input
                       id="company_name"
@@ -681,7 +681,7 @@ export default function SettingsPage() {
 
                   <div className="md:col-span-2">
                     <label htmlFor="company_description" className="block text-sm font-bold text-gray-800 mb-2">
-                      Description
+                      {t('description')}
                     </label>
                     <textarea
                       id="company_description"
@@ -695,7 +695,7 @@ export default function SettingsPage() {
 
                   <div>
                     <label htmlFor="industry" className="block text-sm font-bold text-gray-800 mb-2">
-                      Secteur d'activité
+                      {t('industry')}
                     </label>
                     <input
                       id="industry"
@@ -709,13 +709,13 @@ export default function SettingsPage() {
 
                   <div>
                     <label htmlFor="size" className="block text-sm font-bold text-gray-800 mb-2">
-                      Taille de l'entreprise
+                      {t('size')}
                     </label>
                     <select
                       id="size"
                       value={companyData.size}
                       onChange={(e) => setCompanyData(prev => ({ ...prev, size: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                     >
                       <option value="">Sélectionnez une taille</option>
                       <option value="1-10">1-10 employés</option>
@@ -729,7 +729,7 @@ export default function SettingsPage() {
 
                   <div>
                     <label htmlFor="website_url" className="block text-sm font-bold text-gray-800 mb-2">
-                      Site web
+                      {t('website')}
                     </label>
                     <input
                       id="website_url"
@@ -757,7 +757,7 @@ export default function SettingsPage() {
 
                   <div className="md:col-span-2">
                     <label htmlFor="address" className="block text-sm font-bold text-gray-800 mb-2">
-                      Adresse
+                      {t('address')}
                     </label>
                     <input
                       id="address"
@@ -771,7 +771,7 @@ export default function SettingsPage() {
 
                   <div>
                     <label htmlFor="city" className="block text-sm font-bold text-gray-800 mb-2">
-                      Ville
+                      {t('city')}
                     </label>
                     <input
                       id="city"
@@ -785,7 +785,7 @@ export default function SettingsPage() {
 
                   <div>
                     <label htmlFor="country" className="block text-sm font-bold text-gray-800 mb-2">
-                      Pays
+                      {t('country')}
                     </label>
                     <input
                       id="country"
@@ -889,7 +889,7 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="space-y-4">
-                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 hover:shadow-md transition-all duration-300">
+                  <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-700 rounded-2xl p-6 flex items-center justify-between border border-gray-100 dark:border-gray-600 hover:shadow-md transition-all duration-300">
                     <div className="flex items-center gap-4">
                       <div className="bg-[#6B9B5F]/10 p-3 rounded-xl">
                         <BellIcon className="w-6 h-6 text-[#6B9B5F]" />
@@ -906,7 +906,7 @@ export default function SettingsPage() {
                     />
                   </div>
 
-                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 hover:shadow-md transition-all duration-300">
+                  <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-700 rounded-2xl p-6 flex items-center justify-between border border-gray-100 dark:border-gray-600 hover:shadow-md transition-all duration-300">
                     <div className="flex items-center gap-4">
                       <div className="bg-[#6B46C1]/10 p-3 rounded-xl">
                         <SparklesIcon className="w-6 h-6 text-[#6B46C1]" />
@@ -923,7 +923,7 @@ export default function SettingsPage() {
                     />
                   </div>
 
-                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 hover:shadow-md transition-all duration-300">
+                  <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-700 rounded-2xl p-6 flex items-center justify-between border border-gray-100 dark:border-gray-600 hover:shadow-md transition-all duration-300">
                     <div className="flex items-center gap-4">
                       <div className="bg-[#F7C700]/10 p-3 rounded-xl">
                         <BellIcon className="w-6 h-6 text-[#F7C700]" />
@@ -940,7 +940,7 @@ export default function SettingsPage() {
                     />
                   </div>
 
-                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 hover:shadow-md transition-all duration-300">
+                  <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-700 rounded-2xl p-6 flex items-center justify-between border border-gray-100 dark:border-gray-600 hover:shadow-md transition-all duration-300">
                     <div className="flex items-center gap-4">
                       <div className="bg-[#3B82F6]/10 p-3 rounded-xl">
                         <BellIcon className="w-6 h-6 text-[#3B82F6]" />
@@ -985,7 +985,7 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="space-y-4">
-                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 hover:shadow-md transition-all duration-300">
+                  <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-700 rounded-2xl p-6 flex items-center justify-between border border-gray-100 dark:border-gray-600 hover:shadow-md transition-all duration-300">
                     <div className="flex items-center gap-4">
                       <div className="bg-[#6B9B5F]/10 p-3 rounded-xl">
                         <UserIcon className="w-6 h-6 text-[#6B9B5F]" />
@@ -1002,7 +1002,7 @@ export default function SettingsPage() {
                     />
                   </div>
 
-                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 hover:shadow-md transition-all duration-300">
+                  <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-700 rounded-2xl p-6 flex items-center justify-between border border-gray-100 dark:border-gray-600 hover:shadow-md transition-all duration-300">
                     <div className="flex items-center gap-4">
                       <div className="bg-[#6B46C1]/10 p-3 rounded-xl">
                         <BellIcon className="w-6 h-6 text-[#6B46C1]" />
@@ -1019,7 +1019,7 @@ export default function SettingsPage() {
                     />
                   </div>
 
-                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 hover:shadow-md transition-all duration-300">
+                  <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-700 rounded-2xl p-6 flex items-center justify-between border border-gray-100 dark:border-gray-600 hover:shadow-md transition-all duration-300">
                     <div className="flex items-center gap-4">
                       <div className="bg-[#F7C700]/10 p-3 rounded-xl">
                         <BellIcon className="w-6 h-6 text-[#F7C700]" />
@@ -1036,7 +1036,7 @@ export default function SettingsPage() {
                     />
                   </div>
 
-                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 hover:shadow-md transition-all duration-300">
+                  <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-700 rounded-2xl p-6 flex items-center justify-between border border-gray-100 dark:border-gray-600 hover:shadow-md transition-all duration-300">
                     <div className="flex items-center gap-4">
                       <div className="bg-[#3B82F6]/10 p-3 rounded-xl">
                         <ShieldCheckIcon className="w-6 h-6 text-[#3B82F6]" />
@@ -1161,7 +1161,7 @@ export default function SettingsPage() {
                 </div>
 
                 {/* Danger Zone */}
-                <div className="bg-gradient-to-r from-red-50 to-red-100/50 border-2 border-red-200 rounded-2xl p-6">
+                <div className="bg-gradient-to-r from-red-50 to-red-100/50 dark:from-red-950/30 dark:to-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-2xl p-6">
                   <div className="flex items-start gap-4">
                     <div className="bg-red-100 p-3 rounded-xl shrink-0">
                       <ExclamationTriangleIcon className="w-6 h-6 text-red-600" />

@@ -507,7 +507,7 @@ export default function MesCVPage() {
               {cvs.map((cv, index) => (
                 <div
                   key={cv.id || cv.filename}
-                  className="group p-6 flex items-center justify-between hover:bg-gray-50/50 transition-all"
+                  className="group p-6 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all"
                   style={{ animation: `fadeIn 0.4s ease-out ${0.1 * index}s both` }}
                 >
                   <div className="flex items-center gap-4">

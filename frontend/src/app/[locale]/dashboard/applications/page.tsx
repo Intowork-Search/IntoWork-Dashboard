@@ -299,7 +299,7 @@ export default function ApplicationsPage() {
                 <stat.icon className="w-6 h-6" style={{ color: stat.color }} />
               </div>
               <p className="text-3xl font-bold text-gray-900">{stat.count}</p>
-              <p className="text-sm text-gray-500 font-medium">{stat.label}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">{stat.label}</p>
             </button>
           ))}
         </div>
@@ -307,7 +307,7 @@ export default function ApplicationsPage() {
         {/* Filtres actifs */}
         {selectedStatus && (
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500">Filtre actif:</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">Filtre actif:</span>
             <button
               onClick={() => setSelectedStatus('')}
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium bg-[#6B46C1]/10 text-[#6B46C1] hover:bg-[#6B46C1]/20 transition-colors"
@@ -345,7 +345,7 @@ export default function ApplicationsPage() {
             {selectedStatus ? (
               <button
                 onClick={() => setSelectedStatus('')}
-                className="px-8 py-4 rounded-xl font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all"
+                className="px-8 py-4 rounded-xl font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
               >
                 Voir toutes les candidatures
               </button>
@@ -395,7 +395,7 @@ export default function ApplicationsPage() {
                             </span>
                           </div>
 
-                          <p className="text-sm text-gray-600 font-medium mb-3 flex items-center gap-1">
+                          <p className="text-sm text-gray-600 dark:text-gray-400 font-medium dark:text-gray-300 mb-3 flex items-center gap-1">
                             {application.job.company_name}
                             {application.job.company_is_verified && (
                               <CheckBadgeIcon className="w-4 h-4 text-[#6B9B5F]" title="Entreprise vérifiée" />
@@ -476,7 +476,7 @@ export default function ApplicationsPage() {
                     {/* Notes */}
                     {application.notes && (
                       <div className="mt-3 pt-3 border-t border-gray-100">
-                        <p className="text-sm text-gray-600 bg-gray-50 rounded-xl p-4">
+                        <p className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 rounded-xl p-4">
                           <span className="font-semibold text-gray-700">Notes:</span> {application.notes}
                         </p>
                       </div>

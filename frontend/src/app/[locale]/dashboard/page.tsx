@@ -453,7 +453,7 @@ export default function Dashboard() {
                 {recentActivities.map((activity, index) => (
                   <div
                     key={activity.id}
-                    className="flex items-start gap-4 p-4 rounded-2xl bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 transition-colors"
+                    className="flex items-start gap-4 p-4 rounded-2xl bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
                     style={{ animation: `fadeIn 0.4s ease-out ${0.1 * index}s both` }}
                   >
                     <div className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center ${

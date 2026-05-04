@@ -475,7 +475,7 @@ export default function JobsPage() {
                             </div>
                           )}
                         </div>
-                        <p className="text-sm text-gray-500 mt-0.5 flex items-center gap-1">
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 flex items-center gap-1">
                           {job.company_name}
                           {job.company_is_verified && (
                             <CheckBadgeIcon className="w-4 h-4 text-[#6B9B5F]" title="Entreprise vérifiée" />
@@ -488,7 +488,7 @@ export default function JobsPage() {
                   {/* Content */}
                   <div className="p-6">
                     {/* Description */}
-                    <p className="text-sm text-gray-600 line-clamp-2 mb-4">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-4">
                       {job.description}
                     </p>
 
@@ -686,7 +686,7 @@ export default function JobsPage() {
                 <CheckCircleIcon className="w-6 h-6 text-[#F7C700] flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-sm text-gray-700 font-medium">Votre profil sera automatiquement partagé</p>
-                  <p className="text-sm text-gray-500">Les recruteurs verront votre CV et vos informations de profil.</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Les recruteurs verront votre CV et vos informations de profil.</p>
                 </div>
               </div>
 
@@ -720,7 +720,7 @@ export default function JobsPage() {
                         className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
                           selectedCVId === cv.id 
                             ? 'border-[#6B9B5F] bg-[#6B9B5F]/5 shadow-md' 
-                            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                         }`}
                       >
                         <input
@@ -731,8 +731,8 @@ export default function JobsPage() {
                           className="w-5 h-5 text-[#6B9B5F] focus:ring-[#6B9B5F] cursor-pointer"
                         />
                         <div className="flex-1">
-                          <p className="font-medium text-gray-900">{cv.filename}</p>
-                          <p className="text-sm text-gray-500">
+                          <p className="font-medium text-gray-900 dark:text-gray-100">{cv.filename}</p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
                             Uploadé le {new Date(cv.created_at).toLocaleDateString('fr-FR', {
                               day: 'numeric',
                               month: 'long',
@@ -753,7 +753,7 @@ export default function JobsPage() {
 
               {/* Cover letter */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2 dark:text-gray-200">
                   Lettre de motivation (optionnel)
                 </label>
                 <textarea
@@ -761,7 +761,7 @@ export default function JobsPage() {
                   onChange={(e) => setCoverLetter(e.target.value)}
                   rows={8}
                   placeholder={t('whyIdeal')}
-                  className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-[#6B9B5F] focus:ring-4 focus:ring-[#6B9B5F]/10 transition-all resize-none"
+                  className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 focus:outline-none focus:border-[#6B9B5F] focus:ring-4 focus:ring-[#6B9B5F]/10 transition-all resize-none"
                 />
               </div>
             </div>
@@ -775,7 +775,7 @@ export default function JobsPage() {
                   setCoverLetter('');
                 }}
                 disabled={applyToJob.isPending}
-                className="flex-1 px-6 py-3 rounded-xl font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all disabled:opacity-50"
+                className="flex-1 px-6 py-3 rounded-xl font-semibold bg-gray-100 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all disabled:opacity-50"
               >
                 {tc('cancel')}
               </button>
