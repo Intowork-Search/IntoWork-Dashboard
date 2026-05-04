@@ -147,13 +147,13 @@ export default function Dashboard() {
     if (!file) return;
 
     if (file.type !== 'application/pdf') {
-      toast.error('Veuillez sélectionner un fichier PDF.');
+      toast.error(t('pdfRequired'));
       if (fileInputRef.current) fileInputRef.current.value = '';
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('Le fichier ne peut pas dépasser 5MB.');
+      toast.error(t('fileSizeLimit'));
       if (fileInputRef.current) fileInputRef.current.value = '';
       return;
     }
@@ -162,7 +162,7 @@ export default function Dashboard() {
       setIsUploadingCV(true);
       const token = await getToken();
       if (!token) {
-        toast.error("Erreur d'authentification. Veuillez vous reconnecter.");
+        toast.error(t('cvAuthError'));
         return;
       }
 
@@ -178,15 +178,15 @@ export default function Dashboard() {
       });
 
       if (response.ok) {
-        toast.success('CV téléchargé avec succès !');
+        toast.success(t('cvUploadSuccess'));
         loadDashboardData();
         router.push('/dashboard/cv');
       } else {
         const errorData = await response.json().catch(() => ({ detail: 'Erreur inconnue' }));
-        toast.error(`Erreur: ${errorData.detail || 'Téléchargement échoué'}`);
+        toast.error(errorData.detail || t('uploadFailed'));
       }
     } catch (error) {
-      toast.error('Erreur réseau lors du téléchargement du CV');
+      toast.error(t('cvUploadNetworkError'));
     } finally {
       setIsUploadingCV(false);
       if (fileInputRef.current) {
@@ -204,7 +204,7 @@ export default function Dashboard() {
       setIsExportingPDF(true);
       const token = await getToken();
       if (!token) {
-        toast.error("Authentification requise");
+        toast.error(t('authRequired'));
         return;
       }
 
@@ -226,10 +226,10 @@ export default function Dashboard() {
       a.click();
       a.remove();
       window.URL.revokeObjectURL(url);
-      toast.success('Rapport PDF telecharge !');
+      toast.success(t('reportSuccess'));
     } catch (error) {
       logger.error("Erreur export PDF:", error);
-      toast.error('Erreur lors de la generation du rapport');
+      toast.error(t('reportError'));
     } finally {
       setIsExportingPDF(false);
     }

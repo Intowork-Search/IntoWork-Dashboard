@@ -31,6 +31,7 @@ import {
   XMarkIcon
 } from '@heroicons/react/24/outline';
 import { getApiUrl } from '@/lib/getApiUrl';
+import { useTranslations } from 'next-intl';
 
 interface EmailTemplate {
   id: number;
@@ -45,21 +46,28 @@ interface EmailTemplate {
   updated_at: string;
 }
 
-const TEMPLATE_TYPES = [
-  { value: 'welcome_candidate', label: 'Bienvenue candidat' },
-  { value: 'application_received', label: 'Candidature reçue' },
-  { value: 'application_rejected', label: 'Candidature refusée' },
-  { value: 'interview_invitation', label: 'Invitation entretien' },
-  { value: 'interview_confirmation', label: 'Confirmation entretien' },
-  { value: 'interview_reminder', label: 'Rappel entretien' },
-  { value: 'offer_letter', label: 'Lettre d\'offre' },
-  { value: 'onboarding', label: 'Onboarding' },
-  { value: 'custom', label: 'Personnalisé' },
-];
+const TEMPLATE_TYPES_VALUES = [
+  'welcome_candidate', 'application_received', 'application_rejected',
+  'interview_invitation', 'interview_confirmation', 'interview_reminder',
+  'offer_letter', 'onboarding', 'custom',
+] as const;
 
 export default function EmailTemplatesPage() {
   const { getToken } = useAuth();
   const router = useRouter();
+  const t = useTranslations('emailTemplates');
+  const tc = useTranslations('common');
+  const TEMPLATE_TYPES = [
+    { value: 'welcome_candidate', label: t('typesWelcomeCandidate') },
+    { value: 'application_received', label: t('typesApplicationReceived') },
+    { value: 'application_rejected', label: t('typesApplicationRejected') },
+    { value: 'interview_invitation', label: t('typesInterviewInvitation') },
+    { value: 'interview_confirmation', label: t('typesInterviewConfirmation') },
+    { value: 'interview_reminder', label: t('typesInterviewReminder') },
+    { value: 'offer_letter', label: t('typesOfferLetter') },
+    { value: 'onboarding', label: t('typesOnboarding') },
+    { value: 'custom', label: t('typesCustom') },
+  ];
   const [templates, setTemplates] = useState<EmailTemplate[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingTemplate, setEditingTemplate] = useState<EmailTemplate | null>(null);
@@ -108,14 +116,14 @@ export default function EmailTemplatesPage() {
       } else {
         const errorData = await response.json().catch(() => ({ detail: 'Unknown error' }));
         logger.error("Erreur backend:", response.status, errorData);
-        toast.error(`Erreur ${response.status}: ${errorData.detail || 'Erreur lors du chargement des templates'}`);
+        toast.error(errorData.detail || t('loadError'));
       }
     } catch (error) {
       logger.error("Error fetching templates:", error);
       if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-        toast.error('Erreur réseau - Vérifiez votre connexion');
+        toast.error(t('networkErrorDetail'));
       } else {
-        toast.error('Erreur lors du chargement des templates');
+        toast.error(t('loadError') || 'Erreur');
       }
     } finally {
       setLoading(false);
@@ -173,24 +181,24 @@ export default function EmailTemplatesPage() {
       });
       
       if (response.ok) {
-        toast.success(editingTemplate ? 'Template mis à jour' : 'Template créé');
+        toast.success(editingTemplate ? t('updateSuccess') : t('createSuccess'));
         fetchTemplates();
         resetForm();
       } else {
         const error = await response.json();
-        toast.error(error.detail || 'Erreur lors de la sauvegarde');
+        toast.error(error.detail || t('saveError'));
       }
     } catch (error) {
       logger.error("Error saving template:", error);
-      toast.error('Erreur réseau');
+      toast.error(t('networkError'));
     }
   };
 
   const handleDelete = async (id: number) => {
     const ok = await confirm({
-      title: 'Supprimer ce template ?',
-      message: 'Ce template d\'email sera définitivement supprimé.',
-      confirmLabel: 'Supprimer',
+      title: t('deleteConfirmTitle'),
+      message: t('deleteConfirmMsg'),
+      confirmLabel: tc('delete'),
     });
     if (!ok) return;
 
@@ -211,14 +219,14 @@ export default function EmailTemplatesPage() {
       });
       
       if (response.ok) {
-        toast.success('Template supprimé');
+        toast.success(t('deleteSuccess'));
         fetchTemplates();
       } else {
-        toast.error('Erreur lors de la suppression');
+        toast.error(t('deleteError') || 'Erreur');
       }
     } catch (error) {
       logger.error("Error deleting template:", error);
-      toast.error('Erreur lors de la suppression');    } finally {
+      toast.error(t('deleteError') || tc('error'));    } finally {
       setDeletingTemplate(false);    }
   };
 
@@ -239,14 +247,14 @@ export default function EmailTemplatesPage() {
       });
       
       if (response.ok) {
-        toast.success('Template dupliqué');
+        toast.success(t('duplicateSuccess'));
         fetchTemplates();
       } else {
-        toast.error('Erreur lors de la duplication');
+        toast.error(t('duplicateError'));
       }
     } catch (error) {
       logger.error("Error duplicating template:", error);
-      toast.error('Erreur lors de la duplication');
+      toast.error(t('duplicateError'));
     }
   };
 
@@ -283,11 +291,11 @@ export default function EmailTemplatesPage() {
 
   if (loading) {
     return (
-      <DashboardLayout title="Templates d'Emails" subtitle="Chargement...">
+      <DashboardLayout title={t('loadingTitle')} subtitle={tc('loading')}>
         <div className="flex items-center justify-center py-20">
           <div className="text-center">
             <div className="w-16 h-16 border-4 border-[#F7C700] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-500 dark:text-gray-400">Chargement des templates...</p>
+            <p className="text-gray-500 dark:text-gray-400">{t('loading')}</p>
           </div>
         </div>
       </DashboardLayout>
@@ -295,7 +303,7 @@ export default function EmailTemplatesPage() {
   }
 
   return (
-    <DashboardLayout title="Templates d'Emails" subtitle="Gérez vos templates de communication automatique">
+    <DashboardLayout title={t('title')} subtitle={t('subtitle')}>
       <div className="space-y-8">
         {/* Hero Section */}
         <div
@@ -314,10 +322,10 @@ export default function EmailTemplatesPage() {
                 <div>
                   <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-1.5 mb-2">
                     <SparklesIcon className="w-4 h-4 text-white" />
-                    <span className="text-white/90 text-sm font-medium">Communication Automatisée</span>
+                    <span className="text-white/90 text-sm font-medium">{t('badge')}</span>
                   </div>
                   <h2 className="text-2xl lg:text-3xl font-bold text-white">
-                    Templates d'Emails
+                    {t('heroTitle')}
                   </h2>
                   <p className="text-white/80 mt-1">
                     Créez des templates réutilisables pour vos communications RH
@@ -343,7 +351,7 @@ export default function EmailTemplatesPage() {
                     <EnvelopeIcon className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <p className="text-white/70 text-sm">Total Templates</p>
+                    <p className="text-white/70 text-sm">{t('statTotal')}</p>
                     <p className="text-white font-semibold text-xl">{templates.length}</p>
                   </div>
                 </div>
@@ -354,7 +362,7 @@ export default function EmailTemplatesPage() {
                     <SparklesIcon className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <p className="text-white/70 text-sm">Actifs</p>
+                    <p className="text-white/70 text-sm">{t('statActive')}</p>
                     <p className="text-white font-semibold text-xl">
                       {templates.filter(t => t.is_active).length}
                     </p>
@@ -382,14 +390,14 @@ export default function EmailTemplatesPage() {
         {templates.length === 0 ? (
           <div className="text-center py-20 bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700">
             <EnvelopeIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Aucun template</h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">Créez votre premier template d'email pour automatiser vos communications</p>
+            <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">{t('emptyTitle')}</h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">{t('emptyDescription')}</p>
             <button
               onClick={() => setShowCreateModal(true)}
               className="btn bg-linear-to-r from-[#6B9B5F] to-[#5a8450] hover:from-[#5a8450] hover:to-[#4a6e42] text-white shadow-md"
             >
               <PlusIcon className="h-5 w-5" />
-              Créer un template
+              {t('createButton')}
             </button>
           </div>
         ) : (
@@ -412,12 +420,12 @@ export default function EmailTemplatesPage() {
                         </span>
                         {template.is_default && (
                           <span className="badge bg-[#F7C700]/10 text-[#F7C700] border-0">
-                            Par défaut
+                            {t('badgeDefault')}
                           </span>
                         )}
                         {!template.is_active && (
                           <span className="badge bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 border-0">
-                            Inactif
+                            {t('inactive')}
                           </span>
                         )}
                       </div>
@@ -425,34 +433,34 @@ export default function EmailTemplatesPage() {
                   </div>
                   
                   <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 mb-4">
-                    <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Sujet:</p>
+                    <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">{t('subjectLabel')}</p>
                     <p className="text-sm text-gray-800 dark:text-gray-200">{template.subject}</p>
                   </div>
                   
                   <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Utilisé <span className="font-semibold text-[#6B9B5F]">{template.usage_count}</span> fois
+                      {t('usedCount', { count: template.usage_count })}
                     </p>
                     
                     <div className="flex gap-2">
                       <button
                         onClick={() => startEdit(template)}
                         className="p-2 rounded-xl text-[#3B82F6] bg-[#3B82F6]/10 hover:bg-[#3B82F6]/20 transition-all"
-                        title="Modifier"
+                        title={tc('edit')}
                       >
                         <PencilIcon className="w-5 h-5" />
                       </button>
                       <button
                         onClick={() => handleDuplicate(template.id)}
                         className="p-2 rounded-xl text-[#6B9B5F] bg-[#6B9B5F]/10 hover:bg-[#6B9B5F]/20 transition-all"
-                        title="Dupliquer"
+                        title={tc('view')}
                       >
                         <DocumentDuplicateIcon className="w-5 h-5" />
                       </button>
                       <button
                         onClick={() => handleDelete(template.id)}
                         className="p-2 rounded-xl text-red-600 bg-red-50 hover:bg-red-100 transition-all"
-                        title="Supprimer"
+                        title={tc('delete')}
                       >
                         <TrashIcon className="w-5 h-5" />
                       </button>
@@ -475,7 +483,7 @@ export default function EmailTemplatesPage() {
             <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-600 px-8 py-6 z-10">
               <div className="flex items-center justify-between">
                 <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
-                  {editingTemplate ? 'Modifier le template' : 'Nouveau template'}
+                  {editingTemplate ? t('modalEditTitle') : t('modalCreateTitle')}
                 </h3>
                 <button
                   onClick={resetForm}
@@ -490,7 +498,7 @@ export default function EmailTemplatesPage() {
               {/* Nom du template */}
               <div className="space-y-3">
                 <label className="block text-base font-bold text-gray-800 dark:text-gray-200 mb-3">
-                  Nom du template *
+                  {t('formName')}
                 </label>
                 <input
                   type="text"
@@ -501,14 +509,14 @@ export default function EmailTemplatesPage() {
                   required
                 />
                 <p className="text-sm text-gray-500 dark:text-gray-400 italic dark:text-gray-500">
-                  Donnez un nom descriptif pour identifier facilement ce template
+                  {t('formNameHint')}
                 </p>
               </div>
 
               {/* Type de template */}
               <div className="space-y-3">
                 <label className="block text-base font-bold text-gray-800 dark:text-gray-200 mb-3">
-                  Type de template *
+                  {t('formType')}
                 </label>
                 <div className="relative">
                   <select
@@ -529,14 +537,14 @@ export default function EmailTemplatesPage() {
                   </div>
                 </div>
                 <p className="text-sm text-gray-500 dark:text-gray-400 italic dark:text-gray-500">
-                  Choisissez le type d'email correspondant à votre besoin
+                  {t('formTypeHint')}
                 </p>
               </div>
 
               {/* Sujet de l'email */}
               <div className="space-y-3">
                 <label className="block text-base font-bold text-gray-800 dark:text-gray-200 mb-3">
-                  Sujet de l'email *
+                  {t('formSubject')}
                 </label>
                 <input
                   type="text"
@@ -547,14 +555,14 @@ export default function EmailTemplatesPage() {
                   required
                 />
                 <p className="text-sm text-gray-500 dark:text-gray-400 italic dark:text-gray-500">
-                  Le sujet qui apparaîtra dans la boîte mail du destinataire
+                  {t('formSubjectHint')}
                 </p>
               </div>
 
               {/* Corps du message */}
               <div className="space-y-3">
                 <label className="block text-base font-bold text-gray-800 dark:text-gray-200 mb-3">
-                  Corps du message *
+                  {t('formBody')}
                 </label>
                 <textarea
                   className="w-full px-5 py-4 text-base text-gray-900 dark:text-white font-medium rounded-xl border-2 border-gray-300 bg-white dark:bg-gray-800 shadow-sm focus:ring-4 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] hover:border-gray-400 transition-all resize-y min-h-[240px] placeholder:text-gray-400 placeholder:font-normal leading-relaxed"
@@ -571,7 +579,7 @@ export default function EmailTemplatesPage() {
                     <div className="flex items-center gap-2 mb-3">
                       <SparklesIcon className="w-5 h-5 text-[#3B82F6]" />
                       <p className="text-base font-bold text-gray-800 dark:text-gray-200">
-                        Variables disponibles (cliquez pour insérer)
+                        {t('variablesTitle')}
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-2">
@@ -587,7 +595,7 @@ export default function EmailTemplatesPage() {
                       ))}
                     </div>
                     <p className="text-sm text-gray-600 dark:text-gray-400 mt-3 italic">
-                      💡 Ces variables seront automatiquement remplacées par les vraies valeurs lors de l'envoi
+                      {t('variablesHint')}
                     </p>
                   </div>
                 )}
@@ -605,10 +613,10 @@ export default function EmailTemplatesPage() {
                   />
                   <div>
                     <label htmlFor="is_default" className="text-base font-bold text-gray-800 dark:text-gray-200 cursor-pointer block mb-1">
-                      Définir comme template par défaut
+                      {t('formDefaultLabel')}
                     </label>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Ce template sera automatiquement sélectionné lors de l'envoi d'un email de ce type
+                      {t('formDefaultHint')}
                     </p>
                   </div>
                 </div>
@@ -621,13 +629,13 @@ export default function EmailTemplatesPage() {
                   onClick={resetForm}
                   className="flex-1 px-8 py-4 rounded-xl text-base font-bold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 border-2 border-gray-300 hover:border-gray-400 shadow-sm hover:shadow-md transition-all"
                 >
-                  Annuler
+                  {tc('cancel')}
                 </button>
                 <button
                   type="submit"
                   className="flex-1 px-8 py-4 rounded-xl text-base font-bold text-white bg-gradient-to-r from-[#6B9B5F] to-[#5a8450] hover:from-[#5a8450] hover:to-[#4a6e42] shadow-lg hover:shadow-xl transition-all transform hover:scale-[1.02]"
                 >
-                  {editingTemplate ? '✓ Mettre à jour le template' : '+ Créer le template'}
+                  {editingTemplate ? `✓ ${t('updateButton')}` : `+ ${t('createConfirmButton')}`}
                 </button>
               </div>
             </form>

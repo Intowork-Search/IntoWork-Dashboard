@@ -68,15 +68,15 @@ export default function CompanyPage(): React.JSX.Element {
         setFormData(companyData);
       } else {
         setIsEditing(true);
-        toast("Créez votre profil d'entreprise pour commencer", { icon: '🏢' });
+        toast(t('createProfilePrompt'), { icon: '🏢' });
       }
     } catch (error: unknown) {
       logger.error("Erreur lors du chargement:", error);
       if (isAPIError(error) && (error.response?.status === 403 || error.response?.status === 404)) {
         setIsEditing(true);
-        toast("Créez votre profil d'entreprise pour commencer", { icon: '🏢' });
+        toast(t('createProfilePrompt'), { icon: '🏢' });
       } else {
-        toast.error(getErrorMessage(error, 'Erreur lors du chargement des données'));
+        toast.error(getErrorMessage(error, t('loadError')));
       }
     } finally {
       setLoading(false);
@@ -92,10 +92,10 @@ export default function CompanyPage(): React.JSX.Element {
       const updatedCompany = await companiesAPI.updateMyCompany(token, formData);
       setCompany(updatedCompany);
       setIsEditing(false);
-      toast.success('Informations mises à jour avec succès !');
+      toast.success(t('updateSuccess'));
     } catch (error: unknown) {
       logger.error("Erreur lors de la sauvegarde:", error);
-      toast.error(getErrorMessage(error, 'Erreur lors de la sauvegarde'));
+      toast.error(getErrorMessage(error, t('saveError')));
     } finally {
       setSaving(false);
     }
@@ -109,11 +109,11 @@ export default function CompanyPage(): React.JSX.Element {
   // Loading state
   if (loading) {
     return (
-      <DashboardLayout title={t('title')} subtitle="Chargement...">
+      <DashboardLayout title={t('title')} subtitle={tc('loading')}>
         <div className="flex items-center justify-center py-20">
           <div className="text-center">
             <div className="w-16 h-16 border-4 border-[#F7C700] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-500">Chargement des informations...</p>
+            <p className="text-gray-500">{t('loading')}</p>
           </div>
         </div>
       </DashboardLayout>
@@ -153,7 +153,7 @@ export default function CompanyPage(): React.JSX.Element {
                     <span className="text-white/90 text-sm font-medium">Profil Entreprise</span>
                   </div>
                   <h2 className="text-2xl lg:text-3xl font-bold text-white">
-                    {company?.name || 'Nouvelle Entreprise'}
+                    {company?.name || t('defaultName')}
                   </h2>
                   <p className="text-white/80 mt-1">{company?.industry || 'Industrie non définie'}</p>
                 </div>
@@ -209,7 +209,7 @@ export default function CompanyPage(): React.JSX.Element {
                   <stat.icon className="w-6 h-6" style={{ color: stat.color }} />
                 </div>
                 <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
-                <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">{stat.label}</p>
+                <p className="text-sm text-gray-500 font-medium">{stat.label}</p>
               </div>
             ))}
           </div>
@@ -233,7 +233,7 @@ export default function CompanyPage(): React.JSX.Element {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Nom */}
               <div>
-                <label htmlFor="company-name" className="block text-sm font-semibold text-gray-700 mb-2 dark:text-gray-200">
+                <label htmlFor="company-name" className="block text-sm font-semibold text-gray-700 mb-2">
                   {t('companyName')} *
                 </label>
                 {isEditing ? (
@@ -242,17 +242,17 @@ export default function CompanyPage(): React.JSX.Element {
                     type="text"
                     value={formData.name || ''}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 focus:outline-none focus:border-[#6B9B5F] focus:ring-4 focus:ring-[#6B9B5F]/10 transition-all"
-                    placeholder="Nom de votre entreprise"
+                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-[#6B9B5F] focus:ring-4 focus:ring-[#6B9B5F]/10 transition-all"
+                    placeholder={t('namePlaceholder')}
                   />
                 ) : (
-                  <p className="text-gray-900 text-lg font-medium dark:text-gray-100 py-3">{company?.name || '-'}</p>
+                  <p className="text-gray-900 text-lg font-medium py-3">{company?.name || '-'}</p>
                 )}
               </div>
 
               {/* Industrie */}
               <div>
-                <label htmlFor="company-industry" className="block text-sm font-semibold text-gray-700 mb-2 dark:text-gray-200">
+                <label htmlFor="company-industry" className="block text-sm font-semibold text-gray-700 mb-2">
                   {t('sector')}
                 </label>
                 {isEditing ? (
@@ -261,17 +261,17 @@ export default function CompanyPage(): React.JSX.Element {
                     type="text"
                     value={formData.industry || ''}
                     onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
-                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 focus:outline-none focus:border-[#6B9B5F] focus:ring-4 focus:ring-[#6B9B5F]/10 transition-all"
+                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-[#6B9B5F] focus:ring-4 focus:ring-[#6B9B5F]/10 transition-all"
                     placeholder="Ex: Technologie, Finance, Santé..."
                   />
                 ) : (
-                  <p className="text-gray-900 text-lg py-3 dark:text-gray-100">{company?.industry || '-'}</p>
+                  <p className="text-gray-900 text-lg py-3">{company?.industry || '-'}</p>
                 )}
               </div>
 
               {/* Taille */}
               <div>
-                <label htmlFor="company-size" className="block text-sm font-semibold text-gray-700 mb-2 dark:text-gray-200">
+                <label htmlFor="company-size" className="block text-sm font-semibold text-gray-700 mb-2">
                   {t('size')}
                 </label>
                 {isEditing ? (
@@ -280,7 +280,7 @@ export default function CompanyPage(): React.JSX.Element {
                     title="Taille de l'entreprise"
                     value={formData.size || ''}
                     onChange={(e) => setFormData({ ...formData, size: e.target.value })}
-                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 focus:outline-none focus:border-[#6B9B5F] focus:ring-4 focus:ring-[#6B9B5F]/10 transition-all"
+                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-[#6B9B5F] focus:ring-4 focus:ring-[#6B9B5F]/10 transition-all"
                   >
                     <option value="">Sélectionner...</option>
                     <option value="1-10">1-10 employés</option>
@@ -290,13 +290,13 @@ export default function CompanyPage(): React.JSX.Element {
                     <option value="500+">500+ employés</option>
                   </select>
                 ) : (
-                  <p className="text-gray-900 text-lg py-3 dark:text-gray-100">{company?.size || '-'}</p>
+                  <p className="text-gray-900 text-lg py-3">{company?.size || '-'}</p>
                 )}
               </div>
 
               {/* Site web */}
               <div>
-                <label htmlFor="company-website" className="block text-sm font-semibold text-gray-700 mb-2 dark:text-gray-200">
+                <label htmlFor="company-website" className="block text-sm font-semibold text-gray-700 mb-2">
                   <span className="inline-flex items-center gap-2">
                     <GlobeAltIcon className="w-4 h-4" />
                       {t('website')}
@@ -308,7 +308,7 @@ export default function CompanyPage(): React.JSX.Element {
                     type="url"
                     value={formData.website_url || ''}
                     onChange={(e) => setFormData({ ...formData, website_url: e.target.value })}
-                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 focus:outline-none focus:border-[#6B9B5F] focus:ring-4 focus:ring-[#6B9B5F]/10 transition-all"
+                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-[#6B9B5F] focus:ring-4 focus:ring-[#6B9B5F]/10 transition-all"
                     placeholder="https://www.exemple.com"
                   />
                 ) : (
@@ -330,7 +330,7 @@ export default function CompanyPage(): React.JSX.Element {
 
               {/* LinkedIn */}
               <div>
-                <label htmlFor="company-linkedin" className="block text-sm font-semibold text-gray-700 mb-2 dark:text-gray-200">
+                <label htmlFor="company-linkedin" className="block text-sm font-semibold text-gray-700 mb-2">
                   LinkedIn
                 </label>
                 {isEditing ? (
@@ -339,7 +339,7 @@ export default function CompanyPage(): React.JSX.Element {
                     type="url"
                     value={formData.linkedin_url || ''}
                     onChange={(e) => setFormData({ ...formData, linkedin_url: e.target.value })}
-                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 focus:outline-none focus:border-[#6B9B5F] focus:ring-4 focus:ring-[#6B9B5F]/10 transition-all"
+                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-[#6B9B5F] focus:ring-4 focus:ring-[#6B9B5F]/10 transition-all"
                     placeholder="https://linkedin.com/company/..."
                   />
                 ) : (
@@ -361,7 +361,7 @@ export default function CompanyPage(): React.JSX.Element {
 
               {/* Logo de l'entreprise */}
               <div className="lg:col-span-2">
-                <label className="block text-sm font-semibold text-gray-700 mb-2 dark:text-gray-200">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   <span className="inline-flex items-center gap-2">
                     <PhotoIcon className="w-4 h-4" />
                     {t('logo')}
@@ -375,9 +375,9 @@ export default function CompanyPage(): React.JSX.Element {
                       alt={company.name}
                       className="w-32 h-32 object-contain rounded-xl border-2 border-gray-200 bg-white p-2"
                     />
-                    <div className="text-sm text-gray-600 dark:text-gray-400">
-                      <p className="font-medium text-gray-900 dark:text-gray-100 mb-1">{company.name}</p>
-                      <p className="text-xs text-gray-500">Pour modifier le logo, allez dans Paramètres → Entreprise</p>
+                    <div className="text-sm text-gray-600">
+                      <p className="font-medium text-gray-900 mb-1">{company.name}</p>
+                      <p className="text-xs text-gray-500">{t('changeLogoHint')}</p>
                     </div>
                   </div>
                 ) : (
@@ -385,9 +385,9 @@ export default function CompanyPage(): React.JSX.Element {
                     <div className="w-32 h-32 rounded-xl bg-gray-200 flex items-center justify-center">
                       <PhotoIcon className="w-16 h-16 text-gray-400" />
                     </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400">
-                      <p className="font-medium text-gray-900 dark:text-gray-100 mb-1">Aucun logo</p>
-                      <p className="text-xs text-gray-500">Ajoutez votre logo dans Paramètres → Entreprise</p>
+                    <div className="text-sm text-gray-600">
+                      <p className="font-medium text-gray-900 mb-1">Aucun logo</p>
+                      <p className="text-xs text-gray-500">{t('addLogoHint')}</p>
                     </div>
                   </div>
                 )}
@@ -395,7 +395,7 @@ export default function CompanyPage(): React.JSX.Element {
 
               {/* Description */}
               <div className="lg:col-span-2">
-                <label htmlFor="company-description" className="block text-sm font-semibold text-gray-700 mb-2 dark:text-gray-200">
+                <label htmlFor="company-description" className="block text-sm font-semibold text-gray-700 mb-2">
                   {t('description')}
                 </label>
                 {isEditing ? (
@@ -404,11 +404,11 @@ export default function CompanyPage(): React.JSX.Element {
                     value={formData.description || ''}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     rows={6}
-                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 focus:outline-none focus:border-[#6B9B5F] focus:ring-4 focus:ring-[#6B9B5F]/10 transition-all resize-none"
-                    placeholder="Décrivez votre entreprise, votre mission, votre culture..."
+                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-[#6B9B5F] focus:ring-4 focus:ring-[#6B9B5F]/10 transition-all resize-none"
+                    placeholder={t('descriptionPlaceholder')}
                   />
                 ) : (
-                  <p className="text-gray-900 text-lg py-3 dark:text-gray-100 whitespace-pre-wrap">{company?.description || '-'}</p>
+                  <p className="text-gray-900 text-lg py-3 whitespace-pre-wrap">{company?.description || '-'}</p>
                 )}
               </div>
             </div>
@@ -433,7 +433,7 @@ export default function CompanyPage(): React.JSX.Element {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Adresse */}
               <div className="lg:col-span-3">
-                <label htmlFor="company-address" className="block text-sm font-semibold text-gray-700 mb-2 dark:text-gray-200">
+                <label htmlFor="company-address" className="block text-sm font-semibold text-gray-700 mb-2">
                   {t('address')}
                 </label>
                 {isEditing ? (
@@ -442,18 +442,18 @@ export default function CompanyPage(): React.JSX.Element {
                     type="text"
                     value={formData.address || ''}
                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 focus:outline-none focus:border-[#6B46C1] focus:ring-4 focus:ring-[#6B46C1]/10 transition-all"
-                    placeholder="Adresse complète"
+                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-[#6B46C1] focus:ring-4 focus:ring-[#6B46C1]/10 transition-all"
+                    placeholder={t('addressPlaceholder')}
                   />
                 ) : (
-                  <p className="text-gray-900 text-lg py-3 dark:text-gray-100">{company?.address || '-'}</p>
+                  <p className="text-gray-900 text-lg py-3">{company?.address || '-'}</p>
                 )}
               </div>
 
               {/* Ville */}
               <div>
-                <label htmlFor="company-city" className="block text-sm font-semibold text-gray-700 mb-2 dark:text-gray-200">
-                  Ville
+                <label htmlFor="company-city" className="block text-sm font-semibold text-gray-700 mb-2">
+                  {t('city')}
                 </label>
                 {isEditing ? (
                   <input
@@ -461,18 +461,18 @@ export default function CompanyPage(): React.JSX.Element {
                     type="text"
                     value={formData.city || ''}
                     onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 focus:outline-none focus:border-[#6B46C1] focus:ring-4 focus:ring-[#6B46C1]/10 transition-all"
-                    placeholder="Ville"
+                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-[#6B46C1] focus:ring-4 focus:ring-[#6B46C1]/10 transition-all"
+                    placeholder={t('cityPlaceholder')}
                   />
                 ) : (
-                  <p className="text-gray-900 text-lg py-3 dark:text-gray-100">{company?.city || '-'}</p>
+                  <p className="text-gray-900 text-lg py-3">{company?.city || '-'}</p>
                 )}
               </div>
 
               {/* Pays */}
               <div className="lg:col-span-2">
-                <label htmlFor="company-country" className="block text-sm font-semibold text-gray-700 mb-2 dark:text-gray-200">
-                  Pays
+                <label htmlFor="company-country" className="block text-sm font-semibold text-gray-700 mb-2">
+                  {t('country')}
                 </label>
                 {isEditing ? (
                   <input
@@ -480,11 +480,11 @@ export default function CompanyPage(): React.JSX.Element {
                     type="text"
                     value={formData.country || ''}
                     onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 focus:outline-none focus:border-[#6B46C1] focus:ring-4 focus:ring-[#6B46C1]/10 transition-all"
-                    placeholder="Pays"
+                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-[#6B46C1] focus:ring-4 focus:ring-[#6B46C1]/10 transition-all"
+                    placeholder={t('countryPlaceholder')}
                   />
                 ) : (
-                  <p className="text-gray-900 text-lg py-3 dark:text-gray-100">{company?.country || '-'}</p>
+                  <p className="text-gray-900 text-lg py-3">{company?.country || '-'}</p>
                 )}
               </div>
             </div>
@@ -501,7 +501,7 @@ export default function CompanyPage(): React.JSX.Element {
               type="button"
               onClick={handleCancel}
               disabled={saving}
-              className="px-8 py-3 rounded-xl font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all disabled:opacity-50"
+              className="px-8 py-3 rounded-xl font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all disabled:opacity-50"
             >
               {tc('cancel')}
             </button>

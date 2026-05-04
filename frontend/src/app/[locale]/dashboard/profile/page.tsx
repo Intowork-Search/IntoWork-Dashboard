@@ -252,7 +252,7 @@ export default function ProfilePage() {
         end_date: '',
         description: ''
       });
-      toast.success('Formation ajoutée avec succès');
+      toast.success(t('educationAdded'));
     } catch (error) {
       logger.error("Erreur ajout formation:", error);
       const message = getErrorMessage(error, 'Erreur lors de l\'ajout de la formation');
@@ -277,7 +277,7 @@ export default function ProfilePage() {
         level: 3,
         category: 'technical'
       });
-      toast.success('Compétence ajoutée avec succès');
+      toast.success(t('skillAdded'));
     } catch (error) {
       logger.error("Erreur ajout competence:", error);
       const message = getErrorMessage(error, 'Erreur lors de l\'ajout de la compétence');
@@ -1258,11 +1258,11 @@ export default function ProfilePage() {
                   onChange={(e) => setNewSkill({ ...newSkill, level: Number(e.target.value) })}
                   className="w-full px-4 py-3 rounded-xl bg-gray-50 border-2 border-gray-200 focus:border-[#3B82F6] focus:ring-4 focus:ring-[#3B82F6]/10 outline-none transition-all"
                 >
-                  <option value={1}>Débutant</option>
-                  <option value={2}>Intermédiaire</option>
-                  <option value={3}>Avancé</option>
-                  <option value={4}>Expert</option>
-                  <option value={5}>Maître</option>
+                  <option value={1}>{t('levelBeginner')}</option>
+                  <option value={2}>{t('levelIntermediate')}</option>
+                  <option value={3}>{t('levelAdvanced')}</option>
+                  <option value={4}>{t('levelExpert')}</option>
+                  <option value={5}>{t('levelMaster')}</option>
                 </select>
               </div>
             </div>

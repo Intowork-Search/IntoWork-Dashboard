@@ -26,8 +26,10 @@ import {
   ArrowPathIcon,
 } from '@heroicons/react/24/outline';
 import { CheckCircleIcon as CheckCircleSolid } from '@heroicons/react/24/solid';
+import { useTranslations } from 'next-intl';
 
 export default function TargetymIntegrationPage() {
+  const t = useTranslations('targetym');
   const { user } = useUser();
   const { getToken } = useAuth();
   const router = useRouter();
@@ -65,7 +67,7 @@ export default function TargetymIntegrationPage() {
       if (employerData?.company_id) setMyCompanyId(employerData.company_id);
     } catch (err) {
       logger.error("Erreur chargement targetym:", err);
-      toast.error('Erreur lors du chargement');
+      toast.error(t('loadError'));
     } finally {
       setIsLoading(false);
     }
@@ -81,9 +83,9 @@ export default function TargetymIntegrationPage() {
       const data = await integrationsAPI.generateApiKey(token);
       setGeneratedKey(data.api_key);
       setApiKeyData({ has_key: true, api_key_preview: data.api_key.slice(0, 8) + '••••••••', api_key_full: data.api_key });
-      toast.success('Clé API générée avec succès !');
+      toast.success(t('apiKeySuccess'));
     } catch (err: unknown) {
-      toast.error(getErrorMessage(err, 'Erreur lors de la génération'));
+      toast.error(getErrorMessage(err, t('apiKeyError')));
     } finally {
       setIsGenerating(false);
     }
@@ -99,7 +101,7 @@ export default function TargetymIntegrationPage() {
 
   const handleLink = async () => {
     if (!tenantId || !targetymApiKey) {
-      toast.error('Veuillez remplir tous les champs');
+      toast.error(t('fillAllFields'));
       return;
     }
     try {
@@ -108,11 +110,11 @@ export default function TargetymIntegrationPage() {
       if (!token) return;
       const data = await integrationsAPI.linkTargetym(token, parseInt(tenantId), targetymApiKey);
       setStatus({ linked: true, targetym_tenant_id: data.targetym_tenant_id, linked_at: data.linked_at });
-      toast.success(`✅ Lié au tenant Targetym "${data.targetym_tenant_name}" !`);
+      toast.success(`✅ ${t('linkedSuccess', { name: data.targetym_tenant_name })}`);
       setTenantId('');
       setTargetymApiKey('');
     } catch (err: unknown) {
-      toast.error(getErrorMessage(err, 'Erreur de liaison'));
+      toast.error(getErrorMessage(err, t('linkError')));
     } finally {
       setIsLinking(false);
     }
@@ -120,9 +122,9 @@ export default function TargetymIntegrationPage() {
 
   const handleUnlink = async () => {
     const ok = await confirm({
-      title: 'Supprimer la liaison Targetym ?',
-      message: 'La connexion entre IntoWork et votre compte Targetym sera supprimée.',
-      confirmLabel: 'Supprimer la liaison',
+      title: t('unlinkTitle'),
+      message: t('unlinkMessage'),
+      confirmLabel: t('unlinkConfirm'),
       variant: 'warning',
     });
     if (!ok) return;
@@ -132,9 +134,9 @@ export default function TargetymIntegrationPage() {
       if (!token) return;
       await integrationsAPI.unlinkTargetym(token);
       setStatus({ linked: false });
-      toast.success('Liaison Targetym supprimée');
+      toast.success(t('unlinkSuccess'));
     } catch (err: unknown) {
-      toast.error(getErrorMessage(err, 'Erreur'));
+      toast.error(getErrorMessage(err, t('unlinkError')));
     } finally {
       setIsUnlinking(false);
     }
@@ -187,7 +189,7 @@ export default function TargetymIntegrationPage() {
                   )}
                   <div>
                     <p className="font-semibold text-gray-900 dark:text-white">
-                      {status?.linked ? 'Comptes liés' : 'Comptes non liés'}
+                      {status?.linked ? t('linkedStatus') : t('notLinkedStatus')}
                     </p>
                     {status?.linked ? (
                       <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -207,7 +209,7 @@ export default function TargetymIntegrationPage() {
                     disabled={isUnlinking}
                     className="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl font-medium text-sm border border-red-200 transition-colors disabled:opacity-50"
                   >
-                    {isUnlinking ? 'Suppression...' : 'Délier'}
+                    {isUnlinking ? t('unlinking') : t('unlink')}
                   </button>
                 )}
               </div>
@@ -222,7 +224,7 @@ export default function TargetymIntegrationPage() {
                 <div>
                   <h2 className="font-semibold text-gray-900 dark:text-white">Générez votre clé API IntoWork</h2>
                   <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    Cette clé permet à Targetym de s'authentifier auprès d'IntoWork. Partagez-la avec votre admin Targetym.
+                    {t('apiKeyHint')}
                   </p>
                 </div>
               </div>
@@ -280,7 +282,7 @@ export default function TargetymIntegrationPage() {
                   <div>
                     <h2 className="font-semibold text-gray-900 dark:text-white">Liez votre tenant Targetym</h2>
                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                      Entrez l'ID de votre tenant Targetym et la clé API Targetym (fournie par votre admin Targetym).
+                      {t('tenantHint')}
                     </p>
                   </div>
                 </div>
@@ -334,9 +336,9 @@ export default function TargetymIntegrationPage() {
                 <h2 className="font-semibold text-gray-900 dark:text-white mb-4">Fonctionnalités activées</h2>
                 <div className="space-y-3">
                   {[
-                    { label: 'Candidat embauché → Employé créé automatiquement dans Targetym', active: true },
-                    { label: 'Offres internes Targetym synchronisées sur IntoWork', active: true },
-                    { label: 'Tableau de bord unifié recrutement + RH', active: true },
+                    { label: t('feature1'), active: true },
+                    { label: t('feature2'), active: true },
+                    { label: t('feature3'), active: true },
                   ].map((f, i) => (
                     <div key={i} className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300">
                       <CheckCircleIcon className="h-5 w-5 text-[#6B9B5F] flex-shrink-0" />

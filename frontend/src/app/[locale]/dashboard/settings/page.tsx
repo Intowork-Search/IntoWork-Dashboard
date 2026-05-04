@@ -189,13 +189,13 @@ export default function SettingsPage() {
                 github_url: ''
               });
             } else {
-              toast.error('Erreur lors du chargement de vos informations');
+              toast.error(t('loadInfoError'));
             }
           }
         }
       } catch (error) {
         logger.error("Erreur lors du chargement du profil:", error);
-        toast.error('Erreur lors du chargement du profil');
+        toast.error(t('loadProfileError'));
 
         setProfileData({
           first_name: user?.firstName || '',
@@ -233,10 +233,10 @@ export default function SettingsPage() {
     try {
       setLoading(true);
       await candidateAPI.updateProfile(profileData as unknown as Partial<CandidateProfile>);
-      toast.success('Profil mis à jour avec succès !');
+      toast.success(t('profileSuccess'));
     } catch (error) {
       logger.error("Erreur lors de la mise a jour:", error);
-      toast.error('Erreur lors de la mise à jour du profil');
+      toast.error(t('profileError'));
     } finally {
       setLoading(false);
     }
@@ -249,7 +249,7 @@ export default function SettingsPage() {
       if (!token) return;
 
       await companiesAPI.updateMyCompany(token, companyData);
-      toast.success('Informations de l\'entreprise mises à jour avec succès !');
+      toast.success(t('companySuccess'));
       
       // Recharger les données pour avoir le logo mis à jour
       const updatedCompany = await companiesAPI.getMyCompany(token);
@@ -267,7 +267,7 @@ export default function SettingsPage() {
       });
     } catch (error) {
       logger.error("Erreur lors de la mise a jour:", error);
-      toast.error('Erreur lors de la mise à jour des informations');
+      toast.error(t('companyError'));
     } finally {
       setLoading(false);
     }
@@ -277,12 +277,12 @@ export default function SettingsPage() {
   const handleLogoUpload = async (file: File) => {
     const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml', 'image/webp'];
     if (!validTypes.includes(file.type)) {
-      toast.error('Seuls les fichiers PNG, JPG, SVG et WebP sont acceptés');
+      toast.error(t('logoTypeError'));
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('Le fichier ne peut pas dépasser 5MB');
+      toast.error(t('logoSizeError'));
       return;
     }
 
@@ -290,7 +290,7 @@ export default function SettingsPage() {
       setIsUploadingLogo(true);
       const token = await getToken();
       if (!token) {
-        toast.error('Erreur d\'authentification');
+        toast.error(t('authError'));
         return;
       }
 
@@ -308,7 +308,7 @@ export default function SettingsPage() {
 
       if (response.ok) {
         const data = await response.json();
-        toast.success('Logo téléchargé avec succès !');
+        toast.success(t('logoSuccess'));
         // Mettre à jour le logo dans le state
         setCompanyData(prev => ({ ...prev, logo_url: data.logo_url }));
         
@@ -316,11 +316,11 @@ export default function SettingsPage() {
         window.dispatchEvent(new CustomEvent('company-logo-updated', { detail: data.logo_url }));
       } else {
         const errorData = await response.json();
-        toast.error(errorData.detail || 'Erreur lors du téléchargement');
+        toast.error(errorData.detail || t('logoError'));
       }
     } catch (error) {
       logger.error("Erreur lors du telechargement du logo:", error);
-      toast.error('Erreur lors du téléchargement du logo');
+      toast.error(t('logoUploadError'));
     } finally {
       setIsUploadingLogo(false);
       if (logoInputRef.current) {
@@ -364,10 +364,10 @@ export default function SettingsPage() {
         job_alerts: notifications.job_alerts,
         push_notifications: notifications.push_notifications,
       } as unknown as Partial<CandidateProfile>);
-      toast.success('Préférences de notification mises à jour !');
+      toast.success(t('notifSuccess'));
     } catch (error) {
       logger.error("Erreur lors de la mise a jour:", error);
-      toast.error('Erreur lors de la mise à jour des notifications');
+      toast.error(t('notifError'));
     } finally {
       setLoading(false);
     }
@@ -377,10 +377,10 @@ export default function SettingsPage() {
     try {
       setLoading(true);
       await candidateAPI.updateProfile({ is_profile_public: privacy.is_profile_public } as unknown as Partial<CandidateProfile>);
-      toast.success('Paramètres de confidentialité mis à jour !');
+      toast.success(t('privacySuccess'));
     } catch (error) {
       logger.error("Erreur lors de la mise a jour:", error);
-      toast.error('Erreur lors de la mise à jour des paramètres de confidentialité');
+      toast.error(t('privacyError'));
     } finally {
       setLoading(false);
     }
@@ -391,7 +391,7 @@ export default function SettingsPage() {
     if (!token) throw new Error('Non authentifié');
 
     await authAPI.changePassword(token, currentPassword, newPassword);
-    toast.success('Mot de passe changé avec succès !');
+    toast.success(t('passwordSuccess'));
   };
 
   const handleChangeEmail = async (newEmail: string, password: string) => {
@@ -399,7 +399,7 @@ export default function SettingsPage() {
     if (!token) throw new Error('Non authentifié');
 
     await authAPI.changeEmail(token, newEmail, password);
-    toast.success('Email changé avec succès !');
+    toast.success(t('emailSuccess'));
     globalThis.location?.reload();
   };
 
@@ -410,17 +410,17 @@ export default function SettingsPage() {
 
         const token = await getToken();
         if (!token) {
-          toast.error('Non authentifié');
+          toast.error(t('notAuthenticated'));
           return;
         }
 
         await authAPI.deleteAccount(token);
-        toast.success('Compte supprimé avec succès');
+        toast.success(t('deleteSuccess'));
         await signOut({ redirect: false });
         globalThis.location.href = '/signin';
       } catch (error) {
         logger.error("Erreur lors de la suppression:", error);
-        toast.error('Erreur lors de la suppression du compte');
+        toast.error(t('deleteAccountError'));
       } finally {
         setLoading(false);
       }
@@ -443,14 +443,14 @@ export default function SettingsPage() {
 
   if (loading && !profile) {
     return (
-      <DashboardLayout title={t('title')} subtitle="Gérez votre profil et vos préférences">
+      <DashboardLayout title={t('title')} subtitle={t('loadingSubtitle')}>
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <div className="relative">
               <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#6B9B5F]/20 border-t-[#6B9B5F] mx-auto"></div>
               <Cog6ToothIcon className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-6 h-6 text-[#6B9B5F]" />
             </div>
-            <p className="mt-4 text-gray-600 font-medium">Chargement des paramètres...</p>
+            <p className="mt-4 text-gray-600 font-medium">{t('loadingSettings')}</p>
           </div>
         </div>
       </DashboardLayout>
@@ -479,10 +479,10 @@ export default function SettingsPage() {
               </span>
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Gérez votre compte
+              {t('heroTitle')}
             </h1>
             <p className="text-xl text-white/80 max-w-2xl">
-              Personnalisez votre profil et vos préférences pour une expérience optimale
+              {t('heroSubtitle')}
             </p>
           </div>
         </div>
@@ -520,7 +520,7 @@ export default function SettingsPage() {
                   </div>
                   <div>
                     <h3 className="text-2xl font-bold text-gray-900">{t('personalInfo')}</h3>
-                    <p className="text-gray-600">Mettez à jour vos informations de profil pour améliorer votre visibilité</p>
+                    <p className="text-gray-600">{t('profileSubtitle')}</p>
                   </div>
                 </div>
 
@@ -717,7 +717,7 @@ export default function SettingsPage() {
                       onChange={(e) => setCompanyData(prev => ({ ...prev, size: e.target.value }))}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                     >
-                      <option value="">Sélectionnez une taille</option>
+                      <option value="">{t('selectSize')}</option>
                       <option value="1-10">1-10 employés</option>
                       <option value="11-50">11-50 employés</option>
                       <option value="51-200">51-200 employés</option>
@@ -793,13 +793,13 @@ export default function SettingsPage() {
                       value={companyData.country}
                       onChange={(e) => setCompanyData(prev => ({ ...prev, country: e.target.value }))}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400"
-                      placeholder="Pays"
+                      placeholder={t('countryPlaceholder')}
                     />
                   </div>
 
                   <div className="md:col-span-2">
                     <label className="block text-sm font-bold text-gray-800 mb-2">
-                      Logo de l'entreprise
+                      {t('logoLabel')}
                     </label>
                     
                     {/* Logo actuel */}
@@ -811,8 +811,8 @@ export default function SettingsPage() {
                           className="w-20 h-20 object-contain rounded-lg border-2 border-gray-200"
                         />
                         <div className="text-sm text-gray-600">
-                          <p className="font-medium">Logo actuel</p>
-                          <p className="text-xs text-gray-500">Téléchargez un nouveau logo pour le remplacer</p>
+                          <p className="font-medium">{t('logoCurrentLabel')}</p>
+                          <p className="text-xs text-gray-500">{t('logoReplaceHint')}</p>
                         </div>
                       </div>
                     )}
@@ -851,10 +851,10 @@ export default function SettingsPage() {
                         
                         <div>
                           <p className="text-gray-700 font-medium mb-1">
-                            {isUploadingLogo ? 'Téléchargement...' : isDraggingLogo ? 'Déposez le logo ici' : 'Cliquez ou déposez un logo'}
+                            {isUploadingLogo ? t('logoUploading') : isDraggingLogo ? t('logoDropHere') : t('logoClickOrDrop')}
                           </p>
                           <p className="text-xs text-gray-500">
-                            PNG, JPG, SVG, WebP (max 5MB)
+                            {t('logoFormats')}
                           </p>
                         </div>
                       </div>
@@ -883,8 +883,8 @@ export default function SettingsPage() {
                     <BellIcon className="w-8 h-8 text-[#3B82F6]" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-gray-900">Préférences de notification</h3>
-                    <p className="text-gray-600">Choisissez comment vous souhaitez être informé</p>
+                    <h3 className="text-2xl font-bold text-gray-900">{t('notifTitle')}</h3>
+                    <p className="text-gray-600">{t('notifSubtitle')}</p>
                   </div>
                 </div>
 
@@ -895,14 +895,14 @@ export default function SettingsPage() {
                         <BellIcon className="w-6 h-6 text-[#6B9B5F]" />
                       </div>
                       <div>
-                        <h4 className="text-base font-bold text-gray-900">Notifications par email</h4>
-                        <p className="text-sm text-gray-600 mt-1">Recevez des notifications importantes par email</p>
+                        <h4 className="text-base font-bold text-gray-900">{t('notifEmail')}</h4>
+                        <p className="text-sm text-gray-600 mt-1">{t('notifEmailDesc')}</p>
                       </div>
                     </div>
                     <ToggleButton
                       checked={notifications.email_notifications}
                       onChange={() => setNotifications(prev => ({ ...prev, email_notifications: !prev.email_notifications }))}
-                      label={`${notifications.email_notifications ? 'Désactiver' : 'Activer'} les notifications par email`}
+                      label={`${notifications.email_notifications ? tc('disable') : tc('enable')} ${t('notifEmail').toLowerCase()}`}
                     />
                   </div>
 
@@ -912,14 +912,14 @@ export default function SettingsPage() {
                         <SparklesIcon className="w-6 h-6 text-[#6B46C1]" />
                       </div>
                       <div>
-                        <h4 className="text-base font-bold text-gray-900">Alertes d&apos;emploi</h4>
-                        <p className="text-sm text-gray-600 mt-1">Soyez notifié des nouveaux emplois correspondant à vos critères</p>
+                        <h4 className="text-base font-bold text-gray-900">{t('notifJobAlerts')}</h4>
+                        <p className="text-sm text-gray-600 mt-1">{t('notifJobAlertsDesc')}</p>
                       </div>
                     </div>
                     <ToggleButton
                       checked={notifications.job_alerts}
                       onChange={() => setNotifications(prev => ({ ...prev, job_alerts: !prev.job_alerts }))}
-                      label={`${notifications.job_alerts ? 'Désactiver' : 'Activer'} les alertes d'emploi`}
+                      label={`${notifications.job_alerts ? tc('disable') : tc('enable')} ${t('notifJobAlerts').toLowerCase()}`}
                     />
                   </div>
 
@@ -929,14 +929,14 @@ export default function SettingsPage() {
                         <BellIcon className="w-6 h-6 text-[#F7C700]" />
                       </div>
                       <div>
-                        <h4 className="text-base font-bold text-gray-900">Emails marketing</h4>
-                        <p className="text-sm text-gray-600 mt-1">Recevez des conseils carrière et des mises à jour</p>
+                        <h4 className="text-base font-bold text-gray-900">{t('notifMarketing')}</h4>
+                        <p className="text-sm text-gray-600 mt-1">{t('notifMarketingDesc')}</p>
                       </div>
                     </div>
                     <ToggleButton
                       checked={notifications.marketing_emails}
                       onChange={() => setNotifications(prev => ({ ...prev, marketing_emails: !prev.marketing_emails }))}
-                      label={`${notifications.marketing_emails ? 'Désactiver' : 'Activer'} les emails marketing`}
+                      label={`${notifications.marketing_emails ? tc('disable') : tc('enable')} ${t('notifMarketing').toLowerCase()}`}
                     />
                   </div>
 
@@ -946,14 +946,14 @@ export default function SettingsPage() {
                         <BellIcon className="w-6 h-6 text-[#3B82F6]" />
                       </div>
                       <div>
-                        <h4 className="text-base font-bold text-gray-900">Notifications push</h4>
-                        <p className="text-sm text-gray-600 mt-1">Recevez des notifications dans votre navigateur</p>
+                        <h4 className="text-base font-bold text-gray-900">{t('notifPush')}</h4>
+                        <p className="text-sm text-gray-600 mt-1">{t('notifPushDesc')}</p>
                       </div>
                     </div>
                     <ToggleButton
                       checked={notifications.push_notifications}
                       onChange={() => setNotifications(prev => ({ ...prev, push_notifications: !prev.push_notifications }))}
-                      label={`${notifications.push_notifications ? 'Désactiver' : 'Activer'} les notifications push`}
+                      label={`${notifications.push_notifications ? tc('disable') : tc('enable')} ${t('notifPush').toLowerCase()}`}
                     />
                   </div>
                 </div>
@@ -979,8 +979,8 @@ export default function SettingsPage() {
                     <ShieldCheckIcon className="w-8 h-8 text-[#F7C700]" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-gray-900">Paramètres de confidentialité</h3>
-                    <p className="text-gray-600">Contrôlez la visibilité de vos informations personnelles</p>
+                    <h3 className="text-2xl font-bold text-gray-900">{t('privacyTitle')}</h3>
+                    <p className="text-gray-600">{t('privacySubtitle')}</p>
                   </div>
                 </div>
 
@@ -991,14 +991,14 @@ export default function SettingsPage() {
                         <UserIcon className="w-6 h-6 text-[#6B9B5F]" />
                       </div>
                       <div>
-                        <h4 className="text-base font-bold text-gray-900">Profil public</h4>
-                        <p className="text-sm text-gray-600 mt-1">Rendez votre profil visible aux recruteurs</p>
+                        <h4 className="text-base font-bold text-gray-900">{t('privacyPublicProfile')}</h4>
+                        <p className="text-sm text-gray-600 mt-1">{t('privacyPublicProfileDesc')}</p>
                       </div>
                     </div>
                     <ToggleButton
                       checked={privacy.is_profile_public}
                       onChange={() => setPrivacy(prev => ({ ...prev, is_profile_public: !prev.is_profile_public }))}
-                      label={`${privacy.is_profile_public ? 'Rendre' : 'Garder'} le profil ${privacy.is_profile_public ? 'privé' : 'public'}`}
+                      label={`${privacy.is_profile_public ? tc('hide') : tc('show')} ${t('privacyPublicProfile').toLowerCase()}`}
                     />
                   </div>
 
@@ -1008,14 +1008,14 @@ export default function SettingsPage() {
                         <BellIcon className="w-6 h-6 text-[#6B46C1]" />
                       </div>
                       <div>
-                        <h4 className="text-base font-bold text-gray-900">Afficher l&apos;email</h4>
-                        <p className="text-sm text-gray-600 mt-1">Permettre aux recruteurs de voir votre adresse email</p>
+                        <h4 className="text-base font-bold text-gray-900">{t('privacyShowEmail')}</h4>
+                        <p className="text-sm text-gray-600 mt-1">{t('privacyShowEmailDesc')}</p>
                       </div>
                     </div>
                     <ToggleButton
                       checked={privacy.show_email}
                       onChange={() => setPrivacy(prev => ({ ...prev, show_email: !prev.show_email }))}
-                      label={`${privacy.show_email ? 'Masquer' : 'Afficher'} l'adresse email`}
+                      label={`${privacy.show_email ? tc('hide') : tc('show')} ${t('privacyShowEmail').toLowerCase()}`}
                     />
                   </div>
 
@@ -1025,14 +1025,14 @@ export default function SettingsPage() {
                         <BellIcon className="w-6 h-6 text-[#F7C700]" />
                       </div>
                       <div>
-                        <h4 className="text-base font-bold text-gray-900">Afficher le téléphone</h4>
-                        <p className="text-sm text-gray-600 mt-1">Permettre aux recruteurs de voir votre numéro</p>
+                        <h4 className="text-base font-bold text-gray-900">{t('privacyShowPhone')}</h4>
+                        <p className="text-sm text-gray-600 mt-1">{t('privacyShowPhoneDesc')}</p>
                       </div>
                     </div>
                     <ToggleButton
                       checked={privacy.show_phone}
                       onChange={() => setPrivacy(prev => ({ ...prev, show_phone: !prev.show_phone }))}
-                      label={`${privacy.show_phone ? 'Masquer' : 'Afficher'} le numéro de téléphone`}
+                      label={`${privacy.show_phone ? tc('hide') : tc('show')} ${t('privacyShowPhone').toLowerCase()}`}
                     />
                   </div>
 
@@ -1042,14 +1042,14 @@ export default function SettingsPage() {
                         <ShieldCheckIcon className="w-6 h-6 text-[#3B82F6]" />
                       </div>
                       <div>
-                        <h4 className="text-base font-bold text-gray-900">Contact par les recruteurs</h4>
-                        <p className="text-sm text-gray-600 mt-1">Autoriser les recruteurs à vous contacter directement</p>
+                        <h4 className="text-base font-bold text-gray-900">{t('privacyRecruiterContact')}</h4>
+                        <p className="text-sm text-gray-600 mt-1">{t('privacyRecruiterContactDesc')}</p>
                       </div>
                     </div>
                     <ToggleButton
                       checked={privacy.allow_recruiter_contact}
                       onChange={() => setPrivacy(prev => ({ ...prev, allow_recruiter_contact: !prev.allow_recruiter_contact }))}
-                      label={`${privacy.allow_recruiter_contact ? 'Interdire' : 'Autoriser'} le contact par les recruteurs`}
+                      label={`${privacy.allow_recruiter_contact ? tc('disable') : tc('enable')} ${t('privacyRecruiterContact').toLowerCase()}`}
                     />
                   </div>
                 </div>
@@ -1075,31 +1075,31 @@ export default function SettingsPage() {
                     <KeyIcon className="w-8 h-8 text-[#6B46C1]" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-gray-900">Gestion du compte</h3>
-                    <p className="text-gray-600">Consultez et gérez les paramètres de votre compte</p>
+                    <h3 className="text-2xl font-bold text-gray-900">{t('accountManagement')}</h3>
+                    <p className="text-gray-600">{t('accountManagementDesc')}</p>
                   </div>
                 </div>
 
                 {/* Account Info */}
                 <div className="bg-gradient-to-r from-[#6B9B5F]/5 to-[#6B46C1]/5 p-6 rounded-2xl border border-gray-100">
-                  <h4 className="text-lg font-bold text-gray-900 mb-4">Informations du compte</h4>
+                  <h4 className="text-lg font-bold text-gray-900 mb-4">{t('accountInfo')}</h4>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
-                      <p className="text-sm font-medium text-gray-500 mb-1">Adresse email</p>
+                      <p className="text-sm font-medium text-gray-500 mb-1">{t('emailAddress')}</p>
                       <p className="text-sm font-bold text-gray-900">{user?.email}</p>
                     </div>
                     <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
-                      <p className="text-sm font-medium text-gray-500 mb-1">Nom complet</p>
+                      <p className="text-sm font-medium text-gray-500 mb-1">{t('fullName')}</p>
                       <p className="text-sm font-bold text-gray-900">{user?.fullName || 'N/A'}</p>
                     </div>
                     <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
-                      <p className="text-sm font-medium text-gray-500 mb-1">Rôle</p>
+                      <p className="text-sm font-medium text-gray-500 mb-1">{t('role')}</p>
                       <span className={`inline-flex px-3 py-1 text-xs font-bold rounded-full ${
                         user?.role === 'admin' ? 'bg-[#6B46C1]/10 text-[#6B46C1]' :
                         user?.role === 'candidate' ? 'bg-[#3B82F6]/10 text-[#3B82F6]' :
                         'bg-[#6B9B5F]/10 text-[#6B9B5F]'
                       }`}>
-                        {user?.role === 'candidate' ? 'Candidat' : user?.role === 'admin' ? 'Admin' : 'Employeur'}
+                        {user?.role === 'candidate' ? t('roleCandidate') : user?.role === 'admin' ? t('roleAdmin') : t('roleEmployer')}
                       </span>
                     </div>
                   </div>
@@ -1109,17 +1109,17 @@ export default function SettingsPage() {
                 <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
                   <h4 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                     <ShieldCheckIcon className="w-5 h-5 text-[#6B9B5F]" />
-                    Sécurité
+                    {t('security')}
                   </h4>
                   <p className="text-sm text-gray-600 mb-6">
-                    Gérez votre mot de passe et les paramètres de sécurité de votre compte.
+                    {t('securityDesc')}
                   </p>
 
                   <div className="space-y-4">
                     <div className="flex items-center justify-between py-4 border-b border-gray-100">
                       <div>
-                        <h5 className="text-base font-bold text-gray-900">Mot de passe</h5>
-                        <p className="text-sm text-gray-500 mt-1">Dernière modification: Il y a 30 jours</p>
+                        <h5 className="text-base font-bold text-gray-900">{t('password')}</h5>
+                        <p className="text-sm text-gray-500 mt-1">{t('lastModified')}</p>
                       </div>
                       <button
                         type="button"
@@ -1132,29 +1132,29 @@ export default function SettingsPage() {
 
                     <div className="flex items-center justify-between py-4 border-b border-gray-100">
                       <div>
-                        <h5 className="text-base font-bold text-gray-900">Adresse email</h5>
-                        <p className="text-sm text-gray-500 mt-1">Actuellement: {user?.email}</p>
+                        <h5 className="text-base font-bold text-gray-900">{t('emailAddress')}</h5>
+                        <p className="text-sm text-gray-500 mt-1">{t('currentlyEmail', { email: user?.email ?? '' })}</p>
                       </div>
                       <button
                         type="button"
                         onClick={() => setShowEmailModal(true)}
                         className="px-5 py-2.5 text-[#3B82F6] bg-[#3B82F6]/10 hover:bg-[#3B82F6]/20 rounded-xl transition-all duration-200 text-sm font-bold"
                       >
-                        Modifier l&apos;email
+                        {t('editEmail')}
                       </button>
                     </div>
 
                     <div className="flex items-center justify-between py-4">
                       <div>
-                        <h5 className="text-base font-bold text-gray-900">Authentification à deux facteurs</h5>
-                        <p className="text-sm text-gray-500 mt-1">Ajoutez une couche de sécurité supplémentaire</p>
+                        <h5 className="text-base font-bold text-gray-900">{t('twoFactor')}</h5>
+                        <p className="text-sm text-gray-500 mt-1">{t('twoFactorDesc')}</p>
                       </div>
                       <button
                         type="button"
-                        onClick={() => toast('Fonctionnalité 2FA à venir')}
+                        onClick={() => toast(t('comingSoon2fa'))}
                         className="px-5 py-2.5 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all duration-200 text-sm font-bold"
                       >
-                        Activer la 2FA
+                        {t('enable2fa')}
                       </button>
                     </div>
                   </div>
@@ -1167,10 +1167,9 @@ export default function SettingsPage() {
                       <ExclamationTriangleIcon className="w-6 h-6 text-red-600" />
                     </div>
                     <div className="flex-1">
-                      <h4 className="text-lg font-bold text-red-900 mb-2">Zone de danger</h4>
+                      <h4 className="text-lg font-bold text-red-900 mb-2">{t('dangerZone')}</h4>
                       <p className="text-sm text-red-700 mb-4">
-                        Une fois votre compte supprimé, toutes vos données seront définitivement supprimées.
-                        Cette action ne peut pas être annulée.
+                        {t('dangerZoneDesc')}
                       </p>
                       <button
                         type="button"

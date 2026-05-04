@@ -7,6 +7,7 @@ import DashboardLayout from '@/components/DashboardLayout';
 import { adminAPI } from '@/lib/api';
 import { useAdminUsers } from '@/hooks/useAdminData';
 import toast from 'react-hot-toast';
+import { useTranslations } from 'next-intl';
 import { logger } from '@/lib/logger';
 import { getErrorMessage } from '@/types/api';
 import {
@@ -24,6 +25,8 @@ import {
 export default function AdminUsersPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const t = useTranslations('adminUsers');
+  const tc = useTranslations('common');
   const [userSearch, setUserSearch] = useState('');
   const [userRoleFilter, setUserRoleFilter] = useState('');
 
@@ -63,11 +66,11 @@ export default function AdminUsersPage() {
     
     try {
       await adminAPI.toggleUserActivation(session.accessToken, userId, !currentStatus);
-      toast.success(currentStatus ? 'Utilisateur désactivé avec succès' : 'Utilisateur activé avec succès');
+      toast.success(currentStatus ? t('deactivatedSuccess') : t('activatedSuccess'));
       refetch();
     } catch (error) {
       logger.error("Erreur toggle status:", error);
-      toast.error('Erreur lors de la modification du statut');
+      toast.error(t('statusToggleError'));
     }
   };
 
@@ -80,12 +83,12 @@ export default function AdminUsersPage() {
     setDeleting(true);
     try {
       await adminAPI.deleteUser(session.accessToken, deleteConfirm.userId);
-      toast.success('Utilisateur supprimé avec succès');
+      toast.success(t('deleteSuccess'));
       setDeleteConfirm({ open: false, userId: null, userEmail: '' });
       refetch();
     } catch (error: unknown) {
       logger.error("Erreur suppression:", error);
-      toast.error(getErrorMessage(error, 'Erreur lors de la suppression'));
+      toast.error(getErrorMessage(error, t('deleteError')));
     } finally {
       setDeleting(false);
     }
@@ -103,12 +106,12 @@ export default function AdminUsersPage() {
         role: createForm.role,
         company_name: createForm.role === 'employer' ? createForm.company_name : undefined,
       });
-      toast.success(`Compte créé et email envoyé à ${createForm.email}`);
+      toast.success(t('createSuccess'));
       setShowCreateModal(false);
       setCreateForm({ first_name: '', last_name: '', email: '', role: 'candidate', company_name: '' });
       refetch();
     } catch (error: unknown) {
-      toast.error(getErrorMessage(error, 'Erreur lors de la création'));
+      toast.error(getErrorMessage(error, t('createError')));
     } finally {
       setCreating(false);
     }
@@ -116,7 +119,7 @@ export default function AdminUsersPage() {
 
   if (status === 'loading' || isLoading) {
     return (
-      <DashboardLayout title="Utilisateurs" subtitle="Chargement...">
+      <DashboardLayout title={t('loadingTitle')} subtitle={tc('loading')}>
         <div className="flex items-center justify-center h-64">
           <div className="w-12 h-12 border-4 border-[#6B9B5F] border-t-transparent rounded-full animate-spin"></div>
         </div>
@@ -126,7 +129,7 @@ export default function AdminUsersPage() {
 
   return (
     <DashboardLayout 
-      title="Gestion des utilisateurs" 
+      title={t('title')} 
       subtitle={`${users.length} utilisateur${users.length > 1 ? 's' : ''} au total`}
     >
       <div className="space-y-6">
@@ -137,7 +140,7 @@ export default function AdminUsersPage() {
               <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
               <input
                 type="text"
-                placeholder="Rechercher un utilisateur..."
+                {...{ placeholder: t('searchPlaceholder') }}
                 value={userSearch}
                 onChange={(e) => setUserSearch(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] text-gray-900 dark:text-white placeholder:text-gray-400 transition-all duration-200"
@@ -149,24 +152,24 @@ export default function AdminUsersPage() {
               onChange={(e) => setUserRoleFilter(e.target.value)}
               className="px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] text-gray-900 dark:text-white transition-all duration-200"
             >
-              <option value="">Tous les rôles</option>
-              <option value="candidate">Candidats</option>
-              <option value="employer">Employeurs</option>
-              <option value="admin">Admins</option>
+              <option value="">{t('filterAllRoles')}</option>
+              <option value="candidate">{t('roleCandidates')}</option>
+              <option value="employer">{t('roleEmployers')}</option>
+              <option value="admin">{t('roleAdmins')}</option>
             </select>
             <button
               onClick={() => refetch()}
               className="px-6 py-3 bg-gradient-to-r from-[#6B9B5F] to-[#5a8a4f] text-white rounded-2xl hover:shadow-lg hover:shadow-[#6B9B5F]/30 transition-all duration-300 flex items-center gap-2 font-medium"
             >
               <ArrowPathIcon className="w-5 h-5" />
-              Actualiser
+              {tc('refresh')}
             </button>
             <button
               onClick={() => setShowCreateModal(true)}
               className="px-6 py-3 bg-gradient-to-r from-[#6B46C1] to-[#5a35b0] text-white rounded-2xl hover:shadow-lg hover:shadow-[#6B46C1]/30 transition-all duration-300 flex items-center gap-2 font-medium"
             >
               <PlusIcon className="w-5 h-5" />
-              Créer un utilisateur
+              {t('createButton')}
             </button>
           </div>
         </div>
@@ -177,12 +180,12 @@ export default function AdminUsersPage() {
             <table className="w-full">
               <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 dark:border-gray-600">
                 <tr>
-                  <th className="px-6 py-5 text-left text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Utilisateur</th>
-                  <th className="px-6 py-5 text-left text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Email</th>
-                  <th className="px-6 py-5 text-left text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Rôle</th>
-                  <th className="px-6 py-5 text-left text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Statut</th>
-                  <th className="px-6 py-5 text-left text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Inscription</th>
-                  <th className="px-6 py-5 text-right text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                  <th className="px-6 py-5 text-left text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('colUser')}</th>
+                  <th className="px-6 py-5 text-left text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">{tc('email')}</th>
+                  <th className="px-6 py-5 text-left text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">{tc('role')}</th>
+                  <th className="px-6 py-5 text-left text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('colStatus')}</th>
+                  <th className="px-6 py-5 text-left text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('colRegistration')}</th>
+                  <th className="px-6 py-5 text-right text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">{tc('actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -205,7 +208,7 @@ export default function AdminUsersPage() {
                         user.role === 'candidate' ? 'bg-[#3B82F6]/10 text-[#3B82F6]' :
                         'bg-[#6B9B5F]/10 text-[#6B9B5F]'
                       }`}>
-                        {user.role === 'admin' ? 'Admin' : user.role === 'candidate' ? 'Candidat' : 'Employeur'}
+                        {user.role === 'admin' ? t('roleAdmin') : user.role === 'candidate' ? t('roleCandidate') : t('roleEmployer')}
                       </span>
                     </td>
                     <td className="px-6 py-5">
@@ -213,9 +216,9 @@ export default function AdminUsersPage() {
                         user.is_active ? 'bg-[#6B9B5F]/10 text-[#6B9B5F]' : 'bg-red-100 text-red-700'
                       }`}>
                         {user.is_active ? (
-                          <><CheckCircleIcon className="w-4 h-4" /> Actif</>
+                          <><CheckCircleIcon className="w-4 h-4" /> {tc('active')}</>
                         ) : (
-                          <><XCircleIcon className="w-4 h-4" /> Inactif</>
+                          <><XCircleIcon className="w-4 h-4" /> {tc('inactive')}</>
                         )}
                       </span>
                     </td>
@@ -232,13 +235,13 @@ export default function AdminUsersPage() {
                               : 'bg-[#6B9B5F]/10 text-[#6B9B5F] hover:bg-[#6B9B5F]/20'
                           }`}
                         >
-                          {user.is_active ? 'Désactiver' : 'Activer'}
+                          {user.is_active ? t('deactivate') : t('activate')}
                         </button>
                         <button
                           onClick={() => handleDeleteUser(user.id, user.email)}
                           className="px-4 py-2 text-xs font-bold bg-red-100 text-red-700 hover:bg-red-200 rounded-xl transition-all duration-200"
                         >
-                          Supprimer
+                          {tc('delete')}
                         </button>
                       </div>
                     </td>
@@ -251,7 +254,7 @@ export default function AdminUsersPage() {
           {users.length === 0 && (
             <div className="text-center py-12">
               <UsersIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500 dark:text-gray-400">Aucun utilisateur trouvé</p>
+              <p className="text-gray-500 dark:text-gray-400">{t('empty')}</p>
             </div>
           )}
         </div>
@@ -262,7 +265,7 @@ export default function AdminUsersPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-md p-8">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Créer un utilisateur</h2>
+<h2 className="text-xl font-bold text-gray-900 dark:text-white">{t('modalCreateTitle')}</h2>
               <button onClick={() => setShowCreateModal(false)} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-xl transition-colors">
                 <XMarkIcon className="w-5 h-5 text-gray-500 dark:text-gray-400" />
               </button>
@@ -270,7 +273,7 @@ export default function AdminUsersPage() {
             <form onSubmit={handleCreateUser} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Prénom</label>
+<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{tc('firstName')}</label>
                   <input
                     type="text"
                     required
@@ -281,7 +284,7 @@ export default function AdminUsersPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nom</label>
+<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{tc('lastName')}</label>
                   <input
                     type="text"
                     required
@@ -293,7 +296,7 @@ export default function AdminUsersPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{tc('email')}</label>
                 <input
                   type="email"
                   required
@@ -304,19 +307,19 @@ export default function AdminUsersPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Rôle</label>
+  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{tc('role')}</label>
                 <select
                   value={createForm.role}
                   onChange={(e) => setCreateForm(f => ({ ...f, role: e.target.value as 'candidate' | 'employer' }))}
                   className="w-full px-4 py-2.5 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:border-[#6B9B5F] text-gray-900 dark:text-white text-sm"
                 >
-                  <option value="candidate">Candidat</option>
-                  <option value="employer">Employeur</option>
+                  <option value="candidate">{t('roleCandidate')}</option>
+                  <option value="employer">{t('roleEmployer')}</option>
                 </select>
               </div>
               {createForm.role === 'employer' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nom de l&apos;entreprise</label>
+    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('companyName')}</label>
                   <input
                     type="text"
                     required
@@ -328,7 +331,7 @@ export default function AdminUsersPage() {
                 </div>
               )}
               <p className="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 rounded-xl p-3">
-                Un mot de passe temporaire sera généré automatiquement et envoyé par email à l&apos;utilisateur.
+{t('tempPasswordNote')}
               </p>
               <div className="flex gap-3 pt-2">
                 <button
@@ -336,7 +339,7 @@ export default function AdminUsersPage() {
                   onClick={() => setShowCreateModal(false)}
                   className="flex-1 px-4 py-2.5 border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-medium text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
-                  Annuler
+                  {tc('cancel')}
                 </button>
                 <button
                   type="submit"
@@ -344,9 +347,9 @@ export default function AdminUsersPage() {
                   className="flex-1 px-4 py-2.5 bg-gradient-to-r from-[#6B46C1] to-[#5a35b0] text-white rounded-xl font-medium text-sm hover:shadow-lg transition-all disabled:opacity-60 flex items-center justify-center gap-2"
                 >
                   {creating ? (
-                    <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Création...</>
+<><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> {t('creating')}</>
                   ) : (
-                    <><PlusIcon className="w-4 h-4" /> Créer et envoyer</>
+<><PlusIcon className="w-4 h-4" /> {t('createAndSend')}</>
                   )}
                 </button>
               </div>
@@ -364,13 +367,13 @@ export default function AdminUsersPage() {
                 <ExclamationTriangleIcon className="w-8 h-8 text-red-600" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Supprimer cet utilisateur ?</h2>
+<h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t('deleteModalTitle')}</h2>
                 <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
-                  Vous êtes sur le point de supprimer définitivement le compte de
+                  {t('deleteModalText')}
                 </p>
                 <p className="text-sm font-semibold text-gray-800 dark:text-gray-200 mt-1 break-all">{deleteConfirm.userEmail}</p>
                 <p className="text-xs text-red-500 mt-2 font-medium">
-                  Cette action est irréversible et supprimera toutes les données associées.
+                  {t('deleteIrreversible')}
                 </p>
               </div>
               <div className="flex gap-3 w-full pt-2">
@@ -379,7 +382,7 @@ export default function AdminUsersPage() {
                   disabled={deleting}
                   className="flex-1 px-4 py-2.5 border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-medium text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
                 >
-                  Annuler
+                  {tc('cancel')}
                 </button>
                 <button
                   onClick={confirmDeleteUser}
@@ -387,9 +390,9 @@ export default function AdminUsersPage() {
                   className="flex-1 px-4 py-2.5 bg-gradient-to-r from-red-600 to-red-500 text-white rounded-xl font-medium text-sm hover:shadow-lg hover:shadow-red-200 transition-all disabled:opacity-60 flex items-center justify-center gap-2"
                 >
                   {deleting ? (
-                    <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Suppression...</>
+<><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> {t('deleting')}</>
                   ) : (
-                    <><TrashIcon className="w-4 h-4" /> Supprimer</>
+<><TrashIcon className="w-4 h-4" /> {tc('delete')}</>
                   )}
                 </button>
               </div>

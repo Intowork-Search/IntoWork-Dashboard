@@ -34,6 +34,7 @@ import toast from 'react-hot-toast';
 import { getErrorMessage } from '@/types/api';
 import { useConfirmModal } from '@/hooks/useConfirmModal';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import { useTranslations } from 'next-intl';
 
 interface Props {
   params: Promise<{
@@ -42,6 +43,7 @@ interface Props {
 }
 
 export default function AIScoringPage({ params }: Props) {
+  const t = useTranslations('aiScoring');
   const resolvedParams = use(params);
   const jobId = parseInt(resolvedParams.jobId);
   const router = useRouter();
@@ -71,7 +73,7 @@ export default function AIScoringPage({ params }: Props) {
       setLoading(true);
       const token = await getToken();
       if (!token) {
-        toast.error('Non authentifié');
+        toast.error(t('notAuthenticated'));
         return;
       }
 
@@ -80,7 +82,7 @@ export default function AIScoringPage({ params }: Props) {
       setTotal(data.total);
       setTotalPages(data.total_pages);
     } catch (error: unknown) {
-      toast.error(getErrorMessage(error, 'Erreur lors du chargement'));
+      toast.error(getErrorMessage(error, t('loadError')));
     } finally {
       setLoading(false);
     }
@@ -92,19 +94,19 @@ export default function AIScoringPage({ params }: Props) {
       setScoring(true);
       const token = await getToken();
       if (!token) {
-        toast.error('Non authentifié');
+        toast.error(t('notAuthenticated'));
         return;
       }
 
-      toast.loading('Analyse IA en cours...', { id: 'scoring' });
+      toast.loading(t('aiLoading'), { id: 'scoring' });
       const result = await aiScoringAPI.scoreApplication(applicationId, token);
       
-      toast.success(`Score: ${result.ai_score.toFixed(1)}/100`, { id: 'scoring' });
+      toast.success(t('scoreSuccess', { score: result.ai_score.toFixed(1) }), { id: 'scoring' });
       
       // Recharger la liste
       loadApplications();
     } catch (error: unknown) {
-      toast.error(getErrorMessage(error, 'Erreur lors du scoring'), { id: 'scoring' });
+      toast.error(getErrorMessage(error, t('scoreError')), { id: 'scoring' });
     } finally {
       setScoring(false);
     }
@@ -113,10 +115,10 @@ export default function AIScoringPage({ params }: Props) {
   // Scorer toutes les candidatures non scorées
   const handleBulkScore = async () => {
     const ok = await confirm({
-      title: 'Analyser toutes les candidatures ?',
-      message: 'L\'IA va analyser toutes les candidatures non scorées pour cette offre.',
-      detail: 'Cette opération peut prendre quelques minutes.',
-      confirmLabel: 'Lancer l\'analyse',
+      title: t('analyzeAllTitle'),
+      message: t('analyzeAllMessage'),
+      detail: t('analyzeAllDetail'),
+      confirmLabel: t('analyzeAllConfirm'),
       variant: 'warning',
     });
     if (!ok) return;
@@ -125,19 +127,19 @@ export default function AIScoringPage({ params }: Props) {
       setBulkScoring(true);
       const token = await getToken();
       if (!token) {
-        toast.error('Non authentifié');
+        toast.error(t('notAuthenticated'));
         return;
       }
 
-      toast.loading('Analyse IA en masse...', { id: 'bulk-scoring' });
+      toast.loading(t('bulkLoading'), { id: 'bulk-scoring' });
       const result = await aiScoringAPI.scoreJobApplications(jobId, token);
       
-      toast.success(`${result.scored_count} candidatures analysées !`, { id: 'bulk-scoring' });
+      toast.success(t('bulkSuccess', { count: result.scored_count }), { id: 'bulk-scoring' });
       
       // Recharger la liste
       loadApplications();
     } catch (error: unknown) {
-      toast.error(getErrorMessage(error, 'Erreur lors du scoring en masse'), { id: 'bulk-scoring' });
+      toast.error(getErrorMessage(error, t('bulkError')), { id: 'bulk-scoring' });
     } finally {
       setBulkScoring(false);
     }
@@ -202,12 +204,12 @@ export default function AIScoringPage({ params }: Props) {
               {bulkScoring ? (
                 <>
                   <ArrowPathIcon className="w-5 h-5 animate-spin" />
-                  <span>Analyse en cours...</span>
+                  <span>{t('analyzing')}</span>
                 </>
               ) : (
                 <>
                   <BoltIcon className="w-5 h-5" />
-                  <span>Tout analyser</span>
+                  <span>{t('analyzeAll')}</span>
                 </>
               )}
             </button>
@@ -276,7 +278,7 @@ export default function AIScoringPage({ params }: Props) {
             className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
           >
             <span className="text-sm font-medium">
-              {sortByScore ? 'Score IA' : 'Date de candidature'}
+              {sortByScore ? t('sortByScore') : t('sortByDate')}
             </span>
             <ChevronDownIcon className="w-4 h-4" />
           </button>
@@ -327,12 +329,12 @@ export default function AIScoringPage({ params }: Props) {
                             {expandedDetails === app.id ? (
                               <>
                                 <ChevronUpIcon className="w-4 h-4" />
-                                <span>Masquer détails</span>
+                                <span>{t('hideDetails')}</span>
                               </>
                             ) : (
                               <>
                                 <ChevronDownIcon className="w-4 h-4" />
-                                <span>Voir détails</span>
+                                <span>{t('showDetails')}</span>
                               </>
                             )}
                           </button>
@@ -403,7 +405,7 @@ export default function AIScoringPage({ params }: Props) {
                           className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-blue-500 text-white rounded-lg font-medium hover:from-green-600 hover:to-blue-600 transition-all disabled:opacity-50"
                         >
                           <SparklesIcon className="w-5 h-5" />
-                          <span>Analyser avec IA</span>
+                          <span>{t('analyzeWithAI')}</span>
                         </button>
                       </div>
                     )}
@@ -411,7 +413,7 @@ export default function AIScoringPage({ params }: Props) {
 
                   {/* Date */}
                   <div className="text-right text-sm text-gray-500 dark:text-gray-400">
-                    <p>Candidature:</p>
+                    <p>{t('application')}</p>
                     <p>{new Date(app.applied_at).toLocaleDateString('fr-FR')}</p>
                     {app.ai_analyzed_at && (
                       <>

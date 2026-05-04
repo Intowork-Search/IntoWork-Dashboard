@@ -19,6 +19,7 @@ import OnboardingTour from '@/components/OnboardingTour';
 import { integrationsTour } from '@/config/onboardingTours';
 import { integrationsAPI, Integration, IntegrationStatus } from '@/lib/api';
 import toast from 'react-hot-toast';
+import { useTranslations } from 'next-intl';
 import { useConfirmModal } from '@/hooks/useConfirmModal';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import {
@@ -40,6 +41,8 @@ export default function IntegrationsPage() {
   const { getToken } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const t = useTranslations('integrations');
+  const tc = useTranslations('common');
 
   const [integrations, setIntegrations] = useState<IntegrationStatus | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -60,7 +63,7 @@ export default function IntegrationsPage() {
       setIntegrations(status);
     } catch (error: unknown) {
       logger.error("Error loading integrations:", error);
-      toast.error('Erreur lors du chargement des intégrations');
+      toast.error(t('loadError'));
     } finally {
       setIsLoading(false);
     }
@@ -74,14 +77,15 @@ export default function IntegrationsPage() {
     const success = searchParams.get('success');
     
     if (provider && success === 'true') {
-      toast.success(`✅ ${provider} connecté avec succès !`);
+      const providerLabel = provider === 'google-calendar' ? 'Google Calendar' : provider === 'linkedin' ? 'LinkedIn' : 'Outlook';
+      toast.success(`✅ ${providerLabel} ${t('connectSuccess')} !`);
       // Recharger les intégrations
       loadIntegrations();
       // Nettoyer l'URL
       router.replace('/dashboard/integrations');
     } else if (provider && success === 'false') {
-      const error = searchParams.get('error') || 'Erreur inconnue';
-      toast.error(`❌ Échec de connexion à ${provider}: ${error}`);
+      const error = searchParams.get('error') || tc('error');
+      toast.error(`❌ ${t('connectError')} ${provider}: ${error}`);
       router.replace('/dashboard/integrations');
     }
   }, []);
@@ -109,8 +113,7 @@ export default function IntegrationsPage() {
       window.location.href = authUrlData.auth_url;
     } catch (error: unknown) {
       logger.error(`Error connecting ${provider}:`, error);
-      toast.error(`Erreur lors de la connexion à ${provider}`);
-      setConnectingProvider(null);
+      toast.error(`${t('connectProviderError')} ${provider}`);
     }
   };
 
@@ -118,9 +121,9 @@ export default function IntegrationsPage() {
   const handleDisconnect = async (provider: 'linkedin' | 'google-calendar' | 'outlook') => {
     const providerLabel = provider === 'google-calendar' ? 'Google Calendar' : provider === 'linkedin' ? 'LinkedIn' : 'Outlook';
     const ok = await confirm({
-      title: `Déconnecter ${providerLabel} ?`,
-      message: `Vous allez supprimer l’intégration avec ${providerLabel}. Vous pourrez la reconnecter à tout moment.`,
-      confirmLabel: 'Déconnecter',
+      title: `${t('disconnectTitle').replace('?', '')} ${providerLabel} ?`,
+      message: `${t('disconnectMsg').replace('{provider}', providerLabel)}`,
+      confirmLabel: t('disconnectButton'),
       variant: 'warning',
     });
     if (!ok) return;
@@ -133,17 +136,17 @@ export default function IntegrationsPage() {
       }
 
       await integrationsAPI.disconnect(token, provider);
-      toast.success(`${provider} déconnecté avec succès`);
+      toast.success(`${providerLabel} ${t('connectSuccess')}`);
       await loadIntegrations();
     } catch (error: unknown) {
       logger.error(`Error disconnecting ${provider}:`, error);
-      toast.error(`Erreur lors de la déconnexion de ${provider}`);
+      toast.error(`${t('connectProviderError')} ${provider}`);
     }
   };
 
   // Formater la date
   const formatDate = (dateString?: string) => {
-    if (!dateString) return 'Jamais';
+    if (!dateString) return t('never');
     const date = new Date(dateString);
     return date.toLocaleDateString('fr-FR', {
       day: '2-digit',
@@ -156,11 +159,11 @@ export default function IntegrationsPage() {
 
   if (isLoading) {
     return (
-      <DashboardLayout title="Intégrations" subtitle="Chargement...">
+      <DashboardLayout title={t('loadingTitle')} subtitle={tc('loading')}>
         <div className="flex items-center justify-center py-20">
           <div className="text-center">
             <div className="w-16 h-16 border-4 border-[#F7C700] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-500 dark:text-gray-400">Chargement des intégrations...</p>
+            <p className="text-gray-500 dark:text-gray-400">{t('loading')}</p>
           </div>
         </div>
       </DashboardLayout>
@@ -168,7 +171,7 @@ export default function IntegrationsPage() {
   }
 
   return (
-    <DashboardLayout title="Intégrations" subtitle="Automatisez vos workflows RH">
+    <DashboardLayout title={t('title')} subtitle={t('subtitle')}>
       <div className="space-y-8">
         {/* Hero Section */}
         <div
@@ -189,13 +192,13 @@ export default function IntegrationsPage() {
                 <div>
                   <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-1.5 mb-2">
                     <SparklesIcon className="w-4 h-4 text-white" />
-                    <span className="text-white/90 text-sm font-medium">Intégrations Tierces</span>
+                    <span className="text-white/90 text-sm font-medium">{t('badge')}</span>
                   </div>
                   <h2 className="text-2xl lg:text-3xl font-bold text-white">
-                    Connectez Vos Outils
+                    {t('heroTitle')}
                   </h2>
                   <p className="text-white/80 mt-1">
-                    Automatisez la publication d'offres et la planification d'entretiens
+                    {t('heroSubtitle')}
                   </p>
                 </div>
               </div>
@@ -204,10 +207,10 @@ export default function IntegrationsPage() {
               <button
                 onClick={loadIntegrations}
                 className="btn bg-white/20 hover:bg-white/30 border-white/30 text-white backdrop-blur-sm shadow-lg"
-                title="Rafraîchir"
+                title={tc('refresh')}
               >
                 <ArrowPathIcon className="h-5 w-5" />
-                Actualiser
+                {tc('refresh')}
               </button>
             </div>
 
@@ -221,7 +224,7 @@ export default function IntegrationsPage() {
                   <div>
                     <p className="text-white/70 text-sm">LinkedIn</p>
                     <p className="text-white font-semibold">
-                      {integrations?.linkedin?.is_connected ? 'Connecté' : 'Non connecté'}
+                      {integrations?.linkedin?.is_connected ? t('connected') : t('notConnected')}
                     </p>
                   </div>
                 </div>
@@ -234,7 +237,7 @@ export default function IntegrationsPage() {
                   <div>
                     <p className="text-white/70 text-sm">Google Calendar</p>
                     <p className="text-white font-semibold">
-                      {integrations?.google_calendar?.is_connected ? 'Connecté' : 'Non connecté'}
+                      {integrations?.google_calendar?.is_connected ? t('connected') : t('notConnected')}
                     </p>
                   </div>
                 </div>
@@ -247,7 +250,7 @@ export default function IntegrationsPage() {
                   <div>
                     <p className="text-white/70 text-sm">Microsoft Teams</p>
                     <p className="text-white font-semibold">
-                      {integrations?.outlook_calendar?.is_connected ? 'Connecté' : 'Non connecté'}
+                      {integrations?.outlook_calendar?.is_connected ? t('connected') : t('notConnected')}
                     </p>
                   </div>
                 </div>
@@ -265,10 +268,9 @@ export default function IntegrationsPage() {
               </div>
             </div>
             <div>
-              <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-1">Gagnez du temps avec les intégrations</h3>
+              <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-1">{t('infoTitle')}</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Publiez automatiquement vos offres d'emploi sur LinkedIn, planifiez des entretiens avec Google Calendar ou Microsoft Teams. 
-                Toutes vos actions synchronisées en un clic.
+                {t('infoDescription')}
               </p>
             </div>
           </div>
@@ -292,15 +294,15 @@ export default function IntegrationsPage() {
                   ✨ Natif
                 </div>
               </div>
-              <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">Targetym RH</h3>
+              <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">{t('targetymTitle')}</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-5 leading-relaxed">
-                Connectez votre plateforme RH Targetym pour automatiser l'intégration des candidats embauchés
+  {t('targetymDescription')}
               </p>
               <div className="space-y-2.5 mb-5">
                 {[
-                  'Candidat embauché → Employé créé automatiquement',
-                  'Offres internes Targetym → publiées sur IntoWork',
-                  'Flux RH et recrutement unifiés',
+                  t('targetymFeature1'),
+                  t('targetymFeature2'),
+                  t('targetymFeature3'),
                 ].map((f, i) => (
                   <div key={i} className="flex items-start gap-2.5 text-sm text-gray-700 dark:text-gray-300">
                     <CheckCircleIcon className="h-4 w-4 text-[#6B9B5F] flex-shrink-0 mt-0.5" />
@@ -314,7 +316,7 @@ export default function IntegrationsPage() {
                   className="w-full px-4 py-2.5 bg-gradient-to-r from-[#6B9B5F] to-[#5a8450] text-white rounded-xl font-medium text-sm flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all duration-200"
                 >
                   <LinkIcon className="h-4 w-4" />
-                  Configurer
+                  {t('configureButton')}
                 </button>
               </div>
             </div>
@@ -391,13 +393,12 @@ export default function IntegrationsPage() {
           <div className="bg-gradient-to-r from-[#6B9B5F]/10 to-[#F7C700]/10 p-6 border-b border-gray-100 dark:border-gray-700">
             <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
               <InformationCircleIcon className="w-5 h-5 text-[#6B9B5F]" />
-              Besoin d'aide ?
+              {t('helpTitle')}
             </h3>
           </div>
           <div className="p-6">
             <p className="text-gray-600 dark:text-gray-400 mb-4">
-              Les intégrations utilisent OAuth 2.0 pour sécuriser la connexion à vos comptes.
-              Vous pouvez révoquer l'accès à tout moment depuis cette page.
+              {t('helpDescription')}
             </p>
             <div className="space-y-3">
               <div className="flex gap-3 p-3 bg-[#0A66C2]/5 rounded-xl border border-[#0A66C2]/10">
@@ -405,7 +406,7 @@ export default function IntegrationsPage() {
                 <div>
                   <p className="font-medium text-gray-800 dark:text-gray-200 text-sm">LinkedIn</p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Assurez-vous d'avoir les permissions administrateur sur votre page entreprise
+                    {t('linkedinHelp')}
                   </p>
                 </div>
               </div>
@@ -414,7 +415,7 @@ export default function IntegrationsPage() {
                 <div>
                   <p className="font-medium text-gray-800 dark:text-gray-200 text-sm">Google Calendar</p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Vous aurez besoin d'un compte Google avec accès à Calendar
+                    {t('googleHelp')}
                   </p>
                 </div>
               </div>
@@ -423,7 +424,7 @@ export default function IntegrationsPage() {
                 <div>
                   <p className="font-medium text-gray-800 dark:text-gray-200 text-sm">Outlook / Teams</p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Nécessite un compte Microsoft 365 avec Teams activé
+                    {t('outlookHelp')}
                   </p>
                 </div>
               </div>
@@ -477,6 +478,7 @@ function IntegrationCard({
   formatDate,
   features
 }: IntegrationCardProps) {
+  const t = useTranslations('integrations');
   const isConnected = integration?.is_connected || false;
 
   return (
@@ -498,7 +500,7 @@ function IntegrationCard({
           {isConnected && (
             <div className="flex items-center gap-1.5 bg-gradient-to-r from-[#6B9B5F] to-[#5a8450] text-white px-3 py-1.5 rounded-full text-sm font-medium shadow-md">
               <CheckCircleSolid className="h-4 w-4" />
-              Connecté
+              {t('connected')}
             </div>
           )}
         </div>
@@ -525,12 +527,12 @@ function IntegrationCard({
             <div className="space-y-2 text-xs text-gray-600 dark:text-gray-400">
               <div className="flex items-center gap-2">
                 <CheckCircleSolid className="h-3.5 w-3.5 text-[#6B9B5F]" />
-                <span className="font-medium">Connecté le :</span>
+                <span className="font-medium">{t('connectedOn')}</span>
                 <span>{formatDate(integration?.connected_at)}</span>
               </div>
               <div className="flex items-center gap-2">
                 <CalendarIcon className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400" />
-                <span className="font-medium">Dernière utilisation :</span>
+                <span className="font-medium">{t('lastUsed')}</span>
                 <span>{formatDate(integration?.last_used_at)}</span>
               </div>
             </div>
@@ -545,7 +547,7 @@ function IntegrationCard({
               className="w-full px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl font-medium transition-colors duration-200 flex items-center justify-center gap-2 border border-red-200"
             >
               <XCircleIcon className="h-5 w-5" />
-              Déconnecter
+              {t('disconnectButton')}
             </button>
           ) : (
             <button
@@ -556,12 +558,12 @@ function IntegrationCard({
               {isConnecting ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Connexion en cours...
+                  {t('connecting')}
                 </>
               ) : (
                 <>
                   <LinkIcon className="h-5 w-5" />
-                  Connecter
+                  {t('connectButton')}
                 </>
               )}
             </button>

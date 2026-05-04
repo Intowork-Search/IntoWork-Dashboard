@@ -463,7 +463,7 @@ export default function ApplicationsPage() {
                               ) : (
                                 <TrashIcon className="w-4 h-4" />
                               )}
-                              <span>Retirer</span>
+                              <span>{t('remove')}</span>
                             </button>
                           )}
                         </div>

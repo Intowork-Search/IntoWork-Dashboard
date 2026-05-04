@@ -34,6 +34,7 @@ import { CheckCircleIcon, XCircleIcon, ClockIcon } from '@heroicons/react/24/sol
 import ScheduleInterviewModal from '@/components/ScheduleInterviewModal';
 import { useConfirmModal } from '@/hooks/useConfirmModal';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import { useTranslations } from 'next-intl';
 
 interface CandidateApplication {
   id: number;
@@ -59,6 +60,9 @@ interface ApplicationsResponse {
 }
 
 export default function CandidatesPage(): React.JSX.Element {
+  const t = useTranslations('candidates');
+  const tc = useTranslations('common');
+  const tas = useTranslations('applicationStatus');
   const { getToken } = useAuth();
   const [page, setPage] = useState(1);
   const limit = 20;
@@ -128,13 +132,13 @@ export default function CandidatesPage(): React.JSX.Element {
 
   const getStatusBadge = (status: string) => {
     const statusConfig: Record<string, { label: string; className: string; icon: React.ComponentType<React.SVGProps<SVGSVGElement>> }> = {
-      'applied': { label: 'En attente', className: 'bg-yellow-100 text-yellow-800', icon: ClockIcon },
-      'pending': { label: 'En attente', className: 'bg-yellow-100 text-yellow-800', icon: ClockIcon },
-      'viewed': { label: 'Vue', className: 'bg-blue-100 text-blue-800', icon: EyeIcon },
-      'shortlisted': { label: 'Présélectionné', className: 'bg-purple-100 text-purple-800', icon: CheckCircleIcon },
-      'interview': { label: 'Entretien', className: 'bg-indigo-100 text-indigo-800', icon: UserGroupIcon },
-      'accepted': { label: 'Accepté', className: 'bg-green-100 text-green-800', icon: CheckCircleIcon },
-      'rejected': { label: 'Rejeté', className: 'bg-red-100 text-red-800', icon: XCircleIcon },
+      'applied': { label: tas('pending'), className: 'bg-yellow-100 text-yellow-800', icon: ClockIcon },
+      'pending': { label: tas('pending'), className: 'bg-yellow-100 text-yellow-800', icon: ClockIcon },
+      'viewed': { label: tas('viewed'), className: 'bg-blue-100 text-blue-800', icon: EyeIcon },
+      'shortlisted': { label: tas('shortlisted'), className: 'bg-purple-100 text-purple-800', icon: CheckCircleIcon },
+      'interview': { label: tas('interview'), className: 'bg-indigo-100 text-indigo-800', icon: UserGroupIcon },
+      'accepted': { label: tas('accepted'), className: 'bg-green-100 text-green-800', icon: CheckCircleIcon },
+      'rejected': { label: tas('rejected'), className: 'bg-red-100 text-red-800', icon: XCircleIcon },
     };
 
     const config = statusConfig[status] || { label: status, className: 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200', icon: ClockIcon };
@@ -167,7 +171,7 @@ export default function CandidatesPage(): React.JSX.Element {
 
   if (loading) {
     return (
-      <DashboardLayout title="Candidats" subtitle="Gérer les candidatures">
+  <DashboardLayout title={t('title')} subtitle={t('subtitle')}>
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
         </div>
@@ -176,28 +180,28 @@ export default function CandidatesPage(): React.JSX.Element {
   }
 
   return (
-    <DashboardLayout title="Candidats" subtitle="Gérer les candidatures">
+    <DashboardLayout title={t('title')} subtitle={t('subtitle')}>
       <div className="space-y-6">
         {/* Header avec stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Total candidatures</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{t('statTotal')}</p>
             <p className="text-2xl font-bold text-gray-900 dark:text-white">{total}</p>
           </div>
           <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
-            <p className="text-sm text-gray-600 dark:text-gray-400">En attente</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{t('statPending')}</p>
             <p className="text-2xl font-bold text-yellow-600">
               {applications.filter((a: CandidateApplication) => a.status === 'applied' || a.status === 'pending').length}
             </p>
           </div>
           <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Entretiens</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{t('statInterviews')}</p>
             <p className="text-2xl font-bold text-indigo-600">
               {applications.filter((a: CandidateApplication) => a.status === 'interview').length}
             </p>
           </div>
           <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Acceptés</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{t('statAccepted')}</p>
             <p className="text-2xl font-bold text-green-600">
               {applications.filter((a: CandidateApplication) => a.status === 'accepted').length}
             </p>
@@ -212,7 +216,7 @@ export default function CandidatesPage(): React.JSX.Element {
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
               <input
                 type="text"
-                placeholder="Rechercher un candidat..."
+                {...{ placeholder: t('searchPlaceholder') }}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
@@ -229,13 +233,13 @@ export default function CandidatesPage(): React.JSX.Element {
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                 aria-label="Filtrer par statut"
               >
-                <option value="">Tous les statuts</option>
-                <option value="viewed">Vue</option>
-                <option value="shortlisted">Présélectionné</option>
-                <option value="interview">Entretien</option>
-                <option value="accepted">Accepté</option>
-                <option value="pending">En attente</option>
-                <option value="rejected">Rejeté</option>
+                <option value="">{t('filterAllStatuses')}</option>
+                <option value="viewed">{tas('viewed')}</option>
+                <option value="shortlisted">{tas('shortlisted')}</option>
+                <option value="interview">{tas('interview')}</option>
+                <option value="accepted">{tas('accepted')}</option>
+                <option value="pending">{tas('pending')}</option>
+                <option value="rejected">{tas('rejected')}</option>
               </select>
             </div>
 
@@ -256,9 +260,9 @@ export default function CandidatesPage(): React.JSX.Element {
         {filteredApplications.length === 0 ? (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-12 text-center">
             <UserGroupIcon className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Aucune candidature</h3>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">{t('emptyTitle')}</h3>
             <p className="text-gray-600 dark:text-gray-400">
-              {searchTerm || statusFilter ? 'Aucun résultat pour ces filtres' : 'Les candidatures apparaîtront ici'}
+              {searchTerm || statusFilter ? t('emptyFiltered') : t('emptyDefault')}
             </p>
           </div>
         ) : (
@@ -268,13 +272,13 @@ export default function CandidatesPage(): React.JSX.Element {
                 <thead className="bg-gray-50 dark:bg-gray-900">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Candidat
+                      {t('colCandidate')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Offre
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Statut
+                      {t('colStatus')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Date
@@ -337,17 +341,17 @@ export default function CandidatesPage(): React.JSX.Element {
               disabled={page === 1}
               className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
             >
-              Précédent
+              {tc('previous')}
             </button>
             <span className="px-4 py-2 text-gray-700 dark:text-gray-300">
-              Page {page} sur {totalPages}
+              {tc('page', { current: page, total: totalPages })}
             </span>
             <button
               onClick={() => setPage(Math.min(totalPages, page + 1))}
               disabled={page === totalPages}
               className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
             >
-              Suivant
+              {tc('next')}
             </button>
           </div>
         )}
@@ -358,11 +362,11 @@ export default function CandidatesPage(): React.JSX.Element {
         <div className="fixed inset-0 bg-white/40 flex items-center justify-center z-50 p-4 backdrop-blur-md">
           <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
             <div className="sticky top-0 bg-white dark:bg-gray-800 border-b px-6 py-4 flex justify-between items-center z-10">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white">Détails de la candidature</h3>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t('modalTitle')}</h3>
               <button
                 onClick={() => setViewingApplication(null)}
                 className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-400"
-                aria-label="Fermer"
+                aria-label={tc('close')}
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -373,12 +377,12 @@ export default function CandidatesPage(): React.JSX.Element {
             <div className="p-6 space-y-6">
               {/* Informations candidat */}
               <div>
-                <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">👤 Candidat</h4>
+                <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('sectionCandidate')}</h4>
                 <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 space-y-2">
-                  <p className="text-gray-900 dark:text-white"><strong>Nom:</strong> {viewingApplication.candidate_name}</p>
+                  <p className="text-gray-900 dark:text-white"><strong>{t('labelName')}:</strong> {viewingApplication.candidate_name}</p>
                   <p className="text-gray-900 dark:text-white flex items-center space-x-2">
                     <EnvelopeIcon className="w-4 h-4" />
-                    <span><strong>Email:</strong> {viewingApplication.candidate_email}</span>
+                    <span><strong>{t('labelEmail')}:</strong> {viewingApplication.candidate_email}</span>
                   </p>
                   {viewingApplication.candidate_phone && (
                     <p className="text-gray-900 dark:text-white flex items-center space-x-2">
@@ -398,7 +402,7 @@ export default function CandidatesPage(): React.JSX.Element {
               {/* Statut et date */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">📊 Statut</h4>
+                  <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('sectionStatus')}</h4>
                   <div className="relative" data-tour="change-status">
                     <select
                       value={viewingApplication.status}
@@ -407,12 +411,12 @@ export default function CandidatesPage(): React.JSX.Element {
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                       aria-label="Changer le statut"
                     >
-                      <option value="applied">En attente</option>
-                      <option value="viewed">Vue</option>
-                      <option value="shortlisted">Présélectionné</option>
-                      <option value="interview">Entretien</option>
-                      <option value="accepted">Accepté</option>
-                      <option value="rejected">Rejeté</option>
+                      <option value="applied">{tas('pending')}</option>
+                      <option value="viewed">{tas('viewed')}</option>
+                      <option value="shortlisted">{tas('shortlisted')}</option>
+                      <option value="interview">{tas('interview')}</option>
+                      <option value="accepted">{tas('accepted')}</option>
+                      <option value="rejected">{tas('rejected')}</option>
                     </select>
                     {updatingStatus && (
                       <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
@@ -422,7 +426,7 @@ export default function CandidatesPage(): React.JSX.Element {
                   </div>
                 </div>
                 <div>
-                  <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">📅 Date de candidature</h4>
+                  <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('sectionDate')}</h4>
                   <p className="text-gray-900 dark:text-white">{formatDate(viewingApplication.applied_at)}</p>
                 </div>
               </div>
@@ -430,7 +434,7 @@ export default function CandidatesPage(): React.JSX.Element {
               {/* Lettre de motivation */}
               {viewingApplication.cover_letter && (
                 <div>
-                  <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">✉️ Lettre de motivation</h4>
+                  <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('sectionCoverLetter')}</h4>
                   <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
                     <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{viewingApplication.cover_letter}</p>
                   </div>
@@ -451,14 +455,14 @@ export default function CandidatesPage(): React.JSX.Element {
                     className="inline-flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
                   >
                     <DocumentTextIcon className="w-5 h-5" />
-                    <span>Télécharger le CV</span>
+                    <span>{t('downloadCV')}</span>
                   </a>
                 </div>
               )}
 
               {/* Notes */}
               <div data-tour="add-notes">
-                <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">📝 Notes internes</h4>
+                <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('sectionNotes')}</h4>
                 <div className="relative">
                   <textarea
                     value={viewingApplication.notes || ''}
@@ -469,7 +473,7 @@ export default function CandidatesPage(): React.JSX.Element {
                       handleNotesUpdate(viewingApplication.id, viewingApplication.notes || '');
                     }}
                     disabled={updatingNotes}
-                    placeholder="Ajouter des notes sur ce candidat..."
+                    {...{ placeholder: t('notesPlaceholder') }}
                     rows={4}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                   />
@@ -480,7 +484,7 @@ export default function CandidatesPage(): React.JSX.Element {
                   )}
                 </div>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  {updatingNotes ? 'Sauvegarde en cours...' : 'Les notes se sauvegardent automatiquement'}
+                  {updatingNotes ? tc('saving') : t('notesAutoSave')}
                 </p>
               </div>
 
@@ -501,42 +505,42 @@ export default function CandidatesPage(): React.JSX.Element {
                     className="px-4 py-2 bg-[#6B9B5F] text-white rounded-lg hover:bg-[#5a8a4f] transition flex items-center justify-center gap-2"
                   >
                     <CalendarIcon className="w-5 h-5" />
-                    Planifier un entretien
+                    {t('scheduleInterview')}
                   </button>
                   <button
                     onClick={() => handleStatusChange(viewingApplication.id, 'interview')}
                     disabled={updatingStatus}
                     className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Marquer en entretien
+                    {t('markInterview')}
                   </button>
                   <button
                     onClick={() => handleStatusChange(viewingApplication.id, 'accepted')}
                     disabled={updatingStatus}
                     className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Accepter
+                    {t('accept')}
                   </button>
                   <button
                     onClick={() => handleStatusChange(viewingApplication.id, 'shortlisted')}
                     disabled={updatingStatus}
                     className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Présélectionner
+                    {t('shortlist')}
                   </button>
                   <button
                     onClick={async () => {
                       const ok = await confirm({
-                        title: 'Rejeter cette candidature ?',
+                        title: t('rejectConfirmTitle'),
                         message: `Vous allez rejeter la candidature de ${viewingApplication.candidate_name}.`,
-                        confirmLabel: 'Rejeter',
+                        confirmLabel: t('reject'),
                       });
                       if (ok) handleStatusChange(viewingApplication.id, 'rejected');
                     }}
                     disabled={updatingStatus}
                     className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Rejeter
+                    {t('reject')}
                   </button>
                 </div>
               </div>
@@ -547,7 +551,7 @@ export default function CandidatesPage(): React.JSX.Element {
                   onClick={() => setViewingApplication(null)}
                   className="px-6 py-2 border border-gray-300 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition"
                 >
-                  Fermer
+                  {tc('close')}
                 </button>
               </div>
             </div>

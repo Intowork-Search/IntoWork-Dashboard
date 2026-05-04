@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/DashboardLayout';
 import { adminAPI, type AdminEmployer } from '@/lib/api';
 import { logger } from '@/lib/logger';
+import { useTranslations } from 'next-intl';
 import {
   BuildingOfficeIcon,
   MagnifyingGlassIcon,
@@ -20,6 +21,8 @@ import {
 export default function AdminEmployersPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const t = useTranslations('adminEmployers');
+  const tc = useTranslations('common');
   const [loading, setLoading] = useState(true);
   const [employers, setEmployers] = useState<AdminEmployer[]>([]);
   const [search, setSearch] = useState('');
@@ -66,7 +69,7 @@ export default function AdminEmployersPage() {
 
   if (status === 'loading' || loading) {
     return (
-      <DashboardLayout title="Entreprises" subtitle="Chargement...">
+      <DashboardLayout title={t('loadingTitle')} subtitle={tc('loading')}>
         <div className="flex items-center justify-center h-64">
           <div className="w-12 h-12 border-4 border-[#6B9B5F] border-t-transparent rounded-full animate-spin"></div>
         </div>
@@ -76,7 +79,7 @@ export default function AdminEmployersPage() {
 
   return (
     <DashboardLayout 
-      title="Gestion des entreprises" 
+      title={t('title')} 
       subtitle={`${employers.length} entreprise${employers.length > 1 ? 's' : ''} inscrite${employers.length > 1 ? 's' : ''}`}
     >
       <div className="space-y-6">
@@ -87,7 +90,7 @@ export default function AdminEmployersPage() {
               <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
               <input
                 type="text"
-                placeholder="Rechercher une entreprise..."
+                {...{ placeholder: t('searchPlaceholder') }}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] text-gray-900 dark:text-white placeholder:text-gray-400 transition-all duration-200"
@@ -98,7 +101,7 @@ export default function AdminEmployersPage() {
               className="px-6 py-3 bg-gradient-to-r from-[#6B46C1] to-[#5a3aaa] text-white rounded-2xl hover:shadow-lg hover:shadow-[#6B46C1]/30 transition-all duration-300 flex items-center gap-2 font-medium"
             >
               <ArrowPathIcon className="w-5 h-5" />
-              Actualiser
+              {tc('refresh')}
             </button>
           </div>
         </div>
@@ -150,16 +153,16 @@ export default function AdminEmployersPage() {
                 {employer.is_active ? (
                   <span className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold bg-[#6B9B5F]/10 text-[#6B9B5F]">
                     <CheckCircleIcon className="w-5 h-5" />
-                    Actif
+                    {tc('active')}
                   </span>
                 ) : (
                   <span className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold bg-red-100 text-red-700">
                     <XCircleIcon className="w-5 h-5" />
-                    Inactif
+                    {tc('inactive')}
                   </span>
                 )}
                 <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">
-                  Inscrit le {new Date(employer.created_at).toLocaleDateString('fr-FR')}
+                  {tc('registeredOn')} {new Date(employer.created_at).toLocaleDateString('fr-FR')}
                 </span>
               </div>
             </div>
@@ -169,7 +172,7 @@ export default function AdminEmployersPage() {
         {employers.length === 0 && (
           <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-black/30 p-12 text-center border border-gray-100 dark:border-gray-700">
             <BuildingOfficeIcon className="w-20 h-20 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500 dark:text-gray-400 text-lg">Aucune entreprise trouvée</p>
+<p className="text-gray-500 dark:text-gray-400 text-lg">{t('empty')}</p>
           </div>
         )}
       </div>

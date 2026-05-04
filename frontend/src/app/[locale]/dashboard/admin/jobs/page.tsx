@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/DashboardLayout';
 import { adminAPI, type AdminJob } from '@/lib/api';
 import { logger } from '@/lib/logger';
+import { useTranslations } from 'next-intl';
 import {
   BriefcaseIcon,
   MagnifyingGlassIcon,
@@ -24,6 +25,8 @@ const ITEMS_PER_PAGE = 10;
 export default function AdminJobsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const t = useTranslations('adminJobs');
+  const tc = useTranslations('common');
   const [loading, setLoading] = useState(true);
   const [jobs, setJobs] = useState<AdminJob[]>([]);
   const [search, setSearch] = useState('');
@@ -68,42 +71,42 @@ export default function AdminJobsPage() {
         return (
           <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold bg-[#6B9B5F]/10 text-[#6B9B5F]">
             <CheckCircleIcon className="w-5 h-5" />
-            Active
+            {t('statusActive')}
           </span>
         );
       case 'closed':
         return (
           <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold bg-blue-100 text-blue-700">
             <CheckCircleIcon className="w-5 h-5" />
-            Fermee
+            {t('statusClosed')}
           </span>
         );
       case 'archived':
         return (
           <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
             <XCircleIcon className="w-5 h-5" />
-            Archivee
+            {t('statusArchived')}
           </span>
         );
       case 'draft':
         return (
           <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold bg-[#F7C700]/10 text-[#b39200]">
             <XCircleIcon className="w-5 h-5" />
-            Brouillon
+            {t('statusDraft')}
           </span>
         );
       case 'expired':
         return (
           <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold bg-red-100 text-red-700">
             <XCircleIcon className="w-5 h-5" />
-            Expirée
+            {t('statusExpired')}
           </span>
         );
       case 'closed':
         return (
           <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
             <XCircleIcon className="w-5 h-5" />
-            Fermée
+            {t('statusClosed')}
           </span>
         );
       default:
@@ -119,7 +122,7 @@ export default function AdminJobsPage() {
 
   if (status === 'loading' || loading) {
     return (
-      <DashboardLayout title="Offres d'emploi" subtitle="Chargement...">
+  <DashboardLayout title={t('loadingTitle')} subtitle={tc('loading')}>
         <div className="flex items-center justify-center h-64">
           <div className="w-12 h-12 border-4 border-[#6B9B5F] border-t-transparent rounded-full animate-spin"></div>
         </div>
@@ -129,7 +132,7 @@ export default function AdminJobsPage() {
 
   return (
     <DashboardLayout 
-      title="Gestion des offres d'emploi" 
+      title={t('title')} 
       subtitle={`${jobs.length} offre${jobs.length > 1 ? 's' : ''} publiée${jobs.length > 1 ? 's' : ''}`}
     >
       <div className="space-y-6">
@@ -140,7 +143,7 @@ export default function AdminJobsPage() {
               <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
               <input
                 type="text"
-                placeholder="Rechercher une offre..."
+                {...{ placeholder: t('searchPlaceholder') }}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] text-gray-900 dark:text-white placeholder:text-gray-400 transition-all duration-200"
@@ -151,7 +154,7 @@ export default function AdminJobsPage() {
               className="px-6 py-3 bg-gradient-to-r from-[#F7C700] to-[#e0b400] text-white rounded-2xl hover:shadow-lg hover:shadow-[#F7C700]/30 transition-all duration-300 flex items-center gap-2 font-medium"
             >
               <ArrowPathIcon className="w-5 h-5" />
-              Actualiser
+              {tc('refresh')}
             </button>
           </div>
         </div>
@@ -194,11 +197,11 @@ export default function AdminJobsPage() {
                       <div className="flex items-center gap-2">
                         <UsersIcon className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                         <span className="text-gray-600 dark:text-gray-400 font-medium">
-                          {job.applications_count} candidature{job.applications_count > 1 ? 's' : ''}
+                          {job.applications_count} {t('applicationsCount')}
                         </span>
                       </div>
                       <span className="text-gray-500 dark:text-gray-400">
-                        Publié le {new Date(job.created_at).toLocaleDateString('fr-FR')}
+                        {tc('publishedOn')} {new Date(job.created_at).toLocaleDateString('fr-FR')}
                       </span>
                     </div>
                   </div>
@@ -211,7 +214,7 @@ export default function AdminJobsPage() {
         {jobs.length === 0 && (
           <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-black/30 p-12 text-center border border-gray-100 dark:border-gray-700">
             <BriefcaseIcon className="w-20 h-20 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500 dark:text-gray-400 text-lg">Aucune offre trouvée</p>
+<p className="text-gray-500 dark:text-gray-400 text-lg">{t('empty')}</p>
           </div>
         )}
 
@@ -225,10 +228,10 @@ export default function AdminJobsPage() {
                 className="px-5 py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-medium"
               >
                 <ChevronLeftIcon className="w-5 h-5" />
-                Précédent
+                {tc('previous')}
               </button>
               <span className="text-gray-600 dark:text-gray-400 font-medium">
-                Page {currentPage} sur {totalPages}
+                {tc('page', { current: currentPage, total: totalPages })}
               </span>
               <button
                 onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}

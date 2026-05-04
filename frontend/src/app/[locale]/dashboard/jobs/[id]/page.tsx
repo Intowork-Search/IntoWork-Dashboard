@@ -45,6 +45,7 @@ export default function JobDetailPage() {
   const router = useRouter();
   const params = useParams();
   const t = useTranslations('jobs');
+  const tc = useTranslations('common');
   const jobId = params.id as string;
 
   const [job, setJob] = useState<JobDetail | null>(null);
@@ -83,7 +84,7 @@ export default function JobDetailPage() {
       setApplying(true);
       const token = await getToken();
       if (!token) {
-        toast.error('Vous devez être connecté pour postuler');
+        toast.error(t('loginRequired'));
         return;
       }
 
@@ -92,7 +93,7 @@ export default function JobDetailPage() {
         cover_letter: coverLetter || undefined
       });
 
-      toast.success('✅ Candidature envoyée avec succès !');
+      toast.success(`✅ ${t('applySuccess')}`);
       setShowApplicationModal(false);
       setCoverLetter('');
       
@@ -103,7 +104,7 @@ export default function JobDetailPage() {
       if (isAPIError(error) && error.response?.status === 400 && error.response?.data?.detail?.includes('déjà postulé')) {
         toast.error('❌ Vous avez déjà postulé à cette offre');
       } else {
-        toast.error('❌ Erreur lors de l\'envoi de la candidature');
+        toast.error(`❌ ${t('applyError')}`);
       }
     } finally {
       setApplying(false);
@@ -159,12 +160,12 @@ export default function JobDetailPage() {
       <DashboardLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12">
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Offre non trouvée</h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">Offre non trouvée</h3>
             <button
               onClick={() => router.push('/dashboard/jobs')}
               className="text-blue-600 hover:text-blue-700 font-medium"
             >
-              ← Retour aux offres
+              {t('backToJobs')}
             </button>
           </div>
         </div>
@@ -178,14 +179,14 @@ export default function JobDetailPage() {
         {/* Bouton retour */}
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 mb-6 transition-colors"
+          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors"
         >
           <ArrowLeftIcon className="w-5 h-5" />
-          <span>Retour</span>
+          <span>{tc('back')}</span>
         </button>
 
         {/* En-tête de l'offre */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-600 p-8 mb-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-6">
           <div className="flex items-start justify-between mb-6">
             <div className="flex items-start gap-4 flex-1">
               {job.company_logo_url && (
@@ -196,8 +197,8 @@ export default function JobDetailPage() {
                 />
               )}
               <div className="flex-1">
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{job.title}</h1>
-                <div className="flex items-center gap-4 text-gray-600 dark:text-gray-400">
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">{job.title}</h1>
+                <div className="flex items-center gap-4 text-gray-600">
                   <div className="flex items-center gap-1">
                     <BuildingOfficeIcon className="w-5 h-5" />
                     <span className="font-medium">{job.company_name}</span>
@@ -237,19 +238,19 @@ export default function JobDetailPage() {
           </div>
 
           {/* Informations clés */}
-          <div className="flex flex-wrap gap-4 pt-6 border-t border-gray-200 dark:border-gray-600">
-            <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-gray-900 rounded-lg">
-              <BriefcaseIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-              <span className="text-gray-900 dark:text-white font-medium">{getJobTypeLabel(job.job_type)}</span>
+          <div className="flex flex-wrap gap-4 pt-6 border-t border-gray-200">
+            <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg">
+              <BriefcaseIcon className="w-5 h-5 text-gray-600" />
+              <span className="text-gray-900 font-medium">{getJobTypeLabel(job.job_type)}</span>
             </div>
-            <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-gray-900 rounded-lg">
-              <MapPinIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-              <span className="text-gray-900 dark:text-white font-medium">{getLocationTypeLabel(job.location_type)}</span>
+            <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg">
+              <MapPinIcon className="w-5 h-5 text-gray-600" />
+              <span className="text-gray-900 font-medium">{getLocationTypeLabel(job.location_type)}</span>
             </div>
             {(job.salary_min || job.salary_max) && (
-              <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                <CurrencyEuroIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                <span className="text-gray-900 dark:text-white font-medium">
+              <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg">
+                <CurrencyEuroIcon className="w-5 h-5 text-gray-600" />
+                <span className="text-gray-900 font-medium">
                   {job.salary_min && job.salary_max 
                     ? `${job.salary_min.toLocaleString()} - ${job.salary_max.toLocaleString()} ${job.currency}`
                     : job.salary_min 
@@ -259,26 +260,26 @@ export default function JobDetailPage() {
                 </span>
               </div>
             )}
-            <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-gray-900 rounded-lg">
-              <CalendarDaysIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-              <span className="text-gray-900 dark:text-white font-medium">{formatDate(job.posted_at)}</span>
+            <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg">
+              <CalendarDaysIcon className="w-5 h-5 text-gray-600" />
+              <span className="text-gray-900 font-medium">{formatDate(job.posted_at)}</span>
             </div>
           </div>
         </div>
 
         {/* Description */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-600 p-8 mb-6">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Description du poste</h2>
-          <div className="prose max-w-none text-gray-700 dark:text-gray-300 whitespace-pre-line">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Description du poste</h2>
+          <div className="prose max-w-none text-gray-700 whitespace-pre-line">
             {job.description}
           </div>
         </div>
 
         {/* Responsabilités */}
         {job.responsibilities && (
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-600 p-8 mb-6">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Responsabilités</h2>
-            <div className="prose max-w-none text-gray-700 dark:text-gray-300 whitespace-pre-line">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Responsabilités</h2>
+            <div className="prose max-w-none text-gray-700 whitespace-pre-line">
               {job.responsibilities}
             </div>
           </div>
@@ -286,9 +287,9 @@ export default function JobDetailPage() {
 
         {/* Exigences */}
         {job.requirements && (
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-600 p-8 mb-6">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Exigences</h2>
-            <div className="prose max-w-none text-gray-700 dark:text-gray-300 whitespace-pre-line">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Exigences</h2>
+            <div className="prose max-w-none text-gray-700 whitespace-pre-line">
               {job.requirements}
             </div>
           </div>
@@ -296,9 +297,9 @@ export default function JobDetailPage() {
 
         {/* Avantages */}
         {job.benefits && (
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-600 p-8 mb-6">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Avantages</h2>
-            <div className="prose max-w-none text-gray-700 dark:text-gray-300 whitespace-pre-line">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Avantages</h2>
+            <div className="prose max-w-none text-gray-700 whitespace-pre-line">
               {job.benefits}
             </div>
           </div>
@@ -306,12 +307,12 @@ export default function JobDetailPage() {
 
         {/* Bouton fixe en bas */}
         {!job.has_applied && (
-          <div className="sticky bottom-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-600 p-4">
+          <div className="sticky bottom-8 bg-white rounded-xl shadow-lg border border-gray-200 p-4">
             <button 
               onClick={handleApply}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors"
             >
-              Postuler à cette offre
+              {t('applyButton')}
             </button>
           </div>
         )}
@@ -320,16 +321,16 @@ export default function JobDetailPage() {
       {/* Modal de candidature */}
       {showApplicationModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div className="p-6 border-b border-gray-200 dark:border-gray-600">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Postuler à cette offre</h2>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">{job.title} - {job.company_name}</p>
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="p-6 border-b border-gray-200">
+              <h2 className="text-2xl font-bold text-gray-900">{t('modalTitle')}</h2>
+              <p className="text-gray-600 mt-1">{job.title} - {job.company_name}</p>
             </div>
 
             <div className="p-6">
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
-                  Lettre de motivation <span className="text-gray-500 dark:text-gray-400">(optionnel)</span>
+                <label className="block text-sm font-medium text-gray-900 mb-2">
+                  {t('coverLetterLabel')} <span className="text-gray-500">{t('optional')}</span>
                 </label>
                 <textarea
                   value={coverLetter}
@@ -342,7 +343,7 @@ export default function JobDetailPage() {
 
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
                 <p className="text-sm text-blue-800">
-                  <strong>Note :</strong> Votre CV sera automatiquement joint à votre candidature.
+                  <strong>{t('note')}</strong> {t('cvAttachedNote')}
                 </p>
               </div>
 
@@ -352,10 +353,10 @@ export default function JobDetailPage() {
                     setShowApplicationModal(false);
                     setCoverLetter('');
                   }}
-                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 dark:text-gray-300 font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
                   disabled={applying}
                 >
-                  Annuler
+                  {tc('cancel')}
                 </button>
                 <button
                   onClick={handleSubmitApplication}

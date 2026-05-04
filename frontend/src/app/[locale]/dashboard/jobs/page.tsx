@@ -145,7 +145,7 @@ export default function JobsPage() {
       }
     } catch (error) {
       logger.error("Erreur lors du chargement des CVs:", error);
-      toast.error('Erreur lors du chargement de vos CVs');
+      toast.error(t('loadCVsError'));
     } finally {
       setLoadingCVs(false);
     }
@@ -157,7 +157,7 @@ export default function JobsPage() {
 
     // Vérifier qu'un CV est sélectionné
     if (!selectedCVId && cvs.length > 0) {
-      toast.error('Veuillez sélectionner un CV');
+      toast.error(t('selectCVError'));
       return;
     }
 
@@ -181,7 +181,7 @@ export default function JobsPage() {
   // Formater le salaire avec devise
   const formatSalary = (min?: number, max?: number, currency?: string) => {
     const cur = currency || 'XAF';
-    if (!min && !max) return 'Salaire non précisé';
+    if (!min && !max) return t('salaryNotSpecified');
     if (min && max) return `${formatCurrency(min, cur)} - ${formatCurrency(max, cur)}`;
     if (min) return `${tc('fromAmount', { amount: formatCurrency(min, cur) })}`;
     return `${tc('upToAmount', { amount: formatCurrency(max!, cur) })}`;
@@ -189,7 +189,7 @@ export default function JobsPage() {
 
   // Formater la date relative
   const formatRelativeDate = (dateString?: string) => {
-    if (!dateString) return 'Date non précisée';
+    if (!dateString) return t('dateNotSpecified');
     const date = new Date(dateString);
     const now = new Date();
     const diff = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
@@ -197,7 +197,7 @@ export default function JobsPage() {
     if (diff === 0) return tc('today');
     if (diff === 1) return tc('yesterday');
     if (diff < 7) return tc('daysAgo', { count: diff });
-    if (diff < 30) return `Il y a ${Math.floor(diff / 7)} semaine(s)`;
+    if (diff < 30) return t('weeksAgo', { count: Math.floor(diff / 7) });
     return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
   };
 
@@ -230,9 +230,9 @@ export default function JobsPage() {
           <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-red-100 flex items-center justify-center">
             <XMarkIcon className="w-8 h-8 text-red-500" />
           </div>
-          <h3 className="text-xl font-bold text-red-700 mb-2">Erreur de chargement</h3>
+          <h3 className="text-xl font-bold text-red-700 mb-2">{tc('loadError')}</h3>
           <p className="text-red-600 mb-6">
-            {error instanceof Error ? error.message : 'Erreur lors du chargement des offres'}
+            {error instanceof Error ? error.message : t('loadJobsError')}
           </p>
           <button
             onClick={() => refetch()}
@@ -266,7 +266,7 @@ export default function JobsPage() {
                 <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-1.5 mb-2">
                   <SparklesIcon className="w-4 h-4 text-[#F7C700]" />
                   <span className="text-white/90 text-sm font-medium">
-                    {isEmployer ? 'Espace Employeur' : 'Espace Candidat'}
+                    {isEmployer ? t('employerSpace') : t('candidateSpace')}
                   </span>
                 </div>
                 <h2 className="text-2xl lg:text-3xl font-bold text-white">
@@ -471,7 +471,7 @@ export default function JobsPage() {
                           {job.is_featured && (
                             <div className="flex-shrink-0 flex items-center gap-1 bg-[#F7C700]/10 text-[#F7C700] text-xs font-semibold px-2 py-1 rounded-full">
                               <StarIcon className="w-3 h-3" />
-                              <span>Top</span>
+                              <span>{t('topBadge')}</span>
                             </div>
                           )}
                         </div>
@@ -666,7 +666,7 @@ export default function JobsPage() {
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900 mb-1">
-                    Postuler pour ce poste
+                    {t('applyForPosition')}
                   </h2>
                   <p className="text-gray-500">{selectedJob.title}</p>
                   <p className="text-[#6B9B5F] font-medium flex items-center gap-1">

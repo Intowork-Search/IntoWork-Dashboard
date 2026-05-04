@@ -17,6 +17,7 @@ import { candidatesAPI, CV } from '@/lib/api';
 import { getApiUrl } from '@/lib/getApiUrl';
 import { logger } from '@/lib/logger';
 import toast from 'react-hot-toast';
+import { useTranslations } from 'next-intl';
 import { useConfirmModal } from '@/hooks/useConfirmModal';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import {
@@ -45,6 +46,8 @@ export default function MesCVPage() {
   const [isUploadingCV, setIsUploadingCV] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [deletingCV, setDeletingCV] = useState(false);
+  const t = useTranslations('cv');
+  const tc = useTranslations('common');
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const { confirm, isOpen: isConfirmOpen, options: confirmOptions, handleConfirm, handleCancel } = useConfirmModal();
 
@@ -58,7 +61,7 @@ export default function MesCVPage() {
         setError(null);
         const token = await getToken();
         if (!token) {
-          setError('Token d\'authentification manquant');
+          setError(t('authTokenMissing'));
           setIsLoading(false);
           return;
         }
@@ -71,7 +74,7 @@ export default function MesCVPage() {
         setCvs(cvsData);
       } catch (error) {
         logger.error("Erreur lors du chargement du profil:", error);
-        setError('Erreur lors du chargement des données');
+        setError(t('loadError'));
       } finally {
         setIsLoading(false);
       }
@@ -121,12 +124,12 @@ export default function MesCVPage() {
         minute: '2-digit'
       });
     } catch {
-      return 'Date inconnue';
+      return tc('unknownDate');
     }
   };
 
   const formatFileSize = (bytes?: number) => {
-    if (!bytes) return 'Taille inconnue';
+    if (!bytes) return tc('unknownSize');
     if (bytes < 1024) return `${bytes} B`;
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
@@ -153,7 +156,7 @@ export default function MesCVPage() {
 
     } catch (error) {
       logger.error("Erreur lors de la visualisation:", error);
-      toast.error('Erreur lors de l\'ouverture du CV');
+      toast.error(t('openError'));
     }
   };
 
@@ -183,19 +186,18 @@ export default function MesCVPage() {
       URL.revokeObjectURL(url);
 
     } catch (error) {
-      logger.error("Erreur lors du telechargement:", error);
-      toast.error('Erreur lors du téléchargement du CV');
+      toast.error(t('downloadError'));
     }
   };
 
   const handleFileUpload = async (file: File) => {
     if (file.type !== 'application/pdf') {
-      toast.error('Veuillez sélectionner un fichier PDF.');
+      toast.error(t('pdfRequired'));
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('Le fichier ne peut pas dépasser 5MB.');
+      toast.error(t('fileTooLarge'));
       return;
     }
 
@@ -203,7 +205,7 @@ export default function MesCVPage() {
       setIsUploadingCV(true);
       const token = await getToken();
       if (!token) {
-        toast.error('Erreur d\'authentification');
+        toast.error(t('authError'));
         return;
       }
 
@@ -220,7 +222,7 @@ export default function MesCVPage() {
       });
 
       if (response.ok) {
-        toast.success('CV téléchargé avec succès !');
+        toast.success(t('uploadSuccess'));
         await reloadData();
 
         try {
@@ -231,11 +233,10 @@ export default function MesCVPage() {
         }
       } else {
         const errorData = await response.json();
-        toast.error(`Erreur lors du téléchargement: ${errorData.detail || 'Erreur inconnue'}`);
+        toast.error(errorData.detail || t('uploadError'));
       }
     } catch (error) {
-      logger.error("Erreur lors du telechargement du CV:", error);
-      toast.error('Erreur lors du téléchargement du CV');
+      toast.error(t('uploadError'));
     } finally {
       setIsUploadingCV(false);
       if (fileInputRef.current) {
@@ -272,10 +273,10 @@ export default function MesCVPage() {
 
   const handleDeleteCV = async (cv: CV) => {
     const ok = await confirm({
-      title: 'Supprimer ce CV ?',
+      title: t('deleteConfirmTitle'),
       message: `Le fichier "${cv.filename}" sera définitivement supprimé.`,
-      detail: 'Cette action est irréversible.',
-      confirmLabel: 'Supprimer',
+      detail: tc('irreversible'),
+      confirmLabel: tc('delete'),
     });
     if (!ok) return;
 
@@ -294,12 +295,12 @@ export default function MesCVPage() {
         });
       }
 
-      toast.success('CV supprimé avec succès');
+      toast.success(t('deleteSuccess'));
       setCvs(cvs.filter(existingCV => existingCV.id !== cv.id));
       await reloadData();
     } catch (error) {
       logger.error("Erreur lors de la suppression:", error);
-      toast.error('Erreur lors de la suppression du CV');
+      toast.error(t('deleteError'));
     } finally {
       setDeletingCV(false);
     }
@@ -307,7 +308,7 @@ export default function MesCVPage() {
 
   if (isLoading) {
     return (
-      <DashboardLayout title="Mes CV" subtitle="Gérez vos CV téléchargés">
+      <DashboardLayout title={t('title')} subtitle={t('subtitle')}>
         <div className="flex items-center justify-center min-h-96">
           <div className="w-16 h-16 border-4 border-[#6B9B5F] border-t-transparent rounded-full animate-spin"></div>
         </div>
@@ -324,7 +325,7 @@ export default function MesCVPage() {
             onClick={() => globalThis.location.reload()}
             className="mt-4 px-6 py-3 rounded-xl font-semibold bg-red-600 text-white hover:bg-red-700 transition-colors"
           >
-            Réessayer
+            {t('retry')}
           </button>
         </div>
       </DashboardLayout>
@@ -368,13 +369,13 @@ export default function MesCVPage() {
               <div>
                 <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-1.5 mb-3">
                   <SparklesIcon className="w-4 h-4 text-[#F7C700]" />
-                  <span className="text-white/90 text-sm font-medium">Gestion des CV</span>
+                  <span className="text-white/90 text-sm font-medium">{t('managementBadge')}</span>
                 </div>
                 <h2 className="text-2xl lg:text-3xl font-bold text-white mb-2">
                   {cvs.length === 0 ? 'Ajoutez votre premier CV' : `${cvs.length} CV téléchargé${cvs.length > 1 ? 's' : ''}`}
                 </h2>
                 <p className="text-white/80">
-                  {isDragging ? 'Déposez votre fichier ici !' : 'Glissez-déposez ou cliquez pour ajouter un CV'}
+                  {isDragging ? t('dropHere') : t('dragDropHint')}
                 </p>
               </div>
             </div>
@@ -395,9 +396,9 @@ export default function MesCVPage() {
                   <CloudArrowUpIcon className={`w-12 h-12 text-white transition-transform duration-300 ${isDragging ? 'scale-110' : ''}`} />
                 )}
                 <span className="text-white font-semibold">
-                  {isUploadingCV ? 'Téléchargement...' : isDragging ? 'Déposez ici' : 'Ajouter un CV'}
+                  {isUploadingCV ? t('uploading') : isDragging ? t('dropShort') : t('addCvButton')}
                 </span>
-                <span className="text-white/60 text-sm">PDF uniquement, max 5MB</span>
+                <span className="text-white/60 text-sm">{t('uploadConstraints')}</span>
               </div>
             </div>
           </div>
@@ -415,7 +416,7 @@ export default function MesCVPage() {
                 <DocumentTextSolid className="w-7 h-7 text-white" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">CV téléchargés</p>
+<p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">{t('statUploaded')}</p>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white">{cvs.length}</p>
               </div>
             </div>
@@ -431,7 +432,7 @@ export default function MesCVPage() {
                 <ChartBarIcon className="w-7 h-7 text-white" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Vues par recruteurs</p>
+<p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">{t('statViews')}</p>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white">0</p>
               </div>
             </div>
@@ -447,9 +448,9 @@ export default function MesCVPage() {
                 <CalendarDaysIcon className="w-7 h-7 text-white" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Dernier ajout</p>
+<p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">{t('statLastUpload')}</p>
                 <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                  {cvs.length > 0 ? formatDate(cvs[0].created_at) : 'Aucun'}
+                  {cvs.length > 0 ? formatDate(cvs[0].created_at) : tc('none')}
                 </p>
               </div>
             </div>
@@ -469,8 +470,8 @@ export default function MesCVPage() {
                   <DocumentTextIcon className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">Mes CV</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Gérez vos documents et suivez leur utilisation</p>
+<h3 className="text-xl font-bold text-gray-900 dark:text-white">{t('sectionTitle')}</h3>
+<p className="text-sm text-gray-500 dark:text-gray-400">{t('sectionSubtitle')}</p>
                 </div>
               </div>
               <button
@@ -479,7 +480,7 @@ export default function MesCVPage() {
                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold bg-gradient-to-r from-[#6B9B5F] to-[#5a8a4f] text-white shadow-lg shadow-[#6B9B5F]/30 hover:shadow-xl hover:shadow-[#6B9B5F]/40 transition-all disabled:opacity-50"
               >
                 <PlusIcon className="w-5 h-5" />
-                <span>{isUploadingCV ? 'Upload...' : 'Ajouter un CV'}</span>
+                <span>{isUploadingCV ? t('uploading') : t('addCvButton')}</span>
               </button>
             </div>
           </div>
@@ -489,9 +490,9 @@ export default function MesCVPage() {
               <div className="w-24 h-24 mx-auto mb-6 rounded-3xl bg-gradient-to-br from-[#3B82F6]/10 to-[#3B82F6]/5 flex items-center justify-center">
                 <DocumentPlusIcon className="w-12 h-12 text-[#3B82F6]" />
               </div>
-              <h4 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Aucun CV téléchargé</h4>
+<h4 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t('emptyTitle')}</h4>
               <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-md mx-auto">
-                Téléchargez votre premier CV pour commencer à postuler aux offres d'emploi et attirer l'attention des recruteurs.
+{t('emptyDescription')}
               </p>
               <button
                 onClick={() => fileInputRef.current?.click()}
@@ -499,7 +500,7 @@ export default function MesCVPage() {
                 className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-semibold bg-gradient-to-r from-[#6B9B5F] to-[#5a8a4f] text-white shadow-lg shadow-[#6B9B5F]/30 hover:shadow-xl hover:shadow-[#6B9B5F]/40 transition-all disabled:opacity-50"
               >
                 <CloudArrowUpIcon className="w-6 h-6" />
-                <span>{isUploadingCV ? 'Téléchargement...' : 'Télécharger mon CV'}</span>
+                <span>{isUploadingCV ? t('uploading') : t('uploadMyCV')}</span>
               </button>
             </div>
           ) : (
@@ -531,7 +532,7 @@ export default function MesCVPage() {
                         {cv.is_active && (
                           <span className="flex items-center gap-1 px-2 py-0.5 bg-[#6B9B5F]/10 text-[#6B9B5F] rounded-full text-xs font-medium">
                             <CheckCircleIcon className="w-3 h-3" />
-                            Actif
+                            {tc('active')}
                           </span>
                         )}
                       </div>
@@ -577,13 +578,13 @@ export default function MesCVPage() {
               <CheckCircleIcon className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h3 className="font-bold text-gray-900 dark:text-white mb-3">Conseils pour optimiser votre CV</h3>
+<h3 className="font-bold text-gray-900 dark:text-white mb-3">{t('tipsTitle')}</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {[
-                  { text: 'Utilisez un format PDF pour une meilleure compatibilité', color: '#6B9B5F' },
-                  { text: 'Gardez votre CV à jour avec vos dernières expériences', color: '#F7C700' },
-                  { text: 'Adaptez votre CV en fonction du poste visé', color: '#6B46C1' },
-                  { text: 'Vérifiez régulièrement les statistiques de consultation', color: '#3B82F6' },
+                  { text: t('tip1'), color: '#6B9B5F' },
+                  { text: t('tip2'), color: '#F7C700' },
+                  { text: t('tip3'), color: '#6B46C1' },
+                  { text: t('tip4'), color: '#3B82F6' },
                 ].map((tip, i) => (
                   <div key={i} className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                     <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: tip.color }} />
