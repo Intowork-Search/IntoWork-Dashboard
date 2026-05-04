@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { useUser, useAuth } from '@/hooks/useNextAuth';
 import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/DashboardLayout';
@@ -36,6 +37,7 @@ export default function Dashboard() {
   const { getToken } = useAuth();
   const router = useRouter();
   const userRole = user?.role as 'candidate' | 'employer' | 'admin';
+  const t = useTranslations('dashboard');
 
   // États pour les données du dashboard
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
@@ -322,7 +324,7 @@ export default function Dashboard() {
 
   return (
     <DashboardLayout
-      title={`${getGreeting()}, ${user?.firstName || 'Utilisateur'} !`}
+      title={t('title')}
       subtitle={userRole === 'candidate' ? 'Votre espace candidat' : 'Votre espace employeur'}
     >
       {/* Hero Section avec message de bienvenue */}

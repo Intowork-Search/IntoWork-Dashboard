@@ -61,7 +61,15 @@
     "emailTemplates": "Templates email",
     "integrations": "Intégrations",
     "admin": "Administration",
-    "candidates": "Candidats"
+    "candidates": "Candidats",
+    "users": "Utilisateurs",
+    "companies": "Entreprises",
+    "offers": "Offres",
+    "roleCandidate": "Candidat",
+    "roleEmployer": "Employeur",
+    "roleAdmin": "Admin",
+    "expand": "Étendre le menu",
+    "collapse": "Réduire le menu"
   },
   "auth": {
     "signin": {

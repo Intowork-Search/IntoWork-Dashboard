@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/hooks/useNextAuth';
 import { useRouter, useParams } from 'next/navigation';
 import toast from 'react-hot-toast';
@@ -43,6 +44,7 @@ export default function JobDetailPage() {
   const { getToken } = useAuth();
   const router = useRouter();
   const params = useParams();
+  const t = useTranslations('jobs');
   const jobId = params.id as string;
 
   const [job, setJob] = useState<JobDetail | null>(null);
@@ -228,7 +230,7 @@ export default function JobDetailPage() {
                   onClick={handleApply}
                   className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
                 >
-                  Postuler maintenant
+                  {t('apply')}
                 </button>
               )}
             </div>

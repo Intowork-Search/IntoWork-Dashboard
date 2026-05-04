@@ -11,6 +11,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuth, useUser } from '@/hooks/useNextAuth';
 import DashboardLayout from '@/components/DashboardLayout';
 import OnboardingTour from '@/components/OnboardingTour';
@@ -52,6 +53,7 @@ const getSkillColor = (category: string) => {
 export default function ProfilePage() {
   const { user } = useUser();
   const { getToken } = useAuth();
+  const t = useTranslations('profile');
   const [activeSection, setActiveSection] = useState('personal');
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -346,7 +348,7 @@ export default function ProfilePage() {
   // États de chargement
   if (isLoading) {
     return (
-      <DashboardLayout title="Mon Profil" subtitle="Chargement...">
+      <DashboardLayout title={t('title')} subtitle="Chargement...">
         <div className="flex items-center justify-center min-h-96">
           <div className="w-16 h-16 border-4 border-[#6B9B5F] border-t-transparent rounded-full animate-spin"></div>
         </div>
@@ -356,7 +358,7 @@ export default function ProfilePage() {
 
   if (error && !profile) {
     return (
-      <DashboardLayout title="Mon Profil" subtitle="Erreur">
+      <DashboardLayout title={t('title')} subtitle="Erreur">
         <div className="rounded-3xl p-8 bg-red-50 border border-red-200">
           <p className="text-red-700 font-medium">{error}</p>
           <button
@@ -374,7 +376,7 @@ export default function ProfilePage() {
 
   return (
     <DashboardLayout
-      title="Mon Profil"
+      title={t('title')}
       subtitle="Gérez vos informations personnelles et professionnelles"
     >
       {/* Erreurs */}
@@ -567,7 +569,7 @@ export default function ProfilePage() {
                         className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold bg-gradient-to-r from-[#6B9B5F] to-[#5a8a4f] text-white shadow-lg shadow-[#6B9B5F]/30 hover:shadow-xl hover:shadow-[#6B9B5F]/40 transition-all disabled:opacity-50"
                       >
                         <CheckIcon className="w-5 h-5" />
-                        <span>{isSaving ? 'Sauvegarde...' : 'Sauvegarder'}</span>
+                        <span>{isSaving ? 'Sauvegarde...' : t('saveChanges')}</span>
                       </button>
                       <button
                         onClick={() => setIsEditing(false)}

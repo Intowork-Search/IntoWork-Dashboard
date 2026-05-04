@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { useUser, useAuth } from '@/hooks/useNextAuth';
 import { usePathname, Link } from '@/i18n/navigation';
 import { signOut } from 'next-auth/react';
@@ -32,94 +33,10 @@ interface NavItem {
   href: string;
   icon: React.ComponentType<{ className?: string }>;
   badge?: number;
-  description: string;
-}
-
-function getEmployerNavigation(jobsCount: number): NavItem[] {
-  return [
-    { 
-      name: 'Dashboard', 
-      href: '/dashboard', 
-      icon: HomeIcon, 
-      description: "Vue d'ensemble de votre activité"
-    },
-    { 
-      name: 'Mon Entreprise', 
-      href: '/dashboard/company', 
-      icon: BuildingOfficeIcon, 
-      description: "Gérer votre profil d'entreprise"
-    },
-    { 
-      name: "Offres d'emploi", 
-      href: '/dashboard/job-posts', 
-      icon: DocumentTextIcon, 
-      badge: jobsCount,
-      description: "Gérer vos offres d'emploi"
-    },
-    { 
-      name: 'Candidats', 
-      href: '/dashboard/candidates', 
-      icon: UserIcon, 
-      badge: undefined, // À rendre dynamique si besoin
-      description: 'Voir toutes les candidatures reçues'
-    },
-    { 
-      name: "Templates d'emails", 
-      href: '/dashboard/email-templates', 
-      icon: EnvelopeIcon, 
-      description: 'Gérer vos templates de communication'
-    },
-    {
-      name: 'Intégrations',
-      href: '/dashboard/integrations',
-      icon: Square3Stack3DIcon,
-      description: 'Connecter LinkedIn, Google Calendar, Teams'
-    },
-    {
-      name: 'Paramètres',
-      href: '/dashboard/settings',
-      icon: Cog6ToothIcon,
-      description: 'Configuration de votre compte'
-    },
-  ];
-}
-
-function getAdminNavigation(): NavItem[] {
-  return [
-    { 
-      name: 'Dashboard', 
-      href: '/dashboard/admin', 
-      icon: ChartBarIcon, 
-      description: "Vue d'ensemble et statistiques"
-    },
-    { 
-      name: 'Utilisateurs', 
-      href: '/dashboard/admin/users', 
-      icon: UserIcon, 
-      description: "Gestion des utilisateurs"
-    },
-    { 
-      name: 'Entreprises', 
-      href: '/dashboard/admin/employers', 
-      icon: BuildingOfficeIcon, 
-      description: "Gestion des entreprises"
-    },
-    { 
-      name: 'Offres', 
-      href: '/dashboard/admin/jobs', 
-      icon: BriefcaseIcon, 
-      description: "Gestion des offres d'emploi"
-    },
-    { 
-      name: 'Paramètres', 
-      href: '/dashboard/settings', 
-      icon: Cog6ToothIcon, 
-      description: 'Configuration de votre compte'
-    },
-  ];
 }
 
 export default function Sidebar({ userRole }: SidebarProps) {
+  const t = useTranslations('nav');
   const { user } = useUser();
   const { getToken } = useAuth();
   const pathname = usePathname();
@@ -184,51 +101,31 @@ export default function Sidebar({ userRole }: SidebarProps) {
 
   // Créer la navigation candidate avec le badge CV dynamique
   const candidateNavigation: NavItem[] = [
-    { 
-      name: 'Dashboard', 
-      href: '/dashboard', 
-      icon: HomeIcon, 
-      description: 'Vue d\'ensemble de votre activité'
-    },
-    { 
-      name: 'Mon Profil', 
-      href: '/dashboard/profile', 
-      icon: UserIcon, 
-      description: 'Gérer vos informations personnelles'
-    },
-    { 
-      name: 'Mes CV', 
-      href: '/dashboard/cv', 
-      icon: DocumentTextIcon, 
-      badge: cvCount,
-      description: 'Gérer et optimiser vos CV'
-    },
-    { 
-      name: 'Recherche d\'emplois', 
-      href: '/dashboard/jobs', 
-      icon: MagnifyingGlassIcon, 
-      badge: jobsCount,
-      description: 'Découvrir de nouvelles opportunités'
-    },
-    { 
-      name: 'Mes Candidatures', 
-      href: '/dashboard/applications', 
-      icon: ChartBarIcon, 
-      badge: applicationsCount,
-      description: 'Suivre vos candidatures en cours'
-    },
-    { 
-      name: 'Alertes emploi', 
-      href: '/dashboard/job-alerts', 
-      icon: BellAlertIcon, 
-      description: 'Gérer vos alertes de nouvelles offres'
-    },
-    { 
-      name: 'Paramètres', 
-      href: '/dashboard/settings', 
-      icon: Cog6ToothIcon, 
-      description: 'Configuration de votre compte'
-    },
+    { name: t('dashboard'), href: '/dashboard', icon: HomeIcon },
+    { name: t('profile'), href: '/dashboard/profile', icon: UserIcon },
+    { name: t('cv'), href: '/dashboard/cv', icon: DocumentTextIcon, badge: cvCount },
+    { name: t('jobs'), href: '/dashboard/jobs', icon: MagnifyingGlassIcon, badge: jobsCount },
+    { name: t('applications'), href: '/dashboard/applications', icon: ChartBarIcon, badge: applicationsCount },
+    { name: t('jobAlerts'), href: '/dashboard/job-alerts', icon: BellAlertIcon },
+    { name: t('settings'), href: '/dashboard/settings', icon: Cog6ToothIcon },
+  ];
+
+  const employerNavigation: NavItem[] = [
+    { name: t('dashboard'), href: '/dashboard', icon: HomeIcon },
+    { name: t('company'), href: '/dashboard/company', icon: BuildingOfficeIcon },
+    { name: t('jobPosts'), href: '/dashboard/job-posts', icon: DocumentTextIcon, badge: jobsCount },
+    { name: t('candidates'), href: '/dashboard/candidates', icon: UserIcon },
+    { name: t('emailTemplates'), href: '/dashboard/email-templates', icon: EnvelopeIcon },
+    { name: t('integrations'), href: '/dashboard/integrations', icon: Square3Stack3DIcon },
+    { name: t('settings'), href: '/dashboard/settings', icon: Cog6ToothIcon },
+  ];
+
+  const adminNavigation: NavItem[] = [
+    { name: t('admin'), href: '/dashboard/admin', icon: ChartBarIcon },
+    { name: t('users'), href: '/dashboard/admin/users', icon: UserIcon },
+    { name: t('companies'), href: '/dashboard/admin/employers', icon: BuildingOfficeIcon },
+    { name: t('offers'), href: '/dashboard/admin/jobs', icon: BriefcaseIcon },
+    { name: t('settings'), href: '/dashboard/settings', icon: Cog6ToothIcon },
   ];
 
   // Helper pour obtenir la lettre du badge
@@ -239,14 +136,14 @@ export default function Sidebar({ userRole }: SidebarProps) {
   };
 
   const navigation = 
-    userRole === 'admin' ? getAdminNavigation() :
+    userRole === 'admin' ? adminNavigation :
     userRole === 'candidate' ? candidateNavigation : 
-    getEmployerNavigation(jobsCount);
+    employerNavigation;
   
   const roleLabel = 
-    userRole === 'admin' ? 'Admin' :
-    userRole === 'candidate' ? 'Candidat' : 
-    'Employeur';
+    userRole === 'admin' ? t('roleAdmin') :
+    userRole === 'candidate' ? t('roleCandidate') : 
+    t('roleEmployer');
   
   const roleColor = 
     userRole === 'admin' ? 'bg-red-500' :
@@ -266,29 +163,29 @@ export default function Sidebar({ userRole }: SidebarProps) {
         aria-label="Menu principal"
         className={`fixed top-0 left-0 z-40 h-screen transition-all duration-300 ease-in-out ${
         isCollapsed ? 'w-16' : 'w-64'
-      } bg-white border-r border-gray-200 shadow-lg flex flex-col`}>
+      } bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 shadow-lg flex flex-col`}>
         
         {/* Header avec logo et toggle */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 shrink-0">
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 shrink-0">
           {!isCollapsed && (
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-linear-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">IW</span>
               </div>
-              <span className="font-bold text-gray-900 text-lg">INTOWORK</span>
+              <span className="font-bold text-gray-900 dark:text-gray-100 text-lg">INTOWORK</span>
             </div>
           )}
           <div className="flex items-center gap-2">
             <button
               onClick={() => setIsCollapsed(!isCollapsed)}
-              className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
-              aria-label={isCollapsed ? "Étendre le menu" : "Réduire le menu"}
+              className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              aria-label={isCollapsed ? t('expand') : t('collapse')}
               aria-expanded={!isCollapsed}
             >
               {isCollapsed ? (
-                <ChevronRightIcon className="w-5 h-5 text-gray-600" />
+                <ChevronRightIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               ) : (
-                <ChevronLeftIcon className="w-5 h-5 text-gray-600" />
+                <ChevronLeftIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               )}
             </button>
           </div>
@@ -304,36 +201,36 @@ export default function Sidebar({ userRole }: SidebarProps) {
                 href={item.href}
                 className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ${
                   isActive
-                    ? 'bg-blue-50 text-blue-700 border-r-4 border-blue-700'
-                    : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                    ? 'bg-[#6B9B5F]/10 dark:bg-[#6B9B5F]/20 text-[#6B9B5F] dark:text-[#8ab87f] border-r-4 border-[#6B9B5F]'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100'
                 } ${isCollapsed ? 'justify-center' : ''}`}
                 aria-current={isActive ? 'page' : undefined}
                 aria-label={isCollapsed ? item.name : undefined}
               >
                 <item.icon className={`shrink-0 ${
-                  isActive ? 'text-blue-700' : 'text-gray-400 group-hover:text-gray-500'
+                  isActive ? 'text-[#6B9B5F] dark:text-[#8ab87f]' : 'text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-300'
                 } ${isCollapsed ? 'w-6 h-6' : 'w-5 h-5 mr-3'}`} />
                 
                 {!isCollapsed && (
                   <>
                     <span className="flex-1">{item.name}</span>
-                    {item.badge && (
-                      <span className="ml-2 px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                    {item.badge ? (
+                      <span className="ml-2 px-2 py-1 text-xs font-medium bg-[#6B9B5F]/10 dark:bg-[#6B9B5F]/20 text-[#6B9B5F] dark:text-[#8ab87f] rounded-full">
                         {item.badge}
                       </span>
-                    )}
+                    ) : null}
                   </>
                 )}
 
                 {/* Tooltip pour mode collapsed */}
                 {isCollapsed && (
-                  <div className="absolute left-16 bg-gray-900 text-white px-2 py-1 rounded-lg text-xs opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+                  <div className="absolute left-16 bg-gray-900 dark:bg-gray-700 text-white px-2 py-1 rounded-lg text-xs opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
                     {item.name}
-                    {item.badge && (
-                      <span className="ml-1 px-1.5 py-0.5 bg-blue-600 rounded-full">
+                    {item.badge ? (
+                      <span className="ml-1 px-1.5 py-0.5 bg-[#6B9B5F] rounded-full">
                         {item.badge}
                       </span>
-                    )}
+                    ) : null}
                   </div>
                 )}
               </Link>
@@ -343,15 +240,15 @@ export default function Sidebar({ userRole }: SidebarProps) {
         </ul>
 
         {/* Badge utilisateur */}
-        <div className="p-4 border-b border-gray-200">
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
             <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'}`}>
               <div className="relative">
                 {/* Avatar ou Logo entreprise */}
                 {userRole === 'employer' && companyLogoUrl ? (
-                  <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-200 bg-white flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 flex items-center justify-center">
                     <img
                       src={companyLogoUrl}
-                      alt="Logo entreprise"
+                      alt="Logo"
                       className="w-full h-full object-contain"
                     />
                   </div>
@@ -360,7 +257,7 @@ export default function Sidebar({ userRole }: SidebarProps) {
                     {user?.firstName?.[0]}{user?.lastName?.[0]}
                   </div>
                 )}
-                <div className={`absolute -bottom-1 -right-1 w-4 h-4 ${roleColor} rounded-full border-2 border-white flex items-center justify-center`}>
+                <div className={`absolute -bottom-1 -right-1 w-4 h-4 ${roleColor} rounded-full border-2 border-white dark:border-gray-900 flex items-center justify-center`}>
                   <span className="text-xs text-white font-bold">
                     {getRoleBadgeLetter()}
                   </span>
@@ -369,10 +266,10 @@ export default function Sidebar({ userRole }: SidebarProps) {
               
               {!isCollapsed && (
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">
+                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
                     {user?.firstName} {user?.lastName}
                   </p>
-                  <p className="text-xs text-gray-500 truncate">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                     {roleLabel}
                   </p>
                 </div>
@@ -384,18 +281,18 @@ export default function Sidebar({ userRole }: SidebarProps) {
         <div className="p-4">
           <button
             onClick={() => signOut({ callbackUrl: '/signin' })}
-            className={`w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 text-red-600 hover:bg-red-50 ${
+            className={`w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 ${
               isCollapsed ? 'justify-center' : 'gap-3'
             }`}
-            aria-label="Se déconnecter"
+            aria-label={t('logout')}
           >
             <ArrowRightOnRectangleIcon className={`shrink-0 ${isCollapsed ? 'w-6 h-6' : 'w-5 h-5'}`} />
-            {!isCollapsed && <span>Se déconnecter</span>}
+            {!isCollapsed && <span>{t('logout')}</span>}
             
             {/* Tooltip pour mode collapsed */}
             {isCollapsed && (
-              <span className="absolute left-16 bg-gray-900 text-white px-2 py-1 rounded-lg text-xs opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
-                Se déconnecter
+              <span className="absolute left-16 bg-gray-900 dark:bg-gray-700 text-white px-2 py-1 rounded-lg text-xs opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+                {t('logout')}
               </span>
             )}
           </button>

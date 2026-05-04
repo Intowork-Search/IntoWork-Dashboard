@@ -51,7 +51,7 @@ export default async function LocaleLayout({
           }}
         />
       </head>
-      <body className={`${inter.variable} font-sans antialiased bg-gray-50`}>
+      <body className={`${inter.variable} font-sans antialiased bg-gray-50 dark:bg-gray-900 transition-colors duration-200`}>
         <NextIntlClientProvider messages={messages}>
           <QueryProvider>
             <SessionProvider>

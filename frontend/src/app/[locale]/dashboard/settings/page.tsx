@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { useUser, useAuth } from '@/hooks/useNextAuth';
 import { signOut } from 'next-auth/react';
 import { toast } from 'react-hot-toast';
@@ -59,6 +60,7 @@ interface PrivacySettings {
 export default function SettingsPage() {
   const { user } = useUser();
   const { getToken } = useAuth();
+  const t = useTranslations('settings');
   const { candidateAPI } = useAuthenticatedAPI();
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('profile');
@@ -440,7 +442,7 @@ export default function SettingsPage() {
 
   if (loading && !profile) {
     return (
-      <DashboardLayout title="Paramètres" subtitle="Gérez votre profil et vos préférences">
+      <DashboardLayout title={t('title')} subtitle="Gérez votre profil et vos préférences">
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <div className="relative">

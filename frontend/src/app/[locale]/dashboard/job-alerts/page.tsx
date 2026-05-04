@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { toast } from 'react-hot-toast';
 import { getApiUrl } from '@/lib/getApiUrl';
 import { useConfirmModal } from '@/hooks/useConfirmModal';
@@ -65,6 +66,7 @@ const LOCATION_TYPES = [
 
 export default function JobAlertsPage() {
   const { getToken } = useAuth();
+  const t = useTranslations('jobAlerts');
   const [alerts, setAlerts] = useState<JobAlert[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -276,7 +278,7 @@ export default function JobAlertsPage() {
             <BellSolid className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Alertes emploi</h1>
+            <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
             <p className="text-sm text-gray-500 mt-0.5">
               Recevez des notifications quand de nouveaux jobs correspondent à vos critères
             </p>

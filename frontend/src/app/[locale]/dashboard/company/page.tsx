@@ -11,6 +11,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/hooks/useNextAuth';
 import { companiesAPI, Company, CompanyStats, getUploadUrl } from '@/lib/api';
 import { toast } from 'react-hot-toast';
@@ -36,6 +37,7 @@ import {
 
 export default function CompanyPage(): React.JSX.Element {
   const { getToken } = useAuth();
+  const t = useTranslations('company');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [company, setCompany] = useState<Company | null>(null);
@@ -106,7 +108,7 @@ export default function CompanyPage(): React.JSX.Element {
   // Loading state
   if (loading) {
     return (
-      <DashboardLayout title="Mon Entreprise" subtitle="Chargement...">
+      <DashboardLayout title={t('title')} subtitle="Chargement...">
         <div className="flex items-center justify-center py-20">
           <div className="text-center">
             <div className="w-16 h-16 border-4 border-[#F7C700] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
@@ -118,7 +120,7 @@ export default function CompanyPage(): React.JSX.Element {
   }
 
   return (
-    <DashboardLayout title="Mon Entreprise" subtitle="Gérez les informations de votre entreprise">
+    <DashboardLayout title={t('title')} subtitle="Gérez les informations de votre entreprise">
       <div className="space-y-8">
         {/* Hero Section */}
         <div

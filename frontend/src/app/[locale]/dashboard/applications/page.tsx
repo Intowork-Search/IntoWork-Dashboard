@@ -11,6 +11,7 @@
  */
 
 import React, { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import DashboardLayout from '@/components/DashboardLayout';
 import { useMyApplications, useWithdrawApplication } from '@/hooks';
@@ -41,6 +42,7 @@ import { StarIcon, CheckBadgeIcon } from '@heroicons/react/24/solid';
 import ApplicationTimeline from '@/components/ui/ApplicationTimeline';
 
 export default function ApplicationsPage() {
+  const t = useTranslations('applications');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedStatus, setSelectedStatus] = useState<string>('');
   const limit = 12;
@@ -202,7 +204,7 @@ export default function ApplicationsPage() {
   // Affichage d'erreur
   if (error) {
     return (
-      <DashboardLayout title="Mes candidatures" subtitle="Suivez vos candidatures">
+      <DashboardLayout title={t('title')} subtitle="Suivez vos candidatures">
         <div className="rounded-3xl p-12 bg-red-50 border border-red-200 text-center">
           <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-red-100 flex items-center justify-center">
             <XMarkIcon className="w-8 h-8 text-red-500" />
@@ -221,7 +223,7 @@ export default function ApplicationsPage() {
   }
 
   return (
-    <DashboardLayout title="Mes candidatures" subtitle="Suivez l'évolution de vos candidatures">
+      <DashboardLayout title={t('title')} subtitle="Suivez l'évolution de vos candidatures">
       <div className="space-y-8">
         {/* Hero Section */}
         <div
@@ -337,7 +339,7 @@ export default function ApplicationsPage() {
             <p className="text-gray-500 mb-8 max-w-md mx-auto">
               {selectedStatus
                 ? 'Essayez de retirer le filtre pour voir toutes vos candidatures.'
-                : "Vous n'avez pas encore postulé à des offres d'emploi. Commencez dès maintenant !"}
+                : t('empty')}
             </p>
             {selectedStatus ? (
               <button

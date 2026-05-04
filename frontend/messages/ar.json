@@ -61,7 +61,15 @@
     "emailTemplates": "قوالب البريد الإلكتروني",
     "integrations": "التكاملات",
     "admin": "الإدارة",
-    "candidates": "المرشحون"
+    "candidates": "المرشحون",
+    "users": "المستخدمون",
+    "companies": "الشركات",
+    "offers": "العروض",
+    "roleCandidate": "مرشح",
+    "roleEmployer": "صاحب عمل",
+    "roleAdmin": "مسؤول",
+    "expand": "توسيع القائمة",
+    "collapse": "طي القائمة"
   },
   "auth": {
     "signin": {

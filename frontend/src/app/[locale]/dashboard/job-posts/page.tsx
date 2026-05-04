@@ -11,6 +11,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/hooks/useNextAuth';
 import { jobsAPI, Job } from '@/lib/api';
 import { logger } from '@/lib/logger';
@@ -47,6 +48,7 @@ import PublishToLinkedInModal from '@/components/PublishToLinkedInModal';
 
 export default function JobPostsPage(): React.JSX.Element {
   const { getToken } = useAuth();
+  const t = useTranslations('nav');
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -223,7 +225,7 @@ export default function JobPostsPage(): React.JSX.Element {
   // Loading state
   if (loading) {
     return (
-      <DashboardLayout title="Mes offres d'emploi" subtitle="Gérez vos offres">
+      <DashboardLayout title={t('jobPosts')} subtitle="Gérez vos offres">
         <div className="flex items-center justify-center py-20">
           <div className="text-center">
             <div className="w-16 h-16 border-4 border-[#6B9B5F] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
@@ -240,7 +242,7 @@ export default function JobPostsPage(): React.JSX.Element {
   const activeJobs = jobs.length; // Toutes les offres de l'employeur sont considérées actives
 
   return (
-    <DashboardLayout title="Mes offres d'emploi" subtitle="Gérez vos offres">
+    <DashboardLayout title={t('jobPosts')} subtitle="Gérez vos offres">
       <div className="space-y-8">
         {/* Hero Section */}
         <div

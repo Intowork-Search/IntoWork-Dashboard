@@ -61,7 +61,15 @@
     "emailTemplates": "Email Templates",
     "integrations": "Integrations",
     "admin": "Administration",
-    "candidates": "Candidates"
+    "candidates": "Candidates",
+    "users": "Users",
+    "companies": "Companies",
+    "offers": "Listings",
+    "roleCandidate": "Candidate",
+    "roleEmployer": "Employer",
+    "roleAdmin": "Admin",
+    "expand": "Expand menu",
+    "collapse": "Collapse menu"
   },
   "auth": {
     "signin": {

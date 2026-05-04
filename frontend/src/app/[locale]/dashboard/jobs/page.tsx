@@ -11,6 +11,7 @@
  */
 
 import React, { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import DashboardLayout from '@/components/DashboardLayout';
 import OnboardingTour from '@/components/OnboardingTour';
 import { candidateJobSearchTour } from '@/config/onboardingTours';
@@ -54,6 +55,7 @@ interface CV {
 export default function JobsPage() {
   const { user, isLoaded } = useUser();
   const { getToken } = useAuth();
+  const t = useTranslations('jobs');
   const [filters, setFilters] = useState<JobFilters>({
     page: 1,
     limit: 12
@@ -222,7 +224,7 @@ export default function JobsPage() {
   // Affichage de l'erreur
   if (isError) {
     return (
-      <DashboardLayout title="Offres d'emploi" subtitle="Recherchez votre prochain emploi">
+      <DashboardLayout title={t('title')} subtitle="Recherchez votre prochain emploi">
         <div className="rounded-3xl p-12 bg-red-50 border border-red-200 text-center">
           <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-red-100 flex items-center justify-center">
             <XMarkIcon className="w-8 h-8 text-red-500" />
@@ -243,7 +245,7 @@ export default function JobsPage() {
   }
 
   return (
-    <DashboardLayout title="Offres d'emploi" subtitle={isEmployer ? 'Gérez vos offres publiées' : 'Recherchez votre prochain emploi'}>
+    <DashboardLayout title={t('title')} subtitle={isEmployer ? 'Gérez vos offres publiées' : 'Recherchez votre prochain emploi'}>
       <div className="space-y-8">
         {/* Hero Section avec recherche */}
         <div
@@ -280,7 +282,7 @@ export default function JobsPage() {
                   <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/60" />
                   <input
                     type="text"
-                    placeholder="Titre du poste, entreprise..."
+                    placeholder={t('searchPlaceholder')}
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -552,7 +554,7 @@ export default function JobsPage() {
                             className="w-full py-3 rounded-xl font-semibold bg-gray-100 text-gray-400 cursor-not-allowed flex items-center justify-center gap-2"
                           >
                             <CheckBadgeIcon className="w-5 h-5" />
-                            <span>Candidature envoyée</span>
+                            <span>{t('applied')}</span>
                           </button>
                         ) : (
                           <button
@@ -561,7 +563,7 @@ export default function JobsPage() {
                             className="w-full py-3 rounded-xl font-semibold bg-gradient-to-r from-[#6B9B5F] to-[#5a8a4f] text-white shadow-lg shadow-[#6B9B5F]/20 hover:shadow-xl hover:shadow-[#6B9B5F]/30 transition-all flex items-center justify-center gap-2"
                           >
                             <PaperAirplaneIcon className="w-5 h-5" />
-                            <span>Postuler</span>
+                            <span>{t('apply')}</span>
                           </button>
                         )}
                       </div>
