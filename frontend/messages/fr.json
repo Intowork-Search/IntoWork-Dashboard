@@ -1,0 +1,315 @@
+{
+  "common": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue",
+    "success": "Succès",
+    "back": "Retour",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "apply": "Appliquer",
+    "close": "Fermer",
+    "confirm": "Confirmer",
+    "yes": "Oui",
+    "no": "Non",
+    "or": "ou",
+    "required": "Requis",
+    "optional": "Optionnel",
+    "view": "Voir",
+    "download": "Télécharger",
+    "upload": "Téléverser",
+    "create": "Créer",
+    "add": "Ajouter",
+    "remove": "Retirer",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "submit": "Soumettre",
+    "reset": "Réinitialiser",
+    "all": "Tous",
+    "none": "Aucun",
+    "active": "Actif",
+    "inactive": "Inactif",
+    "enabled": "Activé",
+    "disabled": "Désactivé",
+    "date": "Date",
+    "by": "par",
+    "of": "de",
+    "in": "dans",
+    "noData": "Aucune donnée disponible",
+    "seeAll": "Voir tout"
+  },
+  "meta": {
+    "title": "INTOWORK Search - Plateforme de Recrutement",
+    "description": "Plateforme B2B2C de recrutement avec matching IA pour l'Afrique Centrale"
+  },
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "jobs": "Offres d'emploi",
+    "applications": "Mes candidatures",
+    "profile": "Mon profil",
+    "cv": "Mon CV",
+    "cvBuilder": "CV Builder",
+    "settings": "Paramètres",
+    "logout": "Déconnexion",
+    "jobPosts": "Mes offres",
+    "company": "Mon entreprise",
+    "aiScoring": "Score IA",
+    "jobAlerts": "Alertes emploi",
+    "emailTemplates": "Templates email",
+    "integrations": "Intégrations",
+    "admin": "Administration",
+    "candidates": "Candidats"
+  },
+  "auth": {
+    "signin": {
+      "title": "Connexion",
+      "subtitle": "Accédez à votre espace",
+      "email": "Adresse email",
+      "emailPlaceholder": "vous@exemple.com",
+      "password": "Mot de passe",
+      "passwordPlaceholder": "Votre mot de passe",
+      "submit": "Se connecter",
+      "forgotPassword": "Mot de passe oublié ?",
+      "noAccount": "Pas encore de compte ?",
+      "createAccount": "Créer un compte",
+      "error": "Email ou mot de passe incorrect"
+    },
+    "signup": {
+      "title": "Créer un compte",
+      "subtitle": "Rejoignez INTOWORK",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "email": "Adresse email",
+      "password": "Mot de passe",
+      "submit": "S'inscrire",
+      "alreadyAccount": "Déjà un compte ?",
+      "signin": "Se connecter",
+      "roleCandidate": "Je cherche un emploi",
+      "roleEmployer": "Je recrute",
+      "roleLabel": "Je suis un(e)"
+    },
+    "forgotPassword": {
+      "title": "Mot de passe oublié",
+      "subtitle": "Saisissez votre email pour recevoir les instructions",
+      "email": "Adresse email",
+      "submit": "Envoyer les instructions",
+      "backToSignin": "Retour à la connexion",
+      "successMessage": "Email envoyé ! Vérifiez votre boîte mail.",
+      "errorMessage": "Aucun compte associé à cet email."
+    },
+    "resetPassword": {
+      "title": "Nouveau mot de passe",
+      "password": "Nouveau mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "submit": "Réinitialiser",
+      "success": "Mot de passe modifié avec succès",
+      "tokenInvalid": "Lien expiré ou invalide"
+    }
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "welcome": "Bonjour, {name} 👋",
+    "recentActivity": "Activité récente",
+    "quickActions": "Actions rapides",
+    "stats": {
+      "applications": "Candidatures",
+      "jobsAvailable": "Offres disponibles",
+      "profileViews": "Vues du profil",
+      "interviewsScheduled": "Entretiens planifiés"
+    }
+  },
+  "jobs": {
+    "title": "Offres d'emploi",
+    "searchPlaceholder": "Rechercher un poste, entreprise...",
+    "filters": "Filtres",
+    "noJobs": "Aucune offre disponible pour le moment",
+    "noJobsFiltered": "Aucune offre ne correspond à vos critères",
+    "apply": "Postuler",
+    "applied": "Candidature envoyée",
+    "viewDetails": "Voir les détails",
+    "postedAt": "Publié le {date}",
+    "expiresAt": "Expire le {date}",
+    "salary": "Salaire",
+    "location": "Lieu",
+    "experience": "Expérience requise",
+    "type": "Type de contrat",
+    "locationType": "Mode de travail",
+    "jobType": {
+      "full_time": "Temps plein",
+      "part_time": "Temps partiel",
+      "contract": "Contrat",
+      "internship": "Stage",
+      "freelance": "Freelance"
+    },
+    "locationTypes": {
+      "onsite": "Présentiel",
+      "remote": "Télétravail",
+      "hybrid": "Hybride"
+    },
+    "create": "Publier une offre",
+    "edit": "Modifier l'offre",
+    "delete": "Supprimer l'offre",
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cette offre ?",
+    "status": {
+      "draft": "Brouillon",
+      "active": "Active",
+      "closed": "Fermée",
+      "archived": "Archivée"
+    }
+  },
+  "applications": {
+    "title": "Mes candidatures",
+    "empty": "Vous n'avez pas encore postulé à une offre",
+    "status": {
+      "applied": "Postulé",
+      "pending": "En attente",
+      "viewed": "Vu",
+      "shortlisted": "Présélectionné",
+      "interview": "Entretien",
+      "accepted": "Accepté",
+      "rejected": "Refusé"
+    },
+    "timeline": {
+      "applied": "Candidature envoyée",
+      "viewed": "Candidature consultée",
+      "shortlisted": "Présélectionné",
+      "interview": "Entretien planifié",
+      "accepted": "Offre acceptée",
+      "rejected": "Candidature refusée"
+    },
+    "appliedOn": "Postulé le {date}",
+    "updateStatus": "Mettre à jour le statut",
+    "notes": "Notes internes"
+  },
+  "profile": {
+    "title": "Mon profil",
+    "personalInfo": "Informations personnelles",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "email": "Email",
+    "phone": "Téléphone",
+    "location": "Localisation",
+    "bio": "Bio / Résumé",
+    "experience": "Expériences professionnelles",
+    "education": "Formation",
+    "skills": "Compétences",
+    "languages": "Langues",
+    "saveChanges": "Enregistrer les modifications",
+    "avatarUpload": "Changer la photo",
+    "noExperience": "Aucune expérience ajoutée",
+    "noEducation": "Aucune formation ajoutée",
+    "noSkills": "Aucune compétence ajoutée",
+    "addExperience": "Ajouter une expérience",
+    "addEducation": "Ajouter une formation",
+    "addSkill": "Ajouter une compétence"
+  },
+  "company": {
+    "title": "Mon entreprise",
+    "name": "Nom de l'entreprise",
+    "industry": "Secteur d'activité",
+    "size": "Taille de l'entreprise",
+    "website": "Site web",
+    "description": "Description",
+    "address": "Adresse",
+    "logo": "Logo",
+    "verified": "Entreprise vérifiée",
+    "notVerified": "Vérification en attente"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "account": "Compte",
+    "notifications": "Notifications",
+    "privacy": "Confidentialité",
+    "language": "Langue",
+    "currentPassword": "Mot de passe actuel",
+    "newPassword": "Nouveau mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "changePassword": "Changer le mot de passe",
+    "deleteAccount": "Supprimer le compte",
+    "deleteAccountWarning": "Cette action est irréversible. Toutes vos données seront supprimées.",
+    "languageSelect": "Sélectionner la langue",
+    "theme": "Thème",
+    "themeDark": "Sombre",
+    "themeLight": "Clair",
+    "themeAuto": "Automatique"
+  },
+  "jobAlerts": {
+    "title": "Alertes emploi",
+    "empty": "Aucune alerte configurée",
+    "create": "Créer une alerte",
+    "edit": "Modifier l'alerte",
+    "delete": "Supprimer l'alerte",
+    "toggle": "Activer/Désactiver",
+    "frequency": "Fréquence",
+    "frequencies": {
+      "immediate": "Immédiat",
+      "daily": "Quotidien",
+      "weekly": "Hebdomadaire"
+    }
+  },
+  "aiScoring": {
+    "title": "Score IA",
+    "subtitle": "Analyse automatique des candidats",
+    "score": "Score",
+    "analyzing": "Analyse en cours...",
+    "noScore": "Aucun score disponible"
+  },
+  "admin": {
+    "title": "Administration",
+    "users": "Utilisateurs",
+    "companies": "Entreprises",
+    "jobs": "Offres",
+    "stats": "Statistiques",
+    "totalUsers": "Utilisateurs totaux",
+    "totalJobs": "Offres totales",
+    "totalApplications": "Candidatures totales",
+    "newToday": "Nouveaux aujourd'hui"
+  },
+  "onboarding": {
+    "title": "Bienvenue sur INTOWORK",
+    "subtitle": "Dites-nous qui vous êtes",
+    "candidate": "Je cherche un emploi",
+    "candidateDesc": "Créez votre profil, importez votre CV et postulez aux meilleures offres",
+    "employer": "Je recrute",
+    "employerDesc": "Publiez des offres et trouvez les meilleurs candidats avec l'IA",
+    "continue": "Continuer",
+    "skip": "Passer"
+  },
+  "errors": {
+    "notFound": "Page introuvable",
+    "notFoundDesc": "La page que vous cherchez n'existe pas.",
+    "serverError": "Erreur serveur",
+    "serverErrorDesc": "Une erreur inattendue est survenue. Réessayez plus tard.",
+    "unauthorized": "Non autorisé",
+    "forbiddenDesc": "Vous n'avez pas accès à cette ressource.",
+    "goHome": "Retour à l'accueil",
+    "tryAgain": "Réessayer"
+  },
+  "landing": {
+    "hero": {
+      "title": "Trouvez votre prochain emploi en Afrique Centrale",
+      "subtitle": "La plateforme de recrutement intelligente avec matching IA pour le Gabon, le Cameroun et le Congo",
+      "ctaCandidate": "Je cherche un emploi",
+      "ctaEmployer": "Je recrute"
+    },
+    "features": {
+      "title": "Pourquoi INTOWORK ?",
+      "aiMatching": "Matching IA",
+      "aiMatchingDesc": "Notre IA analyse votre profil et trouve les offres qui correspondent le mieux",
+      "cvBuilder": "CV Builder",
+      "cvBuilderDesc": "Créez un CV professionnel en quelques minutes",
+      "alerts": "Alertes emploi",
+      "alertsDesc": "Soyez notifié dès qu'une offre correspond à vos critères"
+    }
+  },
+  "language": {
+    "fr": "Français",
+    "en": "English",
+    "pt": "Português",
+    "ar": "العربية",
+    "select": "Changer la langue"
+  }
+}

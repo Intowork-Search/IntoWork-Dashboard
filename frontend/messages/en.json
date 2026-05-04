@@ -1,0 +1,315 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "back": "Back",
+    "search": "Search",
+    "filter": "Filter",
+    "apply": "Apply",
+    "close": "Close",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "or": "or",
+    "required": "Required",
+    "optional": "Optional",
+    "view": "View",
+    "download": "Download",
+    "upload": "Upload",
+    "create": "Create",
+    "add": "Add",
+    "remove": "Remove",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "reset": "Reset",
+    "all": "All",
+    "none": "None",
+    "active": "Active",
+    "inactive": "Inactive",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "date": "Date",
+    "by": "by",
+    "of": "of",
+    "in": "in",
+    "noData": "No data available",
+    "seeAll": "See all"
+  },
+  "meta": {
+    "title": "INTOWORK Search - Recruitment Platform",
+    "description": "B2B2C AI-powered recruitment platform for Central Africa"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "jobs": "Job Offers",
+    "applications": "My Applications",
+    "profile": "My Profile",
+    "cv": "My CV",
+    "cvBuilder": "CV Builder",
+    "settings": "Settings",
+    "logout": "Log Out",
+    "jobPosts": "My Listings",
+    "company": "My Company",
+    "aiScoring": "AI Score",
+    "jobAlerts": "Job Alerts",
+    "emailTemplates": "Email Templates",
+    "integrations": "Integrations",
+    "admin": "Administration",
+    "candidates": "Candidates"
+  },
+  "auth": {
+    "signin": {
+      "title": "Sign In",
+      "subtitle": "Access your account",
+      "email": "Email address",
+      "emailPlaceholder": "you@example.com",
+      "password": "Password",
+      "passwordPlaceholder": "Your password",
+      "submit": "Sign In",
+      "forgotPassword": "Forgot password?",
+      "noAccount": "Don't have an account?",
+      "createAccount": "Create an account",
+      "error": "Incorrect email or password"
+    },
+    "signup": {
+      "title": "Create an account",
+      "subtitle": "Join INTOWORK",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email address",
+      "password": "Password",
+      "submit": "Sign Up",
+      "alreadyAccount": "Already have an account?",
+      "signin": "Sign in",
+      "roleCandidate": "I'm looking for a job",
+      "roleEmployer": "I'm hiring",
+      "roleLabel": "I am a"
+    },
+    "forgotPassword": {
+      "title": "Forgot password",
+      "subtitle": "Enter your email to receive instructions",
+      "email": "Email address",
+      "submit": "Send instructions",
+      "backToSignin": "Back to sign in",
+      "successMessage": "Email sent! Check your inbox.",
+      "errorMessage": "No account found with this email."
+    },
+    "resetPassword": {
+      "title": "New password",
+      "password": "New password",
+      "confirmPassword": "Confirm password",
+      "submit": "Reset password",
+      "success": "Password changed successfully",
+      "tokenInvalid": "Link expired or invalid"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Hello, {name} 👋",
+    "recentActivity": "Recent Activity",
+    "quickActions": "Quick Actions",
+    "stats": {
+      "applications": "Applications",
+      "jobsAvailable": "Available Jobs",
+      "profileViews": "Profile Views",
+      "interviewsScheduled": "Scheduled Interviews"
+    }
+  },
+  "jobs": {
+    "title": "Job Offers",
+    "searchPlaceholder": "Search a position, company...",
+    "filters": "Filters",
+    "noJobs": "No jobs available at the moment",
+    "noJobsFiltered": "No jobs match your criteria",
+    "apply": "Apply",
+    "applied": "Application sent",
+    "viewDetails": "View details",
+    "postedAt": "Posted on {date}",
+    "expiresAt": "Expires on {date}",
+    "salary": "Salary",
+    "location": "Location",
+    "experience": "Required experience",
+    "type": "Contract type",
+    "locationType": "Work mode",
+    "jobType": {
+      "full_time": "Full-time",
+      "part_time": "Part-time",
+      "contract": "Contract",
+      "internship": "Internship",
+      "freelance": "Freelance"
+    },
+    "locationTypes": {
+      "onsite": "On-site",
+      "remote": "Remote",
+      "hybrid": "Hybrid"
+    },
+    "create": "Post a job",
+    "edit": "Edit listing",
+    "delete": "Delete listing",
+    "deleteConfirm": "Are you sure you want to delete this listing?",
+    "status": {
+      "draft": "Draft",
+      "active": "Active",
+      "closed": "Closed",
+      "archived": "Archived"
+    }
+  },
+  "applications": {
+    "title": "My Applications",
+    "empty": "You haven't applied to any jobs yet",
+    "status": {
+      "applied": "Applied",
+      "pending": "Pending",
+      "viewed": "Viewed",
+      "shortlisted": "Shortlisted",
+      "interview": "Interview",
+      "accepted": "Accepted",
+      "rejected": "Rejected"
+    },
+    "timeline": {
+      "applied": "Application submitted",
+      "viewed": "Application viewed",
+      "shortlisted": "Shortlisted",
+      "interview": "Interview scheduled",
+      "accepted": "Offer accepted",
+      "rejected": "Application rejected"
+    },
+    "appliedOn": "Applied on {date}",
+    "updateStatus": "Update status",
+    "notes": "Internal notes"
+  },
+  "profile": {
+    "title": "My Profile",
+    "personalInfo": "Personal Information",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "email": "Email",
+    "phone": "Phone",
+    "location": "Location",
+    "bio": "Bio / Summary",
+    "experience": "Work Experience",
+    "education": "Education",
+    "skills": "Skills",
+    "languages": "Languages",
+    "saveChanges": "Save changes",
+    "avatarUpload": "Change photo",
+    "noExperience": "No experience added",
+    "noEducation": "No education added",
+    "noSkills": "No skills added",
+    "addExperience": "Add experience",
+    "addEducation": "Add education",
+    "addSkill": "Add skill"
+  },
+  "company": {
+    "title": "My Company",
+    "name": "Company name",
+    "industry": "Industry",
+    "size": "Company size",
+    "website": "Website",
+    "description": "Description",
+    "address": "Address",
+    "logo": "Logo",
+    "verified": "Verified company",
+    "notVerified": "Verification pending"
+  },
+  "settings": {
+    "title": "Settings",
+    "account": "Account",
+    "notifications": "Notifications",
+    "privacy": "Privacy",
+    "language": "Language",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password",
+    "changePassword": "Change password",
+    "deleteAccount": "Delete account",
+    "deleteAccountWarning": "This action is irreversible. All your data will be deleted.",
+    "languageSelect": "Select language",
+    "theme": "Theme",
+    "themeDark": "Dark",
+    "themeLight": "Light",
+    "themeAuto": "Auto"
+  },
+  "jobAlerts": {
+    "title": "Job Alerts",
+    "empty": "No alerts configured",
+    "create": "Create alert",
+    "edit": "Edit alert",
+    "delete": "Delete alert",
+    "toggle": "Enable/Disable",
+    "frequency": "Frequency",
+    "frequencies": {
+      "immediate": "Immediate",
+      "daily": "Daily",
+      "weekly": "Weekly"
+    }
+  },
+  "aiScoring": {
+    "title": "AI Score",
+    "subtitle": "Automated candidate analysis",
+    "score": "Score",
+    "analyzing": "Analyzing...",
+    "noScore": "No score available"
+  },
+  "admin": {
+    "title": "Administration",
+    "users": "Users",
+    "companies": "Companies",
+    "jobs": "Jobs",
+    "stats": "Statistics",
+    "totalUsers": "Total users",
+    "totalJobs": "Total jobs",
+    "totalApplications": "Total applications",
+    "newToday": "New today"
+  },
+  "onboarding": {
+    "title": "Welcome to INTOWORK",
+    "subtitle": "Tell us who you are",
+    "candidate": "I'm looking for a job",
+    "candidateDesc": "Create your profile, import your CV and apply to the best offers",
+    "employer": "I'm hiring",
+    "employerDesc": "Post jobs and find the best candidates with AI",
+    "continue": "Continue",
+    "skip": "Skip"
+  },
+  "errors": {
+    "notFound": "Page not found",
+    "notFoundDesc": "The page you're looking for doesn't exist.",
+    "serverError": "Server error",
+    "serverErrorDesc": "An unexpected error occurred. Please try again later.",
+    "unauthorized": "Unauthorized",
+    "forbiddenDesc": "You don't have access to this resource.",
+    "goHome": "Go home",
+    "tryAgain": "Try again"
+  },
+  "landing": {
+    "hero": {
+      "title": "Find your next job in Central Africa",
+      "subtitle": "The intelligent AI-powered recruitment platform for Gabon, Cameroon and Congo",
+      "ctaCandidate": "I'm looking for a job",
+      "ctaEmployer": "I'm hiring"
+    },
+    "features": {
+      "title": "Why INTOWORK?",
+      "aiMatching": "AI Matching",
+      "aiMatchingDesc": "Our AI analyzes your profile and finds the best matching jobs",
+      "cvBuilder": "CV Builder",
+      "cvBuilderDesc": "Create a professional CV in minutes",
+      "alerts": "Job Alerts",
+      "alertsDesc": "Get notified when a job matches your criteria"
+    }
+  },
+  "language": {
+    "fr": "Français",
+    "en": "English",
+    "pt": "Português",
+    "ar": "العربية",
+    "select": "Change language"
+  }
+}

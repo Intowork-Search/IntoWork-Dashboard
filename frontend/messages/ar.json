@@ -1,0 +1,315 @@
+{
+  "common": {
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "loading": "جاري التحميل...",
+    "error": "حدث خطأ",
+    "success": "نجاح",
+    "back": "رجوع",
+    "search": "بحث",
+    "filter": "تصفية",
+    "apply": "تطبيق",
+    "close": "إغلاق",
+    "confirm": "تأكيد",
+    "yes": "نعم",
+    "no": "لا",
+    "or": "أو",
+    "required": "مطلوب",
+    "optional": "اختياري",
+    "view": "عرض",
+    "download": "تحميل",
+    "upload": "رفع",
+    "create": "إنشاء",
+    "add": "إضافة",
+    "remove": "إزالة",
+    "next": "التالي",
+    "previous": "السابق",
+    "submit": "إرسال",
+    "reset": "إعادة تعيين",
+    "all": "الكل",
+    "none": "لا شيء",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "enabled": "مفعّل",
+    "disabled": "معطّل",
+    "date": "التاريخ",
+    "by": "بواسطة",
+    "of": "من",
+    "in": "في",
+    "noData": "لا توجد بيانات متاحة",
+    "seeAll": "عرض الكل"
+  },
+  "meta": {
+    "title": "INTOWORK Search - منصة التوظيف",
+    "description": "منصة توظيف B2B2C بالذكاء الاصطناعي لوسط أفريقيا"
+  },
+  "nav": {
+    "dashboard": "لوحة التحكم",
+    "jobs": "فرص العمل",
+    "applications": "طلباتي",
+    "profile": "ملفي الشخصي",
+    "cv": "سيرتي الذاتية",
+    "cvBuilder": "منشئ السيرة الذاتية",
+    "settings": "الإعدادات",
+    "logout": "تسجيل الخروج",
+    "jobPosts": "وظائفي",
+    "company": "شركتي",
+    "aiScoring": "نقاط الذكاء الاصطناعي",
+    "jobAlerts": "تنبيهات الوظائف",
+    "emailTemplates": "قوالب البريد الإلكتروني",
+    "integrations": "التكاملات",
+    "admin": "الإدارة",
+    "candidates": "المرشحون"
+  },
+  "auth": {
+    "signin": {
+      "title": "تسجيل الدخول",
+      "subtitle": "الوصول إلى حسابك",
+      "email": "عنوان البريد الإلكتروني",
+      "emailPlaceholder": "you@example.com",
+      "password": "كلمة المرور",
+      "passwordPlaceholder": "كلمة المرور الخاصة بك",
+      "submit": "تسجيل الدخول",
+      "forgotPassword": "نسيت كلمة المرور؟",
+      "noAccount": "ليس لديك حساب؟",
+      "createAccount": "إنشاء حساب",
+      "error": "البريد الإلكتروني أو كلمة المرور غير صحيحة"
+    },
+    "signup": {
+      "title": "إنشاء حساب",
+      "subtitle": "انضم إلى INTOWORK",
+      "firstName": "الاسم الأول",
+      "lastName": "اسم العائلة",
+      "email": "عنوان البريد الإلكتروني",
+      "password": "كلمة المرور",
+      "submit": "إنشاء حساب",
+      "alreadyAccount": "هل لديك حساب بالفعل؟",
+      "signin": "تسجيل الدخول",
+      "roleCandidate": "أبحث عن عمل",
+      "roleEmployer": "أبحث عن موظفين",
+      "roleLabel": "أنا"
+    },
+    "forgotPassword": {
+      "title": "نسيت كلمة المرور",
+      "subtitle": "أدخل بريدك الإلكتروني لاستلام التعليمات",
+      "email": "عنوان البريد الإلكتروني",
+      "submit": "إرسال التعليمات",
+      "backToSignin": "العودة إلى تسجيل الدخول",
+      "successMessage": "تم إرسال البريد الإلكتروني! تحقق من صندوق الوارد.",
+      "errorMessage": "لم يتم العثور على حساب بهذا البريد الإلكتروني."
+    },
+    "resetPassword": {
+      "title": "كلمة مرور جديدة",
+      "password": "كلمة المرور الجديدة",
+      "confirmPassword": "تأكيد كلمة المرور",
+      "submit": "إعادة تعيين كلمة المرور",
+      "success": "تم تغيير كلمة المرور بنجاح",
+      "tokenInvalid": "الرابط منتهي الصلاحية أو غير صالح"
+    }
+  },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "welcome": "مرحباً، {name} 👋",
+    "recentActivity": "النشاط الأخير",
+    "quickActions": "إجراءات سريعة",
+    "stats": {
+      "applications": "الطلبات",
+      "jobsAvailable": "الوظائف المتاحة",
+      "profileViews": "مشاهدات الملف",
+      "interviewsScheduled": "مقابلات مجدولة"
+    }
+  },
+  "jobs": {
+    "title": "فرص العمل",
+    "searchPlaceholder": "البحث عن منصب، شركة...",
+    "filters": "تصفية",
+    "noJobs": "لا توجد وظائف متاحة في الوقت الحالي",
+    "noJobsFiltered": "لا توجد وظائف تطابق معاييرك",
+    "apply": "تقدم للوظيفة",
+    "applied": "تم إرسال الطلب",
+    "viewDetails": "عرض التفاصيل",
+    "postedAt": "نُشر في {date}",
+    "expiresAt": "تنتهي في {date}",
+    "salary": "الراتب",
+    "location": "الموقع",
+    "experience": "الخبرة المطلوبة",
+    "type": "نوع العقد",
+    "locationType": "نمط العمل",
+    "jobType": {
+      "full_time": "دوام كامل",
+      "part_time": "دوام جزئي",
+      "contract": "عقد",
+      "internship": "تدريب",
+      "freelance": "عمل حر"
+    },
+    "locationTypes": {
+      "onsite": "حضوري",
+      "remote": "عن بُعد",
+      "hybrid": "هجين"
+    },
+    "create": "نشر وظيفة",
+    "edit": "تعديل الوظيفة",
+    "delete": "حذف الوظيفة",
+    "deleteConfirm": "هل أنت متأكد أنك تريد حذف هذه الوظيفة؟",
+    "status": {
+      "draft": "مسودة",
+      "active": "نشطة",
+      "closed": "مغلقة",
+      "archived": "مؤرشفة"
+    }
+  },
+  "applications": {
+    "title": "طلباتي",
+    "empty": "لم تتقدم لأي وظيفة بعد",
+    "status": {
+      "applied": "متقدم",
+      "pending": "قيد الانتظار",
+      "viewed": "مشاهَد",
+      "shortlisted": "مختار مسبقاً",
+      "interview": "مقابلة",
+      "accepted": "مقبول",
+      "rejected": "مرفوض"
+    },
+    "timeline": {
+      "applied": "تم إرسال الطلب",
+      "viewed": "تمت مشاهدة الطلب",
+      "shortlisted": "تم الاختيار المسبق",
+      "interview": "تمت جدولة المقابلة",
+      "accepted": "تم قبول العرض",
+      "rejected": "تم رفض الطلب"
+    },
+    "appliedOn": "تقدمت في {date}",
+    "updateStatus": "تحديث الحالة",
+    "notes": "ملاحظات داخلية"
+  },
+  "profile": {
+    "title": "ملفي الشخصي",
+    "personalInfo": "المعلومات الشخصية",
+    "firstName": "الاسم الأول",
+    "lastName": "اسم العائلة",
+    "email": "البريد الإلكتروني",
+    "phone": "الهاتف",
+    "location": "الموقع",
+    "bio": "نبذة / ملخص",
+    "experience": "الخبرة المهنية",
+    "education": "التعليم",
+    "skills": "المهارات",
+    "languages": "اللغات",
+    "saveChanges": "حفظ التغييرات",
+    "avatarUpload": "تغيير الصورة",
+    "noExperience": "لم تتم إضافة خبرة",
+    "noEducation": "لم تتم إضافة تعليم",
+    "noSkills": "لم تتم إضافة مهارات",
+    "addExperience": "إضافة خبرة",
+    "addEducation": "إضافة تعليم",
+    "addSkill": "إضافة مهارة"
+  },
+  "company": {
+    "title": "شركتي",
+    "name": "اسم الشركة",
+    "industry": "القطاع",
+    "size": "حجم الشركة",
+    "website": "الموقع الإلكتروني",
+    "description": "الوصف",
+    "address": "العنوان",
+    "logo": "الشعار",
+    "verified": "شركة موثقة",
+    "notVerified": "في انتظار التوثيق"
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "account": "الحساب",
+    "notifications": "الإشعارات",
+    "privacy": "الخصوصية",
+    "language": "اللغة",
+    "currentPassword": "كلمة المرور الحالية",
+    "newPassword": "كلمة المرور الجديدة",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "changePassword": "تغيير كلمة المرور",
+    "deleteAccount": "حذف الحساب",
+    "deleteAccountWarning": "هذا الإجراء لا رجعة فيه. سيتم حذف جميع بياناتك.",
+    "languageSelect": "اختيار اللغة",
+    "theme": "السمة",
+    "themeDark": "داكن",
+    "themeLight": "فاتح",
+    "themeAuto": "تلقائي"
+  },
+  "jobAlerts": {
+    "title": "تنبيهات الوظائف",
+    "empty": "لا توجد تنبيهات مضبوطة",
+    "create": "إنشاء تنبيه",
+    "edit": "تعديل التنبيه",
+    "delete": "حذف التنبيه",
+    "toggle": "تفعيل/تعطيل",
+    "frequency": "التكرار",
+    "frequencies": {
+      "immediate": "فوري",
+      "daily": "يومي",
+      "weekly": "أسبوعي"
+    }
+  },
+  "aiScoring": {
+    "title": "نقاط الذكاء الاصطناعي",
+    "subtitle": "تحليل تلقائي للمرشحين",
+    "score": "النقاط",
+    "analyzing": "جاري التحليل...",
+    "noScore": "لا توجد نقاط متاحة"
+  },
+  "admin": {
+    "title": "الإدارة",
+    "users": "المستخدمون",
+    "companies": "الشركات",
+    "jobs": "الوظائف",
+    "stats": "الإحصاءات",
+    "totalUsers": "إجمالي المستخدمين",
+    "totalJobs": "إجمالي الوظائف",
+    "totalApplications": "إجمالي الطلبات",
+    "newToday": "جديد اليوم"
+  },
+  "onboarding": {
+    "title": "مرحباً بك في INTOWORK",
+    "subtitle": "أخبرنا من أنت",
+    "candidate": "أبحث عن عمل",
+    "candidateDesc": "أنشئ ملفك الشخصي، استورد سيرتك الذاتية وتقدم لأفضل الوظائف",
+    "employer": "أبحث عن موظفين",
+    "employerDesc": "انشر وظائف وابحث عن أفضل المرشحين بالذكاء الاصطناعي",
+    "continue": "متابعة",
+    "skip": "تخطي"
+  },
+  "errors": {
+    "notFound": "الصفحة غير موجودة",
+    "notFoundDesc": "الصفحة التي تبحث عنها غير موجودة.",
+    "serverError": "خطأ في الخادم",
+    "serverErrorDesc": "حدث خطأ غير متوقع. يرجى المحاولة لاحقاً.",
+    "unauthorized": "غير مصرح به",
+    "forbiddenDesc": "ليس لديك صلاحية الوصول إلى هذا المورد.",
+    "goHome": "العودة إلى الرئيسية",
+    "tryAgain": "حاول مرة أخرى"
+  },
+  "landing": {
+    "hero": {
+      "title": "ابحث عن وظيفتك القادمة في وسط أفريقيا",
+      "subtitle": "منصة التوظيف الذكية بالذكاء الاصطناعي للغابون والكاميرون والكونغو",
+      "ctaCandidate": "أبحث عن عمل",
+      "ctaEmployer": "أبحث عن موظفين"
+    },
+    "features": {
+      "title": "لماذا INTOWORK؟",
+      "aiMatching": "مطابقة بالذكاء الاصطناعي",
+      "aiMatchingDesc": "يحلل ذكاؤنا الاصطناعي ملفك ويجد أفضل الوظائف المناسبة لك",
+      "cvBuilder": "منشئ السيرة الذاتية",
+      "cvBuilderDesc": "أنشئ سيرة ذاتية احترافية في دقائق",
+      "alerts": "تنبيهات الوظائف",
+      "alertsDesc": "احصل على إشعار عند مطابقة وظيفة لمعاييرك"
+    }
+  },
+  "language": {
+    "fr": "Français",
+    "en": "English",
+    "pt": "Português",
+    "ar": "العربية",
+    "select": "اختيار اللغة"
+  }
+}

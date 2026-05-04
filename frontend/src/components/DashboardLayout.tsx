@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import NotificationPanel from '@/components/NotificationPanel';
 import HelpButton from '@/components/HelpButton';
+import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 import { Bars3Icon } from '@heroicons/react/24/outline';
 
 interface DashboardLayoutProps {
@@ -109,10 +110,16 @@ export default function DashboardLayout({
                 )}
               </div>
               
-              {/* Notifications - Cachées pour les admins */}
+              {/* Notifications + Langue */}
               {user?.role !== 'admin' && (
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center gap-2">
+                  <LanguageSwitcher />
                   <NotificationPanel />
+                </div>
+              )}
+              {user?.role === 'admin' && (
+                <div className="flex items-center gap-2">
+                  <LanguageSwitcher />
                 </div>
               )}
             </div>

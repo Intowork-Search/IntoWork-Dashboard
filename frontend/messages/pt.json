@@ -1,0 +1,315 @@
+{
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "loading": "Carregando...",
+    "error": "Ocorreu um erro",
+    "success": "Sucesso",
+    "back": "Voltar",
+    "search": "Pesquisar",
+    "filter": "Filtrar",
+    "apply": "Aplicar",
+    "close": "Fechar",
+    "confirm": "Confirmar",
+    "yes": "Sim",
+    "no": "Não",
+    "or": "ou",
+    "required": "Obrigatório",
+    "optional": "Opcional",
+    "view": "Ver",
+    "download": "Baixar",
+    "upload": "Enviar",
+    "create": "Criar",
+    "add": "Adicionar",
+    "remove": "Remover",
+    "next": "Próximo",
+    "previous": "Anterior",
+    "submit": "Enviar",
+    "reset": "Redefinir",
+    "all": "Todos",
+    "none": "Nenhum",
+    "active": "Ativo",
+    "inactive": "Inativo",
+    "enabled": "Ativado",
+    "disabled": "Desativado",
+    "date": "Data",
+    "by": "por",
+    "of": "de",
+    "in": "em",
+    "noData": "Nenhum dado disponível",
+    "seeAll": "Ver tudo"
+  },
+  "meta": {
+    "title": "INTOWORK Search - Plataforma de Recrutamento",
+    "description": "Plataforma B2B2C de recrutamento com IA para a África Central"
+  },
+  "nav": {
+    "dashboard": "Painel",
+    "jobs": "Vagas",
+    "applications": "Minhas candidaturas",
+    "profile": "Meu perfil",
+    "cv": "Meu CV",
+    "cvBuilder": "CV Builder",
+    "settings": "Configurações",
+    "logout": "Sair",
+    "jobPosts": "Minhas vagas",
+    "company": "Minha empresa",
+    "aiScoring": "Score IA",
+    "jobAlerts": "Alertas de emprego",
+    "emailTemplates": "Templates de email",
+    "integrations": "Integrações",
+    "admin": "Administração",
+    "candidates": "Candidatos"
+  },
+  "auth": {
+    "signin": {
+      "title": "Entrar",
+      "subtitle": "Acesse sua conta",
+      "email": "Endereço de email",
+      "emailPlaceholder": "voce@exemplo.com",
+      "password": "Senha",
+      "passwordPlaceholder": "Sua senha",
+      "submit": "Entrar",
+      "forgotPassword": "Esqueceu a senha?",
+      "noAccount": "Não tem uma conta?",
+      "createAccount": "Criar uma conta",
+      "error": "Email ou senha incorretos"
+    },
+    "signup": {
+      "title": "Criar uma conta",
+      "subtitle": "Junte-se ao INTOWORK",
+      "firstName": "Nome",
+      "lastName": "Sobrenome",
+      "email": "Endereço de email",
+      "password": "Senha",
+      "submit": "Cadastrar",
+      "alreadyAccount": "Já tem uma conta?",
+      "signin": "Entrar",
+      "roleCandidate": "Estou procurando emprego",
+      "roleEmployer": "Estou contratando",
+      "roleLabel": "Eu sou"
+    },
+    "forgotPassword": {
+      "title": "Esqueci a senha",
+      "subtitle": "Digite seu email para receber as instruções",
+      "email": "Endereço de email",
+      "submit": "Enviar instruções",
+      "backToSignin": "Voltar para entrar",
+      "successMessage": "Email enviado! Verifique sua caixa de entrada.",
+      "errorMessage": "Nenhuma conta encontrada com este email."
+    },
+    "resetPassword": {
+      "title": "Nova senha",
+      "password": "Nova senha",
+      "confirmPassword": "Confirmar senha",
+      "submit": "Redefinir senha",
+      "success": "Senha alterada com sucesso",
+      "tokenInvalid": "Link expirado ou inválido"
+    }
+  },
+  "dashboard": {
+    "title": "Painel",
+    "welcome": "Olá, {name} 👋",
+    "recentActivity": "Atividade recente",
+    "quickActions": "Ações rápidas",
+    "stats": {
+      "applications": "Candidaturas",
+      "jobsAvailable": "Vagas disponíveis",
+      "profileViews": "Visualizações do perfil",
+      "interviewsScheduled": "Entrevistas agendadas"
+    }
+  },
+  "jobs": {
+    "title": "Vagas de emprego",
+    "searchPlaceholder": "Pesquisar cargo, empresa...",
+    "filters": "Filtros",
+    "noJobs": "Nenhuma vaga disponível no momento",
+    "noJobsFiltered": "Nenhuma vaga corresponde aos seus critérios",
+    "apply": "Candidatar-se",
+    "applied": "Candidatura enviada",
+    "viewDetails": "Ver detalhes",
+    "postedAt": "Publicado em {date}",
+    "expiresAt": "Expira em {date}",
+    "salary": "Salário",
+    "location": "Local",
+    "experience": "Experiência necessária",
+    "type": "Tipo de contrato",
+    "locationType": "Modo de trabalho",
+    "jobType": {
+      "full_time": "Tempo integral",
+      "part_time": "Meio período",
+      "contract": "Contrato",
+      "internship": "Estágio",
+      "freelance": "Freelance"
+    },
+    "locationTypes": {
+      "onsite": "Presencial",
+      "remote": "Remoto",
+      "hybrid": "Híbrido"
+    },
+    "create": "Publicar vaga",
+    "edit": "Editar vaga",
+    "delete": "Excluir vaga",
+    "deleteConfirm": "Tem certeza que deseja excluir esta vaga?",
+    "status": {
+      "draft": "Rascunho",
+      "active": "Ativa",
+      "closed": "Encerrada",
+      "archived": "Arquivada"
+    }
+  },
+  "applications": {
+    "title": "Minhas candidaturas",
+    "empty": "Você ainda não se candidatou a nenhuma vaga",
+    "status": {
+      "applied": "Candidatado",
+      "pending": "Pendente",
+      "viewed": "Visualizado",
+      "shortlisted": "Pré-selecionado",
+      "interview": "Entrevista",
+      "accepted": "Aceito",
+      "rejected": "Recusado"
+    },
+    "timeline": {
+      "applied": "Candidatura enviada",
+      "viewed": "Candidatura visualizada",
+      "shortlisted": "Pré-selecionado",
+      "interview": "Entrevista agendada",
+      "accepted": "Oferta aceita",
+      "rejected": "Candidatura recusada"
+    },
+    "appliedOn": "Candidatado em {date}",
+    "updateStatus": "Atualizar status",
+    "notes": "Notas internas"
+  },
+  "profile": {
+    "title": "Meu perfil",
+    "personalInfo": "Informações pessoais",
+    "firstName": "Nome",
+    "lastName": "Sobrenome",
+    "email": "Email",
+    "phone": "Telefone",
+    "location": "Localização",
+    "bio": "Bio / Resumo",
+    "experience": "Experiência profissional",
+    "education": "Formação",
+    "skills": "Habilidades",
+    "languages": "Idiomas",
+    "saveChanges": "Salvar alterações",
+    "avatarUpload": "Alterar foto",
+    "noExperience": "Nenhuma experiência adicionada",
+    "noEducation": "Nenhuma formação adicionada",
+    "noSkills": "Nenhuma habilidade adicionada",
+    "addExperience": "Adicionar experiência",
+    "addEducation": "Adicionar formação",
+    "addSkill": "Adicionar habilidade"
+  },
+  "company": {
+    "title": "Minha empresa",
+    "name": "Nome da empresa",
+    "industry": "Setor",
+    "size": "Tamanho da empresa",
+    "website": "Website",
+    "description": "Descrição",
+    "address": "Endereço",
+    "logo": "Logo",
+    "verified": "Empresa verificada",
+    "notVerified": "Verificação pendente"
+  },
+  "settings": {
+    "title": "Configurações",
+    "account": "Conta",
+    "notifications": "Notificações",
+    "privacy": "Privacidade",
+    "language": "Idioma",
+    "currentPassword": "Senha atual",
+    "newPassword": "Nova senha",
+    "confirmPassword": "Confirmar senha",
+    "changePassword": "Alterar senha",
+    "deleteAccount": "Excluir conta",
+    "deleteAccountWarning": "Esta ação é irreversível. Todos os seus dados serão excluídos.",
+    "languageSelect": "Selecionar idioma",
+    "theme": "Tema",
+    "themeDark": "Escuro",
+    "themeLight": "Claro",
+    "themeAuto": "Automático"
+  },
+  "jobAlerts": {
+    "title": "Alertas de emprego",
+    "empty": "Nenhum alerta configurado",
+    "create": "Criar alerta",
+    "edit": "Editar alerta",
+    "delete": "Excluir alerta",
+    "toggle": "Ativar/Desativar",
+    "frequency": "Frequência",
+    "frequencies": {
+      "immediate": "Imediato",
+      "daily": "Diário",
+      "weekly": "Semanal"
+    }
+  },
+  "aiScoring": {
+    "title": "Score IA",
+    "subtitle": "Análise automática de candidatos",
+    "score": "Score",
+    "analyzing": "Analisando...",
+    "noScore": "Nenhum score disponível"
+  },
+  "admin": {
+    "title": "Administração",
+    "users": "Usuários",
+    "companies": "Empresas",
+    "jobs": "Vagas",
+    "stats": "Estatísticas",
+    "totalUsers": "Total de usuários",
+    "totalJobs": "Total de vagas",
+    "totalApplications": "Total de candidaturas",
+    "newToday": "Novos hoje"
+  },
+  "onboarding": {
+    "title": "Bem-vindo ao INTOWORK",
+    "subtitle": "Conte-nos quem você é",
+    "candidate": "Estou procurando emprego",
+    "candidateDesc": "Crie seu perfil, importe seu CV e candidate-se às melhores vagas",
+    "employer": "Estou contratando",
+    "employerDesc": "Publique vagas e encontre os melhores candidatos com IA",
+    "continue": "Continuar",
+    "skip": "Pular"
+  },
+  "errors": {
+    "notFound": "Página não encontrada",
+    "notFoundDesc": "A página que você está procurando não existe.",
+    "serverError": "Erro do servidor",
+    "serverErrorDesc": "Ocorreu um erro inesperado. Tente novamente mais tarde.",
+    "unauthorized": "Não autorizado",
+    "forbiddenDesc": "Você não tem acesso a este recurso.",
+    "goHome": "Ir para o início",
+    "tryAgain": "Tentar novamente"
+  },
+  "landing": {
+    "hero": {
+      "title": "Encontre seu próximo emprego na África Central",
+      "subtitle": "A plataforma inteligente de recrutamento com IA para Gabão, Camarões e Congo",
+      "ctaCandidate": "Estou procurando emprego",
+      "ctaEmployer": "Estou contratando"
+    },
+    "features": {
+      "title": "Por que INTOWORK?",
+      "aiMatching": "Matching com IA",
+      "aiMatchingDesc": "Nossa IA analisa seu perfil e encontra as vagas que mais combinam",
+      "cvBuilder": "CV Builder",
+      "cvBuilderDesc": "Crie um CV profissional em minutos",
+      "alerts": "Alertas de emprego",
+      "alertsDesc": "Seja notificado quando uma vaga corresponder aos seus critérios"
+    }
+  },
+  "language": {
+    "fr": "Français",
+    "en": "English",
+    "pt": "Português",
+    "ar": "العربية",
+    "select": "Selecionar idioma"
+  }
+}
