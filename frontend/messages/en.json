@@ -65,7 +65,15 @@
     "noResults": "No results",
     "page": "Page {current} of {total}",
     "aiScore": "AI",
-    "top": "Top"
+    "top": "Top",
+    "onsite": "On-site",
+    "inProgress": "In progress",
+    "noJobFound": "No jobs found",
+    "noJobFoundDesc": "No jobs match your current criteria. Try adjusting your filters.",
+    "cityRegion": "City, region...",
+    "fromAmount": "From {amount}",
+    "upToAmount": "Up to {amount}",
+    "notSpecified": "Not specified"
   },
   "meta": {
     "title": "INTOWORK Search - Recruitment Platform",

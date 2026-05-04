@@ -65,7 +65,15 @@
     "noResults": "Sem resultados",
     "page": "Página {current} de {total}",
     "aiScore": "IA",
-    "top": "Top"
+    "top": "Top",
+    "onsite": "Presencial",
+    "inProgress": "Em andamento",
+    "noJobFound": "Nenhuma vaga encontrada",
+    "noJobFoundDesc": "Nenhuma vaga corresponde aos seus critérios. Tente ajustar os filtros.",
+    "cityRegion": "Cidade, região...",
+    "fromAmount": "A partir de {amount}",
+    "upToAmount": "Até {amount}",
+    "notSpecified": "Não especificado"
   },
   "meta": {
     "title": "INTOWORK Search - Plataforma de Recrutamento",

@@ -459,7 +459,7 @@ export default function SettingsPage() {
 
   return (
     <DashboardLayout>
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
         {/* Hero Section */}
         <div className="relative overflow-hidden bg-gradient-to-br from-[#6B9B5F] via-[#5a8a4f] to-[#6B46C1] rounded-b-[3rem] px-6 py-10 mb-8">
           {/* Decorative patterns */}
@@ -489,7 +489,7 @@ export default function SettingsPage() {
 
         <div className="px-6 pb-10 animate-fadeIn">
           {/* Tabs */}
-          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 p-2 mb-8 border border-gray-100">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-sm shadow-gray-100/80 dark:shadow-black/20 p-2 mb-8 border border-gray-100 dark:border-gray-700">
             <nav className="flex gap-2">
               {tabs.map((tab) => (
                 <button
@@ -510,7 +510,7 @@ export default function SettingsPage() {
           </div>
 
           {/* Content */}
-          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 overflow-hidden border border-gray-100">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-sm shadow-gray-100/80 dark:shadow-black/20 overflow-hidden border border-gray-100 dark:border-gray-700">
             {/* Profile Tab */}
             {activeTab === 'profile' && (
               <div className="p-8 space-y-8">
@@ -534,7 +534,7 @@ export default function SettingsPage() {
                       type="text"
                       value={profileData.first_name}
                       onChange={(e) => setProfileData(prev => ({ ...prev, first_name: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400"
                       placeholder="Votre prénom"
                     />
                   </div>
@@ -548,7 +548,7 @@ export default function SettingsPage() {
                       type="text"
                       value={profileData.last_name}
                       onChange={(e) => setProfileData(prev => ({ ...prev, last_name: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400"
                       placeholder="Votre nom"
                     />
                   </div>
@@ -562,7 +562,7 @@ export default function SettingsPage() {
                       type="tel"
                       value={profileData.phone}
                       onChange={(e) => setProfileData(prev => ({ ...prev, phone: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400"
                       placeholder="Votre numéro de téléphone"
                     />
                   </div>
@@ -576,7 +576,7 @@ export default function SettingsPage() {
                       type="text"
                       value={profileData.location}
                       onChange={(e) => setProfileData(prev => ({ ...prev, location: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400"
                       placeholder="Votre ville ou région"
                     />
                   </div>
@@ -590,7 +590,7 @@ export default function SettingsPage() {
                       rows={4}
                       value={profileData.bio}
                       onChange={(e) => setProfileData(prev => ({ ...prev, bio: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 resize-none text-gray-900 placeholder-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 resize-none text-gray-900 placeholder-gray-400"
                       placeholder="Décrivez votre profil professionnel, vos compétences et vos objectifs..."
                     />
                   </div>
@@ -604,7 +604,7 @@ export default function SettingsPage() {
                       type="url"
                       value={profileData.website}
                       onChange={(e) => setProfileData(prev => ({ ...prev, website: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400"
                       placeholder="https://monsite.com"
                     />
                   </div>
@@ -618,7 +618,7 @@ export default function SettingsPage() {
                       type="url"
                       value={profileData.linkedin_url}
                       onChange={(e) => setProfileData(prev => ({ ...prev, linkedin_url: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400"
                       placeholder="https://linkedin.com/in/monprofil"
                     />
                   </div>
@@ -632,7 +632,7 @@ export default function SettingsPage() {
                       type="url"
                       value={profileData.github_url}
                       onChange={(e) => setProfileData(prev => ({ ...prev, github_url: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] transition-all duration-200 text-gray-900 placeholder-gray-400"
                       placeholder="https://github.com/monprofil"
                     />
                   </div>
@@ -674,7 +674,7 @@ export default function SettingsPage() {
                       type="text"
                       value={companyData.name}
                       onChange={(e) => setCompanyData(prev => ({ ...prev, name: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400"
                       placeholder="Nom de votre entreprise"
                     />
                   </div>
@@ -688,7 +688,7 @@ export default function SettingsPage() {
                       value={companyData.description}
                       onChange={(e) => setCompanyData(prev => ({ ...prev, description: e.target.value }))}
                       rows={4}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400"
                       placeholder="Décrivez votre entreprise, votre mission et votre culture..."
                     />
                   </div>
@@ -702,7 +702,7 @@ export default function SettingsPage() {
                       type="text"
                       value={companyData.industry}
                       onChange={(e) => setCompanyData(prev => ({ ...prev, industry: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400"
                       placeholder="ex: Technologie, Finance, Santé..."
                     />
                   </div>
@@ -736,7 +736,7 @@ export default function SettingsPage() {
                       type="url"
                       value={companyData.website_url}
                       onChange={(e) => setCompanyData(prev => ({ ...prev, website_url: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400"
                       placeholder="https://www.votresite.com"
                     />
                   </div>
@@ -750,7 +750,7 @@ export default function SettingsPage() {
                       type="url"
                       value={companyData.linkedin_url}
                       onChange={(e) => setCompanyData(prev => ({ ...prev, linkedin_url: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400"
                       placeholder="https://linkedin.com/company/..."
                     />
                   </div>
@@ -764,7 +764,7 @@ export default function SettingsPage() {
                       type="text"
                       value={companyData.address}
                       onChange={(e) => setCompanyData(prev => ({ ...prev, address: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400"
                       placeholder="Adresse complète"
                     />
                   </div>
@@ -778,7 +778,7 @@ export default function SettingsPage() {
                       type="text"
                       value={companyData.city}
                       onChange={(e) => setCompanyData(prev => ({ ...prev, city: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400"
                       placeholder="Ville"
                     />
                   </div>
@@ -792,7 +792,7 @@ export default function SettingsPage() {
                       type="text"
                       value={companyData.country}
                       onChange={(e) => setCompanyData(prev => ({ ...prev, country: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F7C700]/20 focus:border-[#F7C700] transition-all duration-200 text-gray-900 placeholder-gray-400"
                       placeholder="Pays"
                     />
                   </div>
@@ -889,7 +889,7 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="space-y-4">
-                  <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-700 rounded-2xl p-6 flex items-center justify-between border border-gray-100 dark:border-gray-600 hover:shadow-md transition-all duration-300">
+                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 hover:shadow-md transition-all duration-300">
                     <div className="flex items-center gap-4">
                       <div className="bg-[#6B9B5F]/10 p-3 rounded-xl">
                         <BellIcon className="w-6 h-6 text-[#6B9B5F]" />
@@ -906,7 +906,7 @@ export default function SettingsPage() {
                     />
                   </div>
 
-                  <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-700 rounded-2xl p-6 flex items-center justify-between border border-gray-100 dark:border-gray-600 hover:shadow-md transition-all duration-300">
+                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 hover:shadow-md transition-all duration-300">
                     <div className="flex items-center gap-4">
                       <div className="bg-[#6B46C1]/10 p-3 rounded-xl">
                         <SparklesIcon className="w-6 h-6 text-[#6B46C1]" />
@@ -923,7 +923,7 @@ export default function SettingsPage() {
                     />
                   </div>
 
-                  <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-700 rounded-2xl p-6 flex items-center justify-between border border-gray-100 dark:border-gray-600 hover:shadow-md transition-all duration-300">
+                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 hover:shadow-md transition-all duration-300">
                     <div className="flex items-center gap-4">
                       <div className="bg-[#F7C700]/10 p-3 rounded-xl">
                         <BellIcon className="w-6 h-6 text-[#F7C700]" />
@@ -940,7 +940,7 @@ export default function SettingsPage() {
                     />
                   </div>
 
-                  <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-700 rounded-2xl p-6 flex items-center justify-between border border-gray-100 dark:border-gray-600 hover:shadow-md transition-all duration-300">
+                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 hover:shadow-md transition-all duration-300">
                     <div className="flex items-center gap-4">
                       <div className="bg-[#3B82F6]/10 p-3 rounded-xl">
                         <BellIcon className="w-6 h-6 text-[#3B82F6]" />
@@ -985,7 +985,7 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="space-y-4">
-                  <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-700 rounded-2xl p-6 flex items-center justify-between border border-gray-100 dark:border-gray-600 hover:shadow-md transition-all duration-300">
+                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 hover:shadow-md transition-all duration-300">
                     <div className="flex items-center gap-4">
                       <div className="bg-[#6B9B5F]/10 p-3 rounded-xl">
                         <UserIcon className="w-6 h-6 text-[#6B9B5F]" />
@@ -1002,7 +1002,7 @@ export default function SettingsPage() {
                     />
                   </div>
 
-                  <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-700 rounded-2xl p-6 flex items-center justify-between border border-gray-100 dark:border-gray-600 hover:shadow-md transition-all duration-300">
+                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 hover:shadow-md transition-all duration-300">
                     <div className="flex items-center gap-4">
                       <div className="bg-[#6B46C1]/10 p-3 rounded-xl">
                         <BellIcon className="w-6 h-6 text-[#6B46C1]" />
@@ -1019,7 +1019,7 @@ export default function SettingsPage() {
                     />
                   </div>
 
-                  <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-700 rounded-2xl p-6 flex items-center justify-between border border-gray-100 dark:border-gray-600 hover:shadow-md transition-all duration-300">
+                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 hover:shadow-md transition-all duration-300">
                     <div className="flex items-center gap-4">
                       <div className="bg-[#F7C700]/10 p-3 rounded-xl">
                         <BellIcon className="w-6 h-6 text-[#F7C700]" />
@@ -1036,7 +1036,7 @@ export default function SettingsPage() {
                     />
                   </div>
 
-                  <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-700 rounded-2xl p-6 flex items-center justify-between border border-gray-100 dark:border-gray-600 hover:shadow-md transition-all duration-300">
+                  <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 flex items-center justify-between border border-gray-100 hover:shadow-md transition-all duration-300">
                     <div className="flex items-center gap-4">
                       <div className="bg-[#3B82F6]/10 p-3 rounded-xl">
                         <ShieldCheckIcon className="w-6 h-6 text-[#3B82F6]" />
@@ -1161,7 +1161,7 @@ export default function SettingsPage() {
                 </div>
 
                 {/* Danger Zone */}
-                <div className="bg-gradient-to-r from-red-50 to-red-100/50 dark:from-red-950/30 dark:to-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-2xl p-6">
+                <div className="bg-gradient-to-r from-red-50 to-red-100/50 border-2 border-red-200 rounded-2xl p-6">
                   <div className="flex items-start gap-4">
                     <div className="bg-red-100 p-3 rounded-xl shrink-0">
                       <ExclamationTriangleIcon className="w-6 h-6 text-red-600" />

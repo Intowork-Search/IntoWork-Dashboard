@@ -65,7 +65,15 @@
     "noResults": "لا نتائج",
     "page": "صفحة {current} من {total}",
     "aiScore": "ذكاء اصطناعي",
-    "top": "أفضل"
+    "top": "أفضل",
+    "onsite": "حضوري",
+    "inProgress": "قيد التنفيذ",
+    "noJobFound": "لم يتم العثور على وظائف",
+    "noJobFoundDesc": "لا توجد وظائف تطابق معاييرك الحالية. حاول تعديل الفلاتر.",
+    "cityRegion": "مدينة، منطقة...",
+    "fromAmount": "من {amount}",
+    "upToAmount": "حتى {amount}",
+    "notSpecified": "غير محدد"
   },
   "meta": {
     "title": "INTOWORK Search - منصة التوظيف",

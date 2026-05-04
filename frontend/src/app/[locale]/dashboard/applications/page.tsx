@@ -176,20 +176,20 @@ export default function ApplicationsPage() {
   // Info pour le type de lieu
   const getLocationTypeInfo = (locationType: string) => {
     switch (locationType) {
-      case 'remote': return { label: 'Télétravail', color: '#6B46C1', bg: 'bg-[#6B46C1]/10' };
-      case 'hybrid': return { label: 'Hybride', color: '#F7C700', bg: 'bg-[#F7C700]/10' };
-      default: return { label: 'Présentiel', color: '#6B9B5F', bg: 'bg-[#6B9B5F]/10' };
+      case 'remote': return { label: tc('remote'), color: '#6B46C1', bg: 'bg-[#6B46C1]/10' };
+      case 'hybrid': return { label: tc('hybrid'), color: '#F7C700', bg: 'bg-[#F7C700]/10' };
+      default: return { label: tc('onsite'), color: '#6B9B5F', bg: 'bg-[#6B9B5F]/10' };
     }
   };
 
   // Info pour le type de contrat
   const getJobTypeInfo = (jobType: string) => {
     switch (jobType) {
-      case 'full_time': return { label: 'CDI', color: '#6B9B5F' };
-      case 'part_time': return { label: 'Temps partiel', color: '#3B82F6' };
-      case 'contract': return { label: 'CDD', color: '#F7C700' };
-      case 'temporary': return { label: 'Intérim', color: '#6B46C1' };
-      case 'internship': return { label: 'Stage', color: '#EC4899' };
+      case 'full_time': return { label: tc('fullTime'), color: '#6B9B5F' };
+      case 'part_time': return { label: tc('partTime'), color: '#3B82F6' };
+      case 'contract': return { label: tc('contract'), color: '#F7C700' };
+      case 'temporary': return { label: tc('temporary'), color: '#6B46C1' };
+      case 'internship': return { label: tc('internship'), color: '#EC4899' };
       default: return { label: jobType, color: '#6B9B5F' };
     }
   };
@@ -256,7 +256,7 @@ export default function ApplicationsPage() {
               <div className="flex flex-wrap gap-4">
                 <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3">
                   <ArrowTrendingUpIcon className="w-5 h-5 text-[#F7C700]" />
-                  <span className="text-white font-medium">{stats.viewed + stats.interview} en cours</span>
+                  <span className="text-white font-medium">{stats.viewed + stats.interview} {tc('inProgress')}</span>
                 </div>
                 <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3">
                   <CheckCircleIcon className="w-5 h-5 text-green-400" />
