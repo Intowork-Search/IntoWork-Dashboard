@@ -75,6 +75,9 @@
 /* Import Brand Colors - Charte Graphique INTOWORK */
 @import '../styles/brand-colors.css';
 
+/* Dark mode: répondre à data-theme="dark" (DaisyUI) pour les classes dark: Tailwind */
+@custom-variant dark (&:is([data-theme=dark], [data-theme=dark] *));
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -86,16 +89,9 @@
   --font-sans: var(--font-inter);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--color-base-100, var(--background));
+  color: var(--color-base-content, var(--foreground));
   font-family: Arial, Helvetica, sans-serif;
 }
 

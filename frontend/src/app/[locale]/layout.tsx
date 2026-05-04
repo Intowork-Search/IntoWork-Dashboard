@@ -47,7 +47,7 @@ export default async function LocaleLayout({
         {/* Script anti-flash : applique le thème avant le premier rendu */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('intowork-theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})()`
+            __html: `(function(){try{var t=localStorage.getItem('intowork-theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');document.documentElement.classList.add('dark');}}catch(e){}})()`
           }}
         />
       </head>

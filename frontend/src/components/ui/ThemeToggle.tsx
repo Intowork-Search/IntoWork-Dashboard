@@ -12,6 +12,7 @@ export default function ThemeToggle() {
     const initial = saved ?? 'light';
     setTheme(initial);
     document.documentElement.setAttribute('data-theme', initial);
+    document.documentElement.classList.toggle('dark', initial === 'dark');
   }, []);
 
   function toggle() {
@@ -19,6 +20,8 @@ export default function ThemeToggle() {
     setTheme(next);
     localStorage.setItem('intowork-theme', next);
     document.documentElement.setAttribute('data-theme', next);
+    // Aussi basculer la classe CSS 'dark' pour que les classes Tailwind dark: fonctionnent
+    document.documentElement.classList.toggle('dark', next === 'dark');
   }
 
   // Ne pas rendre avant hydration pour éviter un flash

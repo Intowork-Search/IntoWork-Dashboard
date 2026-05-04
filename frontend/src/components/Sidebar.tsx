@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useUser, useAuth } from '@/hooks/useNextAuth';
-import { usePathname } from 'next/navigation';
-import Link from 'next/link';
+import { usePathname, Link } from '@/i18n/navigation';
 import { signOut } from 'next-auth/react';
 import { candidatesAPI, jobsAPI, applicationsAPI, companiesAPI, getUploadUrl } from '@/lib/api';
 import { logger } from '@/lib/logger';

@@ -54,7 +54,7 @@ export default function DashboardLayout({
   const userRole = user.role as 'candidate' | 'employer' | 'admin';
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Sidebar pour desktop */}
       <div className="hidden lg:block">
         <Sidebar userRole={userRole} />
@@ -81,7 +81,7 @@ export default function DashboardLayout({
       {/* Contenu principal */}
       <div className="lg:pl-64">
         {/* Header mobile */}
-        <div className="lg:hidden bg-white shadow-sm border-b border-gray-200 px-4 py-3">
+        <div className="lg:hidden bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 px-4 py-3">
           <div className="flex items-center justify-between">
             <button
               onClick={() => setSidebarOpen(true)}
@@ -101,13 +101,13 @@ export default function DashboardLayout({
         </div>
 
         {/* Header principal */}
-        <header className="bg-white shadow-sm border-b border-gray-200">
+        <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
           <div className="px-4 sm:px-6 lg:px-8 py-6">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{title}</h1>
                 {subtitle && (
-                  <p className="text-gray-600 mt-1">{subtitle}</p>
+                  <p className="text-gray-600 dark:text-gray-400 mt-1">{subtitle}</p>
                 )}
               </div>
               
