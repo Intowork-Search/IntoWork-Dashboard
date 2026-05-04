@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import DashboardLayout from '@/components/DashboardLayout';
 import { adminAPI, type AdminStats } from '@/lib/api';
 import { logger } from '@/lib/logger';
@@ -41,6 +42,7 @@ export default function AdminDashboardPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<AdminStats | null>(null);
+  const t = useTranslations('admin');
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -73,7 +75,7 @@ export default function AdminDashboardPage() {
 
   if (status === 'loading' || loading) {
     return (
-      <DashboardLayout title="Dashboard Admin" subtitle="Chargement...">
+      <DashboardLayout title={t('dashboardTitle')} subtitle={t('loadingSubtitle')}>
         <div className="flex items-center justify-center h-64">
           <div className="w-12 h-12 border-4 border-[#6B9B5F] border-t-transparent rounded-full animate-spin"></div>
         </div>
@@ -101,39 +103,39 @@ export default function AdminDashboardPage() {
 
   // Chart data
   const userDistribution = [
-    { name: 'Candidats', value: stats?.total_candidates || 0, fill: BRAND_COLORS.blue },
-    { name: 'Employeurs', value: stats?.total_employers || 0, fill: BRAND_COLORS.primary },
-    { name: 'Actifs', value: stats?.active_users || 0, fill: BRAND_COLORS.accent },
+    { name: t('candidates'), value: stats?.total_candidates || 0, fill: BRAND_COLORS.blue },
+    { name: t('employers'), value: stats?.total_employers || 0, fill: BRAND_COLORS.primary },
+    { name: t('active'), value: stats?.active_users || 0, fill: BRAND_COLORS.accent },
   ].filter(item => item.value > 0);
 
   // Utiliser les vrais statuts de la BD: draft, published, closed, archived
   let jobStatusData = [
-    { name: 'Publiées', value: getJobStatusValue('published'), fill: BRAND_COLORS.primary },
-    { name: 'Brouillons', value: getJobStatusValue('draft'), fill: BRAND_COLORS.accent },
-    { name: 'Fermées', value: getJobStatusValue('closed'), fill: '#EF4444' },
-    { name: 'Archivées', value: getJobStatusValue('archived'), fill: '#6B7280' },
+    { name: t('published'), value: getJobStatusValue('published'), fill: BRAND_COLORS.primary },
+    { name: t('drafts'), value: getJobStatusValue('draft'), fill: BRAND_COLORS.accent },
+    { name: t('closed'), value: getJobStatusValue('closed'), fill: '#EF4444' },
+    { name: t('archived'), value: getJobStatusValue('archived'), fill: '#6B7280' },
   ].filter(item => item.value > 0);
 
   // If no data, use total_jobs as fallback
   if (jobStatusData.length === 0 && stats?.total_jobs && stats.total_jobs > 0) {
     jobStatusData = [
-      { name: 'Total', value: stats.total_jobs, fill: BRAND_COLORS.primary }
+      { name: t('total'), value: stats.total_jobs, fill: BRAND_COLORS.primary }
     ];
   }
 
   const monthlyData = [
     {
-      name: 'Utilisateurs',
+      name: t('users'),
       value: stats?.total_users || 0,
       fill: BRAND_COLORS.secondary
     },
     {
-      name: 'Offres',
+      name: t('jobs'),
       value: stats?.total_jobs || 0,
       fill: BRAND_COLORS.primary
     },
     {
-      name: 'Candidatures',
+      name: t('applicationsTitle'),
       value: stats?.total_applications || 0,
       fill: BRAND_COLORS.blue
     }
@@ -145,7 +147,7 @@ export default function AdminDashboardPage() {
 
   const statCards = [
     {
-      title: 'Utilisateurs',
+      title: t('users'),
       value: stats?.total_users || 0,
       icon: UsersIcon,
       color: 'from-[#6B46C1] to-[#5a3aaa]',
@@ -155,18 +157,18 @@ export default function AdminDashboardPage() {
       trendUp: true
     },
     {
-      title: 'Offres d\'emploi',
+      title: t('jobsTitle'),
       value: stats?.total_jobs || 0,
       icon: BriefcaseIcon,
       color: 'from-[#6B9B5F] to-[#5a8a4f]',
       bgColor: 'bg-[#6B9B5F]/10',
       textColor: 'text-[#6B9B5F]',
-      subtitle: `${activeJobs} publiées`,
+      subtitle: t('publishedCount', { count: activeJobs }),
       trend: '+8%',
       trendUp: true
     },
     {
-      title: 'Entreprises',
+      title: t('enterprisesTitle'),
       value: stats?.total_employers || 0,
       icon: BuildingOfficeIcon,
       color: 'from-[#F7C700] to-[#e0b400]',
@@ -176,7 +178,7 @@ export default function AdminDashboardPage() {
       trendUp: true
     },
     {
-      title: 'Candidatures',
+      title: t('applicationsTitle'),
       value: stats?.total_applications || 0,
       icon: DocumentTextIcon,
       color: 'from-[#3B82F6] to-[#2563EB]',
@@ -189,8 +191,8 @@ export default function AdminDashboardPage() {
 
   return (
     <DashboardLayout 
-      title="Dashboard Administrateur" 
-      subtitle="Vue d'ensemble des statistiques de la plateforme"
+      title={t('dashboardTitle')} 
+      subtitle={t('dashboardSubtitle')}
     >
       <div className="space-y-6">
         {/* Cartes de statistiques */}
@@ -238,18 +240,18 @@ export default function AdminDashboardPage() {
                 <UsersIcon className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="font-bold text-xl text-gray-900 dark:text-white">Candidats</h3>
-                <p className="text-gray-600 dark:text-gray-400 text-sm">Utilisateurs cherchant un emploi</p>
+                <h3 className="font-bold text-xl text-gray-900 dark:text-white">{t('candidates')}</h3>
+                <p className="text-gray-600 dark:text-gray-400 text-sm">{t('candidatesDesc')}</p>
               </div>
             </div>
             
             <div className="space-y-4">
               <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-2xl">
-                <span className="text-gray-700 dark:text-gray-300 font-medium">Total candidats</span>
+                <span className="text-gray-700 dark:text-gray-300 font-medium">{t('totalCandidates')}</span>
                 <span className="text-2xl font-bold text-[#6B46C1]">{stats?.total_candidates || 0}</span>
               </div>
               <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-2xl">
-                <span className="text-gray-700 dark:text-gray-300 font-medium">Candidatures envoyées</span>
+                <span className="text-gray-700 dark:text-gray-300 font-medium">{t('applicationsSent')}</span>
                 <span className="text-2xl font-bold text-[#6B46C1]">{stats?.total_applications || 0}</span>
               </div>
             </div>
@@ -262,18 +264,18 @@ export default function AdminDashboardPage() {
                 <BuildingOfficeIcon className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="font-bold text-xl text-gray-900 dark:text-white">Employeurs</h3>
-                <p className="text-gray-600 dark:text-gray-400 text-sm">Entreprises publiant des offres</p>
+                <h3 className="font-bold text-xl text-gray-900 dark:text-white">{t('employers')}</h3>
+                <p className="text-gray-600 dark:text-gray-400 text-sm">{t('employersDesc')}</p>
               </div>
             </div>
             
             <div className="space-y-4">
               <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-2xl">
-                <span className="text-gray-700 dark:text-gray-300 font-medium">Total entreprises</span>
+                <span className="text-gray-700 dark:text-gray-300 font-medium">{t('totalCompanies')}</span>
                 <span className="text-2xl font-bold text-[#b39200]">{stats?.total_employers || 0}</span>
               </div>
               <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-2xl">
-                <span className="text-gray-700 dark:text-gray-300 font-medium">Offres publiées</span>
+                <span className="text-gray-700 dark:text-gray-300 font-medium">{t('publishedJobs')}</span>
                 <span className="text-2xl font-bold text-[#b39200]">{stats?.total_jobs || 0}</span>
               </div>
             </div>
@@ -289,8 +291,8 @@ export default function AdminDashboardPage() {
                 <UsersIcon className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="font-bold text-xl text-gray-900 dark:text-white">Distribution des utilisateurs</h3>
-                <p className="text-gray-600 dark:text-gray-400 text-sm">Par type de compte</p>
+                <h3 className="font-bold text-xl text-gray-900 dark:text-white">{t('usersDistribution')}</h3>
+                <p className="text-gray-600 dark:text-gray-400 text-sm">{t('byAccountType')}</p>
               </div>
             </div>
             
@@ -298,7 +300,7 @@ export default function AdminDashboardPage() {
               <div className="flex items-center justify-center h-64">
                 <div className="text-center">
                   <UsersIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500 dark:text-gray-400">Aucune donnée disponible</p>
+                  <p className="text-gray-500 dark:text-gray-400">{t('noData')}</p>
                 </div>
               </div>
             ) : (
@@ -348,8 +350,8 @@ export default function AdminDashboardPage() {
                 <BriefcaseIcon className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="font-bold text-xl text-gray-900 dark:text-white">Statut des offres</h3>
-                <p className="text-gray-600 dark:text-gray-400 text-sm">Répartition par statut</p>
+                <h3 className="font-bold text-xl text-gray-900 dark:text-white">{t('jobStatus')}</h3>
+                <p className="text-gray-600 dark:text-gray-400 text-sm">{t('byStatus')}</p>
               </div>
             </div>
             
@@ -357,7 +359,7 @@ export default function AdminDashboardPage() {
               <div className="flex items-center justify-center h-64">
                 <div className="text-center">
                   <BriefcaseIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500 dark:text-gray-400">Aucune donnée disponible</p>
+                  <p className="text-gray-500 dark:text-gray-400">{t('noData')}</p>
                 </div>
               </div>
             ) : (
@@ -408,8 +410,8 @@ export default function AdminDashboardPage() {
               <DocumentTextIcon className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h3 className="font-bold text-xl text-gray-900 dark:text-white">Vue d'ensemble de la plateforme</h3>
-              <p className="text-gray-600 dark:text-gray-400 text-sm">Totaux globaux</p>
+              <h3 className="font-bold text-xl text-gray-900 dark:text-white">{t('overview')}</h3>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">{t('globalTotals')}</p>
             </div>
           </div>
           
@@ -417,7 +419,7 @@ export default function AdminDashboardPage() {
             <div className="flex items-center justify-center h-64">
               <div className="text-center">
                 <DocumentTextIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-500 dark:text-gray-400">Aucune donnée disponible</p>
+                <p className="text-gray-500 dark:text-gray-400">{t('noData')}</p>
               </div>
             </div>
           ) : (
