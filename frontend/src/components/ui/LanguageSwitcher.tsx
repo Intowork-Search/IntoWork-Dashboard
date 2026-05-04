@@ -3,7 +3,7 @@
 import { useTransition } from 'react';
 import { useLocale } from 'next-intl';
 import { useRouter, usePathname } from '@/i18n/navigation';
-import { type Locale } from '@/i18n/routing';
+import { routing, type Locale } from '@/i18n/routing';
 
 const LANGUAGE_LABELS: Record<Locale, { label: string; flag: string }> = {
   fr: { label: 'Français', flag: '🇫🇷' },
