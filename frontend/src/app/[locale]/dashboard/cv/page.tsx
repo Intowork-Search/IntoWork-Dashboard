@@ -407,7 +407,7 @@ export default function MesCVPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* CV téléchargés */}
           <div
-            className="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-lg shadow-gray-200/50 border border-gray-100 dark:border-gray-700 hover:shadow-xl hover:shadow-[#6B9B5F]/10 transition-all"
+            className="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700 hover:shadow-xl hover:shadow-[#6B9B5F]/10 transition-all"
             style={{ animation: 'fadeIn 0.6s ease-out 0.1s both' }}
           >
             <div className="flex items-center gap-4">
@@ -423,7 +423,7 @@ export default function MesCVPage() {
 
           {/* Vues */}
           <div
-            className="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-lg shadow-gray-200/50 border border-gray-100 dark:border-gray-700 hover:shadow-xl hover:shadow-[#F7C700]/10 transition-all"
+            className="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700 hover:shadow-xl hover:shadow-[#F7C700]/10 transition-all"
             style={{ animation: 'fadeIn 0.6s ease-out 0.2s both' }}
           >
             <div className="flex items-center gap-4">
@@ -439,7 +439,7 @@ export default function MesCVPage() {
 
           {/* Dernier téléchargement */}
           <div
-            className="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-lg shadow-gray-200/50 border border-gray-100 dark:border-gray-700 hover:shadow-xl hover:shadow-[#6B46C1]/10 transition-all"
+            className="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700 hover:shadow-xl hover:shadow-[#6B46C1]/10 transition-all"
             style={{ animation: 'fadeIn 0.6s ease-out 0.3s both' }}
           >
             <div className="flex items-center gap-4">
@@ -458,11 +458,11 @@ export default function MesCVPage() {
 
         {/* Liste des CV */}
         <div
-          className="bg-white dark:bg-gray-800 rounded-3xl shadow-lg shadow-gray-200/50 border border-gray-100 dark:border-gray-700 overflow-hidden"
+          className="bg-white dark:bg-gray-800 rounded-3xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700 overflow-hidden"
           style={{ animation: 'fadeIn 0.6s ease-out 0.4s both' }}
         >
           {/* Header */}
-          <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white">
+          <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-linear-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-800">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#3B82F6] to-[#2563eb] flex items-center justify-center shadow-lg shadow-[#3B82F6]/30">

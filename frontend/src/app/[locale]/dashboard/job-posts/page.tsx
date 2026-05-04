@@ -295,7 +295,7 @@ export default function JobPostsPage(): React.JSX.Element {
           ].map((stat, index) => (
             <div
               key={stat.label}
-              className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100 dark:border-gray-700 p-5 hover:shadow-xl transition-all"
+              className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700 p-5 hover:shadow-xl transition-all"
               style={{ animation: `fadeIn 0.4s ease-out ${0.05 * index}s both` }}
             >
               <div
@@ -321,7 +321,7 @@ export default function JobPostsPage(): React.JSX.Element {
         {/* Liste des offres */}
         {jobs.length === 0 ? (
           <div
-            className="bg-white dark:bg-gray-800 rounded-3xl shadow-lg shadow-gray-200/50 border border-gray-100 dark:border-gray-700 p-16 text-center"
+            className="bg-white dark:bg-gray-800 rounded-3xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700 p-16 text-center"
             style={{ animation: 'fadeIn 0.6s ease-out 0.2s both' }}
           >
             <div className="w-24 h-24 mx-auto mb-6 rounded-3xl bg-[#6B9B5F]/10 flex items-center justify-center">
@@ -350,7 +350,7 @@ export default function JobPostsPage(): React.JSX.Element {
               return (
                 <div
                   key={job.id}
-                  className="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl hover:border-[#6B9B5F]/20 transition-all"
+                  className="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl hover:border-[#6B9B5F]/20 transition-all"
                   style={{ animation: `fadeIn 0.4s ease-out ${0.05 * index}s both` }}
                 >
                   <div className="p-6">

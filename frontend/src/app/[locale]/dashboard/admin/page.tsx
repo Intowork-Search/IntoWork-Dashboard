@@ -198,7 +198,7 @@ export default function AdminDashboardPage() {
           {statCards.map((card) => (
             <div 
               key={card.title}
-              className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 p-6 border border-gray-100 dark:border-gray-700 hover:shadow-2xl hover:shadow-gray-300/50 transition-all duration-300"
+              className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-black/30 p-6 border border-gray-100 dark:border-gray-700 hover:shadow-2xl hover:shadow-gray-300/50 transition-all duration-300"
             >
               <div className="flex items-start justify-between mb-4">
                 <div className={`p-3 rounded-2xl bg-gradient-to-br ${card.color} shadow-lg`}>
@@ -232,7 +232,7 @@ export default function AdminDashboardPage() {
         {/* Statistiques détaillées */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Candidats */}
-          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 p-8 border border-gray-100 dark:border-gray-700">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-black/30 p-8 border border-gray-100 dark:border-gray-700">
             <div className="flex items-center gap-4 mb-6">
               <div className="p-3 rounded-2xl bg-gradient-to-br from-[#6B46C1] to-[#5a3aaa] shadow-lg">
                 <UsersIcon className="w-6 h-6 text-white" />
@@ -256,7 +256,7 @@ export default function AdminDashboardPage() {
           </div>
 
           {/* Employeurs */}
-          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 p-8 border border-gray-100 dark:border-gray-700">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-black/30 p-8 border border-gray-100 dark:border-gray-700">
             <div className="flex items-center gap-4 mb-6">
               <div className="p-3 rounded-2xl bg-gradient-to-br from-[#F7C700] to-[#e0b400] shadow-lg">
                 <BuildingOfficeIcon className="w-6 h-6 text-white" />
@@ -283,7 +283,7 @@ export default function AdminDashboardPage() {
         {/* Graphiques */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Distribution des utilisateurs (Pie Chart) */}
-          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 p-8 border border-gray-100 dark:border-gray-700">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-black/30 p-8 border border-gray-100 dark:border-gray-700">
             <div className="flex items-center gap-4 mb-6">
               <div className="p-3 rounded-2xl bg-gradient-to-br from-[#6B46C1] to-[#5a3aaa] shadow-lg">
                 <UsersIcon className="w-6 h-6 text-white" />
@@ -342,7 +342,7 @@ export default function AdminDashboardPage() {
           </div>
 
           {/* Statut des offres (Pie Chart) */}
-          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 p-8 border border-gray-100 dark:border-gray-700">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-black/30 p-8 border border-gray-100 dark:border-gray-700">
             <div className="flex items-center gap-4 mb-6">
               <div className="p-3 rounded-2xl bg-gradient-to-br from-[#6B9B5F] to-[#5a8a4f] shadow-lg">
                 <BriefcaseIcon className="w-6 h-6 text-white" />
@@ -402,7 +402,7 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Graphique à barres - Vue d'ensemble */}
-        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 p-8 border border-gray-100 dark:border-gray-700">
+        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-black/30 p-8 border border-gray-100 dark:border-gray-700">
           <div className="flex items-center gap-4 mb-6">
             <div className="p-3 rounded-2xl bg-gradient-to-br from-[#3B82F6] to-[#2563EB] shadow-lg">
               <DocumentTextIcon className="w-6 h-6 text-white" />

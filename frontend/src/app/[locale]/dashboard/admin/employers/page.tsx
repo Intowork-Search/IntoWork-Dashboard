@@ -81,7 +81,7 @@ export default function AdminEmployersPage() {
     >
       <div className="space-y-6">
         {/* En-tête avec recherche */}
-        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 p-6 border border-gray-100 dark:border-gray-700">
+        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-black/30 p-6 border border-gray-100 dark:border-gray-700">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
               <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
@@ -108,7 +108,7 @@ export default function AdminEmployersPage() {
           {employers.map((employer) => (
             <div 
               key={employer.id} 
-              className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 p-8 border border-gray-100 dark:border-gray-700 hover:shadow-2xl hover:shadow-gray-300/50 transition-all duration-300"
+              className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-black/30 p-8 border border-gray-100 dark:border-gray-700 hover:shadow-2xl hover:shadow-gray-300/50 transition-all duration-300"
             >
               {/* En-tête */}
               <div className="flex items-start gap-5 mb-6">
@@ -167,7 +167,7 @@ export default function AdminEmployersPage() {
         </div>
 
         {employers.length === 0 && (
-          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 p-12 text-center border border-gray-100 dark:border-gray-700">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-black/30 p-12 text-center border border-gray-100 dark:border-gray-700">
             <BuildingOfficeIcon className="w-20 h-20 text-gray-300 mx-auto mb-4" />
             <p className="text-gray-500 dark:text-gray-400 text-lg">Aucune entreprise trouvée</p>
           </div>

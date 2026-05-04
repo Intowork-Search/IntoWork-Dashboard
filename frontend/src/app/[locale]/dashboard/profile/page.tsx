@@ -46,7 +46,7 @@ const getSkillColor = (category: string) => {
     case 'technical': return { bg: 'bg-[#3B82F6]/10', text: 'text-[#3B82F6]', border: 'border-[#3B82F6]/20' };
     case 'soft': return { bg: 'bg-[#6B9B5F]/10', text: 'text-[#6B9B5F]', border: 'border-[#6B9B5F]/20' };
     case 'language': return { bg: 'bg-[#6B46C1]/10', text: 'text-[#6B46C1]', border: 'border-[#6B46C1]/20' };
-    default: return { bg: 'bg-gray-100 dark:bg-gray-700', text: 'text-gray-700 dark:text-gray-300', border: 'border-gray-200 dark:border-gray-600' };
+    default: return { bg: 'bg-gray-100', text: 'text-gray-700', border: 'border-gray-200' };
   }
 };
 
@@ -54,6 +54,7 @@ export default function ProfilePage() {
   const { user } = useUser();
   const { getToken } = useAuth();
   const t = useTranslations('profile');
+  const tc = useTranslations('common');
   const [activeSection, setActiveSection] = useState('personal');
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -339,10 +340,10 @@ export default function ProfilePage() {
 
   // Navigation sections avec couleurs
   const sections = [
-    { id: 'personal', label: 'Informations', icon: UserIcon, color: '#6B9B5F' },
-    { id: 'experience', label: 'Expériences', icon: BriefcaseIcon, color: '#F7C700' },
-    { id: 'education', label: 'Formation', icon: AcademicCapIcon, color: '#6B46C1' },
-    { id: 'skills', label: 'Compétences', icon: SparklesIcon, color: '#3B82F6' },
+    { id: 'personal', label: t('personalInfo'), icon: UserIcon, color: '#6B9B5F' },
+    { id: 'experience', label: t('experiences'), icon: BriefcaseIcon, color: '#F7C700' },
+    { id: 'education', label: t('education'), icon: AcademicCapIcon, color: '#6B46C1' },
+    { id: 'skills', label: t('skills'), icon: SparklesIcon, color: '#3B82F6' },
   ];
 
   // États de chargement
@@ -377,7 +378,7 @@ export default function ProfilePage() {
   return (
     <DashboardLayout
       title={t('title')}
-      subtitle="Gérez vos informations personnelles et professionnelles"
+      subtitle={t('subtitle')}
     >
       {/* Erreurs */}
       {error && (
@@ -460,7 +461,7 @@ export default function ProfilePage() {
           className="lg:col-span-1"
           style={{ animation: 'fadeIn 0.6s ease-out 0.1s both' }}
         >
-          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-lg shadow-gray-200/50 border border-gray-100 dark:border-gray-700 p-4 space-y-2">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-lg shadow-gray-200/50 border border-gray-100 p-4 space-y-2">
             {sections.map((section, index) => {
               const Icon = section.icon;
               const isActive = activeSection === section.id;
@@ -472,7 +473,7 @@ export default function ProfilePage() {
                   className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl font-medium transition-all duration-300 ${
                     isActive
                       ? 'text-white shadow-lg'
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50'
+                      : 'text-gray-600 hover:bg-gray-50'
                   }`}
                   style={{
                     background: isActive ? `linear-gradient(135deg, ${section.color}, ${section.color}dd)` : undefined,
@@ -480,28 +481,28 @@ export default function ProfilePage() {
                   }}
                 >
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                    isActive ? 'bg-white/20' : 'bg-gray-100 dark:bg-gray-700'
+                    isActive ? 'bg-white/20' : 'bg-gray-100'
                   }`}>
-                    <Icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-gray-500 dark:text-gray-400'}`} />
+                    <Icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-gray-500'}`} />
                   </div>
                   <span>{section.label}</span>
                   {section.id === 'experience' && profile.experiences?.length ? (
                     <span className={`ml-auto text-xs font-bold px-2 py-1 rounded-full ${
-                      isActive ? 'bg-white/20 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                      isActive ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-600'
                     }`}>
                       {profile.experiences.length}
                     </span>
                   ) : null}
                   {section.id === 'education' && profile.educations?.length ? (
                     <span className={`ml-auto text-xs font-bold px-2 py-1 rounded-full ${
-                      isActive ? 'bg-white/20 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                      isActive ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-600'
                     }`}>
                       {profile.educations.length}
                     </span>
                   ) : null}
                   {section.id === 'skills' && profile.skills?.length ? (
                     <span className={`ml-auto text-xs font-bold px-2 py-1 rounded-full ${
-                      isActive ? 'bg-white/20 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                      isActive ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-600'
                     }`}>
                       {profile.skills.length}
                     </span>
@@ -517,9 +518,9 @@ export default function ProfilePage() {
           className="lg:col-span-3"
           style={{ animation: 'fadeIn 0.6s ease-out 0.2s both' }}
         >
-          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-lg shadow-gray-200/50 border border-gray-100 dark:border-gray-700 overflow-hidden">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-lg shadow-gray-200/50 border border-gray-100 overflow-hidden">
             {/* En-tête de section */}
-            <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white">
+            <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-3">
                   <div
@@ -535,13 +536,13 @@ export default function ProfilePage() {
                     {activeSection === 'skills' && <SparklesIcon className="w-6 h-6 text-white" />}
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                      {activeSection === 'personal' && 'Informations personnelles'}
-                      {activeSection === 'experience' && 'Expériences professionnelles'}
-                      {activeSection === 'education' && 'Formation'}
-                      {activeSection === 'skills' && 'Compétences'}
+                    <h3 className="text-xl font-bold text-gray-900">
+                      {activeSection === 'personal' && t('personalInfo')}
+                      {activeSection === 'experience' && t('experiences')}
+                      {activeSection === 'education' && t('education')}
+                      {activeSection === 'skills' && t('skills')}
                     </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="text-sm text-gray-500">
                       {activeSection === 'personal' && 'Vos coordonnées et présentation'}
                       {activeSection === 'experience' && `${profile.experiences?.length || 0} expérience(s)`}
                       {activeSection === 'education' && `${profile.educations?.length || 0} formation(s)`}
@@ -573,10 +574,10 @@ export default function ProfilePage() {
                       </button>
                       <button
                         onClick={() => setIsEditing(false)}
-                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 transition-all"
+                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all"
                       >
                         <XMarkIcon className="w-5 h-5" />
-                        <span>Annuler</span>
+                        <span>{tc('cancel')}</span>
                       </button>
                     </>
                   )}
@@ -619,7 +620,7 @@ export default function ProfilePage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Téléphone */}
                     <div className="group">
-                      <label className="flex items-center gap-2 mb-3 font-semibold text-gray-900 dark:text-white">
+                      <label className="flex items-center gap-2 mb-3 font-semibold text-gray-900">
                         <div className="w-8 h-8 bg-[#6B9B5F]/10 rounded-lg flex items-center justify-center">
                           <PhoneIcon className="w-4 h-4 text-[#6B9B5F]" />
                         </div>
@@ -630,13 +631,13 @@ export default function ProfilePage() {
                           type="tel"
                           value={profile.phone || ''}
                           onChange={(e) => updateProfile({ phone: e.target.value })}
-                          className="w-full px-4 py-3.5 rounded-xl bg-gray-50 dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white font-medium focus:outline-none focus:border-[#6B9B5F] focus:ring-4 focus:ring-[#6B9B5F]/10 transition-all"
+                          className="w-full px-4 py-3.5 rounded-xl bg-gray-50 border-2 border-gray-200 text-gray-900 font-medium focus:outline-none focus:border-[#6B9B5F] focus:ring-4 focus:ring-[#6B9B5F]/10 transition-all"
                           placeholder="+33 6 12 34 56 78"
                         />
                       ) : (
-                        <div className="px-4 py-3.5 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600">
-                          <p className="font-medium text-gray-900 dark:text-white">
-                            {profile.phone || <span className="text-gray-400 dark:text-gray-500 italic">Non renseigné</span>}
+                        <div className="px-4 py-3.5 rounded-xl bg-gray-50 border border-gray-200">
+                          <p className="font-medium text-gray-900">
+                            {profile.phone || <span className="text-gray-400 italic">Non renseigné</span>}
                           </p>
                         </div>
                       )}
@@ -644,7 +645,7 @@ export default function ProfilePage() {
 
                     {/* Localisation */}
                     <div className="group">
-                      <label className="flex items-center gap-2 mb-3 font-semibold text-gray-900 dark:text-white">
+                      <label className="flex items-center gap-2 mb-3 font-semibold text-gray-900">
                         <div className="w-8 h-8 bg-[#6B46C1]/10 rounded-lg flex items-center justify-center">
                           <MapPinIcon className="w-4 h-4 text-[#6B46C1]" />
                         </div>
@@ -655,13 +656,13 @@ export default function ProfilePage() {
                           type="text"
                           value={profile.location || ''}
                           onChange={(e) => updateProfile({ location: e.target.value })}
-                          className="w-full px-4 py-3.5 rounded-xl bg-gray-50 dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white font-medium focus:outline-none focus:border-[#6B46C1] focus:ring-4 focus:ring-[#6B46C1]/10 transition-all"
+                          className="w-full px-4 py-3.5 rounded-xl bg-gray-50 border-2 border-gray-200 text-gray-900 font-medium focus:outline-none focus:border-[#6B46C1] focus:ring-4 focus:ring-[#6B46C1]/10 transition-all"
                           placeholder="Paris, France"
                         />
                       ) : (
-                        <div className="px-4 py-3.5 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600">
-                          <p className="font-medium text-gray-900 dark:text-white">
-                            {profile.location || <span className="text-gray-400 dark:text-gray-500 italic">Non renseigné</span>}
+                        <div className="px-4 py-3.5 rounded-xl bg-gray-50 border border-gray-200">
+                          <p className="font-medium text-gray-900">
+                            {profile.location || <span className="text-gray-400 italic">Non renseigné</span>}
                           </p>
                         </div>
                       )}
@@ -670,7 +671,7 @@ export default function ProfilePage() {
 
                   {/* Titre professionnel */}
                   <div className="group">
-                    <label className="flex items-center gap-2 mb-3 font-semibold text-gray-900 dark:text-white">
+                    <label className="flex items-center gap-2 mb-3 font-semibold text-gray-900">
                       <div className="w-8 h-8 bg-[#F7C700]/10 rounded-lg flex items-center justify-center">
                         <BriefcaseIcon className="w-4 h-4 text-[#F7C700]" />
                       </div>
@@ -681,13 +682,13 @@ export default function ProfilePage() {
                         type="text"
                         value={profile.title || ''}
                         onChange={(e) => updateProfile({ title: e.target.value })}
-                        className="w-full px-4 py-3.5 rounded-xl bg-gray-50 dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white font-medium focus:outline-none focus:border-[#F7C700] focus:ring-4 focus:ring-[#F7C700]/10 transition-all"
+                        className="w-full px-4 py-3.5 rounded-xl bg-gray-50 border-2 border-gray-200 text-gray-900 font-medium focus:outline-none focus:border-[#F7C700] focus:ring-4 focus:ring-[#F7C700]/10 transition-all"
                         placeholder="ex: Développeur Full Stack"
                       />
                     ) : (
-                      <div className="px-4 py-3.5 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600">
-                        <p className="font-medium text-gray-900 dark:text-white">
-                          {profile.title || <span className="text-gray-400 dark:text-gray-500 italic">Non renseigné</span>}
+                      <div className="px-4 py-3.5 rounded-xl bg-gray-50 border border-gray-200">
+                        <p className="font-medium text-gray-900">
+                          {profile.title || <span className="text-gray-400 italic">Non renseigné</span>}
                         </p>
                       </div>
                     )}
@@ -695,7 +696,7 @@ export default function ProfilePage() {
 
                   {/* Résumé */}
                   <div className="group">
-                    <label className="flex items-center gap-2 mb-3 font-semibold text-gray-900 dark:text-white">
+                    <label className="flex items-center gap-2 mb-3 font-semibold text-gray-900">
                       <div className="w-8 h-8 bg-[#3B82F6]/10 rounded-lg flex items-center justify-center">
                         <EnvelopeIcon className="w-4 h-4 text-[#3B82F6]" />
                       </div>
@@ -706,13 +707,13 @@ export default function ProfilePage() {
                         value={profile.summary || ''}
                         onChange={(e) => updateProfile({ summary: e.target.value })}
                         rows={5}
-                        className="w-full px-4 py-3.5 rounded-xl bg-gray-50 dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white focus:outline-none focus:border-[#3B82F6] focus:ring-4 focus:ring-[#3B82F6]/10 transition-all resize-none"
+                        className="w-full px-4 py-3.5 rounded-xl bg-gray-50 border-2 border-gray-200 text-gray-900 focus:outline-none focus:border-[#3B82F6] focus:ring-4 focus:ring-[#3B82F6]/10 transition-all resize-none"
                         placeholder="Décrivez votre parcours et vos objectifs..."
                       />
                     ) : (
-                      <div className="px-4 py-3.5 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600 min-h-[120px]">
-                        <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-                          {profile.summary || <span className="text-gray-400 dark:text-gray-500 italic">Non renseigné</span>}
+                      <div className="px-4 py-3.5 rounded-xl bg-gray-50 border border-gray-200 min-h-[120px]">
+                        <p className="text-gray-700 whitespace-pre-wrap">
+                          {profile.summary || <span className="text-gray-400 italic">Non renseigné</span>}
                         </p>
                       </div>
                     )}
@@ -721,7 +722,7 @@ export default function ProfilePage() {
                   {/* Liens */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="group">
-                      <label className="flex items-center gap-2 mb-3 font-semibold text-gray-900 dark:text-white">
+                      <label className="flex items-center gap-2 mb-3 font-semibold text-gray-900">
                         <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
                           <LinkIcon className="w-4 h-4 text-blue-600" />
                         </div>
@@ -732,11 +733,11 @@ export default function ProfilePage() {
                           type="url"
                           value={profile.linkedin_url || ''}
                           onChange={(e) => updateProfile({ linkedin_url: e.target.value })}
-                          className="w-full px-4 py-3.5 rounded-xl bg-gray-50 dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
+                          className="w-full px-4 py-3.5 rounded-xl bg-gray-50 border-2 border-gray-200 text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
                           placeholder="https://linkedin.com/in/..."
                         />
                       ) : (
-                        <div className="px-4 py-3.5 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600">
+                        <div className="px-4 py-3.5 rounded-xl bg-gray-50 border border-gray-200">
                           {profile.linkedin_url ? (
                             <a
                               href={profile.linkedin_url}
@@ -747,14 +748,14 @@ export default function ProfilePage() {
                               Voir le profil →
                             </a>
                           ) : (
-                            <span className="text-gray-400 dark:text-gray-500 italic">Non renseigné</span>
+                            <span className="text-gray-400 italic">Non renseigné</span>
                           )}
                         </div>
                       )}
                     </div>
 
                     <div className="group">
-                      <label className="flex items-center gap-2 mb-3 font-semibold text-gray-900 dark:text-white">
+                      <label className="flex items-center gap-2 mb-3 font-semibold text-gray-900">
                         <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
                           <GlobeAltIcon className="w-4 h-4 text-purple-600" />
                         </div>
@@ -765,11 +766,11 @@ export default function ProfilePage() {
                           type="url"
                           value={profile.website || ''}
                           onChange={(e) => updateProfile({ website: e.target.value })}
-                          className="w-full px-4 py-3.5 rounded-xl bg-gray-50 dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 transition-all"
+                          className="w-full px-4 py-3.5 rounded-xl bg-gray-50 border-2 border-gray-200 text-gray-900 focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 transition-all"
                           placeholder="https://..."
                         />
                       ) : (
-                        <div className="px-4 py-3.5 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600">
+                        <div className="px-4 py-3.5 rounded-xl bg-gray-50 border border-gray-200">
                           {profile.website ? (
                             <a
                               href={profile.website}
@@ -780,7 +781,7 @@ export default function ProfilePage() {
                               Visiter le site →
                             </a>
                           ) : (
-                            <span className="text-gray-400 dark:text-gray-500 italic">Non renseigné</span>
+                            <span className="text-gray-400 italic">Non renseigné</span>
                           )}
                         </div>
                       )}
@@ -805,9 +806,9 @@ export default function ProfilePage() {
                               <BuildingOfficeIcon className="w-6 h-6 text-[#F7C700]" />
                             </div>
                             <div>
-                              <h4 className="font-bold text-gray-900 dark:text-white text-lg">{exp.title}</h4>
+                              <h4 className="font-bold text-gray-900 text-lg">{exp.title}</h4>
                               <p className="text-[#F7C700] font-semibold">{exp.company}</p>
-                              <div className="flex items-center gap-3 mt-2 text-sm text-gray-500 dark:text-gray-400">
+                              <div className="flex items-center gap-3 mt-2 text-sm text-gray-500">
                                 <span className="flex items-center gap-1">
                                   <MapPinIcon className="w-4 h-4" />
                                   {exp.location || 'Non précisé'}
@@ -819,13 +820,13 @@ export default function ProfilePage() {
                                 </span>
                               </div>
                               {exp.description && (
-                                <p className="mt-3 text-gray-600 dark:text-gray-400 whitespace-pre-wrap">{exp.description}</p>
+                                <p className="mt-3 text-gray-600 whitespace-pre-wrap">{exp.description}</p>
                               )}
                             </div>
                           </div>
                           <button
                             onClick={() => handleDeleteExperience(exp.id!)}
-                            className="opacity-0 group-hover:opacity-100 p-2 rounded-lg text-gray-400 dark:text-gray-500 hover:text-red-500 hover:bg-red-50 transition-all"
+                            className="opacity-0 group-hover:opacity-100 p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all"
                           >
                             <TrashIcon className="w-5 h-5" />
                           </button>
@@ -837,14 +838,14 @@ export default function ProfilePage() {
                       <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-[#F7C700]/10 flex items-center justify-center">
                         <BriefcaseIcon className="w-10 h-10 text-[#F7C700]" />
                       </div>
-                      <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Aucune expérience</h4>
-                      <p className="text-gray-500 dark:text-gray-400 mb-6">Ajoutez vos expériences professionnelles pour enrichir votre profil</p>
+                      <h4 className="text-lg font-semibold text-gray-900 mb-2">{t('noExperiences')}</h4>
+                      <p className="text-gray-500 mb-6">Ajoutez vos expériences professionnelles pour enrichir votre profil</p>
                       <button
                         onClick={() => setShowExperienceModal(true)}
                         className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold bg-gradient-to-r from-[#F7C700] to-[#e5b800] text-white shadow-lg shadow-[#F7C700]/30 hover:shadow-xl hover:shadow-[#F7C700]/40 transition-all"
                       >
                         <PlusIcon className="w-5 h-5" />
-                        <span>Ajouter une expérience</span>
+                        <span>{t('addExperience')}</span>
                       </button>
                     </div>
                   )}
@@ -867,9 +868,9 @@ export default function ProfilePage() {
                               <AcademicCapIcon className="w-6 h-6 text-[#6B46C1]" />
                             </div>
                             <div>
-                              <h4 className="font-bold text-gray-900 dark:text-white text-lg">{edu.degree}</h4>
+                              <h4 className="font-bold text-gray-900 text-lg">{edu.degree}</h4>
                               <p className="text-[#6B46C1] font-semibold">{edu.school}</p>
-                              <div className="flex items-center gap-3 mt-2 text-sm text-gray-500 dark:text-gray-400">
+                              <div className="flex items-center gap-3 mt-2 text-sm text-gray-500">
                                 <span className="flex items-center gap-1">
                                   <MapPinIcon className="w-4 h-4" />
                                   {edu.location || 'Non précisé'}
@@ -884,7 +885,7 @@ export default function ProfilePage() {
                           </div>
                           <button
                             onClick={() => handleDeleteEducation(edu.id!)}
-                            className="opacity-0 group-hover:opacity-100 p-2 rounded-lg text-gray-400 dark:text-gray-500 hover:text-red-500 hover:bg-red-50 transition-all"
+                            className="opacity-0 group-hover:opacity-100 p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all"
                           >
                             <TrashIcon className="w-5 h-5" />
                           </button>
@@ -896,14 +897,14 @@ export default function ProfilePage() {
                       <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-[#6B46C1]/10 flex items-center justify-center">
                         <AcademicCapIcon className="w-10 h-10 text-[#6B46C1]" />
                       </div>
-                      <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Aucune formation</h4>
-                      <p className="text-gray-500 dark:text-gray-400 mb-6">Ajoutez vos formations pour mettre en avant votre parcours</p>
+                      <h4 className="text-lg font-semibold text-gray-900 mb-2">{t('noEducation')}</h4>
+                      <p className="text-gray-500 mb-6">Ajoutez vos formations pour mettre en avant votre parcours</p>
                       <button
                         onClick={() => setShowEducationModal(true)}
                         className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold bg-gradient-to-r from-[#6B46C1] to-[#5a3ba3] text-white shadow-lg shadow-[#6B46C1]/30 hover:shadow-xl hover:shadow-[#6B46C1]/40 transition-all"
                       >
                         <PlusIcon className="w-5 h-5" />
-                        <span>Ajouter une formation</span>
+                        <span>{t('addEducation')}</span>
                       </button>
                     </div>
                   )}
@@ -939,32 +940,32 @@ export default function ProfilePage() {
                       <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-[#3B82F6]/10 flex items-center justify-center">
                         <SparklesIcon className="w-10 h-10 text-[#3B82F6]" />
                       </div>
-                      <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Aucune compétence</h4>
-                      <p className="text-gray-500 dark:text-gray-400 mb-6">Ajoutez vos compétences pour montrer votre expertise</p>
+                      <h4 className="text-lg font-semibold text-gray-900 mb-2">{t('noSkills')}</h4>
+                      <p className="text-gray-500 mb-6">Ajoutez vos compétences pour montrer votre expertise</p>
                       <button
                         onClick={() => setShowSkillModal(true)}
                         className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold bg-gradient-to-r from-[#3B82F6] to-[#2563eb] text-white shadow-lg shadow-[#3B82F6]/30 hover:shadow-xl hover:shadow-[#3B82F6]/40 transition-all"
                       >
                         <PlusIcon className="w-5 h-5" />
-                        <span>Ajouter une compétence</span>
+                        <span>{t('addSkill')}</span>
                       </button>
                     </div>
                   )}
 
                   {/* Légende des catégories */}
                   {profile.skills && profile.skills.length > 0 && (
-                    <div className="flex flex-wrap gap-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                    <div className="flex flex-wrap gap-4 pt-4 border-t border-gray-100">
                       <div className="flex items-center gap-2">
                         <div className="w-3 h-3 rounded-full bg-[#3B82F6]"></div>
-                        <span className="text-sm text-gray-500 dark:text-gray-400">Technique</span>
+                        <span className="text-sm text-gray-500">Technique</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-3 h-3 rounded-full bg-[#6B9B5F]"></div>
-                        <span className="text-sm text-gray-500 dark:text-gray-400">Soft skill</span>
+                        <span className="text-sm text-gray-500">Soft skill</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-3 h-3 rounded-full bg-[#6B46C1]"></div>
-                        <span className="text-sm text-gray-500 dark:text-gray-400">Langue</span>
+                        <span className="text-sm text-gray-500">Langue</span>
                       </div>
                     </div>
                   )}
@@ -979,7 +980,7 @@ export default function ProfilePage() {
       {showExperienceModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div
-            className="bg-white dark:bg-gray-800 rounded-3xl p-8 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto"
+            className="bg-white rounded-3xl p-8 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto"
             style={{ animation: 'fadeIn 0.3s ease-out' }}
           >
             <div className="flex items-center gap-4 mb-6">
@@ -987,41 +988,41 @@ export default function ProfilePage() {
                 <BriefcaseIcon className="w-7 h-7 text-white" />
               </div>
               <div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Nouvelle expérience</h3>
-                <p className="text-gray-500 dark:text-gray-400">Ajoutez une expérience professionnelle</p>
+                <h3 className="text-2xl font-bold text-gray-900">Nouvelle expérience</h3>
+                <p className="text-gray-500">Ajoutez une expérience professionnelle</p>
               </div>
             </div>
 
             <div className="space-y-5">
               <div>
-                <label className="block mb-2 font-semibold text-gray-700 dark:text-gray-300">Titre du poste *</label>
+                <label className="block mb-2 font-semibold text-gray-700">Titre du poste *</label>
                 <input
                   type="text"
                   value={newExperience.title}
                   onChange={(e) => setNewExperience({ ...newExperience, title: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-600 focus:border-[#F7C700] focus:ring-4 focus:ring-[#F7C700]/10 outline-none transition-all"
+                  className="w-full px-4 py-3 rounded-xl bg-gray-50 border-2 border-gray-200 focus:border-[#F7C700] focus:ring-4 focus:ring-[#F7C700]/10 outline-none transition-all"
                   placeholder="ex: Développeur Full Stack"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block mb-2 font-semibold text-gray-700 dark:text-gray-300">Entreprise *</label>
+                  <label className="block mb-2 font-semibold text-gray-700">Entreprise *</label>
                   <input
                     type="text"
                     value={newExperience.company}
                     onChange={(e) => setNewExperience({ ...newExperience, company: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-600 focus:border-[#F7C700] focus:ring-4 focus:ring-[#F7C700]/10 outline-none transition-all"
+                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border-2 border-gray-200 focus:border-[#F7C700] focus:ring-4 focus:ring-[#F7C700]/10 outline-none transition-all"
                     placeholder="Nom de l'entreprise"
                   />
                 </div>
                 <div>
-                  <label className="block mb-2 font-semibold text-gray-700 dark:text-gray-300">Lieu</label>
+                  <label className="block mb-2 font-semibold text-gray-700">Lieu</label>
                   <input
                     type="text"
                     value={newExperience.location}
                     onChange={(e) => setNewExperience({ ...newExperience, location: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-600 focus:border-[#F7C700] focus:ring-4 focus:ring-[#F7C700]/10 outline-none transition-all"
+                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border-2 border-gray-200 focus:border-[#F7C700] focus:ring-4 focus:ring-[#F7C700]/10 outline-none transition-all"
                     placeholder="Paris, France"
                   />
                 </div>
@@ -1029,22 +1030,22 @@ export default function ProfilePage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block mb-2 font-semibold text-gray-700 dark:text-gray-300">Date de début *</label>
+                  <label className="block mb-2 font-semibold text-gray-700">Date de début *</label>
                   <input
                     type="date"
                     value={newExperience.start_date}
                     onChange={(e) => setNewExperience({ ...newExperience, start_date: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-600 focus:border-[#F7C700] focus:ring-4 focus:ring-[#F7C700]/10 outline-none transition-all"
+                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border-2 border-gray-200 focus:border-[#F7C700] focus:ring-4 focus:ring-[#F7C700]/10 outline-none transition-all"
                   />
                 </div>
                 <div>
-                  <label className="block mb-2 font-semibold text-gray-700 dark:text-gray-300">Date de fin</label>
+                  <label className="block mb-2 font-semibold text-gray-700">Date de fin</label>
                   <input
                     type="date"
                     value={newExperience.end_date}
                     onChange={(e) => setNewExperience({ ...newExperience, end_date: e.target.value })}
                     disabled={newExperience.is_current}
-                    className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-600 focus:border-[#F7C700] focus:ring-4 focus:ring-[#F7C700]/10 outline-none transition-all disabled:opacity-50"
+                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border-2 border-gray-200 focus:border-[#F7C700] focus:ring-4 focus:ring-[#F7C700]/10 outline-none transition-all disabled:opacity-50"
                   />
                 </div>
               </div>
@@ -1056,16 +1057,16 @@ export default function ProfilePage() {
                   onChange={(e) => setNewExperience({ ...newExperience, is_current: e.target.checked, end_date: '' })}
                   className="w-5 h-5 rounded border-gray-300 text-[#F7C700] focus:ring-[#F7C700]"
                 />
-                <span className="font-medium text-gray-700 dark:text-gray-300">Poste actuel</span>
+                <span className="font-medium text-gray-700">Poste actuel</span>
               </label>
 
               <div>
-                <label className="block mb-2 font-semibold text-gray-700 dark:text-gray-300">Description</label>
+                <label className="block mb-2 font-semibold text-gray-700">Description</label>
                 <textarea
                   value={newExperience.description}
                   onChange={(e) => setNewExperience({ ...newExperience, description: e.target.value })}
                   rows={4}
-                  className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-600 focus:border-[#F7C700] focus:ring-4 focus:ring-[#F7C700]/10 outline-none transition-all resize-none"
+                  className="w-full px-4 py-3 rounded-xl bg-gray-50 border-2 border-gray-200 focus:border-[#F7C700] focus:ring-4 focus:ring-[#F7C700]/10 outline-none transition-all resize-none"
                   placeholder="Décrivez vos missions et réalisations..."
                 />
               </div>
@@ -1074,9 +1075,9 @@ export default function ProfilePage() {
             <div className="flex gap-3 mt-8">
               <button
                 onClick={() => setShowExperienceModal(false)}
-                className="flex-1 px-6 py-3 rounded-xl font-semibold bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 transition-all"
+                className="flex-1 px-6 py-3 rounded-xl font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all"
               >
-                Annuler
+                {tc('cancel')}
               </button>
               <button
                 onClick={handleAddExperience}
@@ -1094,7 +1095,7 @@ export default function ProfilePage() {
       {showEducationModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div
-            className="bg-white dark:bg-gray-800 rounded-3xl p-8 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto"
+            className="bg-white rounded-3xl p-8 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto"
             style={{ animation: 'fadeIn 0.3s ease-out' }}
           >
             <div className="flex items-center gap-4 mb-6">
@@ -1102,41 +1103,41 @@ export default function ProfilePage() {
                 <AcademicCapIcon className="w-7 h-7 text-white" />
               </div>
               <div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Nouvelle formation</h3>
-                <p className="text-gray-500 dark:text-gray-400">Ajoutez une formation ou un diplôme</p>
+                <h3 className="text-2xl font-bold text-gray-900">Nouvelle formation</h3>
+                <p className="text-gray-500">Ajoutez une formation ou un diplôme</p>
               </div>
             </div>
 
             <div className="space-y-5">
               <div>
-                <label className="block mb-2 font-semibold text-gray-700 dark:text-gray-300">Diplôme / Formation *</label>
+                <label className="block mb-2 font-semibold text-gray-700">Diplôme / Formation *</label>
                 <input
                   type="text"
                   value={newEducation.degree}
                   onChange={(e) => setNewEducation({ ...newEducation, degree: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-600 focus:border-[#6B46C1] focus:ring-4 focus:ring-[#6B46C1]/10 outline-none transition-all"
+                  className="w-full px-4 py-3 rounded-xl bg-gray-50 border-2 border-gray-200 focus:border-[#6B46C1] focus:ring-4 focus:ring-[#6B46C1]/10 outline-none transition-all"
                   placeholder="ex: Master Informatique"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block mb-2 font-semibold text-gray-700 dark:text-gray-300">Établissement *</label>
+                  <label className="block mb-2 font-semibold text-gray-700">Établissement *</label>
                   <input
                     type="text"
                     value={newEducation.school}
                     onChange={(e) => setNewEducation({ ...newEducation, school: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-600 focus:border-[#6B46C1] focus:ring-4 focus:ring-[#6B46C1]/10 outline-none transition-all"
+                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border-2 border-gray-200 focus:border-[#6B46C1] focus:ring-4 focus:ring-[#6B46C1]/10 outline-none transition-all"
                     placeholder="Nom de l'école"
                   />
                 </div>
                 <div>
-                  <label className="block mb-2 font-semibold text-gray-700 dark:text-gray-300">Lieu</label>
+                  <label className="block mb-2 font-semibold text-gray-700">Lieu</label>
                   <input
                     type="text"
                     value={newEducation.location}
                     onChange={(e) => setNewEducation({ ...newEducation, location: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-600 focus:border-[#6B46C1] focus:ring-4 focus:ring-[#6B46C1]/10 outline-none transition-all"
+                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border-2 border-gray-200 focus:border-[#6B46C1] focus:ring-4 focus:ring-[#6B46C1]/10 outline-none transition-all"
                     placeholder="Paris, France"
                   />
                 </div>
@@ -1144,32 +1145,32 @@ export default function ProfilePage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block mb-2 font-semibold text-gray-700 dark:text-gray-300">Année de début *</label>
+                  <label className="block mb-2 font-semibold text-gray-700">Année de début *</label>
                   <input
                     type="date"
                     value={newEducation.start_date}
                     onChange={(e) => setNewEducation({ ...newEducation, start_date: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-600 focus:border-[#6B46C1] focus:ring-4 focus:ring-[#6B46C1]/10 outline-none transition-all"
+                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border-2 border-gray-200 focus:border-[#6B46C1] focus:ring-4 focus:ring-[#6B46C1]/10 outline-none transition-all"
                   />
                 </div>
                 <div>
-                  <label className="block mb-2 font-semibold text-gray-700 dark:text-gray-300">Année de fin</label>
+                  <label className="block mb-2 font-semibold text-gray-700">Année de fin</label>
                   <input
                     type="date"
                     value={newEducation.end_date}
                     onChange={(e) => setNewEducation({ ...newEducation, end_date: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-600 focus:border-[#6B46C1] focus:ring-4 focus:ring-[#6B46C1]/10 outline-none transition-all"
+                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border-2 border-gray-200 focus:border-[#6B46C1] focus:ring-4 focus:ring-[#6B46C1]/10 outline-none transition-all"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block mb-2 font-semibold text-gray-700 dark:text-gray-300">Description</label>
+                <label className="block mb-2 font-semibold text-gray-700">Description</label>
                 <textarea
                   value={newEducation.description}
                   onChange={(e) => setNewEducation({ ...newEducation, description: e.target.value })}
                   rows={3}
-                  className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-600 focus:border-[#6B46C1] focus:ring-4 focus:ring-[#6B46C1]/10 outline-none transition-all resize-none"
+                  className="w-full px-4 py-3 rounded-xl bg-gray-50 border-2 border-gray-200 focus:border-[#6B46C1] focus:ring-4 focus:ring-[#6B46C1]/10 outline-none transition-all resize-none"
                   placeholder="Spécialisations, mentions..."
                 />
               </div>
@@ -1178,9 +1179,9 @@ export default function ProfilePage() {
             <div className="flex gap-3 mt-8">
               <button
                 onClick={() => setShowEducationModal(false)}
-                className="flex-1 px-6 py-3 rounded-xl font-semibold bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 transition-all"
+                className="flex-1 px-6 py-3 rounded-xl font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all"
               >
-                Annuler
+                {tc('cancel')}
               </button>
               <button
                 onClick={handleAddEducation}
@@ -1198,7 +1199,7 @@ export default function ProfilePage() {
       {showSkillModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div
-            className="bg-white dark:bg-gray-800 rounded-3xl p-8 max-w-md w-full shadow-2xl"
+            className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl"
             style={{ animation: 'fadeIn 0.3s ease-out' }}
           >
             <div className="flex items-center gap-4 mb-6">
@@ -1206,25 +1207,25 @@ export default function ProfilePage() {
                 <SparklesIcon className="w-7 h-7 text-white" />
               </div>
               <div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Nouvelle compétence</h3>
-                <p className="text-gray-500 dark:text-gray-400">Ajoutez une compétence</p>
+                <h3 className="text-2xl font-bold text-gray-900">Nouvelle compétence</h3>
+                <p className="text-gray-500">Ajoutez une compétence</p>
               </div>
             </div>
 
             <div className="space-y-5">
               <div>
-                <label className="block mb-2 font-semibold text-gray-700 dark:text-gray-300">Nom de la compétence *</label>
+                <label className="block mb-2 font-semibold text-gray-700">Nom de la compétence *</label>
                 <input
                   type="text"
                   value={newSkill.name}
                   onChange={(e) => setNewSkill({ ...newSkill, name: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-600 focus:border-[#3B82F6] focus:ring-4 focus:ring-[#3B82F6]/10 outline-none transition-all"
+                  className="w-full px-4 py-3 rounded-xl bg-gray-50 border-2 border-gray-200 focus:border-[#3B82F6] focus:ring-4 focus:ring-[#3B82F6]/10 outline-none transition-all"
                   placeholder="ex: React, Communication..."
                 />
               </div>
 
               <div>
-                <label className="block mb-2 font-semibold text-gray-700 dark:text-gray-300">Catégorie</label>
+                <label className="block mb-2 font-semibold text-gray-700">Catégorie</label>
                 <div className="grid grid-cols-3 gap-2">
                   {[
                     { value: 'technical', label: 'Technique', color: '#3B82F6' },
@@ -1237,7 +1238,7 @@ export default function ProfilePage() {
                       className={`px-4 py-3 rounded-xl font-medium transition-all ${
                         newSkill.category === cat.value
                           ? 'text-white shadow-lg'
-                          : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                       }`}
                       style={{
                         background: newSkill.category === cat.value ? cat.color : undefined,
@@ -1251,11 +1252,11 @@ export default function ProfilePage() {
               </div>
 
               <div>
-                <label className="block mb-2 font-semibold text-gray-700 dark:text-gray-300">Niveau</label>
+                <label className="block mb-2 font-semibold text-gray-700">Niveau</label>
                 <select
                   value={newSkill.level}
                   onChange={(e) => setNewSkill({ ...newSkill, level: Number(e.target.value) })}
-                  className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-600 focus:border-[#3B82F6] focus:ring-4 focus:ring-[#3B82F6]/10 outline-none transition-all"
+                  className="w-full px-4 py-3 rounded-xl bg-gray-50 border-2 border-gray-200 focus:border-[#3B82F6] focus:ring-4 focus:ring-[#3B82F6]/10 outline-none transition-all"
                 >
                   <option value={1}>Débutant</option>
                   <option value={2}>Intermédiaire</option>
@@ -1269,9 +1270,9 @@ export default function ProfilePage() {
             <div className="flex gap-3 mt-8">
               <button
                 onClick={() => setShowSkillModal(false)}
-                className="flex-1 px-6 py-3 rounded-xl font-semibold bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 transition-all"
+                className="flex-1 px-6 py-3 rounded-xl font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all"
               >
-                Annuler
+                {tc('cancel')}
               </button>
               <button
                 onClick={handleAddSkill}

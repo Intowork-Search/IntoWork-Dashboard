@@ -43,6 +43,7 @@ import ApplicationTimeline from '@/components/ui/ApplicationTimeline';
 
 export default function ApplicationsPage() {
   const t = useTranslations('applications');
+  const tc = useTranslations('common');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedStatus, setSelectedStatus] = useState<string>('');
   const limit = 12;
@@ -103,7 +104,7 @@ export default function ApplicationsPage() {
       case 'pending':
         return {
           icon: ClockIcon,
-          label: 'En attente',
+          label: t('status.pending'),
           color: '#F7C700',
           bg: 'bg-[#F7C700]/10',
           border: 'border-[#F7C700]/20'
@@ -111,7 +112,7 @@ export default function ApplicationsPage() {
       case 'viewed':
         return {
           icon: EyeIcon,
-          label: 'Consultée',
+          label: t('status.viewed'),
           color: '#3B82F6',
           bg: 'bg-[#3B82F6]/10',
           border: 'border-[#3B82F6]/20'
@@ -119,7 +120,7 @@ export default function ApplicationsPage() {
       case 'shortlisted':
         return {
           icon: StarIcon,
-          label: 'Présélectionné',
+          label: t('status.shortlisted'),
           color: '#6B46C1',
           bg: 'bg-[#6B46C1]/10',
           border: 'border-[#6B46C1]/20'
@@ -127,7 +128,7 @@ export default function ApplicationsPage() {
       case 'interview':
         return {
           icon: ChatBubbleLeftRightIcon,
-          label: 'Entretien',
+          label: t('status.interview'),
           color: '#6B46C1',
           bg: 'bg-[#6B46C1]/10',
           border: 'border-[#6B46C1]/20'
@@ -135,7 +136,7 @@ export default function ApplicationsPage() {
       case 'accepted':
         return {
           icon: CheckCircleIcon,
-          label: 'Acceptée',
+          label: t('status.accepted'),
           color: '#6B9B5F',
           bg: 'bg-[#6B9B5F]/10',
           border: 'border-[#6B9B5F]/20'
@@ -143,7 +144,7 @@ export default function ApplicationsPage() {
       case 'rejected':
         return {
           icon: XCircleIcon,
-          label: 'Rejetée',
+          label: t('status.rejected'),
           color: '#EF4444',
           bg: 'bg-red-50',
           border: 'border-red-200'
@@ -153,8 +154,8 @@ export default function ApplicationsPage() {
           icon: ExclamationTriangleIcon,
           label: status,
           color: '#6B7280',
-          bg: 'bg-gray-100 dark:bg-gray-700',
-          border: 'border-gray-200 dark:border-gray-600'
+          bg: 'bg-gray-100',
+          border: 'border-gray-200'
         };
     }
   };
@@ -204,7 +205,7 @@ export default function ApplicationsPage() {
   // Affichage d'erreur
   if (error) {
     return (
-      <DashboardLayout title={t('title')} subtitle="Suivez vos candidatures">
+      <DashboardLayout title={t('title')} subtitle={t('subtitle')}>
         <div className="rounded-3xl p-12 bg-red-50 border border-red-200 text-center">
           <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-red-100 flex items-center justify-center">
             <XMarkIcon className="w-8 h-8 text-red-500" />
@@ -223,7 +224,7 @@ export default function ApplicationsPage() {
   }
 
   return (
-      <DashboardLayout title={t('title')} subtitle="Suivez l'évolution de vos candidatures">
+      <DashboardLayout title={t('title')} subtitle={t('subtitle')}>
       <div className="space-y-8">
         {/* Hero Section */}
         <div
@@ -272,11 +273,11 @@ export default function ApplicationsPage() {
           style={{ animation: 'fadeIn 0.6s ease-out 0.1s both' }}
         >
           {[
-            { key: 'pending', label: 'En attente', icon: ClockIcon, color: '#F7C700', count: stats.pending },
-            { key: 'viewed', label: 'Consultées', icon: EyeIcon, color: '#3B82F6', count: stats.viewed },
-            { key: 'interview', label: 'Entretiens', icon: ChatBubbleLeftRightIcon, color: '#6B46C1', count: stats.interview },
-            { key: 'accepted', label: 'Acceptées', icon: CheckCircleIcon, color: '#6B9B5F', count: stats.accepted },
-            { key: 'rejected', label: 'Rejetées', icon: XCircleIcon, color: '#EF4444', count: stats.rejected },
+            { key: 'pending', label: t('status.pending'), icon: ClockIcon, color: '#F7C700', count: stats.pending },
+            { key: 'viewed', label: t('status.viewed'), icon: EyeIcon, color: '#3B82F6', count: stats.viewed },
+            { key: 'interview', label: t('status.interview'), icon: ChatBubbleLeftRightIcon, color: '#6B46C1', count: stats.interview },
+            { key: 'accepted', label: t('status.accepted'), icon: CheckCircleIcon, color: '#6B9B5F', count: stats.accepted },
+            { key: 'rejected', label: t('status.rejected'), icon: XCircleIcon, color: '#EF4444', count: stats.rejected },
           ].map((stat, index) => (
             <button
               key={stat.key}
@@ -284,7 +285,7 @@ export default function ApplicationsPage() {
               className={`group bg-white dark:bg-gray-800 rounded-2xl shadow-lg shadow-gray-200/50 border p-5 text-left transition-all hover:shadow-xl ${
                 selectedStatus === stat.key || (selectedStatus === 'applied' && stat.key === 'pending')
                   ? 'border-2'
-                  : 'border-gray-100 dark:border-gray-700 hover:border-gray-200'
+                  : 'border-gray-100 hover:border-gray-200'
               }`}
               style={{
                 animation: `fadeIn 0.4s ease-out ${0.05 * index}s both`,
@@ -297,8 +298,8 @@ export default function ApplicationsPage() {
               >
                 <stat.icon className="w-6 h-6" style={{ color: stat.color }} />
               </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stat.count}</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">{stat.label}</p>
+              <p className="text-3xl font-bold text-gray-900">{stat.count}</p>
+              <p className="text-sm text-gray-500 font-medium">{stat.label}</p>
             </button>
           ))}
         </div>
@@ -306,7 +307,7 @@ export default function ApplicationsPage() {
         {/* Filtres actifs */}
         {selectedStatus && (
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500 dark:text-gray-400">Filtre actif:</span>
+            <span className="text-sm text-gray-500">Filtre actif:</span>
             <button
               onClick={() => setSelectedStatus('')}
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium bg-[#6B46C1]/10 text-[#6B46C1] hover:bg-[#6B46C1]/20 transition-colors"
@@ -322,21 +323,21 @@ export default function ApplicationsPage() {
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
               <div className="w-16 h-16 border-4 border-[#6B46C1] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-gray-500 dark:text-gray-400">Chargement de vos candidatures...</p>
+              <p className="text-gray-500">Chargement de vos candidatures...</p>
             </div>
           </div>
         ) : filteredApplications.length === 0 ? (
           <div
-            className="bg-white dark:bg-gray-800 rounded-3xl shadow-lg shadow-gray-200/50 border border-gray-100 dark:border-gray-700 p-16 text-center"
+            className="bg-white dark:bg-gray-800 rounded-3xl shadow-lg shadow-gray-200/50 border border-gray-100 p-16 text-center"
             style={{ animation: 'fadeIn 0.6s ease-out 0.2s both' }}
           >
             <div className="w-24 h-24 mx-auto mb-6 rounded-3xl bg-[#6B46C1]/10 flex items-center justify-center">
               <DocumentTextIcon className="w-12 h-12 text-[#6B46C1]" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">
               {selectedStatus ? 'Aucune candidature avec ce statut' : 'Aucune candidature'}
             </h3>
-            <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-md mx-auto">
+            <p className="text-gray-500 mb-8 max-w-md mx-auto">
               {selectedStatus
                 ? 'Essayez de retirer le filtre pour voir toutes vos candidatures.'
                 : t('empty')}
@@ -344,7 +345,7 @@ export default function ApplicationsPage() {
             {selectedStatus ? (
               <button
                 onClick={() => setSelectedStatus('')}
-                className="px-8 py-4 rounded-xl font-semibold bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 transition-all"
+                className="px-8 py-4 rounded-xl font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all"
               >
                 Voir toutes les candidatures
               </button>
@@ -376,13 +377,13 @@ export default function ApplicationsPage() {
                     <div className="flex flex-col lg:flex-row lg:items-start gap-6">
                       {/* Logo et infos principales */}
                       <div className="flex items-start gap-4 flex-1">
-                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center flex-shrink-0 border border-gray-200 dark:border-gray-600">
-                          <BuildingOfficeIcon className="w-7 h-7 text-gray-400 dark:text-gray-500" />
+                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center flex-shrink-0 border border-gray-200">
+                          <BuildingOfficeIcon className="w-7 h-7 text-gray-400" />
                         </div>
 
                         <div className="flex-1 min-w-0">
                           <div className="flex flex-wrap items-center gap-3 mb-2">
-                            <h3 className="text-lg font-bold text-gray-900 dark:text-white group-hover:text-[#6B46C1] transition-colors">
+                            <h3 className="text-lg font-bold text-gray-900 group-hover:text-[#6B46C1] transition-colors">
                               {application.job.title}
                             </h3>
                             <span
@@ -394,7 +395,7 @@ export default function ApplicationsPage() {
                             </span>
                           </div>
 
-                          <p className="text-sm text-gray-600 dark:text-gray-400 font-medium mb-3 flex items-center gap-1">
+                          <p className="text-sm text-gray-600 font-medium mb-3 flex items-center gap-1">
                             {application.job.company_name}
                             {application.job.company_is_verified && (
                               <CheckBadgeIcon className="w-4 h-4 text-[#6B9B5F]" title="Entreprise vérifiée" />
@@ -404,7 +405,7 @@ export default function ApplicationsPage() {
                           {/* Tags et infos */}
                           <div className="flex flex-wrap items-center gap-2 text-sm">
                             {application.job.location && (
-                              <span className="inline-flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
+                              <span className="inline-flex items-center gap-1.5 text-gray-500">
                                 <MapPinIcon className="w-4 h-4" />
                                 {application.job.location}
                               </span>
@@ -425,7 +426,7 @@ export default function ApplicationsPage() {
                             {(application.job.salary_min || application.job.salary_max) && (
                               <>
                                 <span className="text-gray-300">•</span>
-                                <span className="inline-flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
+                                <span className="inline-flex items-center gap-1.5 text-gray-500">
                                   <CurrencyEuroIcon className="w-4 h-4" />
                                   {formatSalary(application.job.salary_min, application.job.salary_max)}
                                 </span>
@@ -437,7 +438,7 @@ export default function ApplicationsPage() {
 
                       {/* Date et actions */}
                       <div className="flex lg:flex-col items-center lg:items-end gap-4">
-                        <div className="flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500">
+                        <div className="flex items-center gap-1.5 text-sm text-gray-400">
                           <CalendarDaysIcon className="w-4 h-4" />
                           <span>{formatRelativeDate(application.applied_at)}</span>
                         </div>
@@ -448,7 +449,7 @@ export default function ApplicationsPage() {
                             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium bg-[#6B46C1]/10 text-[#6B46C1] hover:bg-[#6B46C1]/20 transition-all text-sm"
                           >
                             <EyeIcon className="w-4 h-4" />
-                            <span>Voir l'offre</span>
+                            <span>{t('viewJob')}</span>
                           </Link>
 
                           {(application.status === 'applied' || application.status === 'pending') && (
@@ -474,9 +475,9 @@ export default function ApplicationsPage() {
 
                     {/* Notes */}
                     {application.notes && (
-                      <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
-                        <p className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 rounded-xl p-4">
-                          <span className="font-semibold text-gray-700 dark:text-gray-300">Notes:</span> {application.notes}
+                      <div className="mt-3 pt-3 border-t border-gray-100">
+                        <p className="text-sm text-gray-600 bg-gray-50 rounded-xl p-4">
+                          <span className="font-semibold text-gray-700">Notes:</span> {application.notes}
                         </p>
                       </div>
                     )}
@@ -496,10 +497,10 @@ export default function ApplicationsPage() {
             <button
               onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1 || loading || withdrawMutation.isPending}
-              className="flex items-center gap-2 px-5 py-3 rounded-xl font-medium bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:border-[#6B46C1] hover:text-[#6B46C1] transition-all"
+              className="flex items-center gap-2 px-5 py-3 rounded-xl font-medium bg-white border border-gray-200 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:border-[#6B46C1] hover:text-[#6B46C1] transition-all"
             >
               <ChevronLeftIcon className="w-5 h-5" />
-              <span>Précédent</span>
+              <span>{tc('previous')}</span>
             </button>
 
             <div className="flex items-center gap-2">
@@ -523,7 +524,7 @@ export default function ApplicationsPage() {
                     className={`w-10 h-10 rounded-xl font-semibold transition-all disabled:opacity-50 ${
                       currentPage === pageNum
                         ? 'bg-gradient-to-r from-[#6B46C1] to-[#5b3aa1] text-white shadow-lg shadow-[#6B46C1]/30'
-                        : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-[#6B46C1] hover:text-[#6B46C1]'
+                        : 'bg-white border border-gray-200 text-gray-700 hover:border-[#6B46C1] hover:text-[#6B46C1]'
                     }`}
                   >
                     {pageNum}
@@ -535,9 +536,9 @@ export default function ApplicationsPage() {
             <button
               onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
               disabled={currentPage === totalPages || loading || withdrawMutation.isPending}
-              className="flex items-center gap-2 px-5 py-3 rounded-xl font-medium bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:border-[#6B46C1] hover:text-[#6B46C1] transition-all"
+              className="flex items-center gap-2 px-5 py-3 rounded-xl font-medium bg-white border border-gray-200 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:border-[#6B46C1] hover:text-[#6B46C1] transition-all"
             >
-              <span>Suivant</span>
+              <span>{tc('next')}</span>
               <ChevronRightIcon className="w-5 h-5" />
             </button>
           </div>

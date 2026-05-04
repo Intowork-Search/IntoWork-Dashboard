@@ -39,7 +39,33 @@
     "of": "of",
     "in": "in",
     "noData": "No data available",
-    "seeAll": "See all"
+    "seeAll": "See all",
+    "allContracts": "All contract types",
+    "fullTime": "Full-time",
+    "partTime": "Part-time",
+    "contract": "Fixed-term",
+    "temporary": "Temporary",
+    "internship": "Internship",
+    "allModes": "All modes",
+    "onSite": "On-site",
+    "remote": "Remote",
+    "hybrid": "Hybrid",
+    "allCountries": "All countries",
+    "allCurrencies": "All currencies",
+    "minSalary": "Min salary",
+    "maxSalary": "Max salary",
+    "filters": "Filters",
+    "resetFilters": "Reset",
+    "manage": "Manage",
+    "sendApplication": "Send my application",
+    "sending": "Sending...",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "daysAgo": "{count} days ago",
+    "noResults": "No results",
+    "page": "Page {current} of {total}",
+    "aiScore": "AI",
+    "top": "Top"
   },
   "meta": {
     "title": "INTOWORK Search - Recruitment Platform",
@@ -191,7 +217,19 @@
       "active": "Active",
       "closed": "Closed",
       "archived": "Archived"
-    }
+    },
+    "subtitle": "Search for your next job",
+    "searchCity": "City, region...",
+    "whyIdeal": "Explain why you are the ideal candidate for this position...",
+    "full_time": "Full-time",
+    "part_time": "Part-time",
+    "contract": "Fixed-term",
+    "temporary": "Temporary",
+    "internship": "Internship",
+    "on_site": "On-site",
+    "remote": "Remote",
+    "hybrid": "Hybrid",
+    "applyNow": "Apply now"
   },
   "applications": {
     "title": "My Applications",
@@ -215,7 +253,11 @@
     },
     "appliedOn": "Applied on {date}",
     "updateStatus": "Update status",
-    "notes": "Internal notes"
+    "notes": "Internal notes",
+    "subtitle": "Track your applications",
+    "viewJob": "View job",
+    "addNote": "Add a note...",
+    "yourApplications": "Your applications"
   },
   "profile": {
     "title": "My Profile",
@@ -237,7 +279,10 @@
     "noSkills": "No skills added",
     "addExperience": "Add experience",
     "addEducation": "Add education",
-    "addSkill": "Add skill"
+    "addSkill": "Add skill",
+    "subtitle": "Manage your personal information",
+    "experiences": "Work experience",
+    "noExperiences": "No experience added"
   },
   "company": {
     "title": "My Company",
@@ -249,7 +294,11 @@
     "address": "Address",
     "logo": "Logo",
     "verified": "Verified company",
-    "notVerified": "Verification pending"
+    "notVerified": "Verification pending",
+    "subtitle": "Manage your company information",
+    "companyName": "Company name",
+    "sector": "Industry",
+    "noCompany": "No company configured"
   },
   "settings": {
     "title": "Settings",
@@ -267,7 +316,10 @@
     "theme": "Theme",
     "themeDark": "Dark",
     "themeLight": "Light",
-    "themeAuto": "Auto"
+    "themeAuto": "Auto",
+    "savePassword": "Save password",
+    "enableNotifications": "Enable notifications",
+    "emailNotifications": "Email notifications"
   },
   "jobAlerts": {
     "title": "Job Alerts",

@@ -426,10 +426,10 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Activité récente */}
         <div
-          className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-3xl shadow-lg shadow-gray-200/50 border border-gray-100 dark:border-gray-700 overflow-hidden"
+          className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-3xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700 overflow-hidden"
           style={{ animation: 'fadeIn 0.6s ease-out 0.5s both' }}
         >
-          <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white">
+          <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-linear-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-800">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#6B46C1] to-[#5a3ba3] flex items-center justify-center shadow-lg shadow-[#6B46C1]/20">
@@ -491,10 +491,10 @@ export default function Dashboard() {
 
         {/* Actions rapides */}
         <div
-          className="bg-white dark:bg-gray-800 rounded-3xl shadow-lg shadow-gray-200/50 border border-gray-100 dark:border-gray-700 overflow-hidden"
+          className="bg-white dark:bg-gray-800 rounded-3xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-700 overflow-hidden"
           style={{ animation: 'fadeIn 0.6s ease-out 0.6s both' }}
         >
-          <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white">
+          <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-linear-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-800">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#F7C700] to-[#e5b800] flex items-center justify-center shadow-lg shadow-[#F7C700]/20">
                 <RocketLaunchIcon className="w-5 h-5 text-white" />

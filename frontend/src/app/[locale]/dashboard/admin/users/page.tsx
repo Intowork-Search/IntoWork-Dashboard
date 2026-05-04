@@ -131,7 +131,7 @@ export default function AdminUsersPage() {
     >
       <div className="space-y-6">
         {/* Filtres */}
-        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 p-6 border border-gray-100 dark:border-gray-700">
+        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-black/30 p-6 border border-gray-100 dark:border-gray-700">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
               <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
@@ -172,7 +172,7 @@ export default function AdminUsersPage() {
         </div>
 
         {/* Table des utilisateurs */}
-        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 overflow-hidden border border-gray-100 dark:border-gray-700">
+        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-black/30 overflow-hidden border border-gray-100 dark:border-gray-700">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 dark:border-gray-600">

@@ -39,7 +39,33 @@
     "of": "de",
     "in": "dans",
     "noData": "Aucune donnée disponible",
-    "seeAll": "Voir tout"
+    "seeAll": "Voir tout",
+    "allContracts": "Tous les contrats",
+    "fullTime": "CDI",
+    "partTime": "Temps partiel",
+    "contract": "CDD",
+    "temporary": "Intérim",
+    "internship": "Stage",
+    "allModes": "Tous les modes",
+    "onSite": "Présentiel",
+    "remote": "Télétravail",
+    "hybrid": "Hybride",
+    "allCountries": "Tous les pays",
+    "allCurrencies": "Toutes les devises",
+    "minSalary": "Salaire min",
+    "maxSalary": "Salaire max",
+    "filters": "Filtres",
+    "resetFilters": "Réinitialiser",
+    "manage": "Gérer",
+    "sendApplication": "Envoyer ma candidature",
+    "sending": "Envoi en cours...",
+    "today": "Aujourd'hui",
+    "yesterday": "Hier",
+    "daysAgo": "Il y a {count} jours",
+    "noResults": "Aucun résultat",
+    "page": "Page {current} sur {total}",
+    "aiScore": "IA",
+    "top": "Top"
   },
   "meta": {
     "title": "INTOWORK Search - Plateforme de Recrutement",
@@ -129,14 +155,14 @@
     "greetMorning": "Bonjour",
     "greetAfternoon": "Bon après-midi",
     "greetEvening": "Bonsoir",
-    "updatedAt": "Mis \u00e0 jour \u00e0 {time}",
+    "updatedAt": "Mis à jour à {time}",
     "actionsHint": "Vos actions apparaîtront ici",
     "welcomeTitle": "Bienvenue sur votre Dashboard",
     "candidateSpace": "Espace Candidat",
     "employerSpace": "Espace Employeur",
     "profileLabel": "Profil",
-    "candidateDescription": "G\u00e9rez votre profil, explorez les opportunit\u00e9s et d\u00e9crochez le poste de vos r\u00eaves.",
-    "employerDescription": "G\u00e9rez vos offres d'emploi et trouvez les meilleurs talents pour votre entreprise.",
+    "candidateDescription": "Gérez votre profil, explorez les opportunités et décrochez le poste de vos rêves.",
+    "employerDescription": "Gérez vos offres d'emploi et trouvez les meilleurs talents pour votre entreprise.",
     "candidateSubtitle": "Votre espace candidat",
     "employerSubtitle": "Votre espace employeur",
     "stats": {
@@ -191,7 +217,19 @@
       "active": "Active",
       "closed": "Fermée",
       "archived": "Archivée"
-    }
+    },
+    "subtitle": "Recherchez votre prochain emploi",
+    "searchCity": "Ville, région...",
+    "whyIdeal": "Expliquez pourquoi vous êtes le candidat idéal pour ce poste...",
+    "full_time": "CDI",
+    "part_time": "Temps partiel",
+    "contract": "CDD",
+    "temporary": "Intérim",
+    "internship": "Stage",
+    "on_site": "Présentiel",
+    "remote": "Télétravail",
+    "hybrid": "Hybride",
+    "applyNow": "Postuler maintenant"
   },
   "applications": {
     "title": "Mes candidatures",
@@ -215,7 +253,11 @@
     },
     "appliedOn": "Postulé le {date}",
     "updateStatus": "Mettre à jour le statut",
-    "notes": "Notes internes"
+    "notes": "Notes internes",
+    "subtitle": "Suivez vos candidatures",
+    "viewJob": "Voir l'offre",
+    "addNote": "Ajouter une note...",
+    "yourApplications": "Vos candidatures"
   },
   "profile": {
     "title": "Mon profil",
@@ -237,7 +279,10 @@
     "noSkills": "Aucune compétence ajoutée",
     "addExperience": "Ajouter une expérience",
     "addEducation": "Ajouter une formation",
-    "addSkill": "Ajouter une compétence"
+    "addSkill": "Ajouter une compétence",
+    "subtitle": "Gérez vos informations personnelles",
+    "experiences": "Expériences professionnelles",
+    "noExperiences": "Aucune expérience ajoutée"
   },
   "company": {
     "title": "Mon entreprise",
@@ -249,7 +294,11 @@
     "address": "Adresse",
     "logo": "Logo",
     "verified": "Entreprise vérifiée",
-    "notVerified": "Vérification en attente"
+    "notVerified": "Vérification en attente",
+    "subtitle": "Gérez les informations de votre entreprise",
+    "companyName": "Nom de l'entreprise",
+    "sector": "Secteur d'activité",
+    "noCompany": "Aucune entreprise configurée"
   },
   "settings": {
     "title": "Paramètres",
@@ -267,7 +316,10 @@
     "theme": "Thème",
     "themeDark": "Sombre",
     "themeLight": "Clair",
-    "themeAuto": "Automatique"
+    "themeAuto": "Automatique",
+    "savePassword": "Enregistrer le mot de passe",
+    "enableNotifications": "Activer les notifications",
+    "emailNotifications": "Notifications par email"
   },
   "jobAlerts": {
     "title": "Alertes emploi",

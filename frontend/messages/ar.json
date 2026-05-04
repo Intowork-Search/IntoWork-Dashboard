@@ -39,7 +39,33 @@
     "of": "من",
     "in": "في",
     "noData": "لا توجد بيانات متاحة",
-    "seeAll": "عرض الكل"
+    "seeAll": "عرض الكل",
+    "allContracts": "جميع العقود",
+    "fullTime": "دوام كامل",
+    "partTime": "دوام جزئي",
+    "contract": "عقد محدد المدة",
+    "temporary": "مؤقت",
+    "internship": "تدريب",
+    "allModes": "جميع الأوضاع",
+    "onSite": "حضوري",
+    "remote": "عن بُعد",
+    "hybrid": "مختلط",
+    "allCountries": "جميع البلدان",
+    "allCurrencies": "جميع العملات",
+    "minSalary": "الراتب الأدنى",
+    "maxSalary": "الراتب الأقصى",
+    "filters": "الفلاتر",
+    "resetFilters": "إعادة تعيين",
+    "manage": "إدارة",
+    "sendApplication": "إرسال طلبي",
+    "sending": "جارٍ الإرسال...",
+    "today": "اليوم",
+    "yesterday": "أمس",
+    "daysAgo": "منذ {count} أيام",
+    "noResults": "لا نتائج",
+    "page": "صفحة {current} من {total}",
+    "aiScore": "ذكاء اصطناعي",
+    "top": "أفضل"
   },
   "meta": {
     "title": "INTOWORK Search - منصة التوظيف",
@@ -191,7 +217,19 @@
       "active": "نشطة",
       "closed": "مغلقة",
       "archived": "مؤرشفة"
-    }
+    },
+    "subtitle": "ابحث عن وظيفتك القادمة",
+    "searchCity": "مدينة، منطقة...",
+    "whyIdeal": "اشرح لماذا أنت المرشح المثالي لهذا المنصب...",
+    "full_time": "دوام كامل",
+    "part_time": "دوام جزئي",
+    "contract": "عقد محدد المدة",
+    "temporary": "مؤقت",
+    "internship": "تدريب",
+    "on_site": "حضوري",
+    "remote": "عن بُعد",
+    "hybrid": "مختلط",
+    "applyNow": "تقدم الآن"
   },
   "applications": {
     "title": "طلباتي",
@@ -215,7 +253,11 @@
     },
     "appliedOn": "تقدمت في {date}",
     "updateStatus": "تحديث الحالة",
-    "notes": "ملاحظات داخلية"
+    "notes": "ملاحظات داخلية",
+    "subtitle": "تتبع طلباتك",
+    "viewJob": "عرض الوظيفة",
+    "addNote": "أضف ملاحظة...",
+    "yourApplications": "طلباتك"
   },
   "profile": {
     "title": "ملفي الشخصي",
@@ -237,7 +279,10 @@
     "noSkills": "لم تتم إضافة مهارات",
     "addExperience": "إضافة خبرة",
     "addEducation": "إضافة تعليم",
-    "addSkill": "إضافة مهارة"
+    "addSkill": "إضافة مهارة",
+    "subtitle": "أدر معلوماتك الشخصية",
+    "experiences": "الخبرة المهنية",
+    "noExperiences": "لا توجد خبرات مضافة"
   },
   "company": {
     "title": "شركتي",
@@ -249,7 +294,11 @@
     "address": "العنوان",
     "logo": "الشعار",
     "verified": "شركة موثقة",
-    "notVerified": "في انتظار التوثيق"
+    "notVerified": "في انتظار التوثيق",
+    "subtitle": "أدر معلومات شركتك",
+    "companyName": "اسم الشركة",
+    "sector": "قطاع النشاط",
+    "noCompany": "لم يتم تكوين أي شركة"
   },
   "settings": {
     "title": "الإعدادات",
@@ -267,7 +316,10 @@
     "theme": "السمة",
     "themeDark": "داكن",
     "themeLight": "فاتح",
-    "themeAuto": "تلقائي"
+    "themeAuto": "تلقائي",
+    "savePassword": "حفظ كلمة المرور",
+    "enableNotifications": "تفعيل الإشعارات",
+    "emailNotifications": "إشعارات البريد الإلكتروني"
   },
   "jobAlerts": {
     "title": "تنبيهات الوظائف",
