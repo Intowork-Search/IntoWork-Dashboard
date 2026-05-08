@@ -166,27 +166,39 @@ export default function Sidebar({ userRole }: SidebarProps) {
       } bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 shadow-lg flex flex-col`}>
         
         {/* Header avec logo et toggle */}
-        <div className={`flex items-center p-4 border-b border-gray-200 dark:border-gray-700 shrink-0 ${isCollapsed ? 'flex-col gap-2' : 'justify-between'}`}>
-          <Link href="/" className={isCollapsed ? 'flex items-center justify-center' : 'flex items-center'}>
-            <img
-              src={isCollapsed ? '/favicon-intowork.png' : '/logo-intowork.png'}
-              alt="INTOWORK"
-              className={isCollapsed ? 'h-8 w-8 object-contain' : 'h-10 w-auto object-contain'}
-            />
-          </Link>
-          <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-            aria-label={isCollapsed ? t('expand') : t('collapse')}
-            aria-expanded={!isCollapsed}
-          >
-            {isCollapsed ? (
+        {isCollapsed ? (
+          <div className="flex flex-col items-center gap-2 px-2 py-3 border-b border-gray-200 dark:border-gray-700 shrink-0">
+            <Link href="/" className="flex items-center justify-center">
+              <img src="/favicon-intowork.png" alt="INTOWORK" className="h-8 w-8 object-contain" />
+            </Link>
+            <button
+              onClick={() => setIsCollapsed(false)}
+              className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              aria-label={t('expand')}
+              aria-expanded={false}
+            >
               <ChevronRightIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-            ) : (
+            </button>
+          </div>
+        ) : (
+          <div className="relative border-b border-gray-200 dark:border-gray-700 shrink-0">
+            <Link href="/" className="flex items-center px-3 py-3">
+              <img
+                src="/logo-intowork.png"
+                alt="INTOWORK"
+                className="w-full h-auto object-contain max-h-14"
+              />
+            </Link>
+            <button
+              onClick={() => setIsCollapsed(true)}
+              className="absolute top-1/2 -translate-y-1/2 right-2 p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              aria-label={t('collapse')}
+              aria-expanded={true}
+            >
               <ChevronLeftIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-            )}
-          </button>
-        </div>
+            </button>
+          </div>
+        )}
 
         {/* Navigation */}
         <ul role="list" aria-label="Navigation" className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
