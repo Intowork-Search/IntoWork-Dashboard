@@ -181,22 +181,24 @@ export default function Sidebar({ userRole }: SidebarProps) {
             </button>
           </div>
         ) : (
-          <div className="relative border-b border-gray-200 dark:border-gray-700 shrink-0">
-            <Link href="/" className="flex items-center px-3 py-3">
-              <img
-                src="/logo-intowork.png"
-                alt="INTOWORK"
-                className="w-full h-auto object-contain max-h-14"
-              />
-            </Link>
-            <button
-              onClick={() => setIsCollapsed(true)}
-              className="absolute top-1/2 -translate-y-1/2 right-2 p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              aria-label={t('collapse')}
-              aria-expanded={true}
-            >
-              <ChevronLeftIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-            </button>
+          <div className="border-b border-gray-200 dark:border-gray-700 shrink-0">
+            <div className="flex items-center justify-between pr-2">
+              <Link href="/" className="flex-1 min-w-0">
+                <img
+                  src="/logo-intowork.png"
+                  alt="INTOWORK"
+                  className="w-full h-auto block"
+                />
+              </Link>
+              <button
+                onClick={() => setIsCollapsed(true)}
+                className="shrink-0 p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                aria-label={t('collapse')}
+                aria-expanded={true}
+              >
+                <ChevronLeftIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              </button>
+            </div>
           </div>
         )}
 
