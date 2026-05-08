@@ -25,7 +25,7 @@ import { CheckCircleIcon } from '@heroicons/react/24/solid';
 const CATEGORIES = {
   technical: {
     label: 'Questions techniques',
-    color: 'from-blue-500 to-blue-600',
+    color: 'bg-blue-500',
     bg: 'bg-blue-50 dark:bg-blue-900/20',
     border: 'border-blue-200 dark:border-blue-700',
     text: 'text-blue-700 dark:text-blue-300',
@@ -33,7 +33,7 @@ const CATEGORIES = {
   },
   behavioral: {
     label: 'Questions comportementales',
-    color: 'from-purple-500 to-purple-600',
+    color: 'bg-purple-500',
     bg: 'bg-purple-50 dark:bg-purple-900/20',
     border: 'border-purple-200 dark:border-purple-700',
     text: 'text-purple-700 dark:text-purple-300',
@@ -41,7 +41,7 @@ const CATEGORIES = {
   },
   motivation: {
     label: 'Motivation & adéquation',
-    color: 'from-[#6B9B5F] to-[#5a8a4e]',
+    color: 'bg-[#6B9B5F]',
     bg: 'bg-[#6B9B5F]/10 dark:bg-[#6B9B5F]/20',
     border: 'border-[#6B9B5F]/30',
     text: 'text-[#6B9B5F]',
@@ -49,7 +49,7 @@ const CATEGORIES = {
   },
   company: {
     label: 'Questions à poser',
-    color: 'from-amber-500 to-amber-600',
+    color: 'bg-amber-500',
     bg: 'bg-amber-50 dark:bg-amber-900/20',
     border: 'border-amber-200 dark:border-amber-700',
     text: 'text-amber-700 dark:text-amber-300',
@@ -199,11 +199,11 @@ export default function InterviewPrepPage() {
 
         {/* Header */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden mb-6">
-          <div className="h-2 bg-gradient-to-r from-[#6B9B5F] to-purple-500" />
+          <div className="h-2 bg-[#6B9B5F]" />
           <div className="p-6 sm:p-8">
             <div className="flex items-start justify-between gap-4 flex-wrap">
               <div className="flex items-start gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#6B9B5F] to-purple-500 flex items-center justify-center shadow-lg shrink-0">
+                <div className="w-14 h-14 rounded-2xl bg-[#6B9B5F] flex items-center justify-center shadow-lg shrink-0">
                   <SparklesIcon className="w-7 h-7 text-white" />
                 </div>
                 <div>
@@ -227,7 +227,7 @@ export default function InterviewPrepPage() {
               <button
                 onClick={generate}
                 disabled={loading}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#6B9B5F] to-[#5a8a4e] text-white shadow-lg shadow-[#6B9B5F]/30 hover:shadow-xl hover:shadow-[#6B9B5F]/40 transition-all disabled:opacity-50"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm bg-[#6B9B5F] hover:bg-[#5a8a4e] text-white shadow-lg shadow-[#6B9B5F]/30 transition-all disabled:opacity-50"
               >
                 {loading ? (
                   <>
@@ -248,7 +248,7 @@ export default function InterviewPrepPage() {
         {/* État vide */}
         {!data && !loading && (
           <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-12 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#6B9B5F]/20 to-purple-100 dark:to-purple-900/20 flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 rounded-2xl bg-[#6B9B5F]/15 flex items-center justify-center mx-auto mb-4">
               <SparklesIcon className="w-8 h-8 text-[#6B9B5F]" />
             </div>
             <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
@@ -259,7 +259,7 @@ export default function InterviewPrepPage() {
             </p>
             <button
               onClick={generate}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold bg-gradient-to-r from-[#6B9B5F] to-[#5a8a4e] text-white shadow-lg shadow-[#6B9B5F]/30 hover:shadow-xl transition-all"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold bg-[#6B9B5F] hover:bg-[#5a8a4e] text-white shadow-lg shadow-[#6B9B5F]/30 transition-all"
             >
               <SparklesIcon className="w-5 h-5" />
               Générer les questions
@@ -295,7 +295,7 @@ export default function InterviewPrepPage() {
           <div className="space-y-6">
             {/* Conseils généraux */}
             {data.general_advice.length > 0 && (
-              <div className="bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 rounded-2xl border border-amber-200 dark:border-amber-700 p-6">
+              <div className="bg-amber-50 dark:bg-amber-900/20 rounded-2xl border border-amber-200 dark:border-amber-700 p-6">
                 <h2 className="text-base font-bold text-amber-800 dark:text-amber-300 mb-3 flex items-center gap-2">
                   <LightBulbIcon className="w-5 h-5" />
                   Conseils pour cet entretien
@@ -318,7 +318,7 @@ export default function InterviewPrepPage() {
               return (
                 <div key={category} className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
                   {/* Header catégorie */}
-                  <div className={`p-4 sm:p-5 bg-gradient-to-r ${cfg.color} flex items-center gap-3`}>
+                  <div className={`p-4 sm:p-5 ${cfg.color} flex items-center gap-3`}>
                     <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
                       <IconComponent className="w-5 h-5 text-white" />
                     </div>
