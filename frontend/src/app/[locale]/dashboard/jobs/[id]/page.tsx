@@ -19,6 +19,7 @@ import {
   ArrowLeftIcon,
   CheckCircleIcon,
   PaperAirplaneIcon,
+  SparklesIcon,
 } from '@heroicons/react/24/outline';
 import { CheckBadgeIcon } from '@heroicons/react/24/solid';
 
@@ -351,6 +352,15 @@ export default function JobDetailPage() {
                     {t('applyButton')}
                   </button>
                 )}
+
+                {/* Préparer l'entretien */}
+                <Link
+                  href={`/dashboard/interview-prep/${job.id}`}
+                  className="mt-3 w-full py-2.5 rounded-xl font-medium border border-[#6B9B5F]/30 bg-[#6B9B5F]/5 hover:bg-[#6B9B5F]/10 text-[#6B9B5F] flex items-center justify-center gap-2 text-sm transition-colors"
+                >
+                  <SparklesIcon className="w-4 h-4" />
+                  Préparer l&apos;entretien
+                </Link>
               </div>
 
               {/* Infos clés */}

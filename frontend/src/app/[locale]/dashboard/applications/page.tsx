@@ -443,7 +443,7 @@ export default function ApplicationsPage() {
                           <span>{formatRelativeDate(application.applied_at)}</span>
                         </div>
 
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <Link
                             href={`/dashboard/jobs/${application.job.id}`}
                             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium bg-[#6B46C1]/10 text-[#6B46C1] hover:bg-[#6B46C1]/20 transition-all text-sm"
@@ -451,6 +451,17 @@ export default function ApplicationsPage() {
                             <EyeIcon className="w-4 h-4" />
                             <span>{t('viewJob')}</span>
                           </Link>
+
+                          {/* Bouton Préparer l'entretien */}
+                          {(application.status === 'interview' || application.status === 'shortlisted' || application.status === 'applied' || application.status === 'pending' || application.status === 'viewed') && (
+                            <Link
+                              href={`/dashboard/interview-prep/${application.job.id}`}
+                              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium bg-[#6B9B5F]/10 text-[#6B9B5F] hover:bg-[#6B9B5F]/20 transition-all text-sm"
+                            >
+                              <SparklesIcon className="w-4 h-4" />
+                              <span>Préparer</span>
+                            </Link>
+                          )}
 
                           {(application.status === 'applied' || application.status === 'pending') && (
                             <button

@@ -654,3 +654,174 @@ Ordonne les matches du score le plus élevé au plus faible. Maximum {min(limit,
         from app.logging_config import logger
         logger.error(f"Erreur matching IA candidat: {type(e).__name__}: {e}")
         raise HTTPException(status_code=500, detail="Erreur lors du matching IA. Réessayez dans quelques instants.")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Préparation entretien IA
+# ─────────────────────────────────────────────────────────────────────────────
+
+class InterviewQuestion(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    question: str
+    tip: str
+    category: str  # "technical" | "behavioral" | "motivation" | "company"
+
+
+class InterviewPrepResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    job_title: str
+    company_name: str
+    questions: List[InterviewQuestion]
+    general_advice: List[str]
+    generated_at: datetime
+
+
+class InterviewPrepRequest(BaseModel):
+    job_id: int
+
+
+@router.post("/interview-prep", response_model=InterviewPrepResponse)
+async def generate_interview_prep(
+    request: InterviewPrepRequest,
+    current_user: User = Depends(require_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Génère des questions d'entretien personnalisées pour un candidat et une offre donnée.
+    Accessible uniquement aux candidats.
+    """
+    if current_user.role != UserRole.CANDIDATE:
+        raise HTTPException(status_code=403, detail="Accès réservé aux candidats")
+
+    # Charger le profil candidat
+    stmt = (
+        select(Candidate)
+        .options(
+            selectinload(Candidate.experiences),
+            selectinload(Candidate.educations),
+            selectinload(Candidate.skills),
+        )
+        .filter(Candidate.user_id == current_user.id)
+    )
+    result = await db.execute(stmt)
+    candidate = result.scalar_one_or_none()
+    if not candidate:
+        raise HTTPException(status_code=404, detail="Profil candidat introuvable")
+
+    # Charger l'offre
+    job_stmt = (
+        select(Job)
+        .options(selectinload(Job.company))
+        .filter(Job.id == request.job_id)
+    )
+    job_result = await db.execute(job_stmt)
+    job = job_result.scalar_one_or_none()
+    if not job:
+        raise HTTPException(status_code=404, detail="Offre introuvable")
+
+    company_name = job.company.name if job.company else "l'entreprise"
+
+    # Construire le contexte candidat
+    candidate_context = f"""Nom: {current_user.first_name} {current_user.last_name}
+Titre: {candidate.title or 'Non renseigné'}
+Années d'expérience: {candidate.years_experience or 0}
+Localisation: {candidate.location or 'Non renseignée'}
+"""
+    if candidate.experiences:
+        candidate_context += "\nExpériences:\n" + "\n".join(
+            f"- {e.title} chez {e.company} ({e.start_date} → {e.end_date or 'Présent'}): {e.description or ''}"
+            for e in candidate.experiences
+        )
+    if candidate.educations:
+        candidate_context += "\n\nFormations:\n" + "\n".join(
+            f"- {e.degree} à {e.school} ({e.end_date})"
+            for e in candidate.educations
+        )
+    if candidate.skills:
+        all_skills = [s.name for s in candidate.skills]
+        candidate_context += f"\n\nCompétences: {', '.join(all_skills)}"
+
+    # Contexte offre
+    job_context = f"""Titre: {job.title}
+Entreprise: {company_name}
+Type: {job.job_type} | Mode: {job.location_type} | Lieu: {job.location or 'Non précisé'}
+Description: {(job.description or '')[:600]}
+Exigences: {(job.requirements or '')[:400]}
+Responsabilités: {(job.responsibilities or '')[:400]}
+"""
+
+    prompt = f"""Tu es un coach en préparation d'entretien d'embauche expert.
+Un candidat postule pour ce poste et veut se préparer.
+
+=== PROFIL CANDIDAT ===
+{candidate_context}
+
+=== OFFRE VISÉE ===
+{job_context}
+
+=== INSTRUCTIONS ===
+Génère exactement 12 questions d'entretien personnalisées réparties en 4 catégories :
+- "technical" : 4 questions techniques liées aux compétences requises pour CE poste
+- "behavioral" : 3 questions comportementales (méthode STAR)
+- "motivation" : 3 questions sur la motivation pour CE poste et CETTE entreprise
+- "company" : 2 questions que le candidat devrait poser à l'employeur
+
+Pour chaque question, fournis un conseil court et pratique (tip) en tenant compte du profil du candidat.
+Fournis aussi 3 conseils généraux pour cet entretien spécifique.
+
+Réponds UNIQUEMENT en JSON valide (sans markdown) :
+{{
+  "questions": [
+    {{
+      "question": "...",
+      "tip": "Conseil personnalisé court et actionnable",
+      "category": "technical|behavioral|motivation|company"
+    }}
+  ],
+  "general_advice": ["Conseil 1", "Conseil 2", "Conseil 3"]
+}}"""
+
+    try:
+        ai_service = get_ai_service()
+        message = await ai_service.client.messages.create(
+            model=ai_service.model,
+            max_tokens=2500,
+            temperature=0.3,
+            system="Tu es un expert en coaching d'entretien d'embauche. Tu génères des questions personnalisées et des conseils pratiques.",
+            messages=[{"role": "user", "content": prompt}]
+        )
+        response_text = message.content[0].text
+
+        try:
+            ai_result = json.loads(response_text)
+        except json.JSONDecodeError:
+            import re
+            json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
+            if json_match:
+                ai_result = json.loads(json_match.group())
+            else:
+                raise ValueError("Réponse IA non parseable")
+
+        questions = [
+            InterviewQuestion(
+                question=q.get("question", ""),
+                tip=q.get("tip", ""),
+                category=q.get("category", "behavioral"),
+            )
+            for q in ai_result.get("questions", [])
+            if q.get("question")
+        ]
+
+        return InterviewPrepResponse(
+            job_title=job.title,
+            company_name=company_name,
+            questions=questions,
+            general_advice=ai_result.get("general_advice", []),
+            generated_at=datetime.now(timezone.utc),
+        )
+
+    except Exception as e:
+        from app.logging_config import logger
+        logger.error(f"Erreur préparation entretien: {type(e).__name__}: {e}")
+        raise HTTPException(status_code=500, detail="Erreur lors de la génération. Réessayez dans quelques instants.")
+

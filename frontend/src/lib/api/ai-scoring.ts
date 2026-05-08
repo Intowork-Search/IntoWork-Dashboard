@@ -85,6 +85,20 @@ export interface JobMatchesResponse {
   generated_at: string;
 }
 
+export interface InterviewQuestion {
+  question: string;
+  tip: string;
+  category: 'technical' | 'behavioral' | 'motivation' | 'company';
+}
+
+export interface InterviewPrepResponse {
+  job_title: string;
+  company_name: string;
+  questions: InterviewQuestion[];
+  general_advice: string[];
+  generated_at: string;
+}
+
 // API Client
 const API_URL = getApiUrl();
 
@@ -191,6 +205,30 @@ export const aiScoringAPI = {
     if (!response.ok) {
       const error = await response.json().catch(() => ({ detail: 'Erreur lors du matching' }));
       throw new Error(error.detail || 'Erreur lors du matching IA');
+    }
+
+    return response.json();
+  },
+
+  /**
+   * Génère des questions d'entretien personnalisées
+   */
+  async generateInterviewPrep(
+    token: string,
+    jobId: number
+  ): Promise<InterviewPrepResponse> {
+    const response = await fetch(`${API_URL}/ai-scoring/interview-prep`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ job_id: jobId }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'Erreur lors de la génération' }));
+      throw new Error(error.detail || 'Erreur lors de la génération des questions');
     }
 
     return response.json();
