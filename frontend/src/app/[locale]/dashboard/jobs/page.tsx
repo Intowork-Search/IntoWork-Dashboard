@@ -560,13 +560,20 @@ export default function JobsPage() {
                       </div>
                     </div>
 
-                    {/* Action button */}
+                    {/* Action buttons */}
                     {!isEmployer && (
-                      <div className="mt-4">
+                      <div className="mt-4 grid grid-cols-2 gap-2">
+                        <Link
+                          href={`/dashboard/jobs/${job.id}`}
+                          className="py-3 rounded-xl font-semibold bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all flex items-center justify-center gap-2"
+                        >
+                          <EyeIcon className="w-5 h-5" />
+                          <span>{t('viewDetails')}</span>
+                        </Link>
                         {job.has_applied ? (
                           <button
                             disabled
-                            className="w-full py-3 rounded-xl font-semibold bg-gray-100 text-gray-400 cursor-not-allowed flex items-center justify-center gap-2"
+                            className="py-3 rounded-xl font-semibold bg-gray-100 text-gray-400 cursor-not-allowed flex items-center justify-center gap-2"
                           >
                             <CheckBadgeIcon className="w-5 h-5" />
                             <span>{t('applied')}</span>
@@ -575,7 +582,7 @@ export default function JobsPage() {
                           <button
                             data-tour="apply-button"
                             onClick={() => handleApply(job.id)}
-                            className="w-full py-3 rounded-xl font-semibold bg-gradient-to-r from-[#6B9B5F] to-[#5a8a4f] text-white shadow-lg shadow-[#6B9B5F]/20 hover:shadow-xl hover:shadow-[#6B9B5F]/30 transition-all flex items-center justify-center gap-2"
+                            className="py-3 rounded-xl font-semibold bg-gradient-to-r from-[#6B9B5F] to-[#5a8a4f] text-white shadow-lg shadow-[#6B9B5F]/20 hover:shadow-xl hover:shadow-[#6B9B5F]/30 transition-all flex items-center justify-center gap-2"
                           >
                             <PaperAirplaneIcon className="w-5 h-5" />
                             <span>{t('apply')}</span>
