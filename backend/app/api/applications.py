@@ -913,3 +913,131 @@ async def update_application_notes(
         "application_id": application.id,
         "notes": application.notes
     }
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Message rapide (1 clic) — change statut + envoie email personnalisé
+# ─────────────────────────────────────────────────────────────────────────────
+
+class QuickMessageRequest(BaseModel):
+    status: str           # nouveau statut à appliquer
+    subject: str          # objet de l'email
+    message: str          # corps du message personnalisé
+
+
+@router.post("/employer/applications/{application_id}/quick-message")
+async def send_quick_message(
+    application_id: int,
+    request: QuickMessageRequest,
+    current_user: User = Depends(require_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Changer le statut d'une candidature ET envoyer un email avec message personnalisé.
+    Ne nécessite pas de template configuré.
+    """
+    from app.models.base import Employer, ApplicationStatus, UserRole
+
+    if current_user.role != UserRole.EMPLOYER:
+        raise HTTPException(status_code=403, detail="Accès réservé aux employeurs")
+
+    employer_result = await db.execute(
+        select(Employer).filter(Employer.user_id == current_user.id)
+    )
+    employer = employer_result.scalar_one_or_none()
+    if not employer:
+        raise HTTPException(status_code=404, detail="Employeur introuvable")
+
+    app_result = await db.execute(
+        select(JobApplication)
+        .options(
+            selectinload(JobApplication.job),
+            selectinload(JobApplication.candidate),
+        )
+        .filter(JobApplication.id == application_id)
+    )
+    application = app_result.scalar_one_or_none()
+    if not application:
+        raise HTTPException(status_code=404, detail="Candidature introuvable")
+
+    if application.job.employer_id != employer.id:
+        raise HTTPException(status_code=403, detail="Vous ne pouvez pas modifier cette candidature")
+
+    # Valider et appliquer le statut
+    try:
+        new_status = ApplicationStatus(request.status)
+    except ValueError:
+        raise HTTPException(status_code=400, detail=f"Statut invalide : {request.status}")
+
+    old_status = application.status
+    application.status = new_status
+    await db.commit()
+    await db.refresh(application)
+
+    # Notification in-app
+    if old_status != new_status:
+        try:
+            status_messages = {
+                ApplicationStatus.VIEWED: "👁️ Votre candidature a été vue",
+                ApplicationStatus.SHORTLISTED: "⭐ Vous avez été présélectionné(e)",
+                ApplicationStatus.INTERVIEW: "🎯 Vous êtes convoqué(e) en entretien",
+                ApplicationStatus.ACCEPTED: "🎉 Félicitations ! Votre candidature a été acceptée",
+                ApplicationStatus.REJECTED: "❌ Votre candidature n'a pas été retenue",
+            }
+            title = status_messages.get(new_status, "📬 Mise à jour de votre candidature")
+            await create_notification(
+                db=db,
+                user_id=application.candidate.user_id,
+                type=NotificationType.STATUS_CHANGE,
+                title=title,
+                message=f"Votre candidature pour le poste de {application.job.title} : {new_status.value}",
+                related_job_id=application.job_id,
+                related_application_id=application.id,
+            )
+        except Exception as e:
+            logger.warning(f"Notification échouée (non bloquant) : {e}")
+
+    # Envoi de l'email avec le message personnalisé
+    candidate_user_result = await db.execute(
+        select(User).filter(User.id == application.candidate.user_id)
+    )
+    candidate_user = candidate_user_result.scalar_one_or_none()
+
+    email_sent = False
+    if candidate_user:
+        try:
+            # Construire le HTML du message
+            html_body = f"""
+            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 24px;">
+              <p style="font-size: 16px; color: #1f2937;">{request.message.replace(chr(10), '<br>')}</p>
+              <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;">
+              <p style="font-size: 12px; color: #9ca3af;">
+                Cet email a été envoyé par {current_user.first_name} {current_user.last_name}
+                via la plateforme IntoWork.
+              </p>
+            </div>
+            """
+            from resend import Emails
+            import resend
+            import os
+            resend.api_key = os.getenv("RESEND_API_KEY", "")
+            from_email = os.getenv("FROM_EMAIL", "INTOWORK <noreply@intowork.co>")
+            params = {
+                "from": from_email,
+                "to": [candidate_user.email],
+                "subject": request.subject,
+                "html": html_body,
+            }
+            Emails.send(params)
+            email_sent = True
+            logger.info(f"✅ Quick message sent to {candidate_user.email} (status={new_status.value})")
+        except Exception as e:
+            logger.error(f"❌ Quick message email failed : {e}")
+
+    return {
+        "message": "Statut mis à jour" + (" et email envoyé" if email_sent else " (email non envoyé)"),
+        "application_id": application.id,
+        "new_status": application.status.value,
+        "email_sent": email_sent,
+    }
+

@@ -21,9 +21,11 @@ import {
   CheckCircleIcon,
   ExclamationTriangleIcon,
   CalendarIcon,
+  ChatBubbleLeftRightIcon,
 } from '@heroicons/react/24/outline';
-import { StarIcon as StarSolid } from '@heroicons/react/24/solid';
+import { StarIcon as StarSolid, XCircleIcon as XCircleSolid } from '@heroicons/react/24/solid';
 import type { ApplicationWithScore } from '@/lib/api/ai-scoring';
+import QuickMessageModal, { type QuickActionType } from '@/components/QuickMessageModal';
 
 // ── Colonnes ────────────────────────────────────────────────────────────────
 
@@ -91,10 +93,12 @@ function KanbanCard({
   app,
   isDragging = false,
   onView,
+  onQuickAction,
 }: {
   app: ApplicationWithScore;
   isDragging?: boolean;
   onView: (app: ApplicationWithScore) => void;
+  onQuickAction: (app: ApplicationWithScore, action: QuickActionType) => void;
 }) {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({ id: app.id });
 
@@ -172,6 +176,32 @@ function KanbanCard({
       <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
         {new Date(app.applied_at).toLocaleDateString('fr-FR')}
       </p>
+
+      {/* Boutons action rapide */}
+      {app.status !== 'interview' && app.status !== 'rejected' && (
+        <div className="flex gap-1.5 mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+          {app.status !== 'interview' && (
+            <button
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={(e) => { e.stopPropagation(); onQuickAction(app, 'interview'); }}
+              className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg bg-[#6B9B5F]/10 hover:bg-[#6B9B5F]/20 text-[#6B9B5F] text-xs font-medium transition-colors cursor-pointer"
+              title="Inviter en entretien"
+            >
+              <ChatBubbleLeftRightIcon className="w-3.5 h-3.5" />
+              Inviter
+            </button>
+          )}
+          <button
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={(e) => { e.stopPropagation(); onQuickAction(app, 'rejected'); }}
+            className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/30 text-red-500 text-xs font-medium transition-colors cursor-pointer"
+            title="Refuser"
+          >
+            <XCircleSolid className="w-3.5 h-3.5" />
+            Refuser
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -181,9 +211,11 @@ function KanbanCard({
 function KanbanDetailModal({
   app,
   onClose,
+  onQuickAction,
 }: {
   app: ApplicationWithScore;
   onClose: () => void;
+  onQuickAction: (app: ApplicationWithScore, action: QuickActionType) => void;
 }) {
   const score = app.ai_score;
 
@@ -334,6 +366,28 @@ function KanbanDetailModal({
             </div>
           )}
         </div>
+
+        {/* Actions rapides */}
+        <div className="flex items-center gap-3 px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+          {app.status !== 'interview' && (
+            <button
+              onClick={() => { onClose(); onQuickAction(app, 'interview'); }}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#6B9B5F]/10 hover:bg-[#6B9B5F]/20 text-[#6B9B5F] text-sm font-semibold transition-colors"
+            >
+              <ChatBubbleLeftRightIcon className="w-4 h-4" />
+              Inviter en entretien
+            </button>
+          )}
+          {app.status !== 'rejected' && (
+            <button
+              onClick={() => { onClose(); onQuickAction(app, 'rejected'); }}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-red-50 hover:bg-red-100 dark:bg-red-900/20 text-red-600 text-sm font-semibold transition-colors"
+            >
+              <XCircleSolid className="w-4 h-4" />
+              Refuser
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -371,11 +425,13 @@ function DroppableColumn({
   cards,
   activeId,
   onView,
+  onQuickAction,
 }: {
   column: Column;
   cards: ApplicationWithScore[];
   activeId: number | null;
   onView: (app: ApplicationWithScore) => void;
+  onQuickAction: (app: ApplicationWithScore, action: QuickActionType) => void;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: column.id });
 
@@ -403,7 +459,7 @@ function DroppableColumn({
           </div>
         )}
         {cards.map((app) => (
-          <KanbanCard key={app.id} app={app} isDragging={activeId === app.id} onView={onView} />
+          <KanbanCard key={app.id} app={app} isDragging={activeId === app.id} onView={onView} onQuickAction={onQuickAction} />
         ))}
       </div>
     </div>
@@ -415,12 +471,29 @@ function DroppableColumn({
 interface KanbanBoardProps {
   applications: ApplicationWithScore[];
   onStatusChange: (applicationId: number, newStatus: string) => Promise<void>;
+  onQuickMessage: (applicationId: number, status: string, subject: string, message: string) => Promise<void>;
+  jobTitle?: string;
+  companyName?: string;
 }
 
-export default function KanbanBoard({ applications, onStatusChange }: KanbanBoardProps) {
+export default function KanbanBoard({ applications, onStatusChange, onQuickMessage, jobTitle = '', companyName = '' }: KanbanBoardProps) {
   const [activeId, setActiveId] = useState<number | null>(null);
   const [localApps, setLocalApps] = useState<ApplicationWithScore[]>(applications);
   const [selectedApp, setSelectedApp] = useState<ApplicationWithScore | null>(null);
+  const [quickAction, setQuickAction] = useState<{ app: ApplicationWithScore; action: QuickActionType } | null>(null);
+
+  const handleQuickAction = (app: ApplicationWithScore, action: QuickActionType) => {
+    setQuickAction({ app, action });
+  };
+
+  const handleQuickSend = async (status: string, subject: string, message: string) => {
+    if (!quickAction) return;
+    await onQuickMessage(quickAction.app.id, status, subject, message);
+    // Mettre à jour localement
+    setLocalApps(prev =>
+      prev.map(a => a.id === quickAction.app.id ? { ...a, status } : a)
+    );
+  };
 
   // Synchroniser si les props changent
   React.useEffect(() => {
@@ -481,7 +554,18 @@ export default function KanbanBoard({ applications, onStatusChange }: KanbanBoar
   return (
     <>
       {selectedApp && (
-        <KanbanDetailModal app={selectedApp} onClose={() => setSelectedApp(null)} />
+        <KanbanDetailModal app={selectedApp} onClose={() => setSelectedApp(null)} onQuickAction={handleQuickAction} />
+      )}
+      {quickAction && (
+        <QuickMessageModal
+          isOpen={true}
+          onClose={() => setQuickAction(null)}
+          onSend={handleQuickSend}
+          action={quickAction.action}
+          candidateName={quickAction.app.candidate_name}
+          jobTitle={jobTitle}
+          companyName={companyName}
+        />
       )}
       <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
         <div className="overflow-x-auto pb-4">
@@ -493,6 +577,7 @@ export default function KanbanBoard({ applications, onStatusChange }: KanbanBoar
                 cards={getColumnCards(col)}
                 activeId={activeId}
                 onView={setSelectedApp}
+                onQuickAction={handleQuickAction}
               />
             ))}
           </div>

@@ -595,6 +595,20 @@ export const applicationsAPI = {
   updateApplicationNotes: async (token: string, applicationId: number, notes: string): Promise<void> => {
     const client = createAuthenticatedClient(token);
     await client.put(`/applications/employer/applications/${applicationId}/notes`, { notes });
+  },
+
+  // === EMPLOYEUR: Envoyer un message rapide (change statut + email perso) ===
+  sendQuickMessage: async (
+    token: string,
+    applicationId: number,
+    payload: { status: string; subject: string; message: string }
+  ): Promise<{ email_sent: boolean; new_status: string }> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.post(
+      `/applications/employer/applications/${applicationId}/quick-message`,
+      payload
+    );
+    return response.data;
   }
 };
 

@@ -177,6 +177,16 @@ export default function AIScoringPage({ params }: Props) {
     toast.success('Statut mis à jour');
   };
 
+  const handleQuickMessage = async (applicationId: number, status: string, subject: string, message: string) => {
+    const token = await getToken();
+    if (!token) return;
+    await applicationsAPI.sendQuickMessage(token, applicationId, { status, subject, message });
+    setApplications(prev =>
+      prev.map(a => a.id === applicationId ? { ...a, status } : a)
+    );
+    toast.success('Statut mis à jour et email envoyé');
+  };
+
   // Obtenir la couleur selon le score
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-green-600 bg-green-50 border-green-200';
@@ -342,6 +352,7 @@ export default function AIScoringPage({ params }: Props) {
             <KanbanBoard
               applications={applications}
               onStatusChange={handleStatusChange}
+              onQuickMessage={handleQuickMessage}
             />
           </div>
         )}
