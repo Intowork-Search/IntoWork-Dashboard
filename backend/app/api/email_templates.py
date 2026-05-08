@@ -18,6 +18,144 @@ router = APIRouter(prefix="/email-templates", tags=["email-templates"])
 
 
 # ========================================
+# Templates système (par défaut IntoWork)
+# ========================================
+
+SYSTEM_TEMPLATES = [
+    {
+        "type": EmailTemplateType.APPLICATION_RECEIVED,
+        "name": "Accusé de réception candidature",
+        "subject": "Votre candidature pour le poste {job_title} a bien été reçue",
+        "body": """<p>Bonjour {candidate_first_name},</p>
+
+<p>Nous avons bien reçu votre candidature pour le poste de <strong>{job_title}</strong> au sein de <strong>{company_name}</strong>.</p>
+
+<p>Notre équipe va étudier votre dossier avec attention. Nous vous contacterons dans les prochains jours pour vous informer de la suite donnée à votre candidature.</p>
+
+<p>Nous vous remercions de l'intérêt que vous portez à notre entreprise.</p>
+
+<p>Cordialement,<br>
+<strong>{recruiter_name}</strong><br>
+{company_name}</p>""",
+    },
+    {
+        "type": EmailTemplateType.INTERVIEW_INVITATION,
+        "name": "Invitation à un entretien",
+        "subject": "Invitation à un entretien — {job_title} chez {company_name}",
+        "body": """<p>Bonjour {candidate_first_name},</p>
+
+<p>Nous avons examiné votre candidature pour le poste de <strong>{job_title}</strong> et nous avons le plaisir de vous inviter à un entretien.</p>
+
+<p><strong>Détails de l'entretien :</strong><br>
+📅 Date : {interview_date}<br>
+🕐 Heure : {interview_time}<br>
+📍 Lieu : {interview_location}</p>
+
+<p>Merci de nous confirmer votre disponibilité en répondant à cet email.</p>
+
+<p>Cordialement,<br>
+<strong>{recruiter_name}</strong><br>
+{company_name}</p>""",
+    },
+    {
+        "type": EmailTemplateType.INTERVIEW_CONFIRMATION,
+        "name": "Confirmation d'entretien",
+        "subject": "Confirmation de votre entretien — {job_title}",
+        "body": """<p>Bonjour {candidate_first_name},</p>
+
+<p>Nous confirmons votre entretien pour le poste de <strong>{job_title}</strong>.</p>
+
+<p><strong>Rappel :</strong><br>
+📅 {interview_date} à {interview_time}<br>
+📍 {interview_location}</p>
+
+<p>Pensez à apporter votre CV et tout document utile. N'hésitez pas à nous contacter si vous avez des questions.</p>
+
+<p>À très bientôt,<br>
+<strong>{recruiter_name}</strong><br>
+{company_name}</p>""",
+    },
+    {
+        "type": EmailTemplateType.INTERVIEW_REMINDER,
+        "name": "Rappel d'entretien (J-1)",
+        "subject": "Rappel — Votre entretien demain pour {job_title}",
+        "body": """<p>Bonjour {candidate_first_name},</p>
+
+<p>Nous vous rappelons que votre entretien pour le poste de <strong>{job_title}</strong> a lieu <strong>demain</strong>.</p>
+
+<p>📅 {interview_date} à {interview_time}<br>
+📍 {interview_location}</p>
+
+<p>En cas d'empêchement, merci de nous prévenir le plus tôt possible.</p>
+
+<p>À demain,<br>
+<strong>{recruiter_name}</strong><br>
+{company_name}</p>""",
+    },
+    {
+        "type": EmailTemplateType.APPLICATION_REJECTED,
+        "name": "Refus de candidature (professionnel)",
+        "subject": "Suite donnée à votre candidature — {job_title}",
+        "body": """<p>Bonjour {candidate_first_name},</p>
+
+<p>Nous avons bien étudié votre candidature pour le poste de <strong>{job_title}</strong> au sein de <strong>{company_name}</strong>.</p>
+
+<p>Après examen attentif des dossiers reçus, nous avons le regret de vous informer que votre candidature n'a pas été retenue pour ce poste. Cette décision ne remet pas en cause la qualité de votre profil.</p>
+
+<p>Nous conservons votre dossier et n'hésiterons pas à vous recontacter si une opportunité correspondant à votre profil se présente.</p>
+
+<p>Nous vous souhaitons plein succès dans vos recherches.</p>
+
+<p>Cordialement,<br>
+<strong>{recruiter_name}</strong><br>
+{company_name}</p>""",
+    },
+    {
+        "type": EmailTemplateType.OFFER_LETTER,
+        "name": "Lettre d'offre d'emploi",
+        "subject": "Offre d'emploi — {job_title} chez {company_name}",
+        "body": """<p>Bonjour {candidate_first_name},</p>
+
+<p>Nous avons le plaisir de vous proposer le poste de <strong>{job_title}</strong> au sein de <strong>{company_name}</strong>.</p>
+
+<p>Nous avons été très impressionnés par votre parcours et sommes convaincus que vous apporterez une réelle valeur ajoutée à notre équipe.</p>
+
+<p>Vous trouverez ci-joint les détails de notre proposition. Nous restons disponibles pour répondre à toutes vos questions.</p>
+
+<p>Dans l'attente de votre retour, veuillez agréer l'expression de nos salutations distinguées.</p>
+
+<p><strong>{recruiter_name}</strong><br>
+{company_name}</p>""",
+    },
+    {
+        "type": EmailTemplateType.WELCOME_CANDIDATE,
+        "name": "Bienvenue dans l'équipe",
+        "subject": "Bienvenue chez {company_name} — {job_title}",
+        "body": """<p>Bonjour {candidate_first_name},</p>
+
+<p>Au nom de toute l'équipe de <strong>{company_name}</strong>, nous sommes ravis de vous accueillir en tant que <strong>{job_title}</strong>.</p>
+
+<p>Votre arrivée est une excellente nouvelle pour nous, et nous avons hâte de commencer cette aventure professionnelle ensemble.</p>
+
+<p>Des informations pratiques sur votre intégration vous seront communiquées très prochainement.</p>
+
+<p>Encore une fois, bienvenue !<br>
+<strong>{recruiter_name}</strong><br>
+{company_name}</p>""",
+    },
+]
+
+
+class SystemTemplateResponse(BaseModel):
+    """Template système IntoWork (non lié à une entreprise)"""
+    type: str
+    name: str
+    subject: str
+    body: str
+    already_activated: bool = False
+
+
+# ========================================
 # Helper Functions
 # ========================================
 
@@ -227,6 +365,80 @@ async def get_template_variables(
     }
     
     return variables_info
+
+
+@router.get("/defaults", response_model=List[SystemTemplateResponse])
+async def get_default_templates(
+    employer: Annotated[Employer, Depends(get_employer_profile)],
+    db: Annotated[AsyncSession, Depends(get_db)]
+):
+    """
+    Retourne les templates système IntoWork.
+    Le champ `already_activated` indique si l'entreprise possède déjà un template de ce type.
+    """
+    already_activated_types: set[str] = set()
+    if employer.company_id:
+        result = await db.execute(
+            select(EmailTemplate.type).where(EmailTemplate.company_id == employer.company_id)
+        )
+        already_activated_types = {row[0].value for row in result.fetchall()}
+
+    return [
+        SystemTemplateResponse(
+            type=tpl["type"].value,
+            name=tpl["name"],
+            subject=tpl["subject"],
+            body=tpl["body"],
+            already_activated=tpl["type"].value in already_activated_types,
+        )
+        for tpl in SYSTEM_TEMPLATES
+    ]
+
+
+@router.post("/defaults/{template_type}/activate", response_model=EmailTemplateResponse, status_code=status.HTTP_201_CREATED)
+async def activate_default_template(
+    template_type: EmailTemplateType,
+    employer: Annotated[Employer, Depends(get_employer_profile)],
+    db: Annotated[AsyncSession, Depends(get_db)]
+):
+    """
+    Clone un template système dans l'entreprise de l'employeur.
+    Le template est créé actif et marqué comme défaut pour ce type.
+    """
+    if not employer.company_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You must create a company profile before activating templates"
+        )
+
+    system_tpl = next((t for t in SYSTEM_TEMPLATES if t["type"] == template_type), None)
+    if not system_tpl:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Default template not found")
+
+    # Désactiver le flag is_default pour ce type dans la compagnie
+    await db.execute(
+        update(EmailTemplate)
+        .where(
+            EmailTemplate.company_id == employer.company_id,
+            EmailTemplate.type == template_type
+        )
+        .values(is_default=False)
+    )
+
+    new_template = EmailTemplate(
+        company_id=employer.company_id,
+        created_by_user_id=employer.user_id,
+        name=system_tpl["name"],
+        type=template_type,
+        subject=system_tpl["subject"],
+        body=system_tpl["body"],
+        is_default=True,
+        is_active=True,
+    )
+    db.add(new_template)
+    await db.commit()
+    await db.refresh(new_template)
+    return new_template
 
 
 @router.get("/{template_id}", response_model=EmailTemplateResponse)

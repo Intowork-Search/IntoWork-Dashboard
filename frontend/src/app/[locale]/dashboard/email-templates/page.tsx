@@ -46,6 +46,14 @@ interface EmailTemplate {
   updated_at: string;
 }
 
+interface SystemTemplate {
+  type: string;
+  name: string;
+  subject: string;
+  body: string;
+  already_activated: boolean;
+}
+
 const TEMPLATE_TYPES_VALUES = [
   'welcome_candidate', 'application_received', 'application_rejected',
   'interview_invitation', 'interview_confirmation', 'interview_reminder',
@@ -74,6 +82,9 @@ export default function EmailTemplatesPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [variables, setVariables] = useState<string[]>([]);
   const [deletingTemplate, setDeletingTemplate] = useState(false);
+  const [tab, setTab] = useState<'mine' | 'library'>('mine');
+  const [systemTemplates, setSystemTemplates] = useState<SystemTemplate[]>([]);
+  const [activating, setActivating] = useState<string | null>(null);
   const { confirm, isOpen: isConfirmOpen, options: confirmOptions, handleConfirm, handleCancel } = useConfirmModal();
   
   // Form state
@@ -88,6 +99,7 @@ export default function EmailTemplatesPage() {
   useEffect(() => {
     fetchTemplates();
     fetchVariables();
+    fetchDefaultTemplates();
   }, []);
 
   const fetchTemplates = async () => {
@@ -151,6 +163,50 @@ export default function EmailTemplatesPage() {
       }
     } catch (error) {
       logger.error("Error fetching variables:", error);
+    }
+  };
+
+  const fetchDefaultTemplates = async () => {
+    try {
+      const token = await getToken();
+      if (!token) return;
+      const apiUrl = getApiUrl();
+      const response = await fetch(`${apiUrl}/email-templates/defaults`, {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setSystemTemplates(data);
+      }
+    } catch (error) {
+      logger.error("Error fetching default templates:", error);
+    }
+  };
+
+  const activateDefaultTemplate = async (templateType: string) => {
+    setActivating(templateType);
+    try {
+      const token = await getToken();
+      if (!token) return;
+      const apiUrl = getApiUrl();
+      const response = await fetch(`${apiUrl}/email-templates/defaults/${templateType}/activate`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      if (response.ok) {
+        toast.success('Template activé et ajouté à vos templates');
+        fetchTemplates();
+        fetchDefaultTemplates();
+        setTab('mine');
+      } else {
+        const err = await response.json().catch(() => ({}));
+        toast.error(err.detail || 'Erreur lors de l\'activation');
+      }
+    } catch (error) {
+      logger.error("Error activating template:", error);
+      toast.error('Erreur réseau');
+    } finally {
+      setActivating(null);
     }
   };
 
@@ -386,19 +442,115 @@ export default function EmailTemplatesPage() {
           </div>
         </div>
 
-        {/* Templates Grid */}
+        {/* Onglets */}
+        <div className="flex items-center gap-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl p-1 w-fit">
+          <button
+            onClick={() => setTab('mine')}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              tab === 'mine'
+                ? 'bg-[#6B9B5F] text-white shadow-sm'
+                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+            }`}
+          >
+            Mes templates ({templates.length})
+          </button>
+          <button
+            onClick={() => setTab('library')}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              tab === 'library'
+                ? 'bg-[#6B9B5F] text-white shadow-sm'
+                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+            }`}
+          >
+            <SparklesIcon className="w-4 h-4" />
+            Bibliothèque IntoWork
+          </button>
+        </div>
+
+        {/* Vue Bibliothèque */}
+        {tab === 'library' && (
+          <div className="space-y-4">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Templates professionnels prêts à l&apos;emploi. Cliquez sur <strong>Utiliser</strong> pour l&apos;ajouter à vos templates et le personnaliser.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {systemTemplates.map((tpl) => (
+                <div
+                  key={tpl.type}
+                  className={`bg-white dark:bg-gray-800 rounded-2xl border transition-all duration-200 overflow-hidden ${
+                    tpl.already_activated
+                      ? 'border-[#6B9B5F]/40 shadow-md'
+                      : 'border-gray-200 dark:border-gray-600 shadow-sm hover:shadow-md'
+                  }`}
+                >
+                  <div className="p-5">
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-gray-800 dark:text-gray-200 text-sm mb-1">{tpl.name}</h4>
+                        <span className="badge badge-sm bg-blue-100 text-blue-700 border-0">
+                          {TEMPLATE_TYPES.find(t => t.value === tpl.type)?.label ?? tpl.type}
+                        </span>
+                      </div>
+                      {tpl.already_activated && (
+                        <span className="badge badge-sm bg-[#6B9B5F]/10 text-[#6B9B5F] border-[#6B9B5F]/20 shrink-0">
+                          ✓ Activé
+                        </span>
+                      )}
+                    </div>
+                    <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-3 mb-4">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Objet</p>
+                      <p className="text-sm text-gray-700 dark:text-gray-300 font-medium line-clamp-1">{tpl.subject}</p>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => activateDefaultTemplate(tpl.type)}
+                        disabled={activating === tpl.type}
+                        className={`flex-1 btn btn-sm text-white border-0 ${
+                          tpl.already_activated
+                            ? 'bg-gray-400 hover:bg-gray-500'
+                            : 'bg-[#6B9B5F] hover:bg-[#5a8a4e]'
+                        }`}
+                      >
+                        {activating === tpl.type ? (
+                          <span className="loading loading-spinner loading-xs" />
+                        ) : tpl.already_activated ? (
+                          'Réactiver'
+                        ) : (
+                          'Utiliser ce template'
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Templates Grid (onglet "Mes templates") */}
+        {tab === 'mine' && (
+        <>
         {templates.length === 0 ? (
           <div className="text-center py-20 bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700">
             <EnvelopeIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">{t('emptyTitle')}</h3>
             <p className="text-gray-600 dark:text-gray-400 mb-6">{t('emptyDescription')}</p>
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="btn bg-linear-to-r from-[#6B9B5F] to-[#5a8450] hover:from-[#5a8450] hover:to-[#4a6e42] text-white shadow-md"
-            >
-              <PlusIcon className="h-5 w-5" />
-              {t('createButton')}
-            </button>
+            <div className="flex gap-3 justify-center">
+              <button
+                onClick={() => setTab('library')}
+                className="btn bg-[#6B9B5F] hover:bg-[#5a8a4e] text-white shadow-md"
+              >
+                <SparklesIcon className="h-5 w-5" />
+                Voir la bibliothèque
+              </button>
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="btn btn-outline"
+              >
+                <PlusIcon className="h-5 w-5" />
+                {t('createButton')}
+              </button>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -470,6 +622,8 @@ export default function EmailTemplatesPage() {
               </div>
             ))}
           </div>
+        )}
+        </>
         )}
       </div>
 
