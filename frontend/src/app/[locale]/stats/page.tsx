@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Plus_Jakarta_Sans } from 'next/font/google';
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 import {
   BriefcaseIcon,
   BuildingOfficeIcon,
@@ -11,6 +12,7 @@ import {
   DocumentTextIcon,
   ArrowPathIcon,
   ChartBarIcon,
+  ArrowLeftIcon,
 } from '@heroicons/react/24/outline';
 import {
   BarChart,
@@ -119,7 +121,31 @@ export default function StatsPage() {
     <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${jakarta.variable} font-[var(--font-jakarta)]`}>
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+          {/* Ligne top : logo + bouton retour */}
+          <div className="flex items-center justify-between mb-5">
+            <Link href="/" className="flex items-center gap-2 shrink-0">
+              <Image
+                src="/logo-intowork.png"
+                alt="IntoWork"
+                width={120}
+                height={32}
+                className="h-8 w-auto object-contain"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).style.display = 'none';
+                }}
+              />
+              <span className="font-extrabold text-xl text-[#6B9B5F] tracking-tight hidden sm:inline">INTOWORK</span>
+            </Link>
+            <Link
+              href="/"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+            >
+              <ArrowLeftIcon className="w-4 h-4" />
+              Retour à l&apos;accueil
+            </Link>
+          </div>
+
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-3 mb-2">
@@ -133,10 +159,17 @@ export default function StatsPage() {
               <p className="text-gray-500 dark:text-gray-400 text-sm">{t('subtitle')}</p>
             </div>
             <div className="flex gap-3">
-              <Link href="/offres" className="btn btn-outline btn-sm">
+              <Link
+                href="/offres"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-[#6B9B5F] bg-[#6B9B5F]/10 hover:bg-[#6B9B5F]/20 transition-colors"
+              >
+                <BriefcaseIcon className="w-4 h-4" />
                 {t('cta')}
               </Link>
-              <Link href="/signup" className="btn btn-sm text-white" style={{ backgroundColor: '#6B9B5F' }}>
+              <Link
+                href="/signup"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white bg-[#6B9B5F] hover:bg-[#5a8a4e] transition-colors shadow-sm"
+              >
                 {t('ctaPost')}
               </Link>
             </div>
