@@ -956,11 +956,20 @@ async def delete_cv(
             detail="CV non trouvé"
         )
 
+    # Nullifier cv_id dans les candidatures liées (contrainte FK)
+    from app.models.base import JobApplication
+    from sqlalchemy import update as sql_update
+    await db.execute(
+        sql_update(JobApplication)
+        .where(JobApplication.cv_id == cv_id)
+        .values(cv_id=None)
+    )
+
     # Supprimer le fichier du disque de manière asynchrone
     import os
     import aiofiles.os
     try:
-        if os.path.exists(cv.file_path):
+        if cv.file_path and not cv.file_path.startswith("http") and os.path.exists(cv.file_path):
             await aiofiles.os.remove(cv.file_path)
             logger.info(f"🗑️ Fichier supprimé: {cv.file_path}")
     except Exception as e:
