@@ -232,7 +232,7 @@ export default function AIScoringPage({ params }: Props) {
                 <SparklesIcon className="w-8 h-8 text-green-600" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Scoring IA avec Claude</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Scoring IA</h2>
                 <p className="text-gray-600 dark:text-gray-400">Analyse automatique de {total} candidature{total > 1 ? 's' : ''}</p>
               </div>
             </div>
