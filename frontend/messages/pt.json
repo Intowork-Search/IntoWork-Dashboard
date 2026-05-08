@@ -308,7 +308,16 @@
     "topBadge": "Top",
     "weeksAgo": "Há {count} semana(s)",
     "applyForPosition": "Candidatar-se a esta vaga",
-    "loginRequired": "Tem de estar autenticado para se candidatar"
+    "loginRequired": "Tem de estar autenticado para se candidatar",
+    "applyButton": "Candidatar-se a esta vaga",
+    "modalTitle": "Candidatar-se a esta vaga",
+    "coverLetterLabel": "Carta de apresentação",
+    "optional": "(opcional)",
+    "note": "Nota:",
+    "cvAttachedNote": "O seu CV será automaticamente anexado à sua candidatura.",
+    "applySuccess": "Candidatura enviada com sucesso!",
+    "applyError": "Erro ao enviar a sua candidatura.",
+    "sendApplication": "Enviar candidatura"
   },
   "applications": {
     "title": "Minhas candidaturas",

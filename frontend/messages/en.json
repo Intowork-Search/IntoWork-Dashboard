@@ -308,7 +308,16 @@
     "topBadge": "Top",
     "weeksAgo": "{count} week(s) ago",
     "applyForPosition": "Apply for this position",
-    "loginRequired": "You must be logged in to apply"
+    "loginRequired": "You must be logged in to apply",
+    "applyButton": "Apply for this job",
+    "modalTitle": "Apply for this job",
+    "coverLetterLabel": "Cover letter",
+    "optional": "(optional)",
+    "note": "Note:",
+    "cvAttachedNote": "Your CV will be automatically attached to your application.",
+    "applySuccess": "Application sent successfully!",
+    "applyError": "Error sending your application.",
+    "sendApplication": "Send my application"
   },
   "applications": {
     "title": "My Applications",

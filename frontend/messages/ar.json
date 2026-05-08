@@ -308,7 +308,16 @@
     "topBadge": "الأفضل",
     "weeksAgo": "منذ {count} أسبوع/أسابيع",
     "applyForPosition": "التقديم لهذه الوظيفة",
-    "loginRequired": "يجب أن تكون مسجلاً للتقديم"
+    "loginRequired": "يجب أن تكون مسجلاً للتقديم",
+    "applyButton": "تقدم لهذه الوظيفة",
+    "modalTitle": "تقدم لهذه الوظيفة",
+    "coverLetterLabel": "خطاب تقديم",
+    "optional": "(اختياري)",
+    "note": "ملاحظة:",
+    "cvAttachedNote": "سيتم إرفاق سيرتك الذاتية تلقائياً بطلبك.",
+    "applySuccess": "تم إرسال الطلب بنجاح!",
+    "applyError": "خطأ في إرسال طلبك.",
+    "sendApplication": "إرسال طلبي"
   },
   "applications": {
     "title": "طلباتي",

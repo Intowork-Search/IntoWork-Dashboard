@@ -308,7 +308,16 @@
     "topBadge": "Top",
     "weeksAgo": "Il y a {count} semaine(s)",
     "applyForPosition": "Postuler pour ce poste",
-    "loginRequired": "Vous devez être connecté pour postuler"
+    "loginRequired": "Vous devez être connecté pour postuler",
+    "applyButton": "Postuler à cette offre",
+    "modalTitle": "Postuler à cette offre",
+    "coverLetterLabel": "Lettre de motivation",
+    "optional": "(optionnel)",
+    "note": "Note :",
+    "cvAttachedNote": "Votre CV sera automatiquement joint à votre candidature.",
+    "applySuccess": "Candidature envoyée avec succès !",
+    "applyError": "Erreur lors de l'envoi de votre candidature.",
+    "sendApplication": "Envoyer ma candidature"
   },
   "applications": {
     "title": "Mes candidatures",
