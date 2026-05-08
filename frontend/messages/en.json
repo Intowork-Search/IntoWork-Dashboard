@@ -317,7 +317,8 @@
     "cvAttachedNote": "Your CV will be automatically attached to your application.",
     "applySuccess": "Application sent successfully!",
     "applyError": "Error sending your application.",
-    "sendApplication": "Send my application"
+    "sendApplication": "Send my application",
+    "sending": "Sending..."
   },
   "applications": {
     "title": "My Applications",

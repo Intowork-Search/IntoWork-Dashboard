@@ -317,7 +317,8 @@
     "cvAttachedNote": "سيتم إرفاق سيرتك الذاتية تلقائياً بطلبك.",
     "applySuccess": "تم إرسال الطلب بنجاح!",
     "applyError": "خطأ في إرسال طلبك.",
-    "sendApplication": "إرسال طلبي"
+    "sendApplication": "إرسال طلبي",
+    "sending": "جارٍ الإرسال..."
   },
   "applications": {
     "title": "طلباتي",

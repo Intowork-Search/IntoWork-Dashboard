@@ -317,7 +317,8 @@
     "cvAttachedNote": "O seu CV será automaticamente anexado à sua candidatura.",
     "applySuccess": "Candidatura enviada com sucesso!",
     "applyError": "Erro ao enviar a sua candidatura.",
-    "sendApplication": "Enviar candidatura"
+    "sendApplication": "Enviar candidatura",
+    "sending": "A enviar..."
   },
   "applications": {
     "title": "Minhas candidaturas",
