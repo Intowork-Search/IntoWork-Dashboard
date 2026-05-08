@@ -28,7 +28,12 @@ import {
   EyeIcon,
   FunnelIcon,
   MagnifyingGlassIcon,
-  CalendarIcon
+  CalendarIcon,
+  BriefcaseIcon,
+  ChatBubbleLeftIcon,
+  PencilSquareIcon,
+  BoltIcon,
+  AdjustmentsHorizontalIcon
 } from '@heroicons/react/24/outline';
 import { CheckCircleIcon, XCircleIcon, ClockIcon } from '@heroicons/react/24/solid';
 import ScheduleInterviewModal from '@/components/ScheduleInterviewModal';
@@ -396,7 +401,9 @@ export default function CandidatesPage(): React.JSX.Element {
 
                   {/* Coordonnées */}
                   <div>
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Contact</p>
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                      <UserGroupIcon className="w-3.5 h-3.5" />Contact
+                    </p>
                     <div className="space-y-2">
                       <a href={`mailto:${viewingApplication.candidate_email}`} className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 hover:text-[#6B9B5F] transition group">
                         <span className="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
@@ -424,7 +431,9 @@ export default function CandidatesPage(): React.JSX.Element {
                   {/* CV */}
                   {viewingApplication.cv_url && (
                     <div data-tour="download-cv">
-                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">CV</p>
+                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                        <DocumentTextIcon className="w-3.5 h-3.5" />CV
+                      </p>
                       <a
                         href={(() => {
                           const url = viewingApplication.cv_url!;
@@ -447,7 +456,9 @@ export default function CandidatesPage(): React.JSX.Element {
 
                   {/* Changer statut */}
                   <div data-tour="change-status">
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{t('sectionStatus')}</p>
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                      <AdjustmentsHorizontalIcon className="w-3.5 h-3.5" />{t('sectionStatus')}
+                    </p>
                     <div className="relative">
                       <select
                         value={viewingApplication.status}
@@ -473,7 +484,9 @@ export default function CandidatesPage(): React.JSX.Element {
 
                   {/* Actions rapides */}
                   <div>
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Actions rapides</p>
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                      <BoltIcon className="w-3.5 h-3.5" />Actions rapides
+                    </p>
                     <div className="space-y-2">
                       <button
                         onClick={() => {
@@ -530,7 +543,9 @@ export default function CandidatesPage(): React.JSX.Element {
                   {/* Lettre de motivation */}
                   {viewingApplication.cover_letter ? (
                     <div>
-                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{t('sectionCoverLetter')}</p>
+                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                        <ChatBubbleLeftIcon className="w-3.5 h-3.5" />{t('sectionCoverLetter')}
+                      </p>
                       <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed max-h-52 overflow-y-auto">
                         {viewingApplication.cover_letter}
                       </div>
@@ -543,7 +558,9 @@ export default function CandidatesPage(): React.JSX.Element {
 
                   {/* Notes */}
                   <div data-tour="add-notes">
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{t('sectionNotes')}</p>
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                      <PencilSquareIcon className="w-3.5 h-3.5" />{t('sectionNotes')}
+                    </p>
                     <div className="relative">
                       <textarea
                         value={viewingApplication.notes || ''}
