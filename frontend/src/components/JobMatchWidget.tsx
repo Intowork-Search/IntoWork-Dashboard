@@ -239,7 +239,7 @@ export default function JobMatchWidget({ locale }: JobMatchWidgetProps) {
               <SparklesIcon className="w-7 h-7 text-purple-500" />
             </div>
             <p className="text-gray-700 dark:text-gray-300 font-medium text-sm">Analyse en cours…</p>
-            <p className="text-gray-500 dark:text-gray-400 text-xs mt-1">Claude analyse votre profil et les offres disponibles</p>
+            <p className="text-gray-500 dark:text-gray-400 text-xs mt-1">L'IA analyse votre profil et les offres disponibles</p>
           </div>
         )}
 

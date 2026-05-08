@@ -10,6 +10,7 @@ from datetime import datetime, timezone
 from pydantic import BaseModel, ConfigDict
 import os
 import io
+import json
 import httpx
 
 from app.database import get_db
