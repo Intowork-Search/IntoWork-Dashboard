@@ -33,6 +33,7 @@ import {
   TrophyIcon,
   ViewColumnsIcon,
   ListBulletIcon,
+  ArrowLeftIcon,
 } from '@heroicons/react/24/outline';
 import { StarIcon } from '@heroicons/react/24/solid';
 import toast from 'react-hot-toast';
@@ -214,6 +215,15 @@ export default function AIScoringPage({ params }: Props) {
   return (
     <DashboardLayout title="Scoring IA" subtitle="Analyse intelligente des candidatures">
       <div className="space-y-6">
+        {/* Bouton retour */}
+        <button
+          onClick={() => router.back()}
+          className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-[#6B9B5F] dark:hover:text-[#6B9B5F] transition-colors group"
+        >
+          <ArrowLeftIcon className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
+          <span>Retour</span>
+        </button>
+
         {/* Header avec actions */}
         <div className="bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-xl border border-green-200">
           <div className="flex items-center justify-between">
