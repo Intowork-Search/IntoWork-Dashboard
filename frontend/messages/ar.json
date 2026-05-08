@@ -102,7 +102,8 @@
     "loadError": "خطأ في التحميل",
     "notFoundTitle": "الصفحة غير موجودة",
     "notFoundDashboardDesc": "هذا القسم من لوحة التحكم غير موجود أو تم نقله.",
-    "backToDashboard": "العودة إلى لوحة التحكم"
+    "backToDashboard": "العودة إلى لوحة التحكم",
+    "searchPlaceholder": "بحث..."
   },
   "meta": {
     "title": "INTOWORK Search - منصة التوظيف",
@@ -1061,5 +1062,18 @@
     "feature1": "المرشح المُعيَّن → موظف يُنشأ تلقائيًا في Targetym",
     "feature2": "الوظائف الداخلية لـ Targetym متزامنة على IntoWork",
     "feature3": "لوحة توظيف + موارد بشرية موحدة"
+  },
+  "search": {
+    "title": "البحث الشامل",
+    "placeholder": "ابحث عن وظائف وطلبات...",
+    "hint": "اكتب للبحث في الوظائف والطلبات",
+    "noResults": "لا توجد نتائج لـ \"{query}\"",
+    "typeJob": "عروض العمل",
+    "typeJobPost": "وظائفي",
+    "typeApplication": "طلباتي",
+    "navigate": "التنقل",
+    "select": "تحديد",
+    "close": "إغلاق",
+    "clear": "مسح"
   }
 }

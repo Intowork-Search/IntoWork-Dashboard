@@ -102,7 +102,8 @@
     "loadError": "Loading error",
     "notFoundTitle": "Page not found",
     "notFoundDashboardDesc": "This section of the dashboard does not exist or has been moved.",
-    "backToDashboard": "Back to dashboard"
+    "backToDashboard": "Back to dashboard",
+    "searchPlaceholder": "Search..."
   },
   "meta": {
     "title": "INTOWORK Search - Recruitment Platform",
@@ -1061,5 +1062,18 @@
     "feature1": "Hired candidate → Employee automatically created in Targetym",
     "feature2": "Targetym internal jobs synced on IntoWork",
     "feature3": "Unified recruitment + HR dashboard"
+  },
+  "search": {
+    "title": "Global search",
+    "placeholder": "Search jobs, applications...",
+    "hint": "Type to search across jobs and applications",
+    "noResults": "No results for \"{query}\"",
+    "typeJob": "Job offers",
+    "typeJobPost": "My job posts",
+    "typeApplication": "My applications",
+    "navigate": "Navigate",
+    "select": "Select",
+    "close": "Close",
+    "clear": "Clear"
   }
 }

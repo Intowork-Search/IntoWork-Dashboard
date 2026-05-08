@@ -102,7 +102,8 @@
     "loadError": "Erro de carregamento",
     "notFoundTitle": "Página não encontrada",
     "notFoundDashboardDesc": "Esta secção do painel não existe ou foi movida.",
-    "backToDashboard": "Voltar ao painel"
+    "backToDashboard": "Voltar ao painel",
+    "searchPlaceholder": "Pesquisar..."
   },
   "meta": {
     "title": "INTOWORK Search - Plataforma de Recrutamento",
@@ -1061,5 +1062,18 @@
     "feature1": "Candidato contratado → Colaborador criado automaticamente no Targetym",
     "feature2": "Vagas internas Targetym sincronizadas no IntoWork",
     "feature3": "Painel unificado de recrutamento + RH"
+  },
+  "search": {
+    "title": "Pesquisa global",
+    "placeholder": "Pesquisar vagas, candidaturas...",
+    "hint": "Escreva para pesquisar vagas e candidaturas",
+    "noResults": "Sem resultados para \"{query}\"",
+    "typeJob": "Vagas de emprego",
+    "typeJobPost": "Minhas vagas",
+    "typeApplication": "Minhas candidaturas",
+    "navigate": "Navegar",
+    "select": "Selecionar",
+    "close": "Fechar",
+    "clear": "Limpar"
   }
 }

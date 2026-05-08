@@ -2,13 +2,15 @@
 
 import { useUser } from '@/hooks/useNextAuth';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Sidebar from '@/components/Sidebar';
 import NotificationPanel from '@/components/NotificationPanel';
 import HelpButton from '@/components/HelpButton';
 import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 import ThemeToggle from '@/components/ui/ThemeToggle';
-import { Bars3Icon } from '@heroicons/react/24/outline';
+import GlobalSearchModal from '@/components/GlobalSearchModal';
+import { Bars3Icon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { useTranslations } from 'next-intl';
 
 interface DashboardLayoutProps {
   readonly children: React.ReactNode;
@@ -24,6 +26,22 @@ export default function DashboardLayout({
   const { user, isLoaded } = useUser();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const tc = useTranslations('common');
+
+  const handleOpenSearch = useCallback(() => setSearchOpen(true), []);
+
+  // Ctrl+K / Cmd+K pour ouvrir la recherche
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   useEffect(() => {
     if (isLoaded && !user) {
@@ -111,6 +129,19 @@ export default function DashboardLayout({
                 )}
               </div>
               
+              {/* Recherche globale Ctrl+K */}
+              <button
+                onClick={handleOpenSearch}
+                className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-600 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm"
+                aria-label={tc('search')}
+              >
+                <MagnifyingGlassIcon className="w-4 h-4" />
+                <span className="hidden lg:inline">{tc('searchPlaceholder')}</span>
+                <kbd className="hidden lg:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-600 text-xs font-mono">
+                  <span>⌘</span><span>K</span>
+                </kbd>
+              </button>
+
               {/* Thème + Langue + Notifications */}
               <div className="flex items-center gap-1">
                 <ThemeToggle />
@@ -131,6 +162,9 @@ export default function DashboardLayout({
 
       {/* Bouton d'aide flottant */}
       <HelpButton />
+
+      {/* Recherche globale */}
+      <GlobalSearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
     </div>
   );
 }

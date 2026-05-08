@@ -102,7 +102,8 @@
     "loadError": "Erreur de chargement",
     "notFoundTitle": "Page introuvable",
     "notFoundDashboardDesc": "Cette section du tableau de bord n'existe pas ou a été déplacée.",
-    "backToDashboard": "Retour au tableau de bord"
+    "backToDashboard": "Retour au tableau de bord",
+    "searchPlaceholder": "Rechercher..."
   },
   "meta": {
     "title": "INTOWORK Search - Plateforme de Recrutement",
@@ -1061,5 +1062,18 @@
     "feature1": "Candidat embauché → Employé créé automatiquement dans Targetym",
     "feature2": "Offres internes Targetym synchronisées sur IntoWork",
     "feature3": "Tableau de bord unifié recrutement + RH"
+  },
+  "search": {
+    "title": "Recherche globale",
+    "placeholder": "Rechercher des offres, candidatures...",
+    "hint": "Tapez pour rechercher dans les offres et candidatures",
+    "noResults": "Aucun résultat pour \"{query}\"",
+    "typeJob": "Offres d'emploi",
+    "typeJobPost": "Mes offres",
+    "typeApplication": "Mes candidatures",
+    "navigate": "Naviguer",
+    "select": "Sélectionner",
+    "close": "Fermer",
+    "clear": "Effacer"
   }
 }
