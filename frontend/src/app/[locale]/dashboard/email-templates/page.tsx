@@ -315,16 +315,16 @@ export default function EmailTemplatesPage() {
           
           <div className="relative z-10">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-              <div className="flex items-center gap-5">
-                <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg border border-white/30">
-                  <EnvelopeIcon className="w-8 h-8 text-white" />
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg border border-white/30">
+                  <EnvelopeIcon className="w-6 h-6 text-white" />
                 </div>
                 <div>
                   <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-1.5 mb-2">
                     <SparklesIcon className="w-4 h-4 text-white" />
                     <span className="text-white/90 text-sm font-medium">{t('badge')}</span>
                   </div>
-                  <h2 className="text-2xl lg:text-3xl font-bold text-white">
+                    <h2 className="text-xl lg:text-2xl font-bold text-white">
                     {t('heroTitle')}
                   </h2>
                   <p className="text-white/80 mt-1">
@@ -411,7 +411,7 @@ export default function EmailTemplatesPage() {
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex-1">
-                      <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">
+                      <h3 className="text-base font-bold text-gray-800 dark:text-gray-200 mb-2">
                         {template.name}
                       </h3>
                       <div className="flex flex-wrap gap-2">
@@ -480,9 +480,9 @@ export default function EmailTemplatesPage() {
             className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
             style={{ animation: 'fadeIn 0.3s ease-out' }}
           >
-            <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-600 px-8 py-6 z-10">
+            <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-600 px-6 py-4 z-10">
               <div className="flex items-center justify-between">
-                <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+                <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200">
                   {editingTemplate ? t('modalEditTitle') : t('modalCreateTitle')}
                 </h3>
                 <button
@@ -494,7 +494,7 @@ export default function EmailTemplatesPage() {
               </div>
             </div>
             
-            <form onSubmit={handleSubmit} className="p-8 space-y-8">
+            <form onSubmit={handleSubmit} className="p-6 space-y-5">
               {/* Nom du template */}
               <div className="space-y-3">
                 <label className="block text-base font-bold text-gray-800 dark:text-gray-200 mb-3">
@@ -502,7 +502,7 @@ export default function EmailTemplatesPage() {
                 </label>
                 <input
                   type="text"
-                  className="w-full px-5 py-4 text-base text-gray-900 dark:text-white font-medium rounded-xl border-2 border-gray-300 bg-white dark:bg-gray-800 shadow-sm focus:ring-4 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] hover:border-gray-400 transition-all placeholder:text-gray-400 placeholder:font-normal"
+                  className="w-full px-4 py-2.5 text-sm text-gray-900 dark:text-white rounded-xl border border-gray-300 bg-white dark:bg-gray-800 shadow-sm focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] hover:border-gray-400 transition-all placeholder:text-gray-400"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="Ex: Bienvenue nouveau candidat"
@@ -520,7 +520,7 @@ export default function EmailTemplatesPage() {
                 </label>
                 <div className="relative">
                   <select
-                    className="w-full appearance-none px-5 py-4 text-base text-gray-900 dark:text-white font-medium rounded-xl border-2 border-gray-300 bg-white dark:bg-gray-800 shadow-sm focus:ring-4 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] hover:border-gray-400 transition-all cursor-pointer"
+                    className="w-full appearance-none px-4 py-2.5 text-sm text-gray-900 dark:text-white rounded-xl border border-gray-300 bg-white dark:bg-gray-800 shadow-sm focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] hover:border-gray-400 transition-all cursor-pointer"
                     value={formData.type}
                     onChange={(e) => setFormData({ ...formData, type: e.target.value })}
                   >
@@ -548,7 +548,7 @@ export default function EmailTemplatesPage() {
                 </label>
                 <input
                   type="text"
-                  className="w-full px-5 py-4 text-base text-gray-900 dark:text-white font-medium rounded-xl border-2 border-gray-300 bg-white dark:bg-gray-800 shadow-sm focus:ring-4 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] hover:border-gray-400 transition-all placeholder:text-gray-400 placeholder:font-normal"
+                  className="w-full px-4 py-2.5 text-sm text-gray-900 dark:text-white rounded-xl border border-gray-300 bg-white dark:bg-gray-800 shadow-sm focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] hover:border-gray-400 transition-all placeholder:text-gray-400"
                   value={formData.subject}
                   onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                   placeholder="Ex: Bienvenue chez {company_name} !"
@@ -565,8 +565,8 @@ export default function EmailTemplatesPage() {
                   {t('formBody')}
                 </label>
                 <textarea
-                  className="w-full px-5 py-4 text-base text-gray-900 dark:text-white font-medium rounded-xl border-2 border-gray-300 bg-white dark:bg-gray-800 shadow-sm focus:ring-4 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] hover:border-gray-400 transition-all resize-y min-h-[240px] placeholder:text-gray-400 placeholder:font-normal leading-relaxed"
-                  rows={12}
+                  className="w-full px-4 py-2.5 text-sm text-gray-900 dark:text-white rounded-xl border border-gray-300 bg-white dark:bg-gray-800 shadow-sm focus:ring-2 focus:ring-[#6B9B5F]/20 focus:border-[#6B9B5F] hover:border-gray-400 transition-all resize-y min-h-[200px] placeholder:text-gray-400 leading-relaxed"
+                  rows={10}
                   value={formData.body}
                   onChange={(e) => setFormData({ ...formData, body: e.target.value })}
                   placeholder="Écrivez votre message ici...&#10;&#10;Bonjour {candidate_name},&#10;&#10;Merci pour votre candidature au poste de {job_title}.&#10;&#10;Utilisez les variables ci-dessous pour personnaliser automatiquement vos emails."
@@ -587,7 +587,7 @@ export default function EmailTemplatesPage() {
                         <button
                           key={variable}
                           type="button"
-                          className="px-4 py-2.5 rounded-lg text-sm font-semibold text-[#3B82F6] bg-white dark:bg-gray-800 border-2 border-[#3B82F6]/20 hover:bg-[#3B82F6] hover:text-white hover:border-[#3B82F6] shadow-sm hover:shadow-md transition-all transform hover:scale-105"
+                          className="px-3 py-1.5 rounded-lg text-xs font-semibold text-[#3B82F6] bg-white dark:bg-gray-800 border border-[#3B82F6]/20 hover:bg-[#3B82F6] hover:text-white hover:border-[#3B82F6] shadow-sm transition-all"
                           onClick={() => insertVariable(variable)}
                         >
                           {variable}
@@ -602,12 +602,12 @@ export default function EmailTemplatesPage() {
               </div>
 
               {/* Template par défaut */}
-              <div className="p-6 bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl border-2 border-amber-200 space-y-3">
-                <div className="flex items-start gap-4">
+              <div className="p-4 bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl border border-amber-200">
+                <div className="flex items-start gap-3">
                   <input
                     type="checkbox"
                     id="is_default"
-                    className="mt-1 w-6 h-6 rounded-lg border-2 border-gray-300 text-[#F7C700] focus:ring-4 focus:ring-[#F7C700]/20 cursor-pointer"
+                    className="checkbox checkbox-sm mt-0.5 cursor-pointer"
                     checked={formData.is_default}
                     onChange={(e) => setFormData({ ...formData, is_default: e.target.checked })}
                   />

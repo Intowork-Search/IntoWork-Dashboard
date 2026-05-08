@@ -1360,11 +1360,24 @@ export default function Home() {
 
       {/* ═══════════════════════ ANIMATED STATS ═══════════════════════ */}
       <section ref={statsRef} className="py-12 lg:py-16 bg-gradient-to-b from-gray-50/50 to-white border-y border-gray-100">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
-          <AnimatedStat end={platformStats.candidates} suffix="+" label="Candidats actifs" start={statsVisible} />
-          <AnimatedStat end={platformStats.companies} suffix="+" label="Entreprises" start={statsVisible} />
-          <AnimatedStat end={94} suffix="%" label="Taux de matching" start={statsVisible} />
-          <AnimatedStat end={platformStats.active_jobs} suffix="+" label="Offres actives" start={statsVisible} />
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+            <AnimatedStat end={platformStats.candidates} suffix="+" label="Candidats actifs" start={statsVisible} />
+            <AnimatedStat end={platformStats.companies} suffix="+" label="Entreprises" start={statsVisible} />
+            <AnimatedStat end={94} suffix="%" label="Taux de matching" start={statsVisible} />
+            <AnimatedStat end={platformStats.active_jobs} suffix="+" label="Offres actives" start={statsVisible} />
+          </div>
+          <div className="mt-8 text-center">
+            <Link
+              href="/stats"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-[#6B9B5F] hover:text-[#5a8a4e] transition-colors group"
+            >
+              Voir les statistiques du marché en détail
+              <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
+          </div>
         </div>
       </section>
 
