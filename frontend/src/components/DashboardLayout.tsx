@@ -108,11 +108,12 @@ export default function DashboardLayout({
             >
               <Bars3Icon className="w-6 h-6" />
             </button>
-            <div className="flex items-center space-x-2">
-              <div className="w-6 h-6 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xs">IW</span>
-              </div>
-              <span className="font-bold text-gray-900">INTOWORK</span>
+            <div className="flex items-center">
+              <img
+                src="/logo-intowork.png"
+                alt="INTOWORK"
+                className="h-7 w-auto object-contain"
+              />
             </div>
             <div className="w-10"> {/* Spacer pour équilibrer */}</div>
           </div>

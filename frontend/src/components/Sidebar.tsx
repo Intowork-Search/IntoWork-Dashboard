@@ -168,12 +168,13 @@ export default function Sidebar({ userRole }: SidebarProps) {
         {/* Header avec logo et toggle */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 shrink-0">
           {!isCollapsed && (
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-linear-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">IW</span>
-              </div>
-              <span className="font-bold text-gray-900 dark:text-gray-100 text-lg">INTOWORK</span>
-            </div>
+            <Link href="/" className="flex items-center">
+              <img
+                src="/logo-intowork.png"
+                alt="INTOWORK"
+                className="h-8 w-auto object-contain"
+              />
+            </Link>
           )}
           <div className="flex items-center gap-2">
             <button
