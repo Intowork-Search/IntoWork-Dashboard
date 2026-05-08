@@ -141,7 +141,7 @@ export default function SignUpPage() {
                 <img
                   src="/logo-intowork-white.png"
                   alt="INTOWORK"
-                  className="h-24 sm:h-28 md:h-32 xl:h-36 w-auto object-contain"
+                  className="h-12 sm:h-14 md:h-16 xl:h-20 w-auto object-contain"
                 />
               </Link>
             </div>
@@ -218,7 +218,7 @@ export default function SignUpPage() {
                 <img
                   src="/logo-intowork.png"
                   alt="INTOWORK"
-                  className="h-20 sm:h-24 w-auto"
+                  className="h-10 sm:h-12 w-auto"
                 />
               </Link>
             </div>
