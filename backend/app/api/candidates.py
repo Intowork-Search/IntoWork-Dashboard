@@ -620,72 +620,90 @@ async def upload_cv(
         logger.info(f"Nom du fichier: {cv.filename}")
         logger.info(f"Taille du fichier: {file_size} bytes")
 
-        # Sauvegarder le fichier sur le disque local
         import os
         import re
         import uuid
-        from pathlib import Path
 
-        # Security: Define upload directory with absolute path to prevent path traversal
-        cv_dir = os.path.abspath("uploads/cv")
-        os.makedirs(cv_dir, exist_ok=True)
-
-        # Security: Sanitize filename - remove path separators and dangerous characters
-        # Extract just the filename without any directory components
+        # Security: Sanitize filename
         original_filename = os.path.basename(cv.filename)
-
-        # Remove any remaining path traversal attempts and special characters
         safe_filename = re.sub(r'[^a-zA-Z0-9_.-]', '_', original_filename)
-
-        # Security: Ensure filename doesn't start with dot (hidden file)
         if safe_filename.startswith('.'):
             safe_filename = 'file' + safe_filename
-
-        # Security: Limit filename length to prevent filesystem issues
         name_part, ext = os.path.splitext(safe_filename)
         if len(name_part) > 100:
             name_part = name_part[:100]
         safe_filename = name_part + ext
+        unique_id = f"{current_user.id}_{uuid.uuid4().hex}"
+        unique_filename = f"{unique_id}_{safe_filename}"
 
-        # Security: Create UUID-based filename to prevent filename-based attacks
-        unique_filename = f"{current_user.id}_{uuid.uuid4().hex}_{safe_filename}"
-        cv_path = os.path.join(cv_dir, unique_filename)
-        # Chemin relatif depuis le dossier uploads/ (pour construction d'URL)
-        cv_relative_path = f"cv/{unique_filename}"
+        # ── Tentative upload Cloudinary (persistant) ──
+        cv_url_final: str | None = None
+        cv_path_for_db: str | None = None
 
-        # Security: Validate the final path is within the upload directory (prevent path traversal)
-        cv_path_resolved = os.path.abspath(cv_path)
-        if not cv_path_resolved.startswith(cv_dir):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invalid file path detected"
-            )
-        
-        # Écrire le fichier sur le disque de manière asynchrone
-        async with aiofiles.open(cv_path, "wb") as f:
-            await f.write(cv_content)
+        cloudinary_cloud = os.getenv("CLOUDINARY_CLOUD_NAME")
+        cloudinary_key = os.getenv("CLOUDINARY_API_KEY")
+        cloudinary_secret = os.getenv("CLOUDINARY_API_SECRET")
+
+        if cloudinary_cloud and cloudinary_key and cloudinary_secret:
+            try:
+                import cloudinary
+                import cloudinary.uploader
+                cloudinary.config(
+                    cloud_name=cloudinary_cloud,
+                    api_key=cloudinary_key,
+                    api_secret=cloudinary_secret,
+                    secure=True
+                )
+                result = cloudinary.uploader.upload(
+                    cv_content,
+                    folder="intowork/cvs",
+                    public_id=unique_id,
+                    resource_type="raw",  # PDF et fichiers non-image
+                    use_filename=True,
+                    unique_filename=False,
+                )
+                cv_url_final = result["secure_url"]
+                cv_path_for_db = result["secure_url"]
+                logger.info(f"CV uploadé sur Cloudinary: {cv_url_final}")
+            except Exception as cld_err:
+                logger.warning(f"Cloudinary upload échoué, fallback disque local: {cld_err}")
+
+        # ── Fallback : disque local (éphémère sur Railway) ──
+        if not cv_url_final:
+            from pathlib import Path
+            cv_dir = os.path.abspath("uploads/cv")
+            os.makedirs(cv_dir, exist_ok=True)
+            cv_path = os.path.join(cv_dir, unique_filename)
+            cv_path_resolved = os.path.abspath(cv_path)
+            if not cv_path_resolved.startswith(cv_dir):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Invalid file path detected"
+                )
+            async with aiofiles.open(cv_path, "wb") as f:
+                await f.write(cv_content)
+            cv_url_final = f"cv/{unique_filename}"
+            cv_path_for_db = cv_path
+            logger.info(f"CV sauvegardé sur disque (fallback): {cv_path}")
         
         # Créer un nouvel enregistrement CV au lieu d'écraser l'ancien
         new_cv = CandidateCV(
             candidate_id=candidate.id,
             filename=cv.filename,
-            file_path=cv_path,
+            file_path=cv_path_for_db,
             file_size=len(cv_content),
             is_active=True  # Le nouveau CV devient actif
         )
-
-        # Désactiver les anciens CV (optionnel - garde tous actifs pour l'instant)
-        # await db.execute(update(CandidateCV).filter(CandidateCV.candidate_id == candidate.id).values(is_active=False))
 
         db.add(new_cv)
 
         # Aussi mettre à jour les champs legacy dans candidate pour compatibilité
         candidate.cv_filename = cv.filename
         candidate.cv_uploaded_at = datetime.now(timezone.utc)
-        candidate.cv_url = cv_relative_path  # Chemin relatif depuis uploads/ (ex: cv/filename.pdf)
+        candidate.cv_url = cv_url_final  # URL Cloudinary ou chemin relatif fallback
 
         logger.info(f"Nouveau CV ajouté - filename: {cv.filename}")
-        logger.info(f"CV sauvegardé sur disque: {cv_path} ({len(cv_content)} bytes)")
+        logger.info(f"CV url: {cv_url_final}")
 
         await db.commit()
         await db.refresh(new_cv)
