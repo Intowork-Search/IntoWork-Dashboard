@@ -574,10 +574,16 @@ async def upload_cv(
 
     try:
         # Vérifier le type de fichier (header check)
-        if cv.content_type != "application/pdf":
+        ALLOWED_MIME_TYPES = {
+            "application/pdf",
+            "application/msword",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "application/vnd.oasis.opendocument.text",
+        }
+        if cv.content_type not in ALLOWED_MIME_TYPES:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Seuls les fichiers PDF sont acceptés"
+                detail="Formats acceptés : PDF, DOC, DOCX, ODT"
             )
 
         # Récupérer ou créer le profil candidat
@@ -609,11 +615,16 @@ async def upload_cv(
                 detail=f"Le fichier ne peut pas dépasser 5MB (taille actuelle: {file_size / (1024*1024):.2f}MB)"
             )
 
-        # Vérifier le magic byte du PDF (validation supplémentaire)
-        if not cv_content.startswith(b'%PDF'):
+        # Validation magic bytes (PDF, DOC/DOCX/ODT)
+        MAGIC_BYTES = [
+            b'%PDF',             # PDF
+            b'\xd0\xcf\x11\xe0', # DOC (OLE2)
+            b'PK\x03\x04',       # DOCX / ODT (ZIP)
+        ]
+        if not any(cv_content.startswith(magic) for magic in MAGIC_BYTES):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Le fichier ne semble pas être un PDF valide"
+                detail="Le fichier ne semble pas être un document valide (PDF, DOC, DOCX ou ODT)"
             )
 
         logger.info(f"Début du téléchargement CV pour utilisateur {current_user.id}")

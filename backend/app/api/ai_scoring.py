@@ -19,39 +19,49 @@ from app.services.ai_scoring import get_ai_service
 
 
 async def extract_cv_text(cv_url: Optional[str]) -> str:
-    """Extrait le texte d'un fichier CV (PDF) depuis Cloudinary ou le disque local."""
+    """Extrait le texte d'un fichier CV (PDF, DOCX, DOC) depuis Cloudinary ou le disque local."""
     if not cv_url:
         return ""
     try:
-        import pypdf
-        pdf_bytes: Optional[bytes] = None
+        file_bytes: Optional[bytes] = None
 
         if cv_url.startswith("http"):
-            # URL Cloudinary ou autre stockage distant
             async with httpx.AsyncClient(timeout=15.0) as client:
                 resp = await client.get(cv_url)
                 if resp.status_code == 200:
-                    pdf_bytes = resp.content
+                    file_bytes = resp.content
         else:
-            # Chemin local relatif type "cv/filename.pdf"
             base_dir = os.path.join(os.path.dirname(__file__), "..", "..", "uploads")
-            local_path = os.path.join(base_dir, cv_url.replace("\\\\", "/").replace("\\", "/"))
-            local_path = os.path.normpath(local_path)
+            local_path = os.path.normpath(
+                os.path.join(base_dir, cv_url.replace("\\\\", "/").replace("\\", "/"))
+            )
             if os.path.exists(local_path):
                 with open(local_path, "rb") as f:
-                    pdf_bytes = f.read()
+                    file_bytes = f.read()
 
-        if not pdf_bytes:
+        if not file_bytes:
             return ""
 
-        reader = pypdf.PdfReader(io.BytesIO(pdf_bytes))
-        pages_text = []
-        for page in reader.pages:
-            text = page.extract_text()
-            if text:
-                pages_text.append(text)
-        extracted = "\n".join(pages_text).strip()
-        return extracted[:8000]  # Limite raisonnable pour le prompt IA
+        # Détecter le format via magic bytes
+        if file_bytes.startswith(b"%PDF"):
+            import pypdf
+            reader = pypdf.PdfReader(io.BytesIO(file_bytes))
+            pages_text = [p.extract_text() for p in reader.pages if p.extract_text()]
+            extracted = "\n".join(pages_text).strip()
+        elif file_bytes.startswith(b"PK\x03\x04"):
+            # DOCX ou ODT (format ZIP)
+            import docx
+            doc = docx.Document(io.BytesIO(file_bytes))
+            extracted = "\n".join(p.text for p in doc.paragraphs if p.text.strip())
+        else:
+            # DOC (OLE2) — extraction basique du texte brut
+            extracted = file_bytes.decode("latin-1", errors="ignore")
+            # Filtrer les caractères non imprimables
+            import re
+            extracted = re.sub(r"[^\x20-\x7E\xA0-\xFF\n]", " ", extracted)
+            extracted = re.sub(r" {3,}", " ", extracted).strip()
+
+        return extracted[:8000]
     except Exception:
         return ""
 

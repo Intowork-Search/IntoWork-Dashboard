@@ -338,7 +338,7 @@ export default function MesCVPage() {
         type="file"
         ref={fileInputRef}
         onChange={handleCVUpload}
-        accept=".pdf"
+        accept=".pdf,.doc,.docx,.odt"
         className="hidden"
         aria-label="Sélectionner un fichier CV"
       />
