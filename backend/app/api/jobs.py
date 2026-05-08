@@ -26,7 +26,7 @@ from app.models.base import (
 from app.database import get_db
 from app.schemas import (
     JobCreateRequest, JobResponse, JobDetailResponse, JobListResponse,
-    RecentJobsCountResponse
+    RecentJobsCountResponse, MarketStatsResponse, MarketStatItem
 )
 
 router = APIRouter()
@@ -47,6 +47,7 @@ CountryParam = Annotated[Optional[str], Query(description="Country filter (ISO c
 CurrencyParam = Annotated[Optional[str], Query(description="Currency filter (XAF, XOF, EUR, USD)")]
 StatusFilterParam = Annotated[Optional[str], Query(description="Status filter")]
 DaysParam = Annotated[int, Query(ge=1, le=30, description="Number of days")]
+LanguageParam = Annotated[Optional[str], Query(description="Language filter (fr, en, pt, ar)")]
 JobIdPath = Annotated[int, Path(ge=1, description="Job ID")]
 
 
@@ -65,6 +66,7 @@ async def get_jobs(
     salary_min: SalaryMinParam = None,
     country: CountryParam = None,
     currency: CurrencyParam = None,
+    language: LanguageParam = None,
     current_user: CurrentUserOptional = None,
     db: DBSession = None
 ) -> JobListResponse:
@@ -129,6 +131,9 @@ async def get_jobs(
     if currency:
         stmt = stmt.filter(Job.currency == currency)
 
+    if language:
+        stmt = stmt.filter(Job.language == language)
+
     # Pagination - Count total
     count_stmt = select(func.count()).select_from(stmt.subquery())
     total_result = await db.execute(count_stmt)
@@ -169,6 +174,7 @@ async def get_jobs(
             currency=job.currency,
             country=job.country or company.country,
             zone=job.zone,
+            language=job.language,
             posted_at=job.posted_at,
             is_featured=job.is_featured,
             views_count=job.views_count,
@@ -268,6 +274,7 @@ async def get_my_jobs(
             currency=job.currency,
             country=job.country or company.country,
             zone=job.zone,
+            language=job.language,
             posted_at=job.posted_at,
             is_featured=job.is_featured,
             views_count=job.views_count,
@@ -283,6 +290,92 @@ async def get_my_jobs(
         page=page,
         limit=limit,
         total_pages=total_pages
+    )
+
+
+@router.get("/stats/market", response_model=MarketStatsResponse)
+async def get_market_stats(
+    db: DBSession = None
+) -> MarketStatsResponse:
+    """
+    Statistiques publiques du marché de l'emploi.
+    Aucune authentification requise.
+    """
+    # Totaux
+    total_jobs_res = await db.execute(
+        select(func.count()).select_from(Job).filter(Job.status == JobStatus.PUBLISHED)
+    )
+    total_jobs = total_jobs_res.scalar() or 0
+
+    total_apps_res = await db.execute(select(func.count()).select_from(JobApplication))
+    total_applications = total_apps_res.scalar() or 0
+
+    total_companies_res = await db.execute(select(func.count()).select_from(Company))
+    total_companies = total_companies_res.scalar() or 0
+
+    total_cands_res = await db.execute(select(func.count()).select_from(Candidate))
+    total_candidates = total_cands_res.scalar() or 0
+
+    # Offres par pays
+    by_country_res = await db.execute(
+        select(Job.country, func.count().label("cnt"))
+        .filter(Job.status == JobStatus.PUBLISHED, Job.country.isnot(None))
+        .group_by(Job.country)
+        .order_by(desc("cnt"))
+        .limit(10)
+    )
+    jobs_by_country = [
+        MarketStatItem(label=row.country, count=row.cnt)
+        for row in by_country_res.all()
+    ]
+
+    # Offres par type de contrat
+    by_type_res = await db.execute(
+        select(Job.job_type, func.count().label("cnt"))
+        .filter(Job.status == JobStatus.PUBLISHED)
+        .group_by(Job.job_type)
+        .order_by(desc("cnt"))
+    )
+    jobs_by_type = [
+        MarketStatItem(label=row.job_type, count=row.cnt)
+        for row in by_type_res.all()
+    ]
+
+    # Offres par type de lieu (remote/on-site/hybrid)
+    by_loc_res = await db.execute(
+        select(Job.location_type, func.count().label("cnt"))
+        .filter(Job.status == JobStatus.PUBLISHED)
+        .group_by(Job.location_type)
+        .order_by(desc("cnt"))
+    )
+    jobs_by_location_type = [
+        MarketStatItem(label=row.location_type, count=row.cnt)
+        for row in by_loc_res.all()
+    ]
+
+    # Top industries (via Company)
+    top_industries_res = await db.execute(
+        select(Company.industry, func.count().label("cnt"))
+        .join(Job, Job.company_id == Company.id)
+        .filter(Job.status == JobStatus.PUBLISHED, Company.industry.isnot(None))
+        .group_by(Company.industry)
+        .order_by(desc("cnt"))
+        .limit(8)
+    )
+    top_industries = [
+        MarketStatItem(label=row.industry, count=row.cnt)
+        for row in top_industries_res.all()
+    ]
+
+    return MarketStatsResponse(
+        total_jobs=total_jobs,
+        total_applications=total_applications,
+        total_companies=total_companies,
+        total_candidates=total_candidates,
+        jobs_by_country=jobs_by_country,
+        jobs_by_type=jobs_by_type,
+        jobs_by_location_type=jobs_by_location_type,
+        top_industries=top_industries,
     )
 
 
@@ -364,6 +457,7 @@ async def create_job(
             currency=job.currency,
             country=job.country or company.country,
             zone=job.zone,
+            language=job.language,
             requirements=job.requirements,
             responsibilities=job.responsibilities,
             benefits=job.benefits,
@@ -398,6 +492,7 @@ async def create_job(
         currency=job_obj.currency,
         country=job_obj.country or company.country,
         zone=job_obj.zone,
+        language=job_obj.language,
         posted_at=job_obj.posted_at,
         is_featured=job_obj.is_featured,
         views_count=job_obj.views_count,
@@ -460,6 +555,7 @@ async def update_job(
         job_obj.currency = job.currency
         job_obj.country = job.country or job_obj.country
         job_obj.zone = job.zone or job_obj.zone
+        job_obj.language = job.language if job.language is not None else job_obj.language
         job_obj.requirements = job.requirements
         job_obj.responsibilities = job.responsibilities
         job_obj.benefits = job.benefits
@@ -484,6 +580,7 @@ async def update_job(
             currency=job_obj.currency,
             country=job_obj.country or company.country,
             zone=job_obj.zone,
+            language=job_obj.language,
             posted_at=job_obj.posted_at,
             is_featured=job_obj.is_featured,
             views_count=job_obj.views_count,
@@ -608,6 +705,7 @@ async def get_job(
         currency=job.currency,
         country=job.country or company.country,
         zone=job.zone,
+        language=job.language,
         salary_range=f"{job.salary_min:,} - {job.salary_max:,} {job.currency}" if job.salary_min and job.salary_max else None,
         posted_at=job.posted_at,
         is_featured=job.is_featured,

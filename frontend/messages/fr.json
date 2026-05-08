@@ -103,7 +103,9 @@
     "notFoundTitle": "Page introuvable",
     "notFoundDashboardDesc": "Cette section du tableau de bord n'existe pas ou a été déplacée.",
     "backToDashboard": "Retour au tableau de bord",
-    "searchPlaceholder": "Rechercher..."
+    "searchPlaceholder": "Rechercher...",
+    "allLanguages": "Toutes les langues",
+    "filterByLanguage": "Langue"
   },
   "meta": {
     "title": "INTOWORK Search - Plateforme de Recrutement",
@@ -1075,5 +1077,31 @@
     "select": "Sélectionner",
     "close": "Fermer",
     "clear": "Effacer"
+  },
+  "stats": {
+    "title": "Marché de l'emploi",
+    "subtitle": "Statistiques en temps réel de la plateforme IntoWork",
+    "totalJobs": "Offres actives",
+    "totalApplications": "Candidatures",
+    "totalCompanies": "Entreprises",
+    "totalCandidates": "Candidats inscrits",
+    "jobsByCountry": "Offres par pays",
+    "jobsByType": "Types de contrat",
+    "jobsByLocation": "Mode de travail",
+    "topIndustries": "Top secteurs",
+    "loading": "Chargement des statistiques...",
+    "error": "Impossible de charger les statistiques",
+    "retry": "Réessayer",
+    "lastUpdated": "Données en temps réel",
+    "jobTypeFullTime": "Temps plein",
+    "jobTypePartTime": "Temps partiel",
+    "jobTypeContract": "Contrat",
+    "jobTypeInternship": "Stage",
+    "jobTypeFreelance": "Freelance",
+    "locationOnSite": "Présentiel",
+    "locationRemote": "Télétravail",
+    "locationHybrid": "Hybride",
+    "cta": "Trouver une offre",
+    "ctaPost": "Publier une offre"
   }
 }

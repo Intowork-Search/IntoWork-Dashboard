@@ -103,7 +103,9 @@
     "notFoundTitle": "Página não encontrada",
     "notFoundDashboardDesc": "Esta secção do painel não existe ou foi movida.",
     "backToDashboard": "Voltar ao painel",
-    "searchPlaceholder": "Pesquisar..."
+    "searchPlaceholder": "Pesquisar...",
+    "allLanguages": "Todos os idiomas",
+    "filterByLanguage": "Idioma"
   },
   "meta": {
     "title": "INTOWORK Search - Plataforma de Recrutamento",
@@ -1075,5 +1077,31 @@
     "select": "Selecionar",
     "close": "Fechar",
     "clear": "Limpar"
+  },
+  "stats": {
+    "title": "Mercado de Trabalho",
+    "subtitle": "Estatísticas em tempo real da plataforma IntoWork",
+    "totalJobs": "Vagas ativas",
+    "totalApplications": "Candidaturas",
+    "totalCompanies": "Empresas",
+    "totalCandidates": "Candidatos registados",
+    "jobsByCountry": "Vagas por país",
+    "jobsByType": "Tipos de contrato",
+    "jobsByLocation": "Modo de trabalho",
+    "topIndustries": "Top setores",
+    "loading": "Carregando estatísticas...",
+    "error": "Não foi possível carregar as estatísticas",
+    "retry": "Tentar novamente",
+    "lastUpdated": "Dados em tempo real",
+    "jobTypeFullTime": "Tempo inteiro",
+    "jobTypePartTime": "Tempo parcial",
+    "jobTypeContract": "Contrato",
+    "jobTypeInternship": "Estágio",
+    "jobTypeFreelance": "Freelance",
+    "locationOnSite": "Presencial",
+    "locationRemote": "Remoto",
+    "locationHybrid": "Híbrido",
+    "cta": "Encontrar emprego",
+    "ctaPost": "Publicar vaga"
   }
 }

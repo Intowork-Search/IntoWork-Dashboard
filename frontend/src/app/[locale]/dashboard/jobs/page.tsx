@@ -385,6 +385,20 @@ export default function JobsPage() {
               ))}
             </select>
 
+            {/* Langue */}
+            <select
+              title={tc('filterByLanguage')}
+              value={filters.language || ''}
+              onChange={(e) => setFilters({ ...filters, language: e.target.value || undefined, page: 1 })}
+              className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-700 focus:outline-none focus:border-[#6B9B5F] focus:ring-2 focus:ring-[#6B9B5F]/10 transition-all"
+            >
+              <option value="">{tc('allLanguages')}</option>
+              <option value="fr">Français</option>
+              <option value="en">English</option>
+              <option value="pt">Português</option>
+              <option value="ar">عربي</option>
+            </select>
+
             {/* Salaire minimum */}
             <input
               type="number"
@@ -396,7 +410,7 @@ export default function JobsPage() {
             />
 
             {/* Bouton reset */}
-            {(filters.search || filters.location || filters.job_type || filters.location_type || filters.country || filters.currency || filters.salary_min) && (
+            {(filters.search || filters.location || filters.job_type || filters.location_type || filters.country || filters.currency || filters.salary_min || filters.language) && (
               <button
                 onClick={clearFilters}
                 className="px-4 py-2.5 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all flex items-center gap-2"

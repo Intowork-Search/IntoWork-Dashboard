@@ -476,6 +476,7 @@ class JobCreateRequest(BaseModel):
     currency: str = "XAF"
     country: Optional[str] = None
     zone: Optional[str] = None
+    language: Optional[str] = None
     requirements: Optional[str] = None
     responsibilities: Optional[str] = None
     benefits: Optional[str] = None
@@ -496,6 +497,7 @@ class JobResponse(BaseModel):
     currency: str = "XAF"
     country: Optional[str] = None
     zone: Optional[str] = None
+    language: Optional[str] = None
     posted_at: Optional[datetime] = None
     is_featured: bool = False
     views_count: int = 0
@@ -819,3 +821,25 @@ class DBStatusResponse(BaseModel):
     test_query: int
     users_count: int
     message: str
+
+
+# ==============================================================================
+# Market Stats Schemas
+# ==============================================================================
+
+class MarketStatItem(BaseModel):
+    """Single label/count item for charts"""
+    label: str
+    count: int
+
+
+class MarketStatsResponse(BaseModel):
+    """Public market stats response"""
+    total_jobs: int
+    total_applications: int
+    total_companies: int
+    total_candidates: int
+    jobs_by_country: List[MarketStatItem]
+    jobs_by_type: List[MarketStatItem]
+    jobs_by_location_type: List[MarketStatItem]
+    top_industries: List[MarketStatItem]

@@ -103,7 +103,9 @@
     "notFoundTitle": "Page not found",
     "notFoundDashboardDesc": "This section of the dashboard does not exist or has been moved.",
     "backToDashboard": "Back to dashboard",
-    "searchPlaceholder": "Search..."
+    "searchPlaceholder": "Search...",
+    "allLanguages": "All languages",
+    "filterByLanguage": "Language"
   },
   "meta": {
     "title": "INTOWORK Search - Recruitment Platform",
@@ -1075,5 +1077,31 @@
     "select": "Select",
     "close": "Close",
     "clear": "Clear"
+  },
+  "stats": {
+    "title": "Job Market",
+    "subtitle": "Real-time statistics from the IntoWork platform",
+    "totalJobs": "Active jobs",
+    "totalApplications": "Applications",
+    "totalCompanies": "Companies",
+    "totalCandidates": "Registered candidates",
+    "jobsByCountry": "Jobs by country",
+    "jobsByType": "Contract types",
+    "jobsByLocation": "Work mode",
+    "topIndustries": "Top industries",
+    "loading": "Loading statistics...",
+    "error": "Could not load statistics",
+    "retry": "Retry",
+    "lastUpdated": "Real-time data",
+    "jobTypeFullTime": "Full-time",
+    "jobTypePartTime": "Part-time",
+    "jobTypeContract": "Contract",
+    "jobTypeInternship": "Internship",
+    "jobTypeFreelance": "Freelance",
+    "locationOnSite": "On-site",
+    "locationRemote": "Remote",
+    "locationHybrid": "Hybrid",
+    "cta": "Find a job",
+    "ctaPost": "Post a job"
   }
 }

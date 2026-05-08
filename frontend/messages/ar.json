@@ -103,7 +103,9 @@
     "notFoundTitle": "الصفحة غير موجودة",
     "notFoundDashboardDesc": "هذا القسم من لوحة التحكم غير موجود أو تم نقله.",
     "backToDashboard": "العودة إلى لوحة التحكم",
-    "searchPlaceholder": "بحث..."
+    "searchPlaceholder": "بحث...",
+    "allLanguages": "كل اللغات",
+    "filterByLanguage": "اللغة"
   },
   "meta": {
     "title": "INTOWORK Search - منصة التوظيف",
@@ -1075,5 +1077,31 @@
     "select": "تحديد",
     "close": "إغلاق",
     "clear": "مسح"
+  },
+  "stats": {
+    "title": "سوق العمل",
+    "subtitle": "إحصائيات فورية من منصة IntoWork",
+    "totalJobs": "الوظائف النشطة",
+    "totalApplications": "الطلبات",
+    "totalCompanies": "الشركات",
+    "totalCandidates": "المرشحون المسجلون",
+    "jobsByCountry": "الوظائف حسب البلد",
+    "jobsByType": "أنواع العقود",
+    "jobsByLocation": "نمط العمل",
+    "topIndustries": "أبرز القطاعات",
+    "loading": "جارٍ تحميل الإحصائيات...",
+    "error": "تعذّر تحميل الإحصائيات",
+    "retry": "إعادة المحاولة",
+    "lastUpdated": "بيانات فورية",
+    "jobTypeFullTime": "دوام كامل",
+    "jobTypePartTime": "دوام جزئي",
+    "jobTypeContract": "عقد",
+    "jobTypeInternship": "تدريب",
+    "jobTypeFreelance": "عمل حر",
+    "locationOnSite": "حضوري",
+    "locationRemote": "عن بُعد",
+    "locationHybrid": "هجين",
+    "cta": "ابحث عن وظيفة",
+    "ctaPost": "انشر وظيفة"
   }
 }

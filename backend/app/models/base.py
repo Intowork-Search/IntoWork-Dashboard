@@ -266,6 +266,7 @@ class Job(Base):
     location = Column(String)  # Ville, région
     country = Column(String, nullable=True, index=True)  # Code pays ISO (GA, CM, CG)
     zone = Column(String, nullable=True, index=True)  # Zone économique (UEMOA, CEMAC)
+    language = Column(String, nullable=True, index=True)  # Langue principale de l'offre (fr, en, pt, ar)
     salary_min = Column(Integer)
     salary_max = Column(Integer)
     currency = Column(String, default="XAF")

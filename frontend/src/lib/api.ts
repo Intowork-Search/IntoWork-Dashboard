@@ -396,6 +396,7 @@ export interface Job {
   currency: string;
   country?: string;
   zone?: string;
+  language?: string;
   status: string;
   posted_at?: string;
   is_featured: boolean;
@@ -435,6 +436,7 @@ export interface JobFilters {
   salary_min?: number;
   country?: string;
   currency?: string;
+  language?: string;
 }
 
 // Interface pour les candidatures
