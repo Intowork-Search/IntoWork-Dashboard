@@ -359,201 +359,223 @@ export default function CandidatesPage(): React.JSX.Element {
 
       {/* Modal de détail */}
       {viewingApplication && (
-        <div className="fixed inset-0 bg-white/40 flex items-center justify-center z-50 p-4 backdrop-blur-md">
-          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div className="sticky top-0 bg-white dark:bg-gray-800 border-b px-6 py-4 flex justify-between items-center z-10">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t('modalTitle')}</h3>
-              <button
-                onClick={() => setViewingApplication(null)}
-                className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-400"
-                aria-label={tc('close')}
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm" onClick={() => setViewingApplication(null)}>
+          <div className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-3xl max-h-[92vh] overflow-hidden shadow-2xl flex flex-col" onClick={e => e.stopPropagation()}>
 
-            <div className="p-6 space-y-6">
-              {/* Informations candidat */}
-              <div>
-                <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('sectionCandidate')}</h4>
-                <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 space-y-2">
-                  <p className="text-gray-900 dark:text-white"><strong>{t('labelName')}:</strong> {viewingApplication.candidate_name}</p>
-                  <p className="text-gray-900 dark:text-white flex items-center space-x-2">
-                    <EnvelopeIcon className="w-4 h-4" />
-                    <span><strong>{t('labelEmail')}:</strong> {viewingApplication.candidate_email}</span>
-                  </p>
-                  {viewingApplication.candidate_phone && (
-                    <p className="text-gray-900 dark:text-white flex items-center space-x-2">
-                      <PhoneIcon className="w-4 h-4" />
-                      <span><strong>Téléphone:</strong> {viewingApplication.candidate_phone}</span>
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {/* Offre */}
-              <div>
-                <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">💼 Offre</h4>
-                <p className="text-gray-900 dark:text-white">{viewingApplication.job_title}</p>
-              </div>
-
-              {/* Statut et date */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('sectionStatus')}</h4>
-                  <div className="relative" data-tour="change-status">
-                    <select
-                      value={viewingApplication.status}
-                      onChange={(e) => handleStatusChange(viewingApplication.id, e.target.value)}
-                      disabled={updatingStatus}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                      aria-label="Changer le statut"
-                    >
-                      <option value="applied">{tas('pending')}</option>
-                      <option value="viewed">{tas('viewed')}</option>
-                      <option value="shortlisted">{tas('shortlisted')}</option>
-                      <option value="interview">{tas('interview')}</option>
-                      <option value="accepted">{tas('accepted')}</option>
-                      <option value="rejected">{tas('rejected')}</option>
-                    </select>
-                    {updatingStatus && (
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
-                      </div>
-                    )}
-                  </div>
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-[#6B9B5F]/10 to-transparent shrink-0">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#6B9B5F] to-[#4a7a43] flex items-center justify-center text-white font-bold text-lg shrink-0">
+                  {viewingApplication.candidate_name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase()}
                 </div>
                 <div>
-                  <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('sectionDate')}</h4>
-                  <p className="text-gray-900 dark:text-white">{formatDate(viewingApplication.applied_at)}</p>
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white leading-tight">{viewingApplication.candidate_name}</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{viewingApplication.job_title}</p>
                 </div>
               </div>
-
-              {/* Lettre de motivation */}
-              {viewingApplication.cover_letter && (
-                <div>
-                  <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('sectionCoverLetter')}</h4>
-                  <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
-                    <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{viewingApplication.cover_letter}</p>
-                  </div>
-                </div>
-              )}
-
-              {/* CV */}
-              {viewingApplication.cv_url && (
-                <div data-tour="download-cv">
-                  <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">📄 CV</h4>
-                  <a
-                    href={viewingApplication.cv_url.startsWith('http') 
-                      ? viewingApplication.cv_url 
-                      : `${getApiUrl().replace('/api', '')}/${viewingApplication.cv_url}`
-                    }
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-                  >
-                    <DocumentTextIcon className="w-5 h-5" />
-                    <span>{t('downloadCV')}</span>
-                  </a>
-                </div>
-              )}
-
-              {/* Notes */}
-              <div data-tour="add-notes">
-                <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('sectionNotes')}</h4>
-                <div className="relative">
-                  <textarea
-                    value={viewingApplication.notes || ''}
-                    onChange={(e) => {
-                      setViewingApplication({ ...viewingApplication, notes: e.target.value });
-                    }}
-                    onBlur={() => {
-                      handleNotesUpdate(viewingApplication.id, viewingApplication.notes || '');
-                    }}
-                    disabled={updatingNotes}
-                    {...{ placeholder: t('notesPlaceholder') }}
-                    rows={4}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                  />
-                  {updatingNotes && (
-                    <div className="absolute right-3 top-3">
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
-                    </div>
-                  )}
-                </div>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  {updatingNotes ? tc('saving') : t('notesAutoSave')}
-                </p>
-              </div>
-
-              {/* Actions rapides */}
-              <div>
-                <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">⚡ Actions rapides</h4>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    onClick={() => {
-                      setSelectedCandidate({
-                        name: viewingApplication.candidate_name,
-                        email: viewingApplication.candidate_email,
-                        jobTitle: viewingApplication.job_title,
-                        applicationId: viewingApplication.id
-                      });
-                      setInterviewModalOpen(true);
-                    }}
-                    className="px-4 py-2 bg-[#6B9B5F] text-white rounded-lg hover:bg-[#5a8a4f] transition flex items-center justify-center gap-2"
-                  >
-                    <CalendarIcon className="w-5 h-5" />
-                    {t('scheduleInterview')}
-                  </button>
-                  <button
-                    onClick={() => handleStatusChange(viewingApplication.id, 'interview')}
-                    disabled={updatingStatus}
-                    className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {t('markInterview')}
-                  </button>
-                  <button
-                    onClick={() => handleStatusChange(viewingApplication.id, 'accepted')}
-                    disabled={updatingStatus}
-                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {t('accept')}
-                  </button>
-                  <button
-                    onClick={() => handleStatusChange(viewingApplication.id, 'shortlisted')}
-                    disabled={updatingStatus}
-                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {t('shortlist')}
-                  </button>
-                  <button
-                    onClick={async () => {
-                      const ok = await confirm({
-                        title: t('rejectConfirmTitle'),
-                        message: `Vous allez rejeter la candidature de ${viewingApplication.candidate_name}.`,
-                        confirmLabel: t('reject'),
-                      });
-                      if (ok) handleStatusChange(viewingApplication.id, 'rejected');
-                    }}
-                    disabled={updatingStatus}
-                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {t('reject')}
-                  </button>
-                </div>
-              </div>
-
-              {/* Boutons d'action */}
-              <div className="flex justify-end space-x-3 pt-4 border-t">
+              <div className="flex items-center gap-3">
+                {getStatusBadge(viewingApplication.status)}
                 <button
                   onClick={() => setViewingApplication(null)}
-                  className="px-6 py-2 border border-gray-300 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 hover:text-gray-600 transition"
+                  aria-label={tc('close')}
                 >
-                  {tc('close')}
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
               </div>
+            </div>
+
+            {/* Contenu scrollable */}
+            <div className="flex-1 overflow-y-auto">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-0 divide-y lg:divide-y-0 lg:divide-x divide-gray-100 dark:divide-gray-700">
+
+                {/* Colonne gauche : infos + actions statut */}
+                <div className="lg:col-span-1 p-5 space-y-5">
+
+                  {/* Coordonnées */}
+                  <div>
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Contact</p>
+                    <div className="space-y-2">
+                      <a href={`mailto:${viewingApplication.candidate_email}`} className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 hover:text-[#6B9B5F] transition group">
+                        <span className="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
+                          <EnvelopeIcon className="w-4 h-4 text-blue-500" />
+                        </span>
+                        <span className="truncate">{viewingApplication.candidate_email}</span>
+                      </a>
+                      {viewingApplication.candidate_phone && (
+                        <a href={`tel:${viewingApplication.candidate_phone}`} className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 hover:text-[#6B9B5F] transition">
+                          <span className="w-7 h-7 rounded-lg bg-green-50 dark:bg-green-900/30 flex items-center justify-center shrink-0">
+                            <PhoneIcon className="w-4 h-4 text-green-500" />
+                          </span>
+                          <span>{viewingApplication.candidate_phone}</span>
+                        </a>
+                      )}
+                      <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                        <span className="w-7 h-7 rounded-lg bg-gray-50 dark:bg-gray-800 flex items-center justify-center shrink-0">
+                          <CalendarIcon className="w-4 h-4 text-gray-400" />
+                        </span>
+                        <span>{formatDate(viewingApplication.applied_at)}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* CV */}
+                  {viewingApplication.cv_url && (
+                    <div data-tour="download-cv">
+                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">CV</p>
+                      <a
+                        href={(() => {
+                          const url = viewingApplication.cv_url!;
+                          if (url.startsWith('http')) return url;
+                          const baseUrl = getApiUrl().replace(/\/api$/, '');
+                          // Compatibilité : chemin absolu (ancien) ou relatif (nouveau)
+                          const match = url.match(/uploads[/\\](.+)/);
+                          if (match) return `${baseUrl}/uploads/${match[1].replace(/\\/g, '/')}`;
+                          return `${baseUrl}/uploads/${url}`;
+                        })()}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-4 py-2.5 bg-[#6B9B5F] hover:bg-[#5a8a4f] text-white rounded-xl text-sm font-medium transition w-full justify-center"
+                      >
+                        <DocumentTextIcon className="w-4 h-4 shrink-0" />
+                        {t('downloadCV')}
+                      </a>
+                    </div>
+                  )}
+
+                  {/* Changer statut */}
+                  <div data-tour="change-status">
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{t('sectionStatus')}</p>
+                    <div className="relative">
+                      <select
+                        value={viewingApplication.status}
+                        onChange={(e) => handleStatusChange(viewingApplication.id, e.target.value)}
+                        disabled={updatingStatus}
+                        className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-[#6B9B5F] text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-800 disabled:opacity-50"
+                        aria-label="Changer le statut"
+                      >
+                        <option value="applied">{tas('pending')}</option>
+                        <option value="viewed">{tas('viewed')}</option>
+                        <option value="shortlisted">{tas('shortlisted')}</option>
+                        <option value="interview">{tas('interview')}</option>
+                        <option value="accepted">{tas('accepted')}</option>
+                        <option value="rejected">{tas('rejected')}</option>
+                      </select>
+                      {updatingStatus && (
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#6B9B5F]"></div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Actions rapides */}
+                  <div>
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Actions rapides</p>
+                    <div className="space-y-2">
+                      <button
+                        onClick={() => {
+                          setSelectedCandidate({
+                            name: viewingApplication.candidate_name,
+                            email: viewingApplication.candidate_email,
+                            jobTitle: viewingApplication.job_title,
+                            applicationId: viewingApplication.id
+                          });
+                          setInterviewModalOpen(true);
+                        }}
+                        className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium bg-[#6B9B5F]/10 text-[#6B9B5F] hover:bg-[#6B9B5F]/20 transition"
+                      >
+                        <CalendarIcon className="w-4 h-4" />
+                        {t('scheduleInterview')}
+                      </button>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          onClick={() => handleStatusChange(viewingApplication.id, 'shortlisted')}
+                          disabled={updatingStatus}
+                          className="flex items-center justify-center gap-1 px-3 py-2 rounded-xl text-xs font-medium bg-purple-50 text-purple-700 hover:bg-purple-100 dark:bg-purple-900/20 dark:text-purple-300 transition disabled:opacity-50"
+                        >
+                          <CheckCircleIcon className="w-3.5 h-3.5" />{t('shortlist')}
+                        </button>
+                        <button
+                          onClick={() => handleStatusChange(viewingApplication.id, 'accepted')}
+                          disabled={updatingStatus}
+                          className="flex items-center justify-center gap-1 px-3 py-2 rounded-xl text-xs font-medium bg-green-50 text-green-700 hover:bg-green-100 dark:bg-green-900/20 dark:text-green-300 transition disabled:opacity-50"
+                        >
+                          <CheckCircleIcon className="w-3.5 h-3.5" />{t('accept')}
+                        </button>
+                        <button
+                          onClick={async () => {
+                            const ok = await confirm({
+                              title: t('rejectConfirmTitle'),
+                              message: `Vous allez rejeter la candidature de ${viewingApplication.candidate_name}.`,
+                              confirmLabel: t('reject'),
+                            });
+                            if (ok) handleStatusChange(viewingApplication.id, 'rejected');
+                          }}
+                          disabled={updatingStatus}
+                          className="col-span-2 flex items-center justify-center gap-1 px-3 py-2 rounded-xl text-xs font-medium bg-red-50 text-red-700 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-300 transition disabled:opacity-50"
+                        >
+                          <XCircleIcon className="w-3.5 h-3.5" />{t('reject')}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Colonne droite : lettre + notes */}
+                <div className="lg:col-span-2 p-5 space-y-5">
+
+                  {/* Lettre de motivation */}
+                  {viewingApplication.cover_letter ? (
+                    <div>
+                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{t('sectionCoverLetter')}</p>
+                      <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed max-h-52 overflow-y-auto">
+                        {viewingApplication.cover_letter}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 text-center text-sm text-gray-400">
+                      Aucune lettre de motivation fournie
+                    </div>
+                  )}
+
+                  {/* Notes */}
+                  <div data-tour="add-notes">
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{t('sectionNotes')}</p>
+                    <div className="relative">
+                      <textarea
+                        value={viewingApplication.notes || ''}
+                        onChange={(e) => setViewingApplication({ ...viewingApplication, notes: e.target.value })}
+                        onBlur={() => handleNotesUpdate(viewingApplication.id, viewingApplication.notes || '')}
+                        disabled={updatingNotes}
+                        {...{ placeholder: t('notesPlaceholder') }}
+                        rows={5}
+                        className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-[#6B9B5F] text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-800 disabled:opacity-50 resize-none"
+                      />
+                      {updatingNotes && (
+                        <div className="absolute right-3 top-3">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#6B9B5F]"></div>
+                        </div>
+                      )}
+                    </div>
+                    <p className="text-xs text-gray-400 mt-1.5">
+                      {updatingNotes ? tc('saving') : t('notesAutoSave')}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 py-3 border-t border-gray-100 dark:border-gray-700 flex justify-end shrink-0 bg-gray-50/50 dark:bg-gray-800/50">
+              <button
+                onClick={() => setViewingApplication(null)}
+                className="px-5 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition"
+              >
+                {tc('close')}
+              </button>
             </div>
           </div>
         </div>

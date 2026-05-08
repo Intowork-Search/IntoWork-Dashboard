@@ -650,6 +650,8 @@ async def upload_cv(
         # Security: Create UUID-based filename to prevent filename-based attacks
         unique_filename = f"{current_user.id}_{uuid.uuid4().hex}_{safe_filename}"
         cv_path = os.path.join(cv_dir, unique_filename)
+        # Chemin relatif depuis le dossier uploads/ (pour construction d'URL)
+        cv_relative_path = f"cv/{unique_filename}"
 
         # Security: Validate the final path is within the upload directory (prevent path traversal)
         cv_path_resolved = os.path.abspath(cv_path)
@@ -680,7 +682,7 @@ async def upload_cv(
         # Aussi mettre à jour les champs legacy dans candidate pour compatibilité
         candidate.cv_filename = cv.filename
         candidate.cv_uploaded_at = datetime.now(timezone.utc)
-        candidate.cv_url = cv_path
+        candidate.cv_url = cv_relative_path  # Chemin relatif depuis uploads/ (ex: cv/filename.pdf)
 
         logger.info(f"Nouveau CV ajouté - filename: {cv.filename}")
         logger.info(f"CV sauvegardé sur disque: {cv_path} ({len(cv_content)} bytes)")
