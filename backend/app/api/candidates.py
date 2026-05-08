@@ -785,21 +785,38 @@ async def download_cv(
         )
 
     import os
-    from fastapi.responses import FileResponse
+    from fastapi.responses import FileResponse, RedirectResponse
 
-    # Vérifier que le fichier existe
-    if not os.path.exists(candidate.cv_url):
+    cv_url = candidate.cv_url
+
+    # URL Cloudinary ou stockage distant → rediriger directement
+    if cv_url.startswith("http"):
+        return RedirectResponse(url=cv_url, status_code=302)
+
+    # Fichier local — reconstruire le chemin absolu
+    base_dir = os.path.join(os.path.dirname(__file__), "..", "..", "uploads")
+    local_path = os.path.normpath(
+        os.path.join(base_dir, cv_url.replace("\\\\", "/").replace("\\", "/"))
+    )
+
+    if not os.path.exists(local_path):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Fichier CV introuvable"
         )
 
+    safe_name = candidate.cv_filename.replace('"', '').replace('\n', '').replace('\r', '')
+    ext = os.path.splitext(safe_name)[1].lower()
+    mime_map = {
+        ".pdf": "application/pdf",
+        ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        ".doc": "application/msword",
+        ".odt": "application/vnd.oasis.opendocument.text",
+    }
     return FileResponse(
-        path=candidate.cv_url,
-        media_type="application/pdf",
-        headers={
-            "Content-Disposition": f'inline; filename="{candidate.cv_filename.replace(chr(34), "").replace(chr(10), "").replace(chr(13), "")}"'
-        }
+        path=local_path,
+        media_type=mime_map.get(ext, "application/octet-stream"),
+        headers={"Content-Disposition": f'inline; filename="{safe_name}"'}
     )
 
 
@@ -867,22 +884,40 @@ async def download_specific_cv(
             detail="CV non trouvé"
         )
 
-    # Vérifier que le fichier existe
     import os
-    if not os.path.exists(cv.file_path):
+    from fastapi.responses import FileResponse, RedirectResponse
+
+    file_path = cv.file_path
+
+    # URL Cloudinary ou stockage distant → rediriger directement
+    if file_path and file_path.startswith("http"):
+        return RedirectResponse(url=file_path, status_code=302)
+
+    # Fichier local — reconstruire le chemin absolu si relatif
+    if file_path and not os.path.isabs(file_path):
+        base_dir = os.path.join(os.path.dirname(__file__), "..", "..", "uploads")
+        file_path = os.path.normpath(
+            os.path.join(base_dir, file_path.replace("\\\\", "/").replace("\\", "/"))
+        )
+
+    if not file_path or not os.path.exists(file_path):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Fichier CV introuvable sur le serveur"
         )
 
-    from fastapi.responses import FileResponse
-
+    safe_name = cv.filename.replace('"', '').replace('\n', '').replace('\r', '')
+    ext = os.path.splitext(safe_name)[1].lower()
+    mime_map = {
+        ".pdf": "application/pdf",
+        ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        ".doc": "application/msword",
+        ".odt": "application/vnd.oasis.opendocument.text",
+    }
     return FileResponse(
-        path=cv.file_path,
-        media_type="application/pdf",
-        headers={
-            "Content-Disposition": f'inline; filename="{cv.filename.replace(chr(34), "").replace(chr(10), "").replace(chr(13), "")}"'
-        }
+        path=file_path,
+        media_type=mime_map.get(ext, "application/octet-stream"),
+        headers={"Content-Disposition": f'inline; filename="{safe_name}"'}
     )
 
 
