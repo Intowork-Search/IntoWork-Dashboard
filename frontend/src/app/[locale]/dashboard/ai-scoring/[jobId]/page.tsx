@@ -17,6 +17,8 @@ import DashboardLayout from '@/components/DashboardLayout';
 import { useAuth } from '@/hooks/useNextAuth';
 import { aiScoringAPI, type ApplicationWithScore, type AIScoreDetails } from '@/lib/api/ai-scoring';
 import CandidateCompareModal from '@/components/CandidateCompareModal';
+import KanbanBoard from '@/components/KanbanBoard';
+import { applicationsAPI } from '@/lib/api';
 import {
   SparklesIcon,
   ChartBarIcon,
@@ -29,6 +31,8 @@ import {
   ChevronUpIcon,
   BoltIcon,
   TrophyIcon,
+  ViewColumnsIcon,
+  ListBulletIcon,
 } from '@heroicons/react/24/outline';
 import { StarIcon } from '@heroicons/react/24/solid';
 import toast from 'react-hot-toast';
@@ -62,6 +66,7 @@ export default function AIScoringPage({ params }: Props) {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [compareOpen, setCompareOpen] = useState(false);
   const [bulkConfirmLoading, setBulkConfirmLoading] = useState(false);
+  const [viewMode, setViewMode] = useState<'list' | 'kanban'>('list');
   const { confirm, isOpen: isConfirmOpen, options: confirmOptions, handleConfirm, handleCancel } = useConfirmModal();
 
   const limit = 20;
@@ -160,6 +165,17 @@ export default function AIScoringPage({ params }: Props) {
 
   const selectedApplications = applications.filter(a => selectedIds.includes(a.id));
 
+  const handleStatusChange = async (applicationId: number, newStatus: string) => {
+    const token = await getToken();
+    if (!token) return;
+    await applicationsAPI.updateApplicationStatus(token, applicationId, newStatus);
+    // Mettre à jour localement
+    setApplications(prev =>
+      prev.map(a => a.id === applicationId ? { ...a, status: newStatus } : a)
+    );
+    toast.success('Statut mis à jour');
+  };
+
   // Obtenir la couleur selon le score
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-green-600 bg-green-50 border-green-200';
@@ -231,6 +247,34 @@ export default function AIScoringPage({ params }: Props) {
           </div>
         </div>
 
+        {/* Toggle liste / kanban */}
+        <div className="flex justify-end">
+          <div className="flex items-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl p-1 gap-1">
+            <button
+              onClick={() => setViewMode('list')}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                viewMode === 'list'
+                  ? 'bg-[#6B9B5F] text-white shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+              }`}
+            >
+              <ListBulletIcon className="w-4 h-4" />
+              <span>Liste</span>
+            </button>
+            <button
+              onClick={() => setViewMode('kanban')}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                viewMode === 'kanban'
+                  ? 'bg-[#6B9B5F] text-white shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+              }`}
+            >
+              <ViewColumnsIcon className="w-4 h-4" />
+              <span>Kanban</span>
+            </button>
+          </div>
+        </div>
+
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-600">
@@ -282,7 +326,18 @@ export default function AIScoringPage({ params }: Props) {
           </div>
         </div>
 
-        {/* Tri + bouton Comparer */}
+        {/* Vue Kanban */}
+        {viewMode === 'kanban' && (
+          <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-600">
+            <KanbanBoard
+              applications={applications}
+              onStatusChange={handleStatusChange}
+            />
+          </div>
+        )}
+
+        {/* Tri + bouton Comparer / Liste / Pagination (vue liste uniquement) */}
+        {viewMode === 'list' && (<>
         <div className="flex items-center justify-between bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-600">
           <div className="flex items-center gap-2">
             <ChartBarIcon className="w-5 h-5 text-gray-400 dark:text-gray-500" />
@@ -495,6 +550,7 @@ export default function AIScoringPage({ params }: Props) {
             </button>
           </div>
         )}
+        </>)} {/* fin viewMode === 'list' */}
       </div>
       <ConfirmDialog
         isOpen={isConfirmOpen}

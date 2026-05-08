@@ -169,7 +169,7 @@ export default function Sidebar({ userRole }: SidebarProps) {
         {isCollapsed ? (
           <div className="flex flex-col items-center gap-2 px-2 py-3 border-b border-gray-200 dark:border-gray-700 shrink-0">
             <Link href="/" className="flex items-center justify-center">
-              <img src="/favicon-intowork.png" alt="INTOWORK" className="h-8 w-8 object-contain" />
+              <img src="/favicon-intowork.png" alt="INTOWORK" className="h-10 w-10 object-contain" />
             </Link>
             <button
               onClick={() => setIsCollapsed(false)}
