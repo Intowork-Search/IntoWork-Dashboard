@@ -16,6 +16,7 @@ import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/DashboardLayout';
 import { useAuth } from '@/hooks/useNextAuth';
 import { aiScoringAPI, type ApplicationWithScore, type AIScoreDetails } from '@/lib/api/ai-scoring';
+import CandidateCompareModal from '@/components/CandidateCompareModal';
 import {
   SparklesIcon,
   ChartBarIcon,
@@ -58,6 +59,8 @@ export default function AIScoringPage({ params }: Props) {
   const [totalPages, setTotalPages] = useState(0);
   const [sortByScore, setSortByScore] = useState(true);
   const [expandedDetails, setExpandedDetails] = useState<number | null>(null);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [compareOpen, setCompareOpen] = useState(false);
   const [bulkConfirmLoading, setBulkConfirmLoading] = useState(false);
   const { confirm, isOpen: isConfirmOpen, options: confirmOptions, handleConfirm, handleCancel } = useConfirmModal();
 
@@ -66,6 +69,7 @@ export default function AIScoringPage({ params }: Props) {
   // Charger les candidatures scorées
   useEffect(() => {
     loadApplications();
+    setSelectedIds([]);
   }, [page, sortByScore]);
 
   const loadApplications = async () => {
@@ -144,6 +148,17 @@ export default function AIScoringPage({ params }: Props) {
       setBulkScoring(false);
     }
   };
+
+  // Gestion de la sélection pour comparaison
+  const toggleSelect = (id: number) => {
+    setSelectedIds(prev =>
+      prev.includes(id)
+        ? prev.filter(x => x !== id)
+        : prev.length < 4 ? [...prev, id] : prev
+    );
+  };
+
+  const selectedApplications = applications.filter(a => selectedIds.includes(a.id));
 
   // Obtenir la couleur selon le score
   const getScoreColor = (score: number) => {
@@ -267,21 +282,32 @@ export default function AIScoringPage({ params }: Props) {
           </div>
         </div>
 
-        {/* Tri */}
+        {/* Tri + bouton Comparer */}
         <div className="flex items-center justify-between bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-600">
           <div className="flex items-center gap-2">
             <ChartBarIcon className="w-5 h-5 text-gray-400 dark:text-gray-500" />
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Trier par:</span>
           </div>
-          <button
-            onClick={() => setSortByScore(!sortByScore)}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-          >
-            <span className="text-sm font-medium">
-              {sortByScore ? t('sortByScore') : t('sortByDate')}
-            </span>
-            <ChevronDownIcon className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-3">
+            {selectedIds.length >= 2 && (
+              <button
+                onClick={() => setCompareOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-[#6B9B5F] text-white rounded-xl text-sm font-semibold hover:bg-[#5a8a4e] transition-colors shadow-sm"
+              >
+                <ChartBarIcon className="w-4 h-4" />
+                <span>{t('compareBtn', { count: selectedIds.length })}</span>
+              </button>
+            )}
+            <button
+              onClick={() => setSortByScore(!sortByScore)}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            >
+              <span className="text-sm font-medium">
+                {sortByScore ? t('sortByScore') : t('sortByDate')}
+              </span>
+              <ChevronDownIcon className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
         {/* Liste des candidatures */}
@@ -295,9 +321,28 @@ export default function AIScoringPage({ params }: Props) {
             applications.map((app) => (
               <div
                 key={app.id}
-                className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-600 hover:shadow-md transition-shadow"
+                className={`bg-white dark:bg-gray-800 p-6 rounded-xl border-2 hover:shadow-md transition-all ${
+                  selectedIds.includes(app.id)
+                    ? 'border-[#6B9B5F] shadow-sm'
+                    : 'border-gray-200 dark:border-gray-600'
+                }`}
               >
                 <div className="flex items-start justify-between">
+                  {/* Checkbox de sélection (uniquement pour candidats scorés) */}
+                  {app.ai_score !== null && app.ai_score !== undefined && (
+                    <div className="mr-4 mt-1 shrink-0">
+                      <input
+                        type="checkbox"
+                        className="checkbox checkbox-sm"
+                        style={{ accentColor: '#6B9B5F' }}
+                        checked={selectedIds.includes(app.id)}
+                        onChange={() => toggleSelect(app.id)}
+                        disabled={!selectedIds.includes(app.id) && selectedIds.length >= 4}
+                        title={selectedIds.length >= 4 && !selectedIds.includes(app.id) ? t('compareMax') : t('compareSelect')}
+                        aria-label={t('compareSelect')}
+                      />
+                    </div>
+                  )}
                   {/* Infos candidat */}
                   <div className="flex-1">
                     <div className="flex items-center gap-4 mb-3">
@@ -457,6 +502,11 @@ export default function AIScoringPage({ params }: Props) {
         onConfirm={handleConfirm}
         onCancel={handleCancel}
         loading={bulkConfirmLoading}
+      />
+      <CandidateCompareModal
+        isOpen={compareOpen}
+        onClose={() => setCompareOpen(false)}
+        applications={selectedApplications}
       />
     </DashboardLayout>
   );
