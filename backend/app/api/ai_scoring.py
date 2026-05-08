@@ -135,6 +135,29 @@ class ScoredApplicationsListResponse(BaseModel):
     total_pages: int
 
 
+class JobMatchResult(BaseModel):
+    """Résultat de matching IA pour une offre"""
+    job_id: int
+    job_title: str
+    company_name: str
+    location: Optional[str] = None
+    job_type: Optional[str] = None
+    salary_min: Optional[int] = None
+    salary_max: Optional[int] = None
+    currency: str = "XAF"
+    match_score: float
+    match_reasons: List[str]
+    missing_skills: List[str]
+    posted_at: Optional[datetime] = None
+
+
+class JobMatchesResponse(BaseModel):
+    """Liste des offres recommandées pour un candidat"""
+    matches: List[JobMatchResult]
+    total_jobs_analyzed: int
+    generated_at: datetime
+
+
 # ===== ENDPOINTS =====
 
 @router.post("/score-application", response_model=ScoreApplicationResponse)
@@ -455,3 +478,178 @@ async def get_scored_applications(
         limit=limit,
         total_pages=total_pages
     )
+
+
+@router.get("/candidate/job-matches", response_model=JobMatchesResponse)
+async def get_candidate_job_matches(
+    limit: int = Query(5, ge=1, le=20),
+    current_user: User = Depends(require_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Retourne les offres d'emploi actives les mieux matchées pour le candidat connecté.
+    Utilise Claude pour analyser le profil et classer les offres.
+    Accessible uniquement aux candidats.
+    """
+    if current_user.role != UserRole.CANDIDATE:
+        raise HTTPException(status_code=403, detail="Accès réservé aux candidats")
+
+    # Charger le profil candidat complet
+    stmt = (
+        select(Candidate)
+        .options(
+            selectinload(Candidate.experiences),
+            selectinload(Candidate.educations),
+            selectinload(Candidate.skills),
+        )
+        .filter(Candidate.user_id == current_user.id)
+    )
+    result = await db.execute(stmt)
+    candidate = result.scalar_one_or_none()
+    if not candidate:
+        raise HTTPException(status_code=404, detail="Profil candidat introuvable")
+
+    # Charger les offres actives (max 30 pour ne pas surcharger le prompt)
+    jobs_stmt = (
+        select(Job)
+        .options(selectinload(Job.company))
+        .filter(Job.status == "published")
+        .order_by(Job.posted_at.desc().nullslast())
+        .limit(30)
+    )
+    jobs_result = await db.execute(jobs_stmt)
+    active_jobs = jobs_result.scalars().all()
+
+    if not active_jobs:
+        return JobMatchesResponse(
+            matches=[],
+            total_jobs_analyzed=0,
+            generated_at=datetime.now(timezone.utc)
+        )
+
+    # Construire le profil candidat pour le prompt
+    candidate_profile = f"""Nom: {current_user.first_name} {current_user.last_name}
+Titre recherché: {candidate.title or 'Non renseigné'}
+Résumé: {candidate.summary or 'Non renseigné'}
+Années d'expérience: {candidate.years_experience or 0}
+Localisation: {candidate.location or 'Non renseignée'}
+"""
+    if candidate.experiences:
+        candidate_profile += "\nExpériences:\n" + "\n".join(
+            f"- {e.title} chez {e.company} ({e.start_date} - {e.end_date or 'Présent'}): {e.description or ''}"
+            for e in candidate.experiences
+        )
+    if candidate.educations:
+        candidate_profile += "\n\nFormation:\n" + "\n".join(
+            f"- {e.degree} à {e.school} ({e.end_date})"
+            for e in candidate.educations
+        )
+    if candidate.skills:
+        skills_by_cat: dict = {}
+        for s in candidate.skills:
+            cat = s.category.value if hasattr(s.category, 'value') else str(s.category)
+            skills_by_cat.setdefault(cat, []).append(s.name)
+        candidate_profile += "\n\nCompétences:\n" + "\n".join(
+            f"- {cat}: {', '.join(names)}" for cat, names in skills_by_cat.items()
+        )
+
+    # Extraire le texte du CV si disponible
+    cv_text = await extract_cv_text(candidate.cv_url)
+    if cv_text:
+        candidate_profile += f"\n\n--- CV uploadé ---\n{cv_text[:3000]}"
+
+    # Construire la liste des offres pour le prompt
+    jobs_list = ""
+    for i, job in enumerate(active_jobs):
+        company_name = job.company.name if job.company else "Entreprise inconnue"
+        jobs_list += f"""
+[JOB_{job.id}]
+Titre: {job.title}
+Entreprise: {company_name}
+Type: {job.job_type}
+Lieu: {job.location or 'Non précisé'} ({job.location_type})
+Description (résumé): {(job.description or '')[:400]}
+Exigences: {(job.requirements or '')[:300]}
+"""
+
+    prompt = f"""Tu es un expert en recrutement. Analyse le profil candidat et classe les offres d'emploi par pertinence.
+
+=== PROFIL CANDIDAT ===
+{candidate_profile}
+
+=== OFFRES DISPONIBLES ===
+{jobs_list}
+
+=== INSTRUCTIONS ===
+Sélectionne les {min(limit, len(active_jobs))} offres les plus pertinentes pour ce candidat.
+Pour chaque offre retenue, fournis un score de matching (0-100) et des explications courtes.
+
+Réponds UNIQUEMENT en JSON valide (sans markdown) avec cette structure exacte:
+{{
+  "matches": [
+    {{
+      "job_id": 123,
+      "match_score": 87.5,
+      "match_reasons": ["Raison 1", "Raison 2", "Raison 3"],
+      "missing_skills": ["Compétence manquante 1"]
+    }}
+  ]
+}}
+
+Ordonne les matches du score le plus élevé au plus faible. Maximum {min(limit, len(active_jobs))} résultats."""
+
+    try:
+        ai_service = get_ai_service()
+        message = await ai_service.client.messages.create(
+            model=ai_service.model,
+            max_tokens=1500,
+            temperature=0.2,
+            system="Tu es un expert en recrutement qui analyse la compatibilité entre profils candidats et offres d'emploi.",
+            messages=[{"role": "user", "content": prompt}]
+        )
+        response_text = message.content[0].text
+
+        try:
+            ai_result = json.loads(response_text)
+        except json.JSONDecodeError:
+            import re
+            json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
+            if json_match:
+                ai_result = json.loads(json_match.group())
+            else:
+                raise ValueError("Réponse IA non parseable")
+
+        # Construire un index des offres pour enrichissement
+        jobs_index = {job.id: job for job in active_jobs}
+
+        matches = []
+        for m in ai_result.get("matches", []):
+            job = jobs_index.get(m.get("job_id"))
+            if not job:
+                continue
+            company_name = job.company.name if job.company else "Entreprise inconnue"
+            matches.append(JobMatchResult(
+                job_id=job.id,
+                job_title=job.title,
+                company_name=company_name,
+                location=job.location,
+                job_type=job.job_type,
+                salary_min=job.salary_min,
+                salary_max=job.salary_max,
+                currency=job.currency or "XAF",
+                match_score=float(m.get("match_score", 0)),
+                match_reasons=m.get("match_reasons", []),
+                missing_skills=m.get("missing_skills", []),
+                posted_at=job.posted_at,
+            ))
+
+        return JobMatchesResponse(
+            matches=matches,
+            total_jobs_analyzed=len(active_jobs),
+            generated_at=datetime.now(timezone.utc)
+        )
+
+    except Exception as e:
+        from app.logging_config import logger
+        logger.error(f"Erreur matching IA candidat: {type(e).__name__}: {e}")
+        raise HTTPException(status_code=500, detail="Erreur lors du matching IA. Réessayez dans quelques instants.")

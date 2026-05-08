@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useUser, useAuth } from '@/hooks/useNextAuth';
 import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/DashboardLayout';
@@ -13,6 +13,7 @@ import { dashboardAPI, DashboardData } from '@/lib/api/dashboard';
 import OnboardingTour from '@/components/OnboardingTour';
 import HelpButton from '@/components/HelpButton';
 import { candidateDashboardTour, employerDashboardTour } from '@/config/onboardingTours';
+import JobMatchWidget from '@/components/JobMatchWidget';
 import {
   UserIcon,
   DocumentTextIcon,
@@ -36,6 +37,7 @@ export default function Dashboard() {
   const { user } = useUser();
   const { getToken } = useAuth();
   const router = useRouter();
+  const locale = useLocale();
   const userRole = user?.role as 'candidate' | 'employer' | 'admin';
   const t = useTranslations('dashboard');
 
@@ -720,6 +722,13 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* Widget matching IA — visible uniquement pour les candidats */}
+      {userRole === 'candidate' && (
+        <div className="mt-8">
+          <JobMatchWidget locale={locale} />
+        </div>
+      )}
 
       {/* Input file caché pour le téléchargement de CV */}
       <input

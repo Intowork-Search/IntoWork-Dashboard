@@ -64,6 +64,27 @@ export interface ScoredApplicationsListResponse {
   total_pages: number;
 }
 
+export interface JobMatchResult {
+  job_id: number;
+  job_title: string;
+  company_name: string;
+  location?: string;
+  job_type?: string;
+  salary_min?: number;
+  salary_max?: number;
+  currency: string;
+  match_score: number;
+  match_reasons: string[];
+  missing_skills: string[];
+  posted_at?: string;
+}
+
+export interface JobMatchesResponse {
+  matches: JobMatchResult[];
+  total_jobs_analyzed: number;
+  generated_at: string;
+}
+
 // API Client
 const API_URL = getApiUrl();
 
@@ -145,6 +166,31 @@ export const aiScoringAPI = {
     if (!response.ok) {
       const error = await response.json().catch(() => ({ detail: 'Erreur lors de la récupération' }));
       throw new Error(error.detail || 'Erreur lors de la récupération des candidatures');
+    }
+
+    return response.json();
+  },
+
+  /**
+   * Récupère les offres recommandées pour le candidat connecté
+   */
+  async getCandidateJobMatches(
+    token: string,
+    limit: number = 5
+  ): Promise<JobMatchesResponse> {
+    const response = await fetch(
+      `${API_URL}/ai-scoring/candidate/job-matches?limit=${limit}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'Erreur lors du matching' }));
+      throw new Error(error.detail || 'Erreur lors du matching IA');
     }
 
     return response.json();
