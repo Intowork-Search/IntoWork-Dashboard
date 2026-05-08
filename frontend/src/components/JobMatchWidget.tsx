@@ -161,6 +161,16 @@ interface JobMatchWidgetProps {
   locale: string;
 }
 
+const CACHE_KEY = 'jobMatchWidget_cache';
+const CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutes
+
+interface CachedMatches {
+  matches: JobMatchResult[];
+  totalAnalyzed: number;
+  generatedAt: string;
+  savedAt: number;
+}
+
 export default function JobMatchWidget({ locale }: JobMatchWidgetProps) {
   const { getToken } = useAuth();
   const [matches, setMatches] = useState<JobMatchResult[]>([]);
@@ -168,6 +178,25 @@ export default function JobMatchWidget({ locale }: JobMatchWidgetProps) {
   const [loading, setLoading] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [generatedAt, setGeneratedAt] = useState<Date | null>(null);
+
+  // Restaurer depuis localStorage au montage
+  React.useEffect(() => {
+    try {
+      const raw = localStorage.getItem(CACHE_KEY);
+      if (!raw) return;
+      const cached: CachedMatches = JSON.parse(raw);
+      if (Date.now() - cached.savedAt > CACHE_TTL_MS) {
+        localStorage.removeItem(CACHE_KEY);
+        return;
+      }
+      setMatches(cached.matches);
+      setTotalAnalyzed(cached.totalAnalyzed);
+      setGeneratedAt(new Date(cached.generatedAt));
+      setLoaded(true);
+    } catch {
+      localStorage.removeItem(CACHE_KEY);
+    }
+  }, []);
 
   const loadMatches = async () => {
     try {
@@ -179,6 +208,16 @@ export default function JobMatchWidget({ locale }: JobMatchWidgetProps) {
       setTotalAnalyzed(data.total_jobs_analyzed);
       setGeneratedAt(new Date(data.generated_at));
       setLoaded(true);
+      // Sauvegarder en cache
+      try {
+        const cache: CachedMatches = {
+          matches: data.matches,
+          totalAnalyzed: data.total_jobs_analyzed,
+          generatedAt: data.generated_at,
+          savedAt: Date.now(),
+        };
+        localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
+      } catch { /* quota localStorage dépassé — on ignore */ }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Erreur lors du matching';
       toast.error(msg);
