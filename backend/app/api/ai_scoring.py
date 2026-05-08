@@ -8,11 +8,52 @@ from sqlalchemy.orm import selectinload
 from typing import List, Optional
 from datetime import datetime, timezone
 from pydantic import BaseModel, ConfigDict
+import os
+import io
+import httpx
 
 from app.database import get_db
 from app.auth import require_user
 from app.models.base import User, UserRole, Employer, JobApplication, Job, Candidate
 from app.services.ai_scoring import get_ai_service
+
+
+async def extract_cv_text(cv_url: Optional[str]) -> str:
+    """Extrait le texte d'un fichier CV (PDF) depuis Cloudinary ou le disque local."""
+    if not cv_url:
+        return ""
+    try:
+        import pypdf
+        pdf_bytes: Optional[bytes] = None
+
+        if cv_url.startswith("http"):
+            # URL Cloudinary ou autre stockage distant
+            async with httpx.AsyncClient(timeout=15.0) as client:
+                resp = await client.get(cv_url)
+                if resp.status_code == 200:
+                    pdf_bytes = resp.content
+        else:
+            # Chemin local relatif type "cv/filename.pdf"
+            base_dir = os.path.join(os.path.dirname(__file__), "..", "..", "uploads")
+            local_path = os.path.join(base_dir, cv_url.replace("\\\\", "/").replace("\\", "/"))
+            local_path = os.path.normpath(local_path)
+            if os.path.exists(local_path):
+                with open(local_path, "rb") as f:
+                    pdf_bytes = f.read()
+
+        if not pdf_bytes:
+            return ""
+
+        reader = pypdf.PdfReader(io.BytesIO(pdf_bytes))
+        pages_text = []
+        for page in reader.pages:
+            text = page.extract_text()
+            if text:
+                pages_text.append(text)
+        extracted = "\n".join(pages_text).strip()
+        return extracted[:8000]  # Limite raisonnable pour le prompt IA
+    except Exception:
+        return ""
 
 router = APIRouter()
 
@@ -132,8 +173,11 @@ async def score_single_application(
     # Extraire les données pour l'IA
     job = application.job
     candidate = application.candidate
-    
-    # Construire le texte du CV (simplif pour l'instant, TODO: extraire du PDF)
+
+    # Extraire le contenu du fichier PDF si disponible
+    pdf_content = await extract_cv_text(candidate.cv_url)
+
+    # Construire le texte du CV (profil + contenu PDF)
     cv_text = f"""
 Nom: {candidate.user.first_name} {candidate.user.last_name}
 Email: {candidate.user.email}
@@ -143,7 +187,9 @@ Titre: {candidate.title or 'Non renseigné'}
 Résumé: {candidate.summary or 'Non renseigné'}
 Années d'expérience: {candidate.years_experience or 0}
 """
-    
+    if pdf_content:
+        cv_text += f"\n\n--- Contenu extrait du fichier CV ---\n{pdf_content}"
+
     # Ajouter les expériences
     candidate_experience = ""
     if candidate.experiences:
@@ -151,12 +197,12 @@ Années d'expérience: {candidate.years_experience or 0}
             f"- {exp.title} chez {exp.company} ({exp.start_date} - {exp.end_date or 'Présent'})"
             for exp in candidate.experiences
         ])
-    
+
     # Ajouter les compétences
     candidate_skills = ""
     if candidate.skills:
         candidate_skills = ", ".join([skill.name for skill in candidate.skills])
-    
+
     # Appeler l'IA pour le scoring
     try:
         score_result = await get_ai_service().score_candidate(
@@ -252,7 +298,10 @@ async def score_all_job_applications(
     for application in applications:
         try:
             candidate = application.candidate
-            
+
+            # Extraire le contenu du fichier PDF si disponible
+            pdf_content = await extract_cv_text(candidate.cv_url)
+
             cv_text = f"""
 Nom: {candidate.user.first_name} {candidate.user.last_name}
 Email: {candidate.user.email}
@@ -262,18 +311,20 @@ Titre: {candidate.title or 'Non renseigné'}
 Résumé: {candidate.summary or 'Non renseigné'}
 Années d'expérience: {candidate.years_experience or 0}
 """
-            
+            if pdf_content:
+                cv_text += f"\n\n--- Contenu extrait du fichier CV ---\n{pdf_content}"
+
             candidate_experience = ""
             if candidate.experiences:
                 candidate_experience = "\n".join([
                     f"- {exp.title} chez {exp.company} ({exp.start_date} - {exp.end_date or 'Présent'})"
                     for exp in candidate.experiences
                 ])
-            
+
             candidate_skills = ""
             if candidate.skills:
                 candidate_skills = ", ".join([skill.name for skill in candidate.skills])
-            
+
             score_result = await get_ai_service().score_candidate(
                 job_title=job.title,
                 job_description=job.description,
