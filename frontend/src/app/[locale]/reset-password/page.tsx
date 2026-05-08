@@ -128,8 +128,7 @@ function ResetPasswordContent() {
                 <SparklesIcon className="w-6 h-6 xl:w-7 xl:h-7 text-white" />
               </div>
               <div>
-                <h1 className="text-xl xl:text-2xl font-bold text-white">INTOWORK</h1>
-                <p className="text-xs xl:text-sm text-white/80">Plateforme de Recrutement B2B2C</p>
+                <img src="/logo-intowork.png" alt="INTOWORK" className="h-10 w-auto object-contain brightness-0 invert" />
               </div>
             </div>
 
@@ -205,8 +204,7 @@ function ResetPasswordContent() {
                 <SparklesIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl sm:text-2xl font-bold text-slate-900">INTOWORK</h1>
-                <p className="text-xs sm:text-sm text-slate-600">Plateforme de Recrutement</p>
+                <img src="/logo-intowork.png" alt="INTOWORK" className="h-8 sm:h-10 w-auto object-contain" />
               </div>
             </div>
 

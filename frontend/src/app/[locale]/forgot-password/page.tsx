@@ -78,13 +78,7 @@ export default function ForgotPasswordPage() {
           <div className="relative z-10">
             {/* Logo */}
             <div className="flex items-center gap-3 mb-16 xl:mb-20 animate-fade-in">
-              <div className="w-12 h-12 xl:w-14 xl:h-14 bg-white/15 rounded-xl flex items-center justify-center backdrop-blur-md border border-white/20 shadow-xl">
-                <SparklesIcon className="w-6 h-6 xl:w-7 xl:h-7 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl xl:text-2xl font-bold text-white">INTOWORK</h1>
-                <p className="text-xs xl:text-sm text-white/80">Plateforme de Recrutement B2B2C</p>
-              </div>
+              <img src="/logo-intowork.png" alt="INTOWORK" className="h-10 w-auto object-contain brightness-0 invert" />
             </div>
 
             {/* Features - Adapted for Password Reset Context */}
@@ -155,13 +149,7 @@ export default function ForgotPasswordPage() {
           <div className="w-full max-w-md relative z-10">
             {/* Mobile Logo */}
             <div className="lg:hidden flex items-center gap-2 sm:gap-3 mb-8 sm:mb-10 animate-fade-in">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-secondary rounded-xl flex items-center justify-center shadow-lg">
-                <SparklesIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl sm:text-2xl font-bold text-slate-900">INTOWORK</h1>
-                <p className="text-xs sm:text-sm text-slate-600">Plateforme de Recrutement</p>
-              </div>
+              <img src="/logo-intowork.png" alt="INTOWORK" className="h-8 sm:h-10 w-auto object-contain" />
             </div>
 
             {!emailSent ? (
