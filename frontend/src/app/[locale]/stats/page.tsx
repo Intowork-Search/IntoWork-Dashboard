@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Plus_Jakarta_Sans } from 'next/font/google';
 import { useTranslations } from 'next-intl';
-import Image from 'next/image';
 import {
   BriefcaseIcon,
   BuildingOfficeIcon,
@@ -125,17 +124,11 @@ export default function StatsPage() {
           {/* Ligne top : logo + bouton retour */}
           <div className="flex items-center justify-between mb-5">
             <Link href="/" className="flex items-center gap-2 shrink-0">
-              <Image
+              <img
                 src="/logo-intowork.png"
-                alt="IntoWork"
-                width={120}
-                height={32}
-                className="h-8 w-auto object-contain"
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).style.display = 'none';
-                }}
+                alt="INTOWORK"
+                className="h-auto w-28 sm:w-32 object-contain"
               />
-              <span className="font-extrabold text-xl text-[#6B9B5F] tracking-tight hidden sm:inline">INTOWORK</span>
             </Link>
             <Link
               href="/"
