@@ -12,6 +12,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 import { useAuth } from '@/hooks/useNextAuth';
 import { jobsAPI, Job } from '@/lib/api';
 import { logger } from '@/lib/logger';
@@ -441,6 +442,13 @@ export default function JobPostsPage(): React.JSX.Element {
                             <LinkIcon className="w-5 h-5" />
                           </button>
                         )}
+                        <Link
+                          href={`/dashboard/ai-scoring/${job.id}`}
+                          className="p-3 rounded-xl text-[#F7C700] bg-[#F7C700]/10 hover:bg-[#F7C700]/20 transition-all"
+                          title="Scoring IA des candidatures"
+                        >
+                          <SparklesIcon className="w-5 h-5" />
+                        </Link>
                         <button
                           type="button"
                           onClick={() => handleEdit(job)}
