@@ -166,30 +166,26 @@ export default function Sidebar({ userRole }: SidebarProps) {
       } bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 shadow-lg flex flex-col`}>
         
         {/* Header avec logo et toggle */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 shrink-0">
-          {!isCollapsed && (
-            <Link href="/" className="flex items-center">
-              <img
-                src="/logo-intowork.png"
-                alt="INTOWORK"
-                className="h-8 w-auto object-contain"
-              />
-            </Link>
-          )}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setIsCollapsed(!isCollapsed)}
-              className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              aria-label={isCollapsed ? t('expand') : t('collapse')}
-              aria-expanded={!isCollapsed}
-            >
-              {isCollapsed ? (
-                <ChevronRightIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-              ) : (
-                <ChevronLeftIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-              )}
-            </button>
-          </div>
+        <div className={`flex items-center p-4 border-b border-gray-200 dark:border-gray-700 shrink-0 ${isCollapsed ? 'flex-col gap-2' : 'justify-between'}`}>
+          <Link href="/" className={isCollapsed ? 'flex items-center justify-center' : 'flex items-center'}>
+            <img
+              src={isCollapsed ? '/favicon-intowork.png' : '/logo-intowork.png'}
+              alt="INTOWORK"
+              className={isCollapsed ? 'h-8 w-8 object-contain' : 'h-10 w-auto object-contain'}
+            />
+          </Link>
+          <button
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            aria-label={isCollapsed ? t('expand') : t('collapse')}
+            aria-expanded={!isCollapsed}
+          >
+            {isCollapsed ? (
+              <ChevronRightIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            ) : (
+              <ChevronLeftIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            )}
+          </button>
         </div>
 
         {/* Navigation */}

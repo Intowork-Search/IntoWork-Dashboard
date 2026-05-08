@@ -128,7 +128,7 @@ function ResetPasswordContent() {
                 <SparklesIcon className="w-6 h-6 xl:w-7 xl:h-7 text-white" />
               </div>
               <div>
-                <img src="/logo-intowork.png" alt="INTOWORK" className="h-10 w-auto object-contain brightness-0 invert" />
+                <img src="/logo-intowork-white.png" alt="INTOWORK" className="h-10 w-auto object-contain" />
               </div>
             </div>
 

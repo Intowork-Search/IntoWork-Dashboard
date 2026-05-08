@@ -2530,9 +2530,9 @@ export default function Home() {
             <div className="col-span-2 md:col-span-1">
               <Link href="/" className="inline-block mb-4">
                 <img
-                  src="/logo-intowork.png"
+                  src="/logo-intowork-white.png"
                   alt="INTOWORK"
-                  className="h-28 w-auto brightness-0 invert"
+                  className="h-28 w-auto object-contain"
                 />
               </Link>
               <p className="text-sm text-gray-400 leading-relaxed mb-4">

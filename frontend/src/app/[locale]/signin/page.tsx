@@ -89,9 +89,9 @@ export default function SignInPage() {
             <div className="mb-16 xl:mb-20 animate-fade-in">
               <Link href="/">
                 <img
-                  src="/logo-intowork.png"
+                  src="/logo-intowork-white.png"
                   alt="INTOWORK"
-                  className="h-24 sm:h-28 md:h-32 xl:h-36 w-auto brightness-0 invert"
+                  className="h-24 sm:h-28 md:h-32 xl:h-36 w-auto object-contain"
                 />
               </Link>
             </div>

@@ -78,7 +78,7 @@ export default function ForgotPasswordPage() {
           <div className="relative z-10">
             {/* Logo */}
             <div className="flex items-center gap-3 mb-16 xl:mb-20 animate-fade-in">
-              <img src="/logo-intowork.png" alt="INTOWORK" className="h-10 w-auto object-contain brightness-0 invert" />
+              <img src="/logo-intowork-white.png" alt="INTOWORK" className="h-10 w-auto object-contain" />
             </div>
 
             {/* Features - Adapted for Password Reset Context */}
