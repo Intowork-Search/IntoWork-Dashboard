@@ -331,7 +331,7 @@ export default function JobDetailPage() {
 
           {/* Colonne latérale sticky */}
           <div className="space-y-4">
-            <div className="sticky top-6">
+            <div className="sticky top-6 space-y-4">
               {/* CTA postuler */}
               <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-6">
                 <h3 className="text-base font-bold text-gray-900 dark:text-white mb-4">
