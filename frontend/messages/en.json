@@ -318,7 +318,8 @@
     "applySuccess": "Application sent successfully!",
     "applyError": "Error sending your application.",
     "sendApplication": "Send my application",
-    "sending": "Sending..."
+    "sending": "Sending...",
+    "backToJobs": "← Back to jobs"
   },
   "applications": {
     "title": "My Applications",
@@ -454,7 +455,8 @@
     "size2": "11-50 employees",
     "size3": "51-200 employees",
     "size4": "201-500 employees",
-    "size5": "500+ employees"
+    "size5": "500+ employees",
+    "loadError": "Error loading company"
   },
   "settings": {
     "title": "Settings",
@@ -1042,7 +1044,8 @@
     "connectedOn": "Connected on:",
     "lastUsed": "Last used:",
     "connecting": "Connecting...",
-    "connectButton": "Connect"
+    "connectButton": "Connect",
+    "refresh": "Refresh"
   },
   "jobDetail": {
     "authRequired": "You must be logged in to apply",

@@ -318,7 +318,8 @@
     "applySuccess": "Candidature envoyée avec succès !",
     "applyError": "Erreur lors de l'envoi de votre candidature.",
     "sendApplication": "Envoyer ma candidature",
-    "sending": "Envoi en cours..."
+    "sending": "Envoi en cours...",
+    "backToJobs": "← Retour aux offres"
   },
   "applications": {
     "title": "Mes candidatures",
@@ -454,7 +455,8 @@
     "size2": "11-50 employés",
     "size3": "51-200 employés",
     "size4": "201-500 employés",
-    "size5": "500+ employés"
+    "size5": "500+ employés",
+    "loadError": "Erreur lors du chargement"
   },
   "settings": {
     "title": "Paramètres",
@@ -1042,7 +1044,8 @@
     "connectedOn": "Connecté le :",
     "lastUsed": "Dernière utilisation :",
     "connecting": "Connexion en cours...",
-    "connectButton": "Connecter"
+    "connectButton": "Connecter",
+    "refresh": "Actualiser"
   },
   "jobDetail": {
     "authRequired": "Vous devez être connecté pour postuler",

@@ -318,7 +318,8 @@
     "applySuccess": "تم إرسال الطلب بنجاح!",
     "applyError": "خطأ في إرسال طلبك.",
     "sendApplication": "إرسال طلبي",
-    "sending": "جارٍ الإرسال..."
+    "sending": "جارٍ الإرسال...",
+    "backToJobs": "← العودة إلى الوظائف"
   },
   "applications": {
     "title": "طلباتي",
@@ -454,7 +455,8 @@
     "size2": "11-50 موظفاً",
     "size3": "51-200 موظف",
     "size4": "201-500 موظف",
-    "size5": "500+ موظف"
+    "size5": "500+ موظف",
+    "loadError": "خطأ في تحميل الشركة"
   },
   "settings": {
     "title": "الإعدادات",
@@ -1042,7 +1044,8 @@
     "connectedOn": "متصل في:",
     "lastUsed": "آخر استخدام:",
     "connecting": "جارٍ الاتصال...",
-    "connectButton": "اتصال"
+    "connectButton": "اتصال",
+    "refresh": "تحديث"
   },
   "jobDetail": {
     "authRequired": "يجب أن تكون مسجلاً للتقديم",

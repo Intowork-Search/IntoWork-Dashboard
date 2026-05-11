@@ -262,8 +262,8 @@ export default function JobPostsPage(): React.JSX.Element {
         setJobs([newJob, ...jobs]);
         toast.success(t('createSuccess'));
       } else if (editingJob) {
-        const updatedJob = await jobsAPI.updateJob(editingJob.id, formData, token);
-        setJobs(jobs.map(job => (job.id === updatedJob.id ? updatedJob : job)));
+        await jobsAPI.updateJob(editingJob.id, formData, token);
+        await fetchJobs();
         toast.success(t('updateSuccess'));
       }
 
