@@ -15,6 +15,7 @@ import HelpButton from '@/components/HelpButton';
 import { candidateDashboardTour, employerDashboardTour } from '@/config/onboardingTours';
 import JobMatchWidget from '@/components/JobMatchWidget';
 import EmployerFunnel from '@/components/EmployerFunnel';
+import ProfileCompletionBanner, { type ProfileCompletion } from '@/components/ProfileCompletionBanner';
 import {
   UserIcon,
   DocumentTextIcon,
@@ -55,6 +56,7 @@ export default function Dashboard() {
   const [experiencesCount, setExperiencesCount] = useState<number>(0);
   const [educationCount, setEducationCount] = useState<number>(0);
   const [skillsCount, setSkillsCount] = useState<number>(0);
+  const [profileCompletionDetail, setProfileCompletionDetail] = useState<ProfileCompletion | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fonction pour charger les données du dashboard
@@ -99,6 +101,20 @@ export default function Dashboard() {
             const hasExperience = experiencesCount > 0;
             const hasEducation = educationCount > 0;
             const hasSkills = skillsCount > 0;
+
+            // Objet structuré pour le banner gamifié
+            setProfileCompletionDetail({
+              hasBasicInfo: !!(user.firstName && user.lastName && user.email),
+              hasPhone: !!profileData.phone?.trim(),
+              hasLocation: !!profileData.location?.trim(),
+              hasTitle: !!profileData.title?.trim(),
+              hasSummary: !!profileData.summary?.trim(),
+              hasExperience,
+              hasEducation,
+              hasSkills: skillsCount >= 3,
+              hasCv: !!profileData.cv_url?.trim(),
+              hasAvatar: false,
+            });
 
             let totalCompletion = profileCompletion * 0.6;
             if (hasExperience) totalCompletion += 15;
@@ -394,6 +410,11 @@ export default function Dashboard() {
           )}
         </div>
       </div>
+
+      {/* Banner complétion profil — candidats uniquement */}
+      {userRole === 'candidate' && profileCompletionDetail && (
+        <ProfileCompletionBanner completion={profileCompletionDetail} />
+      )}
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
