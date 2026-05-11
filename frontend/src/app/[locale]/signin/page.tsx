@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import {
   EnvelopeIcon,
@@ -28,6 +28,8 @@ const plusJakarta = Plus_Jakarta_Sans({
 
 export default function SignInPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl') ?? '/dashboard';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
@@ -52,7 +54,7 @@ export default function SignInPage() {
       } else {
         setFormError(null);
         toast.success('Connexion réussie');
-        router.push('/dashboard');
+        router.push(callbackUrl);
         router.refresh();
       }
     } catch (error) {
@@ -67,7 +69,7 @@ export default function SignInPage() {
   const handleSocialSignIn = async (provider: 'google' | 'github') => {
     setSocialLoading(provider);
     try {
-      await signIn(provider, { callbackUrl: '/dashboard' });
+      await signIn(provider, { callbackUrl });
     } catch (error) {
       logger.error(`${provider} sign in error:`, error);
       toast.error(`Erreur lors de la connexion avec ${provider}`);
