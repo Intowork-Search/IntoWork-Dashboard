@@ -34,6 +34,7 @@ import {
   ViewColumnsIcon,
   ListBulletIcon,
   ArrowLeftIcon,
+  DocumentArrowDownIcon,
 } from '@heroicons/react/24/outline';
 import { StarIcon } from '@heroicons/react/24/solid';
 import toast from 'react-hot-toast';
@@ -41,6 +42,7 @@ import { getErrorMessage } from '@/types/api';
 import { useConfirmModal } from '@/hooks/useConfirmModal';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { useTranslations } from 'next-intl';
+import { exportCandidaturesPDF } from '@/lib/exportPDF';
 
 interface Props {
   params: Promise<{
@@ -68,6 +70,7 @@ export default function AIScoringPage({ params }: Props) {
   const [compareOpen, setCompareOpen] = useState(false);
   const [bulkConfirmLoading, setBulkConfirmLoading] = useState(false);
   const [viewMode, setViewMode] = useState<'list' | 'kanban'>('list');
+  const [exporting, setExporting] = useState(false);
   const { confirm, isOpen: isConfirmOpen, options: confirmOptions, handleConfirm, handleCancel } = useConfirmModal();
 
   const limit = 20;
@@ -187,6 +190,19 @@ export default function AIScoringPage({ params }: Props) {
     toast.success('Statut mis à jour et email envoyé');
   };
 
+  const handleExportPDF = async () => {
+    if (applications.length === 0) return;
+    setExporting(true);
+    try {
+      await exportCandidaturesPDF(applications, jobId);
+      toast.success('PDF exporté');
+    } catch {
+      toast.error('Erreur lors de l\'export PDF');
+    } finally {
+      setExporting(false);
+    }
+  };
+
   // Obtenir la couleur selon le score
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-green-600 bg-green-50 border-green-200';
@@ -247,11 +263,24 @@ export default function AIScoringPage({ params }: Props) {
               </div>
             </div>
             
-            <button
-              onClick={handleBulkScore}
-              disabled={bulkScoring || scoring}
-              className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
-            >
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleExportPDF}
+                disabled={exporting || applications.length === 0}
+                className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-500 text-gray-700 dark:text-gray-200 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+              >
+                {exporting ? (
+                  <ArrowPathIcon className="w-4 h-4 animate-spin" />
+                ) : (
+                  <DocumentArrowDownIcon className="w-4 h-4" />
+                )}
+                <span>Exporter PDF</span>
+              </button>
+              <button
+                onClick={handleBulkScore}
+                disabled={bulkScoring || scoring}
+                className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+              >
               {bulkScoring ? (
                 <>
                   <ArrowPathIcon className="w-5 h-5 animate-spin" />
@@ -264,6 +293,7 @@ export default function AIScoringPage({ params }: Props) {
                 </>
               )}
             </button>
+            </div>
           </div>
         </div>
 
