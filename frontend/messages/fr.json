@@ -319,7 +319,19 @@
     "applyError": "Erreur lors de l'envoi de votre candidature.",
     "sendApplication": "Envoyer ma candidature",
     "sending": "Envoi en cours...",
-    "backToJobs": "← Retour aux offres"
+    "backToJobs": "← Retour aux offres",
+    "notFound": "Offre non trouvée",
+    "notFoundDesc": "Cette offre n'existe plus ou a été supprimée.",
+    "sectionDescription": "Description du poste",
+    "sectionResponsibilities": "Responsabilités",
+    "sectionRequirements": "Exigences",
+    "sectionBenefits": "Avantages",
+    "interestedTitle": "Intéressé par ce poste ?",
+    "prepareInterview": "Préparer l'entretien",
+    "infoTitle": "Informations",
+    "modeLabel": "Mode de travail",
+    "locationLabel": "Localisation",
+    "publishedLabel": "Publiée"
   },
   "applications": {
     "title": "Mes candidatures",

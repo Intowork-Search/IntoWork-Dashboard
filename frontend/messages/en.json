@@ -319,7 +319,19 @@
     "applyError": "Error sending your application.",
     "sendApplication": "Send my application",
     "sending": "Sending...",
-    "backToJobs": "← Back to jobs"
+    "backToJobs": "← Back to jobs",
+    "notFound": "Job not found",
+    "notFoundDesc": "This job no longer exists or has been deleted.",
+    "sectionDescription": "Job description",
+    "sectionResponsibilities": "Responsibilities",
+    "sectionRequirements": "Requirements",
+    "sectionBenefits": "Benefits",
+    "interestedTitle": "Interested in this position?",
+    "prepareInterview": "Prepare for interview",
+    "infoTitle": "Information",
+    "modeLabel": "Work mode",
+    "locationLabel": "Location",
+    "publishedLabel": "Published"
   },
   "applications": {
     "title": "My Applications",

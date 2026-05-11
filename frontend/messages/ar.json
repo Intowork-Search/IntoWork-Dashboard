@@ -319,7 +319,19 @@
     "applyError": "خطأ في إرسال طلبك.",
     "sendApplication": "إرسال طلبي",
     "sending": "جارٍ الإرسال...",
-    "backToJobs": "← العودة إلى الوظائف"
+    "backToJobs": "← العودة إلى الوظائف",
+    "notFound": "الوظيفة غير موجودة",
+    "notFoundDesc": "هذا المنصب لم يعد موجودًا أو تم حذفه.",
+    "sectionDescription": "وصف الوظيفة",
+    "sectionResponsibilities": "المسؤوليات",
+    "sectionRequirements": "المتطلبات",
+    "sectionBenefits": "المزايا",
+    "interestedTitle": "مهتم بهذا المنصب؟",
+    "prepareInterview": "التحضير للمقابلة",
+    "infoTitle": "معلومات",
+    "modeLabel": "نمط العمل",
+    "locationLabel": "الموقع",
+    "publishedLabel": "تم النشر"
   },
   "applications": {
     "title": "طلباتي",

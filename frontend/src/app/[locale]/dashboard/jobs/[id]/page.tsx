@@ -134,22 +134,24 @@ export default function JobDetailPage() {
     }
   };
 
-  const getLocationTypeLabel = (locationType: string) => {
+  const getLocationTypeLabel = (locationType?: string) => {
+    if (!locationType) return '';
     switch (locationType) {
-      case 'remote': return 'Télétravail';
-      case 'hybrid': return 'Hybride';
-      case 'on_site': return 'Présentiel';
+      case 'remote': return t('remote');
+      case 'hybrid': return t('hybrid');
+      case 'on_site': return t('on_site');
       default: return locationType;
     }
   };
 
-  const getJobTypeLabel = (jobType: string) => {
+  const getJobTypeLabel = (jobType?: string) => {
+    if (!jobType) return '';
     switch (jobType) {
-      case 'full_time': return 'Temps plein';
-      case 'part_time': return 'Temps partiel';
-      case 'contract': return 'Contrat';
-      case 'temporary': return 'Temporaire';
-      case 'internship': return 'Stage';
+      case 'full_time': return t('full_time');
+      case 'part_time': return t('part_time');
+      case 'contract': return t('contract');
+      case 'temporary': return t('temporary');
+      case 'internship': return t('internship');
       default: return jobType;
     }
   };
@@ -185,8 +187,8 @@ export default function JobDetailPage() {
           <div className="w-20 h-20 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-4">
             <BriefcaseIcon className="w-10 h-10 text-gray-400" />
           </div>
-          <h3 className="text-2xl font-bold text-gray-900 mb-2">Offre non trouvée</h3>
-          <p className="text-gray-500 mb-6">Cette offre n&apos;existe plus ou a été supprimée.</p>
+          <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('notFound')}</h3>
+          <p className="text-gray-500 mb-6">{t('notFoundDesc')}</p>
           <button
             onClick={() => router.push('/dashboard/jobs')}
             className="px-6 py-3 bg-[#6B9B5F] hover:bg-[#5a8a4e] text-white font-semibold rounded-xl transition-colors"
@@ -286,7 +288,7 @@ export default function JobDetailPage() {
             <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-6 sm:p-8">
               <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                 <span className="w-1 h-5 rounded-full bg-[#6B9B5F] inline-block" />
-                Description du poste
+                {t('sectionDescription')}
               </h2>
               <div className="text-gray-700 dark:text-gray-300 whitespace-pre-line leading-relaxed text-sm">
                 {job.description}
@@ -298,7 +300,7 @@ export default function JobDetailPage() {
               <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-6 sm:p-8">
                 <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                   <span className="w-1 h-5 rounded-full bg-purple-500 inline-block" />
-                  Responsabilités
+                  {t('sectionResponsibilities')}
                 </h2>
                 <div className="text-gray-700 dark:text-gray-300 whitespace-pre-line leading-relaxed text-sm">
                   {job.responsibilities}
@@ -311,7 +313,7 @@ export default function JobDetailPage() {
               <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-6 sm:p-8">
                 <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                   <span className="w-1 h-5 rounded-full bg-amber-500 inline-block" />
-                  Exigences
+                  {t('sectionRequirements')}
                 </h2>
                 <div className="text-gray-700 dark:text-gray-300 whitespace-pre-line leading-relaxed text-sm">
                   {job.requirements}
@@ -324,7 +326,7 @@ export default function JobDetailPage() {
               <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-6 sm:p-8">
                 <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                   <span className="w-1 h-5 rounded-full bg-blue-500 inline-block" />
-                  Avantages
+                  {t('sectionBenefits')}
                 </h2>
                 <div className="text-gray-700 dark:text-gray-300 whitespace-pre-line leading-relaxed text-sm">
                   {job.benefits}
@@ -339,12 +341,12 @@ export default function JobDetailPage() {
               {/* CTA postuler */}
               <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-6">
                 <h3 className="text-base font-bold text-gray-900 dark:text-white mb-4">
-                  Intéressé par ce poste ?
+                  {t('interestedTitle')}
                 </h3>
                 {job.has_applied ? (
                   <div className="w-full py-3 rounded-xl font-semibold bg-gray-100 dark:bg-gray-700 text-gray-400 cursor-not-allowed flex items-center justify-center gap-2 text-sm">
                     <CheckCircleIcon className="w-5 h-5 text-[#6B9B5F]" />
-                    <span className="text-[#6B9B5F]">Candidature envoyée</span>
+                    <span className="text-[#6B9B5F]">{t('applied')}</span>
                   </div>
                 ) : (
                   <button
@@ -362,20 +364,20 @@ export default function JobDetailPage() {
                   className="mt-3 w-full py-2.5 rounded-xl font-medium border border-[#6B9B5F]/30 bg-[#6B9B5F]/5 hover:bg-[#6B9B5F]/10 text-[#6B9B5F] flex items-center justify-center gap-2 text-sm transition-colors"
                 >
                   <SparklesIcon className="w-4 h-4" />
-                  Préparer l&apos;entretien
+                  {t('prepareInterview')}
                 </Link>
               </div>
 
               {/* Infos clés */}
               <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-6 space-y-4">
-                <h3 className="text-base font-bold text-gray-900 dark:text-white">Informations</h3>
+                <h3 className="text-base font-bold text-gray-900 dark:text-white">{t('infoTitle')}</h3>
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-xl bg-[#6B9B5F]/10 flex items-center justify-center shrink-0">
                       <BriefcaseIcon className="w-4.5 h-4.5 text-[#6B9B5F]" />
                     </div>
                     <div>
-                      <p className="text-xs text-gray-400 dark:text-gray-500">Type de contrat</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500">{t('type')}</p>
                       <p className="text-sm font-semibold text-gray-900 dark:text-white">{getJobTypeLabel(job.job_type)}</p>
                     </div>
                   </div>
@@ -384,7 +386,7 @@ export default function JobDetailPage() {
                       <MapPinIcon className="w-4.5 h-4.5 text-purple-600" />
                     </div>
                     <div>
-                      <p className="text-xs text-gray-400 dark:text-gray-500">Mode de travail</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500">{t('modeLabel')}</p>
                       <p className="text-sm font-semibold text-gray-900 dark:text-white">{getLocationTypeLabel(job.location_type)}</p>
                     </div>
                   </div>
@@ -394,7 +396,7 @@ export default function JobDetailPage() {
                         <CurrencyEuroIcon className="w-4.5 h-4.5 text-amber-600" />
                       </div>
                       <div>
-                        <p className="text-xs text-gray-400 dark:text-gray-500">Salaire</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500">{t('salary')}</p>
                         <p className="text-sm font-semibold text-gray-900 dark:text-white">
                           {job.salary_min && job.salary_max
                             ? `${job.salary_min.toLocaleString('fr-FR')} – ${job.salary_max.toLocaleString('fr-FR')} ${job.currency}`
@@ -411,7 +413,7 @@ export default function JobDetailPage() {
                         <BuildingOfficeIcon className="w-4.5 h-4.5 text-blue-600" />
                       </div>
                       <div>
-                        <p className="text-xs text-gray-400 dark:text-gray-500">Localisation</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500">{t('locationLabel')}</p>
                         <p className="text-sm font-semibold text-gray-900 dark:text-white">{job.location}</p>
                       </div>
                     </div>
@@ -422,7 +424,7 @@ export default function JobDetailPage() {
                         <CalendarDaysIcon className="w-4.5 h-4.5 text-gray-500" />
                       </div>
                       <div>
-                        <p className="text-xs text-gray-400 dark:text-gray-500">Publiée</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500">{t('publishedLabel')}</p>
                         <p className="text-sm font-semibold text-gray-900 dark:text-white">{formatDate(job.posted_at)}</p>
                       </div>
                     </div>

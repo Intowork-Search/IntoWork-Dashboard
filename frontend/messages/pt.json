@@ -319,7 +319,19 @@
     "applyError": "Erro ao enviar a sua candidatura.",
     "sendApplication": "Enviar candidatura",
     "sending": "A enviar...",
-    "backToJobs": "← Voltar às vagas"
+    "backToJobs": "← Voltar às vagas",
+    "notFound": "Vaga não encontrada",
+    "notFoundDesc": "Esta vaga não existe mais ou foi excluída.",
+    "sectionDescription": "Descrição da vaga",
+    "sectionResponsibilities": "Responsabilidades",
+    "sectionRequirements": "Requisitos",
+    "sectionBenefits": "Benefícios",
+    "interestedTitle": "Interessado nesta vaga?",
+    "prepareInterview": "Preparar para entrevista",
+    "infoTitle": "Informações",
+    "modeLabel": "Modo de trabalho",
+    "locationLabel": "Localização",
+    "publishedLabel": "Publicada"
   },
   "applications": {
     "title": "Minhas candidaturas",

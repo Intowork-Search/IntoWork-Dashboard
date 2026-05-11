@@ -492,6 +492,10 @@ class JobResponse(BaseModel):
     company_name: str
     company_logo_url: Optional[str] = None
     company_is_verified: bool = False
+    location: Optional[str] = None
+    location_type: Optional[str] = None
+    job_type: Optional[str] = None
+    status: Optional[str] = None
     salary_min: Optional[int] = None
     salary_max: Optional[int] = None
     currency: str = "XAF"
