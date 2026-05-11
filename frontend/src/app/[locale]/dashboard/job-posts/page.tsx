@@ -10,7 +10,7 @@
  * - Bleu: #3B82F6 (complémentaire)
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { useAuth } from '@/hooks/useNextAuth';
@@ -44,6 +44,9 @@ import {
   ChartBarIcon,
   LinkIcon,
   ShareIcon,
+  ChatBubbleLeftIcon,
+  EnvelopeIcon,
+  GlobeAltIcon,
 } from '@heroicons/react/24/outline';
 import { StarIcon } from '@heroicons/react/24/solid';
 import PublishToLinkedInModal from '@/components/PublishToLinkedInModal';
@@ -66,20 +69,50 @@ export default function JobPostsPage(): React.JSX.Element {
   const [selectedJobForLinkedIn, setSelectedJobForLinkedIn] = useState<{ id: number; title: string } | null>(null);
   const [deletingJob, setDeletingJob] = useState(false);
   const [shareMenuJobId, setShareMenuJobId] = useState<number | null>(null);
+  const [shareMenuPos, setShareMenuPos] = useState<{ top: number; left: number } | null>(null);
+  const shareMenuRef = useRef<HTMLDivElement>(null);
+
+  // Fermer le menu de partage en cliquant en dehors
+  const handleCloseShareMenu = useCallback((e: MouseEvent) => {
+    if (shareMenuRef.current && !shareMenuRef.current.contains(e.target as Node)) {
+      setShareMenuJobId(null);
+      setShareMenuPos(null);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (shareMenuJobId !== null) {
+      document.addEventListener('mousedown', handleCloseShareMenu);
+    } else {
+      document.removeEventListener('mousedown', handleCloseShareMenu);
+    }
+    return () => document.removeEventListener('mousedown', handleCloseShareMenu);
+  }, [shareMenuJobId, handleCloseShareMenu]);
+
+  const handleToggleShareMenu = (e: React.MouseEvent<HTMLButtonElement>, jobId: number) => {
+    if (shareMenuJobId === jobId) {
+      setShareMenuJobId(null);
+      setShareMenuPos(null);
+      return;
+    }
+    const rect = e.currentTarget.getBoundingClientRect();
+    setShareMenuPos({ top: rect.bottom + 8, left: rect.right - 208 });
+    setShareMenuJobId(jobId);
+  };
 
   const SHARE_CHANNELS = [
-    { key: 'whatsapp', label: 'WhatsApp', icon: '💬' },
-    { key: 'linkedin', label: 'LinkedIn', icon: '💼' },
-    { key: 'email', label: 'Email', icon: '📧' },
-    { key: 'facebook', label: 'Facebook', icon: '👥' },
-    { key: 'direct', label: 'Lien direct', icon: '🔗' },
+    { key: 'whatsapp', label: 'WhatsApp', icon: <ChatBubbleLeftIcon className="w-4 h-4" />, color: '#25D366' },
+    { key: 'linkedin', label: 'LinkedIn', icon: <LinkIcon className="w-4 h-4" />, color: '#0A66C2' },
+    { key: 'email', label: 'Email', icon: <EnvelopeIcon className="w-4 h-4" />, color: '#6B9B5F' },
+    { key: 'facebook', label: 'Facebook', icon: <GlobeAltIcon className="w-4 h-4" />, color: '#1877F2' },
+    { key: 'direct', label: 'Lien direct', icon: <ShareIcon className="w-4 h-4" />, color: '#7C3AED' },
   ] as const;
 
   const handleShareJob = (jobId: number, channel: string) => {
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
-    const shareUrl = `${baseUrl}/offres/${jobId}?ref=${channel}`;
+    const shareUrl = `${baseUrl}/dashboard/jobs/${jobId}?ref=${channel}`;
     navigator.clipboard.writeText(shareUrl).then(() => {
-      toast.success(`📋 Lien ${channel === 'direct' ? '' : channel + ' '}copié !`);
+      toast.success(`📋 Lien copié !`);
     });
     setShareMenuJobId(null);
   };
@@ -470,32 +503,14 @@ export default function JobPostsPage(): React.JSX.Element {
                         </Link>
                         {/* Bouton Partager avec menu canaux — visible pour toutes les offres sauf archivées */}
                         {job.status !== 'archived' && (
-                          <div className="relative">
-                            <button
-                              type="button"
-                              onClick={() => setShareMenuJobId(shareMenuJobId === job.id ? null : job.id)}
-                              className="p-3 rounded-xl text-[#7C3AED] bg-[#7C3AED]/10 hover:bg-[#7C3AED]/20 transition-all"
-                              title="Partager l'offre avec lien tracé"
-                            >
-                              <ShareIcon className="w-5 h-5" />
-                            </button>
-                            {shareMenuJobId === job.id && (
-                              <div className="absolute right-0 top-full mt-1 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-600 shadow-xl z-30 w-44 overflow-hidden">
-                                <p className="text-xs text-gray-400 font-medium px-3 pt-3 pb-1">Copier le lien tracé</p>
-                                {SHARE_CHANNELS.map(ch => (
-                                  <button
-                                    key={ch.key}
-                                    type="button"
-                                    onClick={() => handleShareJob(job.id, ch.key)}
-                                    className="w-full flex items-center gap-2 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors text-sm text-left"
-                                  >
-                                    <span>{ch.icon}</span>
-                                    <span className="font-medium text-gray-700 dark:text-gray-300">{ch.label}</span>
-                                  </button>
-                                ))}
-                              </div>
-                            )}
-                          </div>
+                          <button
+                            type="button"
+                            onClick={(e) => handleToggleShareMenu(e, job.id)}
+                            className="p-3 rounded-xl text-[#7C3AED] bg-[#7C3AED]/10 hover:bg-[#7C3AED]/20 transition-all"
+                            title="Partager l'offre avec lien tracé"
+                          >
+                            <ShareIcon className="w-5 h-5" />
+                          </button>
                         )}
 
                         <button
@@ -884,6 +899,28 @@ export default function JobPostsPage(): React.JSX.Element {
         tourId="employer-create-job"
         steps={employerCreateJobTour}
       />
+
+      {/* Menu de partage — portail fixed pour éviter overflow-hidden des cards */}
+      {shareMenuJobId !== null && shareMenuPos && (
+        <div
+          ref={shareMenuRef}
+          className="fixed z-50 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-600 shadow-2xl w-52"
+          style={{ top: shareMenuPos.top, left: Math.max(8, shareMenuPos.left) }}
+        >
+          <p className="text-xs text-gray-400 font-semibold px-3 pt-3 pb-2 uppercase tracking-wide">Copier le lien tracé</p>
+          {SHARE_CHANNELS.map(ch => (
+            <button
+              key={ch.key}
+              type="button"
+              onClick={() => handleShareJob(shareMenuJobId, ch.key)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors text-sm text-left"
+            >
+              <span style={{ color: ch.color }}>{ch.icon}</span>
+              <span className="font-medium text-gray-700 dark:text-gray-300">{ch.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* LinkedIn Modal */}
       {selectedJobForLinkedIn && (
