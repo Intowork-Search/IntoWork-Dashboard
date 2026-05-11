@@ -468,8 +468,8 @@ export default function JobPostsPage(): React.JSX.Element {
                         >
                           <SparklesIcon className="w-5 h-5" />
                         </Link>
-                        {/* Bouton Partager avec menu canaux */}
-                        {(job.status === 'published' || job.status === 'active') && (
+                        {/* Bouton Partager avec menu canaux — visible pour toutes les offres sauf archivées */}
+                        {job.status !== 'archived' && (
                           <div className="relative">
                             <button
                               type="button"
