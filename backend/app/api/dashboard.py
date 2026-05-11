@@ -529,3 +529,116 @@ async def get_recent_activities(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Erreur interne du serveur"
         )
+
+
+# ── Entonnoir recrutement employeur ──────────────────────────────────────────
+
+@router.get("/dashboard/employer-funnel")
+async def get_employer_funnel(
+    current_user: User = Depends(require_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Statistiques avancées pour le dashboard recruteur :
+    - Entonnoir par statut (candidaté → présélection → entretien → accepté)
+    - Entonnoir par offre (top 5 offres avec le plus de candidatures)
+    - Taux de conversion global
+    - Temps moyen entre candidature et entretien (en jours)
+    """
+    if current_user.role.value not in ("employer", "admin"):
+        raise HTTPException(status_code=403, detail="Accès réservé aux employeurs")
+
+    employer_result = await db.execute(
+        select(Employer).where(Employer.user_id == current_user.id)
+    )
+    employer = employer_result.scalar_one_or_none()
+    if not employer or not employer.company_id:
+        return {
+            "funnel": [],
+            "by_job": [],
+            "conversion_rate": 0,
+            "avg_days_to_interview": None,
+        }
+
+    # ── Entonnoir global par statut ───────────────────────────────────────
+    status_order = [
+        ApplicationStatus.APPLIED,
+        ApplicationStatus.VIEWED,
+        ApplicationStatus.SHORTLISTED,
+        ApplicationStatus.INTERVIEW,
+        ApplicationStatus.ACCEPTED,
+    ]
+    status_labels = {
+        ApplicationStatus.APPLIED: "Candidaté",
+        ApplicationStatus.VIEWED: "Vue",
+        ApplicationStatus.SHORTLISTED: "Présélectionné",
+        ApplicationStatus.INTERVIEW: "Entretien",
+        ApplicationStatus.ACCEPTED: "Accepté",
+    }
+
+    counts_result = await db.execute(
+        select(JobApplication.status, func.count().label("cnt"))
+        .join(Job)
+        .where(Job.employer_id == employer.id)
+        .group_by(JobApplication.status)
+    )
+    counts_map = {row.status: row.cnt for row in counts_result.fetchall()}
+
+    total_applied = sum(counts_map.values()) or 1
+    funnel = []
+    for st in status_order:
+        cnt = counts_map.get(st, 0)
+        funnel.append({
+            "status": st.value,
+            "label": status_labels[st],
+            "count": cnt,
+            "pct": round(cnt / total_applied * 100, 1),
+        })
+
+    # ── Top 5 offres par volume de candidatures ───────────────────────────
+    by_job_result = await db.execute(
+        select(Job.id, Job.title, func.count(JobApplication.id).label("total"))
+        .join(JobApplication, Job.id == JobApplication.job_id, isouter=True)
+        .where(Job.employer_id == employer.id)
+        .group_by(Job.id, Job.title)
+        .order_by(func.count(JobApplication.id).desc())
+        .limit(5)
+    )
+    by_job = [
+        {
+            "job_id": row.id,
+            "title": row.title,
+            "total": row.total,
+        }
+        for row in by_job_result.fetchall()
+    ]
+
+    # ── Taux de conversion (candidaté → accepté) ─────────────────────────
+    accepted = counts_map.get(ApplicationStatus.ACCEPTED, 0)
+    conversion_rate = round(accepted / total_applied * 100, 1)
+
+    # ── Temps moyen candidature → entretien ──────────────────────────────
+    avg_days_result = await db.execute(
+        select(
+            func.avg(
+                func.extract(
+                    "epoch",
+                    JobApplication.updated_at - JobApplication.applied_at
+                ) / 86400
+            )
+        )
+        .join(Job)
+        .where(
+            Job.employer_id == employer.id,
+            JobApplication.status == ApplicationStatus.INTERVIEW,
+        )
+    )
+    avg_days_raw = avg_days_result.scalar()
+    avg_days_to_interview = round(float(avg_days_raw), 1) if avg_days_raw else None
+
+    return {
+        "funnel": funnel,
+        "by_job": by_job,
+        "conversion_rate": conversion_rate,
+        "avg_days_to_interview": avg_days_to_interview,
+    }

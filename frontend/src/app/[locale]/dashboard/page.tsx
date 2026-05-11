@@ -14,6 +14,7 @@ import OnboardingTour from '@/components/OnboardingTour';
 import HelpButton from '@/components/HelpButton';
 import { candidateDashboardTour, employerDashboardTour } from '@/config/onboardingTours';
 import JobMatchWidget from '@/components/JobMatchWidget';
+import EmployerFunnel from '@/components/EmployerFunnel';
 import {
   UserIcon,
   DocumentTextIcon,
@@ -729,6 +730,9 @@ export default function Dashboard() {
           <JobMatchWidget locale={locale} />
         </div>
       )}
+
+      {/* Entonnoir recrutement — visible uniquement pour les employeurs */}
+      {userRole === 'employer' && <EmployerFunnel />}
 
       {/* Input file caché pour le téléchargement de CV */}
       <input
