@@ -43,6 +43,7 @@ import {
   CalendarDaysIcon,
   ChartBarIcon,
   LinkIcon,
+  ShareIcon,
 } from '@heroicons/react/24/outline';
 import { StarIcon } from '@heroicons/react/24/solid';
 import PublishToLinkedInModal from '@/components/PublishToLinkedInModal';
@@ -64,6 +65,24 @@ export default function JobPostsPage(): React.JSX.Element {
   const [linkedInModalOpen, setLinkedInModalOpen] = useState(false);
   const [selectedJobForLinkedIn, setSelectedJobForLinkedIn] = useState<{ id: number; title: string } | null>(null);
   const [deletingJob, setDeletingJob] = useState(false);
+  const [shareMenuJobId, setShareMenuJobId] = useState<number | null>(null);
+
+  const SHARE_CHANNELS = [
+    { key: 'whatsapp', label: 'WhatsApp', icon: '💬' },
+    { key: 'linkedin', label: 'LinkedIn', icon: '💼' },
+    { key: 'email', label: 'Email', icon: '📧' },
+    { key: 'facebook', label: 'Facebook', icon: '👥' },
+    { key: 'direct', label: 'Lien direct', icon: '🔗' },
+  ] as const;
+
+  const handleShareJob = (jobId: number, channel: string) => {
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+    const shareUrl = `${baseUrl}/offres/${jobId}?ref=${channel}`;
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      toast.success(`📋 Lien ${channel === 'direct' ? '' : channel + ' '}copié !`);
+    });
+    setShareMenuJobId(null);
+  };
   const { confirm, isOpen: isConfirmOpen, options: confirmOptions, handleConfirm, handleCancel } = useConfirmModal();
 
   // Helper functions
@@ -449,6 +468,36 @@ export default function JobPostsPage(): React.JSX.Element {
                         >
                           <SparklesIcon className="w-5 h-5" />
                         </Link>
+                        {/* Bouton Partager avec menu canaux */}
+                        {(job.status === 'published' || job.status === 'active') && (
+                          <div className="relative">
+                            <button
+                              type="button"
+                              onClick={() => setShareMenuJobId(shareMenuJobId === job.id ? null : job.id)}
+                              className="p-3 rounded-xl text-[#7C3AED] bg-[#7C3AED]/10 hover:bg-[#7C3AED]/20 transition-all"
+                              title="Partager l'offre avec lien tracé"
+                            >
+                              <ShareIcon className="w-5 h-5" />
+                            </button>
+                            {shareMenuJobId === job.id && (
+                              <div className="absolute right-0 top-full mt-1 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-600 shadow-xl z-30 w-44 overflow-hidden">
+                                <p className="text-xs text-gray-400 font-medium px-3 pt-3 pb-1">Copier le lien tracé</p>
+                                {SHARE_CHANNELS.map(ch => (
+                                  <button
+                                    key={ch.key}
+                                    type="button"
+                                    onClick={() => handleShareJob(job.id, ch.key)}
+                                    className="w-full flex items-center gap-2 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors text-sm text-left"
+                                  >
+                                    <span>{ch.icon}</span>
+                                    <span className="font-medium text-gray-700 dark:text-gray-300">{ch.label}</span>
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )}
+
                         <button
                           type="button"
                           onClick={() => handleEdit(job)}
