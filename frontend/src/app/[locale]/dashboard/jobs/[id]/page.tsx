@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/hooks/useNextAuth';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 import DashboardLayout from '@/components/DashboardLayout';
@@ -20,6 +20,7 @@ import {
   CheckCircleIcon,
   PaperAirplaneIcon,
   SparklesIcon,
+  ShareIcon,
 } from '@heroicons/react/24/outline';
 import { CheckBadgeIcon } from '@heroicons/react/24/solid';
 
@@ -47,9 +48,11 @@ export default function JobDetailPage() {
   const { getToken } = useAuth();
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const t = useTranslations('jobs');
   const tc = useTranslations('common');
   const jobId = params.id as string;
+  const sourceRef = searchParams.get('ref') ?? undefined;
 
   const [job, setJob] = useState<JobDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -59,6 +62,24 @@ export default function JobDetailPage() {
   const [selectedCVId, setSelectedCVId] = useState<number | null>(null);
   const [cvs, setCvs] = useState<{ id: number; filename: string; is_active: boolean; created_at: string }[]>([]);
   const [loadingCVs, setLoadingCVs] = useState(false);
+  const [showShareMenu, setShowShareMenu] = useState(false);
+
+  const SHARE_CHANNELS = [
+    { key: 'whatsapp', label: 'WhatsApp', icon: '💬', color: '#25D366' },
+    { key: 'linkedin', label: 'LinkedIn', icon: '💼', color: '#0A66C2' },
+    { key: 'email', label: 'Email', icon: '📧', color: '#6B9B5F' },
+    { key: 'facebook', label: 'Facebook', icon: '👥', color: '#1877F2' },
+    { key: 'direct', label: 'Copier le lien', icon: '🔗', color: '#7C3AED' },
+  ] as const;
+
+  const handleShare = (channel: string) => {
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+    const shareUrl = `${baseUrl}/offres/${jobId}?ref=${channel}`;
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      toast.success(`📋 Lien ${channel === 'direct' ? '' : channel + ' '}copié !`);
+    });
+    setShowShareMenu(false);
+  };
 
   useEffect(() => {
     loadJobDetail();
@@ -114,6 +135,7 @@ export default function JobDetailPage() {
         job_id: job.id,
         cover_letter: coverLetter || undefined,
         cv_id: selectedCVId || undefined,
+        source_ref: sourceRef,
       });
       toast.success(`✅ ${t('applySuccess')}`);
       setShowApplicationModal(false);
@@ -361,6 +383,34 @@ export default function JobDetailPage() {
                   <SparklesIcon className="w-4 h-4" />
                   Préparer l&apos;entretien
                 </Link>
+
+                {/* Partager l'offre avec tracking */}
+                <div className="relative mt-3">
+                  <button
+                    onClick={() => setShowShareMenu(v => !v)}
+                    className="w-full py-2.5 rounded-xl font-medium border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 flex items-center justify-center gap-2 text-sm transition-colors"
+                  >
+                    <ShareIcon className="w-4 h-4" />
+                    Partager l&apos;offre
+                  </button>
+
+                  {showShareMenu && (
+                    <div className="absolute bottom-full left-0 right-0 mb-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-600 shadow-xl z-20 overflow-hidden">
+                      <p className="text-xs text-gray-400 font-medium px-3 pt-3 pb-1">Choisir le canal de partage</p>
+                      {SHARE_CHANNELS.map(ch => (
+                        <button
+                          key={ch.key}
+                          onClick={() => handleShare(ch.key)}
+                          className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors text-sm text-left"
+                        >
+                          <span className="text-base">{ch.icon}</span>
+                          <span className="font-medium text-gray-700 dark:text-gray-300">{ch.label}</span>
+                          <span className="ml-auto text-xs text-gray-400 font-mono">?ref={ch.key}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Infos clés */}

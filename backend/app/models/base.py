@@ -322,6 +322,9 @@ class JobApplication(Base):
     ai_score_details = Column(JSONB)  # Détails du scoring (compétences, expérience, etc.)
     ai_analyzed_at = Column(DateTime(timezone=True))  # Date d'analyse IA
     
+    # Tracking source (canal de recrutement)
+    source_ref = Column(String(100), nullable=True, index=True)  # ex: 'whatsapp', 'email', 'linkedin', 'direct'
+
     # Suivi
     applied_at = Column(DateTime(timezone=True), server_default=func.now())
     viewed_at = Column(DateTime(timezone=True))

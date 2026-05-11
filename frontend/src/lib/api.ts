@@ -455,6 +455,7 @@ export interface CreateApplicationData {
   job_id: number;
   cv_id?: number;
   cover_letter?: string;
+  source_ref?: string;  // Canal de recrutement (whatsapp, email, linkedin, facebook, direct)
 }
 
 export interface ApplicationsResponse {

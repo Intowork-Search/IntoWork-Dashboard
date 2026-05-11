@@ -15,6 +15,7 @@ import HelpButton from '@/components/HelpButton';
 import { candidateDashboardTour, employerDashboardTour } from '@/config/onboardingTours';
 import JobMatchWidget from '@/components/JobMatchWidget';
 import EmployerFunnel from '@/components/EmployerFunnel';
+import ApplicationSourcesWidget from '@/components/ApplicationSourcesWidget';
 import ProfileCompletionBanner, { type ProfileCompletion } from '@/components/ProfileCompletionBanner';
 import {
   UserIcon,
@@ -754,6 +755,13 @@ export default function Dashboard() {
 
       {/* Entonnoir recrutement — visible uniquement pour les employeurs */}
       {userRole === 'employer' && <EmployerFunnel />}
+
+      {/* Sources des candidatures — visible uniquement pour les employeurs */}
+      {userRole === 'employer' && (
+        <div className="mt-4">
+          <ApplicationSourcesWidget />
+        </div>
+      )}
 
       {/* Input file caché pour le téléchargement de CV */}
       <input

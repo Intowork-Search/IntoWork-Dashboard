@@ -23,6 +23,7 @@ class JobApplicationCreate(BaseModel):
     job_id: int
     cv_id: Optional[int] = None  # ID du CV sélectionné
     cover_letter: Optional[str] = None
+    source_ref: Optional[str] = None  # Canal de recrutement (whatsapp, email, linkedin, facebook, direct)
 
 class JobApplicationResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -214,6 +215,12 @@ async def create_application(
             # Fallback legacy
             cv_url = candidate.cv_url
 
+    # Sanitize source_ref : seulement des caractères alphanumériques, tirets, underscores
+    import re
+    source_ref = None
+    if application_data.source_ref:
+        source_ref = re.sub(r'[^a-zA-Z0-9_-]', '', application_data.source_ref[:100]) or None
+
     # Créer la candidature
     application = JobApplication(
         job_id=application_data.job_id,
@@ -222,6 +229,7 @@ async def create_application(
         cv_url=cv_url,  # Pour compatibilité
         status=ApplicationStatus.APPLIED,
         cover_letter=application_data.cover_letter,
+        source_ref=source_ref,
         applied_at=datetime.now(timezone.utc)
     )
 
@@ -1040,4 +1048,66 @@ async def send_quick_message(
         "new_status": application.status.value,
         "email_sent": email_sent,
     }
+
+
+# ─── Tracking sources ─────────────────────────────────────────────────────────
+
+@router.get("/employer/applications/sources")
+async def get_application_sources(
+    current_user: User = Depends(require_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Répartition des candidatures par canal source (pour le dashboard employeur)."""
+    if current_user.role.value != 'employer':
+        raise HTTPException(status_code=403, detail="Réservé aux employeurs")
+
+    employer_result = await db.execute(
+        select(Employer).filter(Employer.user_id == current_user.id)
+    )
+    employer = employer_result.scalar_one_or_none()
+    if not employer:
+        raise HTTPException(status_code=404, detail="Profil employeur introuvable")
+
+    # Agréger les candidatures par source_ref pour les offres de cet employeur
+    rows = await db.execute(
+        select(
+            JobApplication.source_ref,
+            func.count(JobApplication.id).label("count")
+        )
+        .join(Job, Job.id == JobApplication.job_id)
+        .filter(Job.employer_id == employer.id)
+        .group_by(JobApplication.source_ref)
+        .order_by(func.count(JobApplication.id).desc())
+    )
+    results = rows.all()
+
+    total = sum(r.count for r in results)
+
+    LABELS = {
+        "whatsapp": "WhatsApp",
+        "email": "Email",
+        "linkedin": "LinkedIn",
+        "facebook": "Facebook",
+        "direct": "Direct",
+    }
+    COLORS = {
+        "whatsapp": "#25D366",
+        "email":    "#6B9B5F",
+        "linkedin": "#0A66C2",
+        "facebook": "#1877F2",
+        "direct":   "#7C3AED",
+    }
+
+    sources = []
+    for r in results:
+        key = r.source_ref or "direct"
+        sources.append({
+            "source": key,
+            "label": LABELS.get(key, key.capitalize()),
+            "count": r.count,
+            "pct": round(r.count / total * 100, 1) if total > 0 else 0,
+            "color": COLORS.get(key, "#9ca3af"),
+        })
+
+    return {"sources": sources, "total": total}
 
