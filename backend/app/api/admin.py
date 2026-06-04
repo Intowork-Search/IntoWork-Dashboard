@@ -648,3 +648,112 @@ async def toggle_company_verification(
         is_verified=company.is_verified,
         verified_at=company.verified_at,
     )
+
+
+class CompanyListItem(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    name: str
+    industry: Optional[str]
+    city: Optional[str]
+    country: Optional[str]
+    is_verified: bool
+    jobs_count: int
+    employers_count: int
+    created_at: datetime
+
+
+@router.get("/companies", response_model=List[CompanyListItem])
+async def list_companies(
+    search: Optional[str] = None,
+    current_user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    """Liste toutes les entreprises avec leur nombre d'offres et employeurs."""
+    from sqlalchemy import func as sqlfunc
+    query = select(
+        Company,
+        sqlfunc.count(Job.id.distinct()).label("jobs_count"),
+        sqlfunc.count(Employer.id.distinct()).label("employers_count"),
+    ).outerjoin(Job, Job.company_id == Company.id).outerjoin(Employer, Employer.company_id == Company.id).group_by(Company.id)
+
+    if search:
+        query = query.filter(Company.name.ilike(f"%{search}%"))
+
+    query = query.order_by(Company.name)
+    result = await db.execute(query)
+    rows = result.all()
+
+    return [
+        CompanyListItem(
+            id=row.Company.id,
+            name=row.Company.name,
+            industry=row.Company.industry,
+            city=row.Company.city,
+            country=row.Company.country,
+            is_verified=row.Company.is_verified,
+            jobs_count=row.jobs_count,
+            employers_count=row.employers_count,
+            created_at=row.Company.created_at,
+        )
+        for row in rows
+    ]
+
+
+@router.delete("/companies/{company_id}")
+async def delete_company(
+    company_id: int,
+    current_user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Supprime une entreprise et tout ce qui lui est lié en cascade :
+    notifications → candidatures → offres → profils employeurs → entreprise.
+    Les comptes User des employeurs sont conservés (dissociés).
+    """
+    from sqlalchemy import delete as sql_delete
+
+    result = await db.execute(select(Company).filter(Company.id == company_id))
+    company = result.scalar_one_or_none()
+    if not company:
+        raise HTTPException(status_code=404, detail="Entreprise introuvable")
+
+    # 1. Récupérer les IDs des jobs liés
+    job_ids_result = await db.execute(select(Job.id).filter(Job.company_id == company_id))
+    job_ids = [r[0] for r in job_ids_result.fetchall()]
+
+    if job_ids:
+        # 2. Récupérer les IDs des candidatures liées à ces jobs
+        app_ids_result = await db.execute(
+            select(JobApplication.id).filter(JobApplication.job_id.in_(job_ids))
+        )
+        app_ids = [r[0] for r in app_ids_result.fetchall()]
+
+        # 3. Supprimer les notifications liées aux candidatures et jobs
+        if app_ids:
+            await db.execute(
+                sql_delete(Notification).filter(Notification.related_application_id.in_(app_ids))
+            )
+        await db.execute(
+            sql_delete(Notification).filter(Notification.related_job_id.in_(job_ids))
+        )
+
+        # 4. Supprimer les candidatures
+        await db.execute(
+            sql_delete(JobApplication).filter(JobApplication.job_id.in_(job_ids))
+        )
+
+        # 5. Supprimer les offres
+        await db.execute(sql_delete(Job).filter(Job.company_id == company_id))
+
+    # 6. Dissocier les employeurs (conserver les comptes User)
+    await db.execute(
+        sql_delete(Employer).filter(Employer.company_id == company_id)
+    )
+
+    # 7. Supprimer l'entreprise
+    await db.execute(sql_delete(Company).filter(Company.id == company_id))
+    await db.commit()
+
+    return {"message": f"Entreprise \"{company.name}\" et toutes ses données supprimées."}
