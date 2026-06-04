@@ -118,10 +118,12 @@ export default function OffresPage() {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
-    const diffTime = Math.abs(now.getTime() - date.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    if (diffDays === 0) return "Aujourd'hui";
+    // Comparer les dates calendaires (pas les timestamps) pour éviter les décalages UTC
+    const dateDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const nowDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const diffDays = Math.round((nowDay.getTime() - dateDay.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (diffDays <= 0) return "Aujourd'hui";
     if (diffDays === 1) return 'Hier';
     if (diffDays < 7) return `Il y a ${diffDays} jours`;
     if (diffDays < 30) return `Il y a ${Math.floor(diffDays / 7)} semaine${Math.floor(diffDays / 7) > 1 ? 's' : ''}`;
