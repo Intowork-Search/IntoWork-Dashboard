@@ -751,6 +751,18 @@ export interface AdminEmployer {
   created_at: string;
 }
 
+export interface AdminCompany {
+  id: number;
+  name: string;
+  industry: string | null;
+  city: string | null;
+  country: string | null;
+  is_verified: boolean;
+  jobs_count: number;
+  employers_count: number;
+  created_at: string;
+}
+
 export interface AdminJob {
   id: number;
   title: string;
@@ -828,6 +840,18 @@ export const adminAPI = {
   resendCredentials: async (token: string, userId: number): Promise<{ message: string }> => {
     const client = createAuthenticatedClient(token);
     const response = await client.post(`/admin/users/${userId}/resend-credentials`);
+    return response.data;
+  },
+
+  getCompanies: async (token: string, search?: string): Promise<AdminCompany[]> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.get('/admin/companies', { params: search ? { search } : {} });
+    return response.data;
+  },
+
+  deleteCompany: async (token: string, companyId: number): Promise<{ message: string }> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.delete(`/admin/companies/${companyId}`);
     return response.data;
   },
 };
