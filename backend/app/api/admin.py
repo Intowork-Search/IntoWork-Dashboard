@@ -2,7 +2,7 @@
 Routes Admin pour le back-office
 Accessible uniquement par l'admin (software@hcexecutive.net)
 """
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, case
 from sqlalchemy.orm import selectinload
@@ -504,6 +504,7 @@ async def get_admin_info(
 @router.post("/users", response_model=UserListItem, status_code=201)
 async def create_user_by_admin(
     data: CreateUserRequest,
+    background_tasks: BackgroundTasks,
     current_user: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db)
 ):
@@ -557,26 +558,15 @@ async def create_user_by_admin(
     await db.commit()
     await db.refresh(new_user)
 
-    # Envoyer l'email de bienvenue avec les identifiants
-    email_sent = await email_service.send_welcome_credentials_email(
+    # Envoyer l'email de bienvenue en arrière-plan (non bloquant)
+    background_tasks.add_task(
+        email_service.send_welcome_credentials_email,
         email=new_user.email,
         first_name=new_user.first_name,
         last_name=new_user.last_name,
         role=data.role,
         temporary_password=temporary_password,
     )
-
-    if not email_sent:
-        # Le compte est créé mais l'email a échoué — on retourne quand même avec un warning
-        return UserListItem(
-            id=new_user.id,
-            email=new_user.email,
-            first_name=new_user.first_name,
-            last_name=new_user.last_name,
-            role=new_user.role.value,
-            is_active=new_user.is_active,
-            created_at=new_user.created_at,
-        )
 
     return UserListItem(
         id=new_user.id,
