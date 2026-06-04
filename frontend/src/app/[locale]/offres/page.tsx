@@ -94,6 +94,13 @@ export default function OffresPage() {
     const matchesCurrency = currencyFilter === '' || job.currency === currencyFilter;
 
     return matchesSearch && matchesLocation && matchesType && matchesCountry && matchesCurrency;
+  }).sort((a, b) => {
+    // Jobs sans date en bas
+    if (!a.posted_at && !b.posted_at) return 0;
+    if (!a.posted_at) return 1;
+    if (!b.posted_at) return -1;
+    // Du plus récent au plus ancien
+    return new Date(b.posted_at).getTime() - new Date(a.posted_at).getTime();
   });
 
   const formatSalary = (job: Job) => {
