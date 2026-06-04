@@ -9,7 +9,8 @@ from sqlalchemy.orm import selectinload
 from app.database import get_db
 from app.models.base import (
     User, UserRole, Candidate, Employer, Company, Job, JobApplication, 
-    Notification, PasswordResetToken, CVDocument
+    Notification, PasswordResetToken, CVDocument,
+    EmailTemplate, InterviewSchedule, JobPosting, IntegrationCredential
 )
 from app.auth import require_admin, PasswordHasher
 from app.services.email_service import email_service
@@ -730,7 +731,13 @@ async def delete_company(
         )
         app_ids = [r[0] for r in app_ids_result.fetchall()]
 
-        # 3. Supprimer les notifications liées aux candidatures et jobs
+        # 3. Supprimer les entretiens planifiés (Phase 2)
+        if app_ids:
+            await db.execute(
+                sql_delete(InterviewSchedule).filter(InterviewSchedule.application_id.in_(app_ids))
+            )
+
+        # 4. Supprimer les notifications liées aux candidatures et jobs
         if app_ids:
             await db.execute(
                 sql_delete(Notification).filter(Notification.related_application_id.in_(app_ids))
@@ -739,20 +746,35 @@ async def delete_company(
             sql_delete(Notification).filter(Notification.related_job_id.in_(job_ids))
         )
 
-        # 4. Supprimer les candidatures
+        # 5. Supprimer les candidatures
         await db.execute(
             sql_delete(JobApplication).filter(JobApplication.job_id.in_(job_ids))
         )
 
-        # 5. Supprimer les offres
+        # 6. Supprimer les publications multi-canaux (Phase 2)
+        await db.execute(
+            sql_delete(JobPosting).filter(JobPosting.job_id.in_(job_ids))
+        )
+
+        # 7. Supprimer les offres
         await db.execute(sql_delete(Job).filter(Job.company_id == company_id))
 
-    # 6. Dissocier les employeurs (conserver les comptes User)
+    # 8. Supprimer les templates email liés à l'entreprise (Phase 2)
+    await db.execute(
+        sql_delete(EmailTemplate).filter(EmailTemplate.company_id == company_id)
+    )
+
+    # 9. Supprimer les credentials d'intégration (Phase 2)
+    await db.execute(
+        sql_delete(IntegrationCredential).filter(IntegrationCredential.company_id == company_id)
+    )
+
+    # 10. Dissocier les employeurs (conserver les comptes User)
     await db.execute(
         sql_delete(Employer).filter(Employer.company_id == company_id)
     )
 
-    # 7. Supprimer l'entreprise
+    # 11. Supprimer l'entreprise
     await db.execute(sql_delete(Company).filter(Company.id == company_id))
     await db.commit()
 
