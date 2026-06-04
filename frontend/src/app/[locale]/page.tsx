@@ -545,7 +545,13 @@ export default function Home() {
         setLoadingJobs(true);
         const response = await jobsAPI.getJobs({ limit: 50 });
         if (response?.jobs?.length > 0) {
-          setFeaturedJobs(response.jobs.slice(0, 3));
+          const sorted = [...response.jobs].sort((a: Job, b: Job) => {
+            if (!a.posted_at && !b.posted_at) return 0;
+            if (!a.posted_at) return 1;
+            if (!b.posted_at) return -1;
+            return new Date(b.posted_at).getTime() - new Date(a.posted_at).getTime();
+          });
+          setFeaturedJobs(sorted.slice(0, 3));
           const companyMap = new Map<string, number>();
           response.jobs.forEach((job: Job) => {
             const name = job.company_name || 'Entreprise';
@@ -1165,6 +1171,97 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ═══════════════════════ OFFRES EN VEDETTE ═══════════════════════ */}
+      <section id="offres" className="py-16 lg:py-20 bg-gray-50/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <AnimateOnScroll className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-50 border border-green-200/60 text-sm font-semibold text-[#6B9B5F] mb-4">
+              <IconBriefcase className="w-4 h-4" />
+              Opportunites
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
+              Offres en vedette
+            </h2>
+            <p className="mt-4 text-lg text-gray-500 max-w-2xl mx-auto">
+              Decouvrez les dernieres opportunites publiees sur notre plateforme
+            </p>
+          </AnimateOnScroll>
+
+          {loadingJobs ? (
+            <div className="flex justify-center py-12">
+              <div className="w-12 h-12 border-4 border-[#6B9B5F] border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : featuredJobs.length > 0 ? (
+            <div className="grid md:grid-cols-3 gap-6 mb-10">
+              {featuredJobs.map((job) => (
+                <Link
+                  key={job.id}
+                  href="/offres"
+                  className="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-[#6B9B5F]/40 hover:shadow-lg hover:shadow-green-500/5 hover:-translate-y-1 transition-all duration-300"
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-lg font-bold text-gray-900 mb-1 group-hover:text-[#6B9B5F] transition-colors truncate">
+                        {job.title}
+                      </h3>
+                      <p className="text-sm text-gray-500 font-medium">{job.company_name}</p>
+                    </div>
+                    <div className="w-10 h-10 rounded-xl bg-[#6B9B5F]/10 flex items-center justify-center flex-shrink-0 ml-3">
+                      <IconBriefcase className="w-5 h-5 text-[#6B9B5F]" />
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {job.location && (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gray-50 text-gray-600 text-xs font-medium">
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        {job.location}
+                      </span>
+                    )}
+                    {job.job_type && (
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-[#6B9B5F]/10 text-[#6B9B5F] text-xs font-medium">
+                        {job.job_type}
+                      </span>
+                    )}
+                  </div>
+                  {job.description && (
+                    <p className="text-sm text-gray-500 line-clamp-2 mb-4">{job.description}</p>
+                  )}
+                  <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                    <span className="text-xs text-gray-400">
+                      {job.posted_at ? new Date(job.posted_at).toLocaleDateString('fr-FR') : 'Recent'}
+                    </span>
+                    <span className="text-[#6B9B5F] font-semibold text-xs group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
+                      Voir l&apos;offre
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 bg-white rounded-2xl border border-gray-100">
+              <p className="text-gray-500">Aucune offre disponible pour le moment</p>
+            </div>
+          )}
+
+          <div className="text-center">
+            <Link
+              href="/offres"
+              className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#6B9B5F] text-white font-semibold rounded-full hover:bg-[#5a8a4f] transition-colors shadow-lg shadow-green-500/20"
+            >
+              Voir toutes les offres
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
+          </div>
+        </div>
+      </section>
 
       {/* ═══════════════════════ COUNTRIES BANNER ═══════════════════════ */}
       <section className="py-20 lg:py-28 border-t border-gray-50 bg-white overflow-hidden">
@@ -2063,98 +2160,6 @@ export default function Home() {
               </div>
             </div>
           </AnimateOnScroll>
-        </div>
-      </section>
-
-      {/* ═══════════════════════ OFFRES EN VEDETTE ═══════════════════════ */}
-      <section id="offres" className="py-20 lg:py-28">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <AnimateOnScroll className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-50 border border-green-200/60 text-sm font-semibold text-[#6B9B5F] mb-4">
-              <IconBriefcase className="w-4 h-4" />
-              Opportunites
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
-              Offres en vedette
-            </h2>
-            <p className="mt-4 text-lg text-gray-500 max-w-2xl mx-auto">
-              Decouvrez les dernieres opportunites publiees sur notre plateforme
-            </p>
-          </AnimateOnScroll>
-
-          {loadingJobs ? (
-            <div className="flex justify-center py-12">
-              <div className="w-12 h-12 border-4 border-[#6B9B5F] border-t-transparent rounded-full animate-spin" />
-            </div>
-          ) : featuredJobs.length > 0 ? (
-            <div className="grid md:grid-cols-3 gap-6 mb-10">
-              {featuredJobs.map((job) => (
-                <Link
-                  key={job.id}
-                  href="/offres"
-                  className="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-[#6B9B5F]/40 hover:shadow-lg hover:shadow-green-500/5 hover:-translate-y-1 transition-all duration-300"
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-bold text-gray-900 mb-1 group-hover:text-[#6B9B5F] transition-colors truncate">
-                        {job.title}
-                      </h3>
-                      <p className="text-sm text-gray-500 font-medium">{job.company_name}</p>
-                    </div>
-                    <div className="w-10 h-10 rounded-xl bg-[#6B9B5F]/10 flex items-center justify-center flex-shrink-0 ml-3">
-                      <IconBriefcase className="w-5 h-5 text-[#6B9B5F]" />
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {job.location && (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gray-50 text-gray-600 text-xs font-medium">
-                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        {job.location}
-                      </span>
-                    )}
-                    {job.job_type && (
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-[#6B9B5F]/10 text-[#6B9B5F] text-xs font-medium">
-                        {job.job_type}
-                      </span>
-                    )}
-                  </div>
-                  {job.description && (
-                    <p className="text-sm text-gray-500 line-clamp-2 mb-4">{job.description}</p>
-                  )}
-                  <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                    <span className="text-xs text-gray-400">
-                      {job.posted_at ? new Date(job.posted_at).toLocaleDateString('fr-FR') : 'Recent'}
-                    </span>
-                    <span className="text-[#6B9B5F] font-semibold text-xs group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
-                      Voir l&apos;offre
-                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                      </svg>
-                    </span>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12 bg-gray-50 rounded-2xl border border-gray-100">
-              <p className="text-gray-500">Aucune offre disponible pour le moment</p>
-            </div>
-          )}
-
-          <div className="text-center">
-            <Link
-              href="/offres"
-              className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#6B9B5F] text-white font-semibold rounded-full hover:bg-[#5a8a4f] transition-colors shadow-lg shadow-green-500/20"
-            >
-              Voir toutes les offres
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </Link>
-          </div>
         </div>
       </section>
 
