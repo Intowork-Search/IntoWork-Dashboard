@@ -824,6 +824,12 @@ export const adminAPI = {
     const response = await client.post('/admin/users', data);
     return response.data;
   },
+
+  resendCredentials: async (token: string, userId: number): Promise<{ message: string }> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.post(`/admin/users/${userId}/resend-credentials`);
+    return response.data;
+  },
 };
 
 // ============================================

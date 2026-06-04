@@ -579,6 +579,41 @@ async def create_user_by_admin(
     )
 
 
+@router.post("/users/{user_id}/resend-credentials", status_code=200)
+async def resend_credentials_email(
+    user_id: int,
+    background_tasks: BackgroundTasks,
+    current_user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Génère un nouveau mot de passe temporaire et renvoie les identifiants par email.
+    À utiliser si l'utilisateur n'a pas reçu son mail de bienvenue.
+    """
+    result = await db.execute(select(User).filter(User.id == user_id))
+    user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=404, detail="Utilisateur introuvable")
+
+    # Générer un nouveau mot de passe temporaire
+    alphabet = string.ascii_letters + string.digits
+    temporary_password = ''.join(secrets.choice(alphabet) for _ in range(12))
+    user.password_hash = PasswordHasher.hash_password(temporary_password)
+    await db.commit()
+
+    role_str = user.role.value if hasattr(user.role, 'value') else str(user.role)
+    background_tasks.add_task(
+        email_service.send_welcome_credentials_email,
+        email=user.email,
+        first_name=user.first_name,
+        last_name=user.last_name,
+        role=role_str,
+        temporary_password=temporary_password,
+    )
+
+    return {"message": f"Email de credentials renvoyé à {user.email}"}
+
+
 # ==================== COMPANY VERIFICATION ====================
 
 class CompanyVerifyResponse(BaseModel):

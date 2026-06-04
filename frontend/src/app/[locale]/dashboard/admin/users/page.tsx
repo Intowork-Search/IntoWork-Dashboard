@@ -20,6 +20,7 @@ import {
   XMarkIcon,
   ExclamationTriangleIcon,
   TrashIcon,
+  EnvelopeIcon,
 } from '@heroicons/react/24/outline';
 
 export default function AdminUsersPage() {
@@ -35,6 +36,7 @@ export default function AdminUsersPage() {
     open: false, userId: null, userEmail: '',
   });
   const [deleting, setDeleting] = useState(false);
+  const [resendingId, setResendingId] = useState<number | null>(null);
 
   // Modal création
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -91,6 +93,19 @@ export default function AdminUsersPage() {
       toast.error(getErrorMessage(error, t('deleteError')));
     } finally {
       setDeleting(false);
+    }
+  };
+
+  const handleResendCredentials = async (userId: number, email: string) => {
+    if (!session?.accessToken) return;
+    setResendingId(userId);
+    try {
+      await adminAPI.resendCredentials(session.accessToken, userId);
+      toast.success(`Identifiants renvoyés à ${email}`);
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, 'Erreur lors de l\'envoi'));
+    } finally {
+      setResendingId(null);
     }
   };
 
@@ -236,6 +251,15 @@ export default function AdminUsersPage() {
                           }`}
                         >
                           {user.is_active ? t('deactivate') : t('activate')}
+                        </button>
+                        <button
+                          onClick={() => handleResendCredentials(user.id, user.email)}
+                          disabled={resendingId === user.id}
+                          title="Renvoyer les identifiants"
+                          className="px-4 py-2 text-xs font-bold bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-xl transition-all duration-200 disabled:opacity-50 flex items-center gap-1"
+                        >
+                          <EnvelopeIcon className="w-3.5 h-3.5" />
+                          {resendingId === user.id ? '...' : 'Renvoyer'}
                         </button>
                         <button
                           onClick={() => handleDeleteUser(user.id, user.email)}
