@@ -143,8 +143,7 @@ export default function OffresPage() {
   };
 
   const handleJobClick = (jobId: number) => {
-    // Rediriger vers la page de connexion avec l'ID de l'offre en paramètre
-    router.push(`/signin?redirect=/dashboard/jobs/${jobId}`);
+    router.push(`/offres/${jobId}`);
   };
 
   return (

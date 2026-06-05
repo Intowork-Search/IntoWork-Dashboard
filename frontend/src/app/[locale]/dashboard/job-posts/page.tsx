@@ -213,6 +213,13 @@ export default function JobPostsPage(): React.JSX.Element {
       salary_min: job.salary_min,
       salary_max: job.salary_max,
       currency: job.currency || 'XOF',
+      context: job.context,
+      mission_principale: job.mission_principale,
+      profil_formation: job.profil_formation,
+      profil_experience: job.profil_experience,
+      profil_competences: job.profil_competences,
+      profil_posture: job.profil_posture,
+      profil_autre: job.profil_autre,
     });
   };
 
@@ -711,6 +718,126 @@ export default function JobPostsPage(): React.JSX.Element {
                 </div>
               </div>
 
+              {/* ===== SECTION ENRICHIE ===== */}
+              <div className="border-t border-gray-100 pt-6 space-y-5">
+                <h3 className="text-base font-bold text-gray-800 flex items-center gap-2">
+                  <SparklesIcon className="w-5 h-5 text-[#6B9B5F]" />
+                  Détails du poste
+                </h3>
+
+                {/* Contexte */}
+                <div>
+                  <label htmlFor="context" className="block text-sm font-semibold text-gray-700 mb-2">
+                    Contexte
+                  </label>
+                  <textarea
+                    id="context"
+                    name="context"
+                    value={formData.context || ''}
+                    onChange={handleInputChange}
+                    rows={3}
+                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-[#6B9B5F] focus:ring-4 focus:ring-[#6B9B5F]/10 transition-all resize-none"
+                    placeholder="Décrivez le contexte et l'environnement du poste..."
+                  />
+                </div>
+
+                {/* Mission principale */}
+                <div>
+                  <label htmlFor="mission_principale" className="block text-sm font-semibold text-gray-700 mb-2">
+                    Mission principale
+                  </label>
+                  <textarea
+                    id="mission_principale"
+                    name="mission_principale"
+                    value={formData.mission_principale || ''}
+                    onChange={handleInputChange}
+                    rows={4}
+                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-[#6B9B5F] focus:ring-4 focus:ring-[#6B9B5F]/10 transition-all resize-none"
+                    placeholder="Décrivez la mission principale du poste..."
+                  />
+                </div>
+
+                {/* Profil recherché */}
+                <div className="bg-gray-50 rounded-2xl p-5 space-y-4">
+                  <h4 className="text-sm font-bold text-gray-800">Profil recherché</h4>
+
+                  <div>
+                    <label htmlFor="profil_formation" className="block text-sm font-semibold text-gray-600 mb-1.5">
+                      Formation
+                    </label>
+                    <textarea
+                      id="profil_formation"
+                      name="profil_formation"
+                      value={formData.profil_formation || ''}
+                      onChange={handleInputChange}
+                      rows={2}
+                      className="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-[#6B9B5F] focus:ring-4 focus:ring-[#6B9B5F]/10 transition-all resize-none"
+                      placeholder="Ex: Bac+5 en Informatique, Finance..."
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="profil_experience" className="block text-sm font-semibold text-gray-600 mb-1.5">
+                      Profil &amp; Expérience
+                    </label>
+                    <textarea
+                      id="profil_experience"
+                      name="profil_experience"
+                      value={formData.profil_experience || ''}
+                      onChange={handleInputChange}
+                      rows={3}
+                      className="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-[#6B9B5F] focus:ring-4 focus:ring-[#6B9B5F]/10 transition-all resize-none"
+                      placeholder="Ex: 3 ans d'expérience minimum en gestion de projet..."
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="profil_competences" className="block text-sm font-semibold text-gray-600 mb-1.5">
+                      Compétences
+                    </label>
+                    <textarea
+                      id="profil_competences"
+                      name="profil_competences"
+                      value={formData.profil_competences || ''}
+                      onChange={handleInputChange}
+                      rows={3}
+                      className="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-[#6B9B5F] focus:ring-4 focus:ring-[#6B9B5F]/10 transition-all resize-none"
+                      placeholder="Ex: Maîtrise de Python, SQL, gestion budgétaire..."
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="profil_posture" className="block text-sm font-semibold text-gray-600 mb-1.5">
+                      Posture comportementale
+                    </label>
+                    <textarea
+                      id="profil_posture"
+                      name="profil_posture"
+                      value={formData.profil_posture || ''}
+                      onChange={handleInputChange}
+                      rows={3}
+                      className="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-[#6B9B5F] focus:ring-4 focus:ring-[#6B9B5F]/10 transition-all resize-none"
+                      placeholder="Ex: Sens du leadership, autonomie, esprit d'équipe..."
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="profil_autre" className="block text-sm font-semibold text-gray-600 mb-1.5">
+                      Autre
+                    </label>
+                    <textarea
+                      id="profil_autre"
+                      name="profil_autre"
+                      value={formData.profil_autre || ''}
+                      onChange={handleInputChange}
+                      rows={2}
+                      className="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-[#6B9B5F] focus:ring-4 focus:ring-[#6B9B5F]/10 transition-all resize-none"
+                      placeholder="Autres critères ou informations complémentaires..."
+                    />
+                  </div>
+                </div>
+              </div>
+
               {/* Actions */}
               <div className="flex justify-end gap-4 pt-4 border-t border-gray-100">
                 <button
@@ -806,6 +933,61 @@ export default function JobPostsPage(): React.JSX.Element {
                 <h4 className="text-lg font-semibold text-gray-900 mb-3">Description du poste</h4>
                 <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">{viewingJob.description}</p>
               </div>
+
+              {/* Contexte */}
+              {viewingJob.context && (
+                <div>
+                  <h4 className="text-lg font-semibold text-gray-900 mb-3">Contexte</h4>
+                  <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">{viewingJob.context}</p>
+                </div>
+              )}
+
+              {/* Mission principale */}
+              {viewingJob.mission_principale && (
+                <div>
+                  <h4 className="text-lg font-semibold text-gray-900 mb-3">Mission principale</h4>
+                  <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">{viewingJob.mission_principale}</p>
+                </div>
+              )}
+
+              {/* Profil recherché */}
+              {(viewingJob.profil_formation || viewingJob.profil_experience || viewingJob.profil_competences || viewingJob.profil_posture || viewingJob.profil_autre) && (
+                <div>
+                  <h4 className="text-lg font-semibold text-gray-900 mb-4">Profil recherché</h4>
+                  <div className="bg-gray-50 rounded-2xl p-5 space-y-4">
+                    {viewingJob.profil_formation && (
+                      <div>
+                        <p className="text-sm font-bold text-[#6B9B5F] mb-1">Formation</p>
+                        <p className="text-gray-700 whitespace-pre-wrap">{viewingJob.profil_formation}</p>
+                      </div>
+                    )}
+                    {viewingJob.profil_experience && (
+                      <div>
+                        <p className="text-sm font-bold text-[#6B9B5F] mb-1">Profil &amp; Expérience</p>
+                        <p className="text-gray-700 whitespace-pre-wrap">{viewingJob.profil_experience}</p>
+                      </div>
+                    )}
+                    {viewingJob.profil_competences && (
+                      <div>
+                        <p className="text-sm font-bold text-[#6B9B5F] mb-1">Compétences</p>
+                        <p className="text-gray-700 whitespace-pre-wrap">{viewingJob.profil_competences}</p>
+                      </div>
+                    )}
+                    {viewingJob.profil_posture && (
+                      <div>
+                        <p className="text-sm font-bold text-[#6B9B5F] mb-1">Posture comportementale</p>
+                        <p className="text-gray-700 whitespace-pre-wrap">{viewingJob.profil_posture}</p>
+                      </div>
+                    )}
+                    {viewingJob.profil_autre && (
+                      <div>
+                        <p className="text-sm font-bold text-[#6B9B5F] mb-1">Autre</p>
+                        <p className="text-gray-700 whitespace-pre-wrap">{viewingJob.profil_autre}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* Salaire */}
               {viewingJob.salary_min && viewingJob.salary_max && (

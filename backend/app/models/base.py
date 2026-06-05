@@ -259,6 +259,16 @@ class Job(Base):
     requirements = Column(Text)
     responsibilities = Column(Text)
     benefits = Column(Text)
+
+    # Nouveaux champs structurés
+    context = Column(Text, nullable=True)                           # Contexte du poste
+    mission_principale = Column(Text, nullable=True)               # Mission principale
+    # Profil recherché (sections séparées)
+    profil_formation = Column(Text, nullable=True)                 # Formation requise
+    profil_experience = Column(Text, nullable=True)                # Profil/expérience
+    profil_competences = Column(Text, nullable=True)               # Compétences
+    profil_posture = Column(Text, nullable=True)                   # Posture comportementale
+    profil_autre = Column(Text, nullable=True)                     # Autres critères
     
     # Détails du poste
     job_type = Column(SQLEnum(JobType, native_enum=False, values_callable=lambda x: [e.value for e in x]), nullable=False, default=JobType.FULL_TIME)

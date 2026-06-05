@@ -480,6 +480,14 @@ class JobCreateRequest(BaseModel):
     requirements: Optional[str] = None
     responsibilities: Optional[str] = None
     benefits: Optional[str] = None
+    # Nouveaux champs structurés
+    context: Optional[str] = None
+    mission_principale: Optional[str] = None
+    profil_formation: Optional[str] = None
+    profil_experience: Optional[str] = None
+    profil_competences: Optional[str] = None
+    profil_posture: Optional[str] = None
+    profil_autre: Optional[str] = None
 
 
 class JobResponse(BaseModel):
@@ -521,6 +529,14 @@ class JobDetailResponse(JobResponse):
     created_at: Optional[datetime] = None
     employment_type: Optional[str] = None
     salary_range: Optional[str] = None
+    # Nouveaux champs structurés
+    context: Optional[str] = None
+    mission_principale: Optional[str] = None
+    profil_formation: Optional[str] = None
+    profil_experience: Optional[str] = None
+    profil_competences: Optional[str] = None
+    profil_posture: Optional[str] = None
+    profil_autre: Optional[str] = None
 
 
 class JobListResponse(BaseModel):

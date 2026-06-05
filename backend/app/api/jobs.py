@@ -461,6 +461,13 @@ async def create_job(
             requirements=job.requirements,
             responsibilities=job.responsibilities,
             benefits=job.benefits,
+            context=job.context,
+            mission_principale=job.mission_principale,
+            profil_formation=job.profil_formation,
+            profil_experience=job.profil_experience,
+            profil_competences=job.profil_competences,
+            profil_posture=job.profil_posture,
+            profil_autre=job.profil_autre,
             status=JobStatus.PUBLISHED,
             posted_at=datetime.now(timezone.utc),
             is_featured=False,
@@ -559,6 +566,13 @@ async def update_job(
         job_obj.requirements = job.requirements
         job_obj.responsibilities = job.responsibilities
         job_obj.benefits = job.benefits
+        job_obj.context = job.context
+        job_obj.mission_principale = job.mission_principale
+        job_obj.profil_formation = job.profil_formation
+        job_obj.profil_experience = job.profil_experience
+        job_obj.profil_competences = job.profil_competences
+        job_obj.profil_posture = job.profil_posture
+        job_obj.profil_autre = job.profil_autre
 
         await db.commit()
         await db.refresh(job_obj)
@@ -713,5 +727,12 @@ async def get_job(
         applications_count=real_app_count,
         has_applied=has_applied,
         status=job.status.value,
-        created_at=job.created_at
+        created_at=job.created_at,
+        context=job.context,
+        mission_principale=job.mission_principale,
+        profil_formation=job.profil_formation,
+        profil_experience=job.profil_experience,
+        profil_competences=job.profil_competences,
+        profil_posture=job.profil_posture,
+        profil_autre=job.profil_autre,
     )

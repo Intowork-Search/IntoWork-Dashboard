@@ -403,6 +403,14 @@ export interface Job {
   views_count: number;
   applications_count: number;
   has_applied: boolean;
+  // Champs enrichis
+  context?: string;
+  mission_principale?: string;
+  profil_formation?: string;
+  profil_experience?: string;
+  profil_competences?: string;
+  profil_posture?: string;
+  profil_autre?: string;
 }
 
 export interface JobDetail extends Job {
@@ -416,6 +424,14 @@ export interface JobDetail extends Job {
   created_at?: string;
   employment_type?: string;
   salary_range?: string;
+  // Champs enrichis (également sur JobDetail pour compatibilité)
+  context?: string;
+  mission_principale?: string;
+  profil_formation?: string;
+  profil_experience?: string;
+  profil_competences?: string;
+  profil_posture?: string;
+  profil_autre?: string;
 }
 
 export interface JobListResponse {
