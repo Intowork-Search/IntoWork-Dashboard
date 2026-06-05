@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { Link, useRouter } from '@/i18n/navigation';import { Plus_Jakarta_Sans } from 'next/font/google';
+import { Link } from '@/i18n/navigation';import { Plus_Jakarta_Sans } from 'next/font/google';
 import {
   MapPinIcon,
   BriefcaseIcon,
@@ -96,7 +96,6 @@ const formatDate = (dateString: string) => {
 
 export default function OffreDetailPage() {
   const params = useParams();
-  const router = useRouter();
   const jobId = params?.id as string;
   const [job, setJob] = useState<JobDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -189,14 +188,13 @@ export default function OffreDetailPage() {
       <main className="pt-24 sm:pt-32 pb-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Retour */}
-          <button
-            type="button"
-            onClick={() => router.push('/offres')}
+          <a
+            href="/offres"
             className="inline-flex items-center gap-2 text-slate-600 hover:text-green-600 font-medium mb-6 transition-colors"
           >
             <ArrowLeftIcon className="w-4 h-4" />
             Retour aux offres
-          </button>
+          </a>
 
           {loading ? (
             <div className="bg-white rounded-2xl p-12 text-center border border-slate-200">
