@@ -136,15 +136,15 @@ export default function CompanyPage(): React.JSX.Element {
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
               {/* Logo et infos */}
               <div className="flex items-center gap-5">
-                <div className="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg border border-white/30 overflow-hidden">
+                <div className="w-14 h-14 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg border border-white/30 overflow-hidden">
                   {company?.logo_url ? (
                     <img
                       src={getUploadUrl(company.logo_url)}
                       alt={company.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain p-1"
                     />
                   ) : (
-                    <BuildingOffice2Icon className="w-10 h-10 text-white" />
+                    <BuildingOffice2Icon className="w-7 h-7 text-white" />
                   )}
                 </div>
                 <div>

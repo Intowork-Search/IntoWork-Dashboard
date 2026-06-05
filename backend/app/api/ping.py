@@ -61,7 +61,7 @@ async def get_public_stats(request: Request, db: AsyncSession = Depends(get_db))
         total_companies = result.scalar() or 0
 
         result = await db.execute(
-            select(func.count()).select_from(Job).filter(Job.status == "active")
+            select(func.count()).select_from(Job).filter(Job.status == "published")
         )
         active_jobs = result.scalar() or 0
 

@@ -1317,167 +1317,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ═══════════════════════ ENTREPRISES PARTENAIRES ═══════════════════════ */}
-      <section className="relative py-24 lg:py-32 overflow-hidden bg-white">
-        {/* Background Decorative Blobs */}
-        <div className="absolute top-1/4 -left-20 w-96 h-96 bg-[#6B9B5F]/5 rounded-full blur-3xl -z-10 animate-pulse" />
-        <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-[#7C3AED]/5 rounded-full blur-3xl -z-10" />
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <AnimateOnScroll className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200/60 shadow-sm text-sm font-semibold text-[#6B9B5F] mb-6">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
-              ÉCOSYSTÈME PARTENAIRE
-            </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 tracking-tight">
-              Entreprises qui <span className="text-[#6B9B5F]">recrutent</span>
-            </h2>
-            <p className="mt-6 text-lg text-gray-600 max-w-2xl mx-auto">
-              Rejoignez les leaders du marché qui font confiance à INTOWORK pour bâtir leurs équipes de demain.
-            </p>
-          </AnimateOnScroll>
-
-          {/* Partenaires fondateurs — statiques */}
-          <div className="mb-12">
-            <div className="flex items-center justify-center gap-3 mb-8">
-              <div className="h-px flex-1 max-w-[80px] bg-gray-100" />
-              <span className="text-xs font-bold uppercase tracking-widest text-gray-400">Partenaires fondateurs</span>
-              <div className="h-px flex-1 max-w-[80px] bg-gray-100" />
-            </div>
-            <div className="flex flex-col sm:flex-row items-stretch justify-center gap-6 max-w-2xl mx-auto">
-              {[
-                {
-                  name: 'Agiltym',
-                  logo: 'https://agiltym.com/wp-content/uploads/2025/12/agiltym-by-HC.png',
-                  href: 'https://agiltym.com',
-                },
-                {
-                  name: 'H&C Executive Education',
-                  logo: 'https://hcexecutive.co/wp-content/uploads/2025/02/LOG-IN-HOR.png',
-                  href: 'https://hcexecutive.co',
-                },
-              ].map((partner) => (
-                <a
-                  key={partner.name}
-                  href={partner.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex-1 min-w-[220px] max-w-[320px] bg-white rounded-2xl p-8 border border-gray-100 hover:border-[#6B9B5F]/30 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 text-center flex flex-col items-center justify-between"
-                >
-                  <div className="h-16 flex items-center justify-center mb-4">
-                    <img
-                      src={partner.logo}
-                      alt={`Logo ${partner.name}`}
-                      className="max-h-14 max-w-[180px] w-auto object-contain group-hover:scale-105 transition-transform duration-300"
-                      loading="lazy"
-                    />
-                  </div>
-                  <h3 className="text-sm font-bold text-gray-900 mb-3">{partner.name}</h3>
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-xs font-semibold text-[#6B9B5F]">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#6B9B5F] animate-pulse" />
-                    Partenaire vérifié
-                  </div>
-                </a>
-              ))}
-            </div>
-          </div>
-
-          {loadingJobs ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-16">
-              {[...Array(8)].map((_, i) => (
-                <div key={i} className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm animate-pulse">
-                  <div className="w-20 h-20 rounded-full bg-gray-100 mx-auto mb-6" />
-                  <div className="h-4 bg-gray-100 rounded-full w-3/4 mx-auto mb-3" />
-                  <div className="h-3 bg-gray-50 rounded-full w-1/2 mx-auto" />
-                </div>
-              ))}
-            </div>
-          ) : companies.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-16">
-              {companies.map((company, idx) => {
-                const gradients = [
-                  'from-[#6B9B5F] to-[#93C587]',
-                  'from-[#7C3AED] to-[#A78BFA]',
-                  'from-[#003DA5] to-[#60A5FA]',
-                  'from-[#F59E0B] to-[#FCD34D]',
-                  'from-[#10B981] to-[#6EE7B7]'
-                ];
-                const gradient = gradients[idx % gradients.length];
-
-                return (
-                  <Link
-                    key={company.name}
-                    href="/entreprises"
-                    className="group relative bg-white rounded-2xl p-8 border border-gray-100 hover:border-[#6B9B5F]/30 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 text-center"
-                  >
-                    <div className={`w-20 h-20 rounded-full bg-gradient-to-br ${gradient} flex items-center justify-center mx-auto mb-6 shadow-lg shadow-gray-200 group-hover:scale-110 transition-transform duration-500`}>
-                      <span className="text-2xl font-bold text-white">
-                        {company.name.charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                    <h3 className="text-base font-bold text-gray-900 mb-2 group-hover:text-[#6B9B5F] transition-colors truncate">
-                      {company.name}
-                    </h3>
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-50 text-xs font-medium text-gray-500 group-hover:bg-green-50 group-hover:text-[#6B9B5F] transition-colors">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#6B9B5F] animate-pulse" />
-                      {company.count} offre{company.count > 1 ? 's' : ''} active{company.count > 1 ? 's' : ''}
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="max-w-2xl mx-auto mb-16 text-center py-20 px-8 rounded-3xl border-2 border-dashed border-gray-100 bg-gray-50/50">
-              <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm border border-gray-50">
-                <svg className="w-10 h-10 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-              </div>
-              <h4 className="text-lg font-bold text-gray-900 mb-2">Bientôt disponible</h4>
-              <p className="text-gray-500">Les entreprises apparaitront ici dès qu&apos;elles auront publié leurs premières offres.</p>
-            </div>
-          )}
-
-          <div className="flex justify-center">
-            <Link
-              href="/entreprises"
-              className="group relative inline-flex items-center gap-3 px-10 py-4 text-base font-bold text-white bg-[#6B9B5F] hover:bg-[#5A8A4E] rounded-2xl transition-all duration-300 shadow-lg shadow-[#6B9B5F]/20 hover:shadow-xl hover:shadow-[#6B9B5F]/30 overflow-hidden"
-            >
-              <span className="relative z-10">Parcourir toutes les entreprises</span>
-              <svg className="relative z-10 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-              <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════ ANIMATED STATS ═══════════════════════ */}
-      <section ref={statsRef} className="py-12 lg:py-16 bg-gradient-to-b from-gray-50/50 to-white border-y border-gray-100">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
-            <AnimatedStat end={platformStats.candidates} suffix="+" label="Candidats actifs" start={statsVisible} />
-            <AnimatedStat end={platformStats.companies} suffix="+" label="Entreprises" start={statsVisible} />
-            <AnimatedStat end={94} suffix="%" label="Taux de matching" start={statsVisible} />
-            <AnimatedStat end={platformStats.active_jobs} suffix="+" label="Offres actives" start={statsVisible} />
-          </div>
-          <div className="mt-8 text-center">
-            <Link
-              href="/stats"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-[#6B9B5F] hover:text-[#5a8a4e] transition-colors group"
-            >
-              Voir les statistiques du marché en détail
-              <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </Link>
-          </div>
-        </div>
-      </section>
-
       {/* ═══════════════════════ FEATURES ═══════════════════════ */}
       <section id="features" className="py-20 lg:py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -2459,6 +2298,168 @@ export default function Home() {
                 </a>
               </AnimateOnScroll>
             ))}
+          </div>
+        </div>
+      </section>
+
+
+      {/* ═══════════════════════ ENTREPRISES PARTENAIRES ═══════════════════════ */}
+      <section className="relative py-24 lg:py-32 overflow-hidden bg-white">
+        {/* Background Decorative Blobs */}
+        <div className="absolute top-1/4 -left-20 w-96 h-96 bg-[#6B9B5F]/5 rounded-full blur-3xl -z-10 animate-pulse" />
+        <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-[#7C3AED]/5 rounded-full blur-3xl -z-10" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <AnimateOnScroll className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200/60 shadow-sm text-sm font-semibold text-[#6B9B5F] mb-6">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+              ÉCOSYSTÈME PARTENAIRE
+            </div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 tracking-tight">
+              Entreprises qui <span className="text-[#6B9B5F]">recrutent</span>
+            </h2>
+            <p className="mt-6 text-lg text-gray-600 max-w-2xl mx-auto">
+              Rejoignez les leaders du marché qui font confiance à INTOWORK pour bâtir leurs équipes de demain.
+            </p>
+          </AnimateOnScroll>
+
+          {/* Partenaires fondateurs — statiques */}
+          <div className="mb-12">
+            <div className="flex items-center justify-center gap-3 mb-8">
+              <div className="h-px flex-1 max-w-[80px] bg-gray-100" />
+              <span className="text-xs font-bold uppercase tracking-widest text-gray-400">Partenaires fondateurs</span>
+              <div className="h-px flex-1 max-w-[80px] bg-gray-100" />
+            </div>
+            <div className="flex flex-col sm:flex-row items-stretch justify-center gap-6 max-w-2xl mx-auto">
+              {[
+                {
+                  name: 'Agiltym',
+                  logo: 'https://agiltym.com/wp-content/uploads/2025/12/agiltym-by-HC.png',
+                  href: 'https://agiltym.com',
+                },
+                {
+                  name: 'H&C Executive Education',
+                  logo: 'https://hcexecutive.co/wp-content/uploads/2025/02/LOG-IN-HOR.png',
+                  href: 'https://hcexecutive.co',
+                },
+              ].map((partner) => (
+                <a
+                  key={partner.name}
+                  href={partner.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex-1 min-w-[220px] max-w-[320px] bg-white rounded-2xl p-8 border border-gray-100 hover:border-[#6B9B5F]/30 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 text-center flex flex-col items-center justify-between"
+                >
+                  <div className="h-16 flex items-center justify-center mb-4">
+                    <img
+                      src={partner.logo}
+                      alt={`Logo ${partner.name}`}
+                      className="max-h-14 max-w-[180px] w-auto object-contain group-hover:scale-105 transition-transform duration-300"
+                      loading="lazy"
+                    />
+                  </div>
+                  <h3 className="text-sm font-bold text-gray-900 mb-3">{partner.name}</h3>
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-xs font-semibold text-[#6B9B5F]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#6B9B5F] animate-pulse" />
+                    Partenaire vérifié
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {loadingJobs ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-16">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm animate-pulse">
+                  <div className="w-20 h-20 rounded-full bg-gray-100 mx-auto mb-6" />
+                  <div className="h-4 bg-gray-100 rounded-full w-3/4 mx-auto mb-3" />
+                  <div className="h-3 bg-gray-50 rounded-full w-1/2 mx-auto" />
+                </div>
+              ))}
+            </div>
+          ) : companies.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-16">
+              {companies.map((company, idx) => {
+                const gradients = [
+                  'from-[#6B9B5F] to-[#93C587]',
+                  'from-[#7C3AED] to-[#A78BFA]',
+                  'from-[#003DA5] to-[#60A5FA]',
+                  'from-[#F59E0B] to-[#FCD34D]',
+                  'from-[#10B981] to-[#6EE7B7]'
+                ];
+                const gradient = gradients[idx % gradients.length];
+
+                return (
+                  <Link
+                    key={company.name}
+                    href="/entreprises"
+                    className="group relative bg-white rounded-2xl p-8 border border-gray-100 hover:border-[#6B9B5F]/30 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 text-center"
+                  >
+                    <div className={`w-20 h-20 rounded-full bg-gradient-to-br ${gradient} flex items-center justify-center mx-auto mb-6 shadow-lg shadow-gray-200 group-hover:scale-110 transition-transform duration-500`}>
+                      <span className="text-2xl font-bold text-white">
+                        {company.name.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                    <h3 className="text-base font-bold text-gray-900 mb-2 group-hover:text-[#6B9B5F] transition-colors truncate">
+                      {company.name}
+                    </h3>
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-50 text-xs font-medium text-gray-500 group-hover:bg-green-50 group-hover:text-[#6B9B5F] transition-colors">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#6B9B5F] animate-pulse" />
+                      {company.count} offre{company.count > 1 ? 's' : ''} active{company.count > 1 ? 's' : ''}
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="max-w-2xl mx-auto mb-16 text-center py-20 px-8 rounded-3xl border-2 border-dashed border-gray-100 bg-gray-50/50">
+              <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm border border-gray-50">
+                <svg className="w-10 h-10 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </div>
+              <h4 className="text-lg font-bold text-gray-900 mb-2">Bientôt disponible</h4>
+              <p className="text-gray-500">Les entreprises apparaitront ici dès qu&apos;elles auront publié leurs premières offres.</p>
+            </div>
+          )}
+
+          <div className="flex justify-center">
+            <Link
+              href="/entreprises"
+              className="group relative inline-flex items-center gap-3 px-10 py-4 text-base font-bold text-white bg-[#6B9B5F] hover:bg-[#5A8A4E] rounded-2xl transition-all duration-300 shadow-lg shadow-[#6B9B5F]/20 hover:shadow-xl hover:shadow-[#6B9B5F]/30 overflow-hidden"
+            >
+              <span className="relative z-10">Parcourir toutes les entreprises</span>
+              <svg className="relative z-10 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+              <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════ ANIMATED STATS ═══════════════════════ */}
+      <section ref={statsRef} className="py-12 lg:py-16 bg-gradient-to-b from-gray-50/50 to-white border-y border-gray-100">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+            <AnimatedStat end={platformStats.candidates} suffix="+" label="Candidats actifs" start={statsVisible} />
+            <AnimatedStat end={platformStats.companies} suffix="+" label="Entreprises" start={statsVisible} />
+            <AnimatedStat end={94} suffix="%" label="Taux de matching" start={statsVisible} />
+            <AnimatedStat end={platformStats.active_jobs} suffix="+" label="Offres actives" start={statsVisible} />
+          </div>
+          <div className="mt-8 text-center">
+            <Link
+              href="/stats"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-[#6B9B5F] hover:text-[#5a8a4e] transition-colors group"
+            >
+              Voir les statistiques du marché en détail
+              <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
           </div>
         </div>
       </section>
