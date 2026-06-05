@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { Link, useRouter } from '@/i18n/navigation';
-import { Plus_Jakarta_Sans } from 'next/font/google';
+import { Link, useRouter } from '@/i18n/navigation';import { Plus_Jakarta_Sans } from 'next/font/google';
 import {
   MapPinIcon,
   BriefcaseIcon,
