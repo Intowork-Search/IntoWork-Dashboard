@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Plus_Jakarta_Sans } from 'next/font/google';
 import {
@@ -97,7 +97,10 @@ const formatDate = (dateString: string) => {
 
 export default function OffreDetailPage() {
   const params = useParams();
+  const pathname = usePathname();
   const jobId = params?.id as string;
+  // Extraire la locale depuis le pathname (ex: /fr/offres/1 → /fr/offres)
+  const offresHref = pathname.replace(/\/offres\/.*$/, '/offres');
   const [job, setJob] = useState<JobDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -190,7 +193,7 @@ export default function OffreDetailPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Retour */}
           <Link
-            href="/offres"
+            href={offresHref}
             className="inline-flex items-center gap-2 text-slate-600 hover:text-green-600 font-medium mb-6 transition-colors"
           >
             <ArrowLeftIcon className="w-4 h-4" />
