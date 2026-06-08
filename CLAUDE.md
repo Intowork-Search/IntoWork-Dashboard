@@ -135,7 +135,8 @@ Fichiers statiques : `backend/uploads/` servis via `/uploads` (FastAPI StaticFil
   /admin                  Panel admin
 /cv-builder               CV builder public
 /cv/[slug]                Viewer CV public
-/offres                   Liste offres publique
+/offres                   Liste offres publique (cards cliquables → détail)
+/offres/[id]              Détail offre publique (contexte, mission, profil recherché, postuler)
 /entreprises              Annuaire entreprises public
 ```
 
@@ -382,7 +383,7 @@ Modèles core (`backend/app/models/base.py`) :
 | **Experience**, **Education**, **Skill** → Candidate | cascade delete |
 | **Company** | infos entreprise pour employeurs |
 | **Employer** → User + Company (1:1) | |
-| **Job** → Company | status : draft/active/closed/archived ; `job_type` en VARCHAR |
+| **Job** → Company | status : draft/published/closed/archived ; `job_type` en VARCHAR ; champs enrichis : `context`, `mission_principale`, `profil_formation`, `profil_experience`, `profil_competences`, `profil_posture`, `profil_autre` (migration `y9z0a1b2c3d4`) |
 | **JobApplication** → Candidate + Job | status : applied/pending/viewed/shortlisted/interview/accepted/rejected ; champs `notes` et `cv_id` |
 | **CVDocument** → Candidate | CV Builder (5 templates), `slug` pour partage public |
 | **CVAnalytics** → CVDocument | tracking vues/téléchargements |
@@ -398,7 +399,7 @@ Modèles core (`backend/app/models/base.py`) :
 
 | Composant | Plateforme | Notes |
 |-----------|------------|-------|
-| **Frontend** | Vercel — projet `frontend` | Deploy manuel : `vercel --prod` depuis `frontend/`. Git auto-deploy **non configuré** |
+| **Frontend** | Vercel — projet `frontend` | **Deploy automatique au push sur `main`**. Domaine `intowork.co`. |
 | **Backend** | Railway → `intowork-dashboard-production-1ede.up.railway.app` | `alembic upgrade head` lancé automatiquement via `backend/start.sh` |
 | **CORS** | `main.py` | `allowed_origins` + regex `https://intowork[a-z0-9-]*\.vercel\.app` |
 
@@ -443,10 +444,11 @@ Modèles core (`backend/app/models/base.py`) :
 11. **AI scoring** nécessite `ANTHROPIC_API_KEY` — `ai_scoring.py` utilise le SDK Anthropic directement
 12. **Tailwind inline** — tous les tokens dans `frontend/src/app/globals.css`, jamais dans `tailwind.config.js`
 13. **`CandidateProfile` type mismatch** — le backend retourne données user+candidate fusionnées. Caster via `as unknown as UserProfile` dans les pages settings/profil
-14. **Deploy Vercel manuel** — toujours `vercel --prod` depuis `frontend/` après push
+14. **Deploy Vercel automatique** — le push sur `main` déclenche automatiquement le build et le deploy sur Vercel. Pas besoin de `vercel --prod`.
 15. **Pydantic V2 strict** — tous les schémas utilisent `model_config = ConfigDict(...)`, jamais de migration silencieuse vers V1
 16. **CI/CD** — GitHub Actions dans `.github/workflows/ci.yml` : syntax check Python, pytest, tsc, ESLint, build Next.js
 17. **pool_recycle=3600** — connexions DB recyclées après 1h pour éviter les stales Railway
-18. **Enums Literal** — `SignUpRequest.role` et `UpdateApplicationStatusRequest.status` utilisent `Literal[...]` au lieu de `str`
+19. **Navigation i18n dans pages publiques** — ne jamais utiliser `next/link` ou `href="/offres"` dans les pages sous `[locale]/`. Utiliser `useRouter` de `@/i18n/navigation` ou un `<a href="/offres">` natif. `Link` de `next/link` avec chemin absolu ignore la locale et cause des redirections vers `/`.
+20. **`stats/public` filtre `published`** — le compteur d'offres actives filtre sur `Job.status == "published"` (pas `"active"` qui n'existe pas dans `JobStatus`).
 19. **DB constraints** — migration `t2u3v4w5x6y7` : CHECK `salary_min <= salary_max`, index sur `applied_at` et `status`
 20. **Logger frontend** — utiliser `import { logger } from '@/lib/logger'` au lieu de `console.log` (filtré par env)
