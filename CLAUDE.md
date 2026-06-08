@@ -16,7 +16,7 @@
 |-------|-------------|--------|
 | 1–2 | Auth, dashboards, offres, candidatures, notifications, ATS (scoring IA, CV builder, alertes, calendriers, LinkedIn, TargetYM, collaboration) | ✅ Complet |
 | 3 | Dashboard admin et gestion plateforme | ✅ Complet (mars 2026) |
-| 4 | **AI matching avancé, analytics, intégrations tierces** | 🔄 En cours |
+| 4 | **AI matching avancé, analytics, intégrations tierces** — scoring IA bulk/individuel, job matches, préparation entretien, LinkedIn OAuth, Google Calendar, Outlook, alertes emploi, collaboration recruteurs | ✅ Complet (juin 2026) |
 
 ---
 
