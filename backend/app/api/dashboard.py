@@ -8,6 +8,7 @@ from app.models.base import (
     Employer, Job, JobApplication, ApplicationStatus, JobStatus, UserRole
 )
 from app.auth import require_user
+from app.services.employer_service import get_or_create_employer
 from pydantic import BaseModel
 from typing import List, Optional
 import logging
@@ -112,11 +113,8 @@ async def get_dashboard_data(
             }
         
         if current_user.role.value == "employer":
-            # Récupérer l'employeur lié à l'utilisateur
-            result = await db.execute(select(Employer).filter(Employer.user_id == current_user.id))
-            employer = result.scalar_one_or_none()
-            if not employer:
-                raise HTTPException(status_code=404, detail="Employeur non trouvé")
+            # Récupérer l'employeur (auto-création si le profil est manquant)
+            employer = await get_or_create_employer(db, current_user)
 
             # Si l'employeur n'a pas encore d'entreprise, retourner un dashboard vide avec message
             if not employer.company_id:

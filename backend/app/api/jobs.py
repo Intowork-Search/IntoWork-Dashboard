@@ -28,6 +28,7 @@ from app.schemas import (
     JobCreateRequest, JobResponse, JobDetailResponse, JobListResponse,
     RecentJobsCountResponse, MarketStatsResponse, MarketStatItem
 )
+from app.services.employer_service import get_or_create_employer
 
 router = APIRouter()
 
@@ -208,13 +209,8 @@ async def get_my_jobs(
     if current_user.role != UserRole.EMPLOYER:
         raise HTTPException(status_code=403, detail="Seuls les employeurs peuvent accéder à cette ressource")
 
-    # Récupérer l'employeur
-    employer_result = await db.execute(
-        select(Employer).filter(Employer.user_id == current_user.id)
-    )
-    employer = employer_result.scalar_one_or_none()
-    if not employer:
-        raise HTTPException(status_code=404, detail="Profil employeur non trouvé")
+    # Récupérer l'employeur (auto-création si le profil est manquant)
+    employer = await get_or_create_employer(db, current_user)
 
     # Query de base - uniquement les jobs de cet employeur
     stmt = select(Job, Company).join(Company, Job.company_id == Company.id)
@@ -415,14 +411,8 @@ async def create_job(
         logger.warning("Refus: utilisateur non employeur")
         raise HTTPException(status_code=403, detail="Seuls les employeurs peuvent créer une offre")
 
-    # Récupérer l'employeur avec eager loading de company
-    employer_result = await db.execute(
-        select(Employer).options(selectinload(Employer.company)).filter(Employer.user_id == current_user.id)
-    )
-    employer = employer_result.scalar_one_or_none()
-    if not employer:
-        logger.error("Employeur introuvable pour user_id=%s", current_user.id)
-        raise HTTPException(status_code=404, detail="Employeur introuvable")
+    # Récupérer l'employeur (auto-création si le profil est manquant) avec son entreprise
+    employer = await get_or_create_employer(db, current_user, with_company=True)
 
     company = employer.company
     if not company:
