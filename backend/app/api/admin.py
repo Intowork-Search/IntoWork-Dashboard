@@ -747,8 +747,9 @@ async def delete_company(
 ):
     """
     Supprime une entreprise et tout ce qui lui est lié en cascade :
-    notifications → candidatures → offres → profils employeurs → entreprise.
-    Les comptes User des employeurs sont conservés (dissociés).
+    notifications → candidatures → offres → profils employeurs → comptes recruteurs → entreprise.
+    Les comptes User des recruteurs rattachés à l'entreprise sont également supprimés
+    (sauf l'admin courant), afin qu'ils ne puissent plus se connecter.
     """
     from sqlalchemy import delete as sql_delete
 
@@ -806,13 +807,56 @@ async def delete_company(
         sql_delete(IntegrationCredential).filter(IntegrationCredential.company_id == company_id)
     )
 
-    # 10. Dissocier les employeurs (conserver les comptes User)
+    # 10. Récupérer les recruteurs rattachés à l'entreprise (+ leur compte User)
+    employers_result = await db.execute(
+        select(Employer)
+        .options(selectinload(Employer.user))
+        .filter(Employer.company_id == company_id)
+    )
+    company_employers = employers_result.scalars().all()
+
+    # Comptes User des recruteurs à supprimer (on épargne l'admin courant)
+    recruiter_users = [
+        emp.user
+        for emp in company_employers
+        if emp.user is not None and emp.user.id != current_user.id
+    ]
+    recruiter_user_ids = [u.id for u in recruiter_users]
+
+    if recruiter_user_ids:
+        # Nettoyer les données liées aux comptes recruteurs (non gérées par le cascade ORM)
+        await db.execute(
+            sql_delete(Notification).filter(Notification.user_id.in_(recruiter_user_ids))
+        )
+        await db.execute(
+            sql_delete(PasswordResetToken).filter(
+                PasswordResetToken.user_id.in_(recruiter_user_ids)
+            )
+        )
+        await db.execute(
+            sql_delete(CVDocument).filter(CVDocument.user_id.in_(recruiter_user_ids))
+        )
+
+    # 11. Supprimer les comptes recruteurs via l'ORM
+    #     (le cascade supprime Employer, Account, Session automatiquement)
+    for recruiter in recruiter_users:
+        await db.delete(recruiter)
+
+    # 12. Supprimer les éventuels profils employeurs restants (recruteur = admin conservé)
     await db.execute(
         sql_delete(Employer).filter(Employer.company_id == company_id)
     )
 
-    # 11. Supprimer l'entreprise
+    # 13. Supprimer l'entreprise
     await db.execute(sql_delete(Company).filter(Company.id == company_id))
     await db.commit()
 
-    return {"message": f"Entreprise \"{company.name}\" et toutes ses données supprimées."}
+    deleted_accounts = len(recruiter_users)
+    suffix = (
+        f" et {deleted_accounts} compte(s) recruteur associé(s)"
+        if deleted_accounts
+        else ""
+    )
+    return {
+        "message": f"Entreprise \"{company.name}\"{suffix} et toutes ses données supprimées."
+    }
