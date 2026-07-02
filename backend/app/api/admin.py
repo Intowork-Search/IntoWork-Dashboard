@@ -359,6 +359,99 @@ async def toggle_user_activation(
     )
 
 
+async def _delete_candidate_data(db: AsyncSession, user: User) -> None:
+    """Supprime les candidatures et notifications liées d'un candidat."""
+    from sqlalchemy import delete as sql_delete
+
+    result = await db.execute(
+        select(JobApplication.id).filter(
+            JobApplication.candidate_id == user.candidate.id
+        )
+    )
+    application_ids = [row[0] for row in result.fetchall()]
+
+    if application_ids:
+        await db.execute(
+            sql_delete(Notification).filter(
+                Notification.related_application_id.in_(application_ids)
+            )
+        )
+
+    await db.execute(
+        sql_delete(JobApplication).filter(
+            JobApplication.candidate_id == user.candidate.id
+        )
+    )
+
+
+async def _delete_employer_data(db: AsyncSession, user: User) -> None:
+    """Supprime jobs, candidatures liées et l'entreprise orpheline d'un employeur."""
+    from sqlalchemy import delete as sql_delete
+
+    company_id = user.employer.company_id
+
+    result = await db.execute(
+        select(Job).filter(Job.employer_id == user.employer.id)
+    )
+    employer_jobs = result.scalars().all()
+    job_ids = [job.id for job in employer_jobs]
+
+    if job_ids:
+        await db.execute(
+            sql_delete(Notification).filter(Notification.related_job_id.in_(job_ids))
+        )
+
+        result = await db.execute(
+            select(JobApplication.id).filter(JobApplication.job_id.in_(job_ids))
+        )
+        application_ids = [row[0] for row in result.fetchall()]
+
+        if application_ids:
+            await db.execute(
+                sql_delete(InterviewSchedule).filter(
+                    InterviewSchedule.application_id.in_(application_ids)
+                )
+            )
+            await db.execute(
+                sql_delete(Notification).filter(
+                    Notification.related_application_id.in_(application_ids)
+                )
+            )
+
+        await db.execute(
+            sql_delete(JobApplication).filter(JobApplication.job_id.in_(job_ids))
+        )
+        await db.execute(
+            sql_delete(JobPosting).filter(JobPosting.job_id.in_(job_ids))
+        )
+
+    for job in employer_jobs:
+        await db.delete(job)
+
+    # Supprimer l'entreprise si plus aucun autre recruteur n'y est rattaché
+    if company_id is not None:
+        other_employers = await db.execute(
+            select(func.count())
+            .select_from(Employer)
+            .filter(
+                Employer.company_id == company_id,
+                Employer.user_id != user.id,
+            )
+        )
+        if (other_employers.scalar() or 0) == 0:
+            await db.execute(
+                sql_delete(EmailTemplate).filter(EmailTemplate.company_id == company_id)
+            )
+            await db.execute(
+                sql_delete(IntegrationCredential).filter(
+                    IntegrationCredential.company_id == company_id
+                )
+            )
+            await db.execute(
+                sql_delete(Company).filter(Company.id == company_id)
+            )
+
+
 @router.delete("/users/{user_id}")
 async def delete_user(
     user_id: int,
@@ -402,72 +495,11 @@ async def delete_user(
 
         # Si c'est un candidat, supprimer les candidatures
         if user.role == UserRole.CANDIDATE and user.candidate:
-            # Récupérer les IDs des candidatures pour supprimer les notifications liées
-            result = await db.execute(
-                select(JobApplication.id).filter(
-                    JobApplication.candidate_id == user.candidate.id
-                )
-            )
-            application_ids = [row[0] for row in result.fetchall()]
-            
-            # Supprimer les notifications qui référencent ces candidatures
-            if application_ids:
-                await db.execute(
-                    sql_delete(Notification).filter(
-                        Notification.related_application_id.in_(application_ids)
-                    )
-                )
-            
-            # Supprimer toutes les candidatures
-            await db.execute(
-                sql_delete(JobApplication).filter(
-                    JobApplication.candidate_id == user.candidate.id
-                )
-            )
+            await _delete_candidate_data(db, user)
 
-        # Si c'est un employeur, supprimer les offres d'emploi et candidatures associées
+        # Si c'est un employeur, supprimer les offres, candidatures et l'entreprise orpheline
         if user.role == UserRole.EMPLOYER and user.employer:
-            # Récupérer tous les jobs de l'employeur
-            result = await db.execute(
-                select(Job).filter(Job.employer_id == user.employer.id)
-            )
-            employer_jobs = result.scalars().all()
-            job_ids = [job.id for job in employer_jobs]
-
-            if job_ids:
-                # Supprimer les notifications liées à ces jobs
-                await db.execute(
-                    sql_delete(Notification).filter(
-                        Notification.related_job_id.in_(job_ids)
-                    )
-                )
-
-                # Récupérer les IDs des candidatures liées à ces jobs
-                result = await db.execute(
-                    select(JobApplication.id).filter(
-                        JobApplication.job_id.in_(job_ids)
-                    )
-                )
-                application_ids = [row[0] for row in result.fetchall()]
-                
-                # Supprimer les notifications liées à ces candidatures
-                if application_ids:
-                    await db.execute(
-                        sql_delete(Notification).filter(
-                            Notification.related_application_id.in_(application_ids)
-                        )
-                    )
-                
-                # Supprimer les candidatures
-                await db.execute(
-                    sql_delete(JobApplication).filter(
-                        JobApplication.job_id.in_(job_ids)
-                    )
-                )
-
-            # Supprimer les jobs
-            for job in employer_jobs:
-                await db.delete(job)
+            await _delete_employer_data(db, user)
 
         # Maintenant supprimer l'utilisateur (cascade supprimera candidate/employer et autres relations)
         await db.delete(user)
