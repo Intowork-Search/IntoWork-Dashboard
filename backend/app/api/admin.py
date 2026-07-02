@@ -651,6 +651,17 @@ async def toggle_company_verification(
     )
 
 
+class CompanyRecruiter(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    first_name: Optional[str]
+    last_name: Optional[str]
+    email: str
+    phone: Optional[str]
+    position: Optional[str]
+
+
 class CompanyListItem(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -662,6 +673,7 @@ class CompanyListItem(BaseModel):
     is_verified: bool
     jobs_count: int
     employers_count: int
+    recruiters: List[CompanyRecruiter] = []
     created_at: datetime
 
 
@@ -686,6 +698,30 @@ async def list_companies(
     result = await db.execute(query)
     rows = result.all()
 
+    # Charger les recruteurs (employeurs + leur user) pour chaque entreprise
+    company_ids = [row.Company.id for row in rows]
+    recruiters_by_company: dict[int, List[CompanyRecruiter]] = {}
+    if company_ids:
+        recruiters_result = await db.execute(
+            select(Employer)
+            .options(selectinload(Employer.user))
+            .filter(Employer.company_id.in_(company_ids))
+        )
+        for employer in recruiters_result.scalars().all():
+            user = employer.user
+            if user is None:
+                continue
+            recruiters_by_company.setdefault(employer.company_id, []).append(
+                CompanyRecruiter(
+                    id=user.id,
+                    first_name=user.first_name,
+                    last_name=user.last_name,
+                    email=user.email,
+                    phone=employer.phone,
+                    position=employer.position,
+                )
+            )
+
     return [
         CompanyListItem(
             id=row.Company.id,
@@ -696,6 +732,7 @@ async def list_companies(
             is_verified=row.Company.is_verified,
             jobs_count=row.jobs_count,
             employers_count=row.employers_count,
+            recruiters=recruiters_by_company.get(row.Company.id, []),
             created_at=row.Company.created_at,
         )
         for row in rows

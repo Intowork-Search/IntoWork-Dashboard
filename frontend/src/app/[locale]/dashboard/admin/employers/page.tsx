@@ -18,6 +18,9 @@ import {
   CheckBadgeIcon,
   ExclamationTriangleIcon,
   XMarkIcon,
+  EnvelopeIcon,
+  PhoneIcon,
+  UserCircleIcon,
 } from '@heroicons/react/24/outline';
 
 export default function AdminEmployersPage() {
@@ -142,6 +145,44 @@ export default function AdminEmployersPage() {
                   <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{company.employers_count} recruteur{company.employers_count > 1 ? 's' : ''}</span>
                 </div>
               </div>
+
+              {/* Recruteurs */}
+              {company.recruiters && company.recruiters.length > 0 && (
+                <div className="mb-5 space-y-2">
+                  {company.recruiters.map((recruiter) => {
+                    const fullName = [recruiter.first_name, recruiter.last_name].filter(Boolean).join(' ').trim();
+                    return (
+                      <div key={recruiter.id} className="bg-gray-50 dark:bg-gray-900 rounded-xl p-3">
+                        <div className="flex items-center gap-2 mb-1">
+                          <UserCircleIcon className="w-4 h-4 text-[#6B46C1] shrink-0" />
+                          <span className="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate">
+                            {fullName || 'Recruteur'}
+                          </span>
+                          {recruiter.position && (
+                            <span className="text-xs text-gray-400 truncate">· {recruiter.position}</span>
+                          )}
+                        </div>
+                        <a
+                          href={`mailto:${recruiter.email}`}
+                          className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 hover:text-[#6B9B5F] transition-colors"
+                        >
+                          <EnvelopeIcon className="w-3.5 h-3.5 shrink-0" />
+                          <span className="truncate">{recruiter.email}</span>
+                        </a>
+                        {recruiter.phone && (
+                          <a
+                            href={`tel:${recruiter.phone}`}
+                            className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 hover:text-[#6B9B5F] transition-colors mt-0.5"
+                          >
+                            <PhoneIcon className="w-3.5 h-3.5 shrink-0" />
+                            <span className="truncate">{recruiter.phone}</span>
+                          </a>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
 
               {/* Footer */}
               <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">

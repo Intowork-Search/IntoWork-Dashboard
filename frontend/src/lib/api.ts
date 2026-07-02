@@ -767,6 +767,15 @@ export interface AdminEmployer {
   created_at: string;
 }
 
+export interface AdminCompanyRecruiter {
+  id: number;
+  first_name: string | null;
+  last_name: string | null;
+  email: string;
+  phone: string | null;
+  position: string | null;
+}
+
 export interface AdminCompany {
   id: number;
   name: string;
@@ -776,6 +785,7 @@ export interface AdminCompany {
   is_verified: boolean;
   jobs_count: number;
   employers_count: number;
+  recruiters: AdminCompanyRecruiter[];
   created_at: string;
 }
 
