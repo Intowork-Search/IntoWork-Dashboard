@@ -451,6 +451,15 @@ export default function JobPostsPage(): React.JSX.Element {
                 >
                   <div className="p-6">
                     <div className="flex flex-col lg:flex-row lg:items-start gap-6">
+                      {/* Visuel de l'offre */}
+                      {job.image_url && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={job.image_url}
+                          alt={job.title}
+                          className="w-full lg:w-40 h-32 lg:h-24 object-cover rounded-xl flex-shrink-0"
+                        />
+                      )}
                       {/* Info principale */}
                       <div className="flex-1">
                         <div className="flex flex-wrap items-center gap-3 mb-3">
@@ -979,6 +988,15 @@ export default function JobPostsPage(): React.JSX.Element {
             </div>
 
             <div className="p-6 space-y-6">
+              {/* Visuel de l'offre */}
+              {viewingJob.image_url && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={viewingJob.image_url}
+                  alt={viewingJob.title}
+                  className="w-full h-56 object-cover rounded-2xl"
+                />
+              )}
               {/* Tags */}
               <div className="flex flex-wrap gap-3">
                 <span
