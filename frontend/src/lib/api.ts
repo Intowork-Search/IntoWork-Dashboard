@@ -404,6 +404,7 @@ export interface Job {
   views_count: number;
   applications_count: number;
   has_applied: boolean;
+  linkedin_published_at?: string | null;
   // Champs enrichis
   context?: string;
   mission_principale?: string;

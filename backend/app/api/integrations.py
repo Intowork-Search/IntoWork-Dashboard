@@ -478,6 +478,7 @@ async def publish_job_to_linkedin(
 
     # Au moins une publication réussie
     credentials.last_used_at = datetime.now(timezone.utc)
+    job.linkedin_published_at = datetime.now(timezone.utc)
     await db.commit()
 
     return {

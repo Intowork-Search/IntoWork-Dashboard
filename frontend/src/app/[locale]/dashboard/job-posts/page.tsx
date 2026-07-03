@@ -521,66 +521,65 @@ export default function JobPostsPage(): React.JSX.Element {
                           </span>
                         </div>
                       </div>
+                    </div>
 
-                      {/* Actions */}
-                      <div className="flex lg:flex-col items-center gap-2">
+                    {/* Actions — barre en bas de la card */}
+                    <div className="mt-5 pt-4 border-t border-gray-100 flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleView(job)}
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-[#6B9B5F] bg-[#6B9B5F]/10 hover:bg-[#6B9B5F]/20 transition-all"
+                      >
+                        <EyeIcon className="w-4 h-4" />
+                        Voir
+                      </button>
+                      {(job.status === 'published' || job.status === 'active') && (
                         <button
                           type="button"
-                          onClick={() => handleView(job)}
-                          className="p-3 rounded-xl text-[#6B9B5F] bg-[#6B9B5F]/10 hover:bg-[#6B9B5F]/20 transition-all"
-                          title="Voir les détails"
+                          onClick={() => {
+                            setSelectedJobForLinkedIn({ id: job.id, title: job.title });
+                            setLinkedInModalOpen(true);
+                          }}
+                          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-[#0A66C2] bg-[#0A66C2]/10 hover:bg-[#0A66C2]/20 transition-all"
                         >
-                          <EyeIcon className="w-5 h-5" />
+                          <LinkIcon className="w-4 h-4" />
+                          {job.linkedin_published_at ? 'Republier' : 'Publier'}
                         </button>
-                        {(job.status === 'published' || job.status === 'active') && (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setSelectedJobForLinkedIn({ id: job.id, title: job.title });
-                              setLinkedInModalOpen(true);
-                            }}
-                            className="p-3 rounded-xl text-[#0A66C2] bg-[#0A66C2]/10 hover:bg-[#0A66C2]/20 transition-all"
-                            title="Publier sur LinkedIn"
-                          >
-                            <LinkIcon className="w-5 h-5" />
-                          </button>
-                        )}
-                        <Link
-                          href={`/dashboard/ai-scoring/${job.id}`}
-                          className="p-3 rounded-xl text-[#F7C700] bg-[#F7C700]/10 hover:bg-[#F7C700]/20 transition-all"
-                          title="Scoring IA des candidatures"
-                        >
-                          <SparklesIcon className="w-5 h-5" />
-                        </Link>
-                        {/* Bouton Partager avec menu canaux — visible pour toutes les offres sauf archivées */}
-                        {job.status !== 'archived' && (
-                          <button
-                            type="button"
-                            onClick={(e) => handleToggleShareMenu(e, job.id)}
-                            className="p-3 rounded-xl text-[#7C3AED] bg-[#7C3AED]/10 hover:bg-[#7C3AED]/20 transition-all"
-                            title="Partager l'offre avec lien tracé"
-                          >
-                            <ShareIcon className="w-5 h-5" />
-                          </button>
-                        )}
-
+                      )}
+                      <Link
+                        href={`/dashboard/ai-scoring/${job.id}`}
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-[#F7C700] bg-[#F7C700]/10 hover:bg-[#F7C700]/20 transition-all"
+                      >
+                        <SparklesIcon className="w-4 h-4" />
+                        Scoring IA
+                      </Link>
+                      {/* Bouton Partager avec menu canaux — visible pour toutes les offres sauf archivées */}
+                      {job.status !== 'archived' && (
                         <button
                           type="button"
-                          onClick={() => handleEdit(job)}
-                          className="p-3 rounded-xl text-[#3B82F6] bg-[#3B82F6]/10 hover:bg-[#3B82F6]/20 transition-all"
-                          title={tc('edit')}
+                          onClick={(e) => handleToggleShareMenu(e, job.id)}
+                          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-[#7C3AED] bg-[#7C3AED]/10 hover:bg-[#7C3AED]/20 transition-all"
                         >
-                          <PencilIcon className="w-5 h-5" />
+                          <ShareIcon className="w-4 h-4" />
+                          Partager
                         </button>
-                        <button
-                          type="button"
-                          onClick={() => handleDelete(job.id)}
-                          className="p-3 rounded-xl text-red-500 bg-red-50 hover:bg-red-100 transition-all"
-                          title="Supprimer"
-                        >
-                          <TrashIcon className="w-5 h-5" />
-                        </button>
-                      </div>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => handleEdit(job)}
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-[#3B82F6] bg-[#3B82F6]/10 hover:bg-[#3B82F6]/20 transition-all"
+                      >
+                        <PencilIcon className="w-4 h-4" />
+                        {tc('edit')}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(job.id)}
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-red-500 bg-red-50 hover:bg-red-100 transition-all sm:ml-auto"
+                      >
+                        <TrashIcon className="w-4 h-4" />
+                        Supprimer
+                      </button>
                     </div>
                   </div>
                 </div>

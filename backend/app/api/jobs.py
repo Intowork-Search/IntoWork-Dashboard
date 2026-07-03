@@ -285,9 +285,9 @@ async def get_my_jobs(
             is_featured=job.is_featured,
             views_count=job.views_count,
             applications_count=employer_app_counts_map.get(job.id, 0),
-            has_applied=False  # L'employeur ne postule pas à ses propres offres
+            has_applied=False,  # L'employeur ne postule pas à ses propres offres
+            linkedin_published_at=job.linkedin_published_at,
         ))
-
     total_pages = (total + limit - 1) // limit
 
     return JobListResponse(

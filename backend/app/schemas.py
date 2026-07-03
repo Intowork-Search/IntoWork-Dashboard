@@ -517,6 +517,7 @@ class JobResponse(BaseModel):
     views_count: int = 0
     applications_count: int = 0
     has_applied: bool = False
+    linkedin_published_at: Optional[datetime] = None
 
 
 class JobDetailResponse(JobResponse):

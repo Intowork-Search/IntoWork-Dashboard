@@ -285,6 +285,9 @@ class Job(Base):
     image_url = Column(String, nullable=True)
     image_cloudinary_id = Column(String, nullable=True)
 
+    # Date de dernière publication sur LinkedIn (null = jamais publiée)
+    linkedin_published_at = Column(DateTime(timezone=True), nullable=True)
+
     # Paramètres
     status = Column(SQLEnum(JobStatus, native_enum=False, values_callable=lambda x: [e.value for e in x]), nullable=False, default=JobStatus.DRAFT)
     is_featured = Column(Boolean, default=False)
