@@ -53,10 +53,12 @@ class LinkedInService:
         if not self.enabled:
             raise ValueError("LinkedIn integration is not enabled")
         
-        # Scope minimal qui fonctionne sans approbation spéciale
-        # Note: profile et email nécessitent "Sign In with LinkedIn using OpenID Connect"
-        # qui requiert une approbation. On utilise uniquement w_member_social.
-        scopes = "w_member_social"
+        # Scopes OpenID Connect + publication.
+        # - openid + profile : requis pour récupérer l'URN du membre via /v2/userinfo
+        # - w_member_social : publier du contenu au nom du membre
+        # "Sign In with LinkedIn using OpenID Connect" est un produit standard
+        # activable sans approbation manuelle dans le portail développeur LinkedIn.
+        scopes = "openid profile w_member_social"
         
         params = {
             "response_type": "code",
@@ -101,29 +103,44 @@ class LinkedInService:
     async def get_member_urn(self, access_token: str) -> str:
         """
         Récupérer l'URN du membre connecté (utilisateur personnel)
-        
-        Disponible avec le scope 'profile' (inclus dans LinkedIn Sign In)
-        
+
+        Utilise l'endpoint OpenID Connect /v2/userinfo (scopes openid + profile),
+        dont le champ `sub` correspond à l'identifiant de la personne.
+        Fallback sur l'ancien endpoint /v2/me (scope r_liteprofile) si nécessaire.
+
         Args:
             access_token: Token d'accès LinkedIn
-            
+
         Returns:
             Member URN (ex: "urn:li:person:ABC123")
         """
         async with httpx.AsyncClient() as client:
+            # 1) OpenID Connect (recommandé)
+            try:
+                response = await client.get(
+                    f"{LINKEDIN_API_BASE}/userinfo",
+                    headers={"Authorization": f"Bearer {access_token}"}
+                )
+                response.raise_for_status()
+                sub = response.json().get("sub")
+                if sub:
+                    return f"urn:li:person:{sub}"
+            except httpx.HTTPStatusError as exc:
+                logger.warning(
+                    "LinkedIn /userinfo indisponible (%s), fallback sur /me",
+                    exc.response.status_code,
+                )
+
+            # 2) Fallback ancien endpoint
             response = await client.get(
                 f"{LINKEDIN_API_BASE}/me",
                 headers={"Authorization": f"Bearer {access_token}"}
             )
-            
             response.raise_for_status()
-            data = response.json()
-            
-            # Construire l'URN du membre
-            member_id = data.get("id")
+            member_id = response.json().get("id")
             if not member_id:
                 raise ValueError("Could not retrieve member ID from LinkedIn")
-            
+
             return f"urn:li:person:{member_id}"
     
     async def get_company_id(self, access_token: str) -> str:

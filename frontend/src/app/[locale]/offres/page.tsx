@@ -329,22 +329,29 @@ export default function OffresPage() {
               {filteredJobs.map((job) => (
                 <div
                   key={job.id}
-                  className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 hover:border-green-500 hover:shadow-xl transition-all duration-300 group"
+                  className="bg-white rounded-2xl border border-slate-200 hover:border-green-500 hover:shadow-xl transition-all duration-300 group overflow-hidden"
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                  {job.image_url && (
+                    <button
+                      onClick={() => handleJobClick(job.id)}
+                      className="block w-full"
+                      type="button"
+                      aria-label={`Voir l'offre ${job.title}`}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={job.image_url}
+                        alt={job.title}
+                        className="w-full h-52 sm:h-64 object-cover group-hover:scale-[1.02] transition-transform duration-300"
+                      />
+                    </button>
+                  )}
+                  <div className="p-6 sm:p-8 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                     <button
                       onClick={() => handleJobClick(job.id)}
                       className="flex-1 text-left hover:opacity-80 transition-opacity"
                       type="button"
                     >
-                      {job.image_url && (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={job.image_url}
-                          alt={job.title}
-                          className="w-full h-40 sm:h-48 object-cover rounded-xl mb-4"
-                        />
-                      )}
                       <div className="flex items-start gap-4 mb-4">
                         <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl bg-green-600 flex items-center justify-center shrink-0">
                           <BuildingOfficeIcon className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
