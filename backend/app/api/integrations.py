@@ -17,6 +17,8 @@ import os
 import re
 import logging
 
+import httpx
+
 logger = logging.getLogger(__name__)
 
 from app.database import get_db
@@ -430,8 +432,29 @@ async def publish_job_to_linkedin(
             "post_url": linkedin_service.build_post_url(post_id),
             "job_id": job.id
         }
-        
+
+    except httpx.HTTPStatusError as e:
+        # 401/403 = token invalide ou scopes insuffisants (ex: ancien token sans
+        # 'openid profile'). L'utilisateur doit reconnecter son compte LinkedIn.
+        if e.response.status_code in (401, 403):
+            logger.warning(
+                "LinkedIn publish refusé (%s) pour user_id=%s: scopes insuffisants ou token expiré",
+                e.response.status_code, current_user.id
+            )
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=(
+                    "Votre connexion LinkedIn doit être renouvelée. "
+                    "Veuillez déconnecter puis reconnecter LinkedIn dans vos intégrations "
+                    "afin d'autoriser les nouvelles permissions de publication."
+                )
+            )
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=f"Erreur LinkedIn ({e.response.status_code}) lors de la publication."
+        )
     except Exception as e:
+        logger.exception("Erreur inattendue publication LinkedIn pour user_id=%s", current_user.id)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to publish to LinkedIn: {str(e)}"
