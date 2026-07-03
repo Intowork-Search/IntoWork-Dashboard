@@ -52,6 +52,7 @@ interface JobDetail {
   requirements?: string;
   responsibilities?: string;
   benefits?: string;
+  image_url?: string;
   // Champs enrichis
   context?: string;
   mission_principale?: string;
@@ -210,6 +211,15 @@ export default function OffreDetailPage() {
             </div>
           ) : (
             <div className="space-y-6">
+              {/* Visuel de l'offre */}
+              {job.image_url && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={job.image_url}
+                  alt={job.title}
+                  className="w-full h-48 sm:h-72 object-cover rounded-2xl border border-slate-200 shadow-sm"
+                />
+              )}
               {/* Header carte */}
               <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm">
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">

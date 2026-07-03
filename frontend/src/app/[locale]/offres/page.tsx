@@ -33,6 +33,7 @@ interface Job {
   title: string;
   company_name: string;
   company_logo_url: string | null;
+  image_url?: string;
   location: string;
   location_type: string;
   job_type: string;
@@ -336,6 +337,14 @@ export default function OffresPage() {
                       className="flex-1 text-left hover:opacity-80 transition-opacity"
                       type="button"
                     >
+                      {job.image_url && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={job.image_url}
+                          alt={job.title}
+                          className="w-full h-40 sm:h-48 object-cover rounded-xl mb-4"
+                        />
+                      )}
                       <div className="flex items-start gap-4 mb-4">
                         <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl bg-green-600 flex items-center justify-center shrink-0">
                           <BuildingOfficeIcon className="w-6 h-6 sm:w-8 sm:h-8 text-white" />

@@ -182,6 +182,8 @@ async def get_jobs(
             country=job.country or company.country,
             zone=job.zone,
             language=job.language,
+            image_url=job.image_url,
+            status=job.status.value,
             posted_at=job.posted_at,
             is_featured=job.is_featured,
             views_count=job.views_count,

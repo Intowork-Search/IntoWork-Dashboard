@@ -1199,6 +1199,14 @@ export default function Home() {
                   href="/offres"
                   className="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-[#6B9B5F]/40 hover:shadow-lg hover:shadow-green-500/5 hover:-translate-y-1 transition-all duration-300"
                 >
+                  {job.image_url && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={job.image_url}
+                      alt={job.title}
+                      className="w-full h-36 object-cover rounded-xl mb-4 -mt-1"
+                    />
+                  )}
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1 min-w-0">
                       <h3 className="text-lg font-bold text-gray-900 mb-1 group-hover:text-[#6B9B5F] transition-colors truncate">
