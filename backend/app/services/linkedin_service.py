@@ -233,6 +233,80 @@ class LinkedInService:
             return ""
         return f"https://www.linkedin.com/feed/update/{post_id}"
     
+    async def _upload_image_asset(self, access_token: str, owner_urn: str, image_url: str) -> Optional[str]:
+        """
+        Enregistrer et uploader une image sur LinkedIn pour l'attacher à un post.
+
+        Flux officiel LinkedIn (Vector Asset API) :
+        1. registerUpload → obtenir une uploadUrl + un asset URN
+        2. Télécharger l'image source (Cloudinary)
+        3. Uploader le binaire vers uploadUrl
+
+        Args:
+            access_token: Token d'accès LinkedIn
+            owner_urn: URN de l'auteur du post (personne ou organisation)
+            image_url: URL publique de l'image (Cloudinary)
+
+        Returns:
+            L'asset URN (ex: "urn:li:digitalmediaAsset:...") ou None en cas d'échec.
+        """
+        try:
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                # 1) registerUpload
+                register_payload = {
+                    "registerUploadRequest": {
+                        "recipes": ["urn:li:digitalmediaRecipe:feedshare-image"],
+                        "owner": owner_urn,
+                        "serviceRelationships": [
+                            {
+                                "relationshipType": "OWNER",
+                                "identifier": "urn:li:userGeneratedContent",
+                            }
+                        ],
+                    }
+                }
+                register_resp = await client.post(
+                    f"{LINKEDIN_API_BASE}/assets?action=registerUpload",
+                    json=register_payload,
+                    headers={
+                        "Authorization": f"Bearer {access_token}",
+                        "Content-Type": "application/json",
+                        "X-Restli-Protocol-Version": "2.0.0",
+                    },
+                )
+                register_resp.raise_for_status()
+                register_data = register_resp.json()
+
+                value = register_data.get("value", {})
+                asset = value.get("asset")
+                upload_url = (
+                    value.get("uploadMechanism", {})
+                    .get("com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest", {})
+                    .get("uploadUrl")
+                )
+                if not asset or not upload_url:
+                    logger.warning("LinkedIn registerUpload: réponse incomplète, image ignorée")
+                    return None
+
+                # 2) Télécharger l'image source
+                image_resp = await client.get(image_url)
+                image_resp.raise_for_status()
+                image_bytes = image_resp.content
+
+                # 3) Upload binaire vers LinkedIn
+                upload_resp = await client.put(
+                    upload_url,
+                    content=image_bytes,
+                    headers={"Authorization": f"Bearer {access_token}"},
+                )
+                upload_resp.raise_for_status()
+
+                logger.info(f"🖼️ Image LinkedIn uploadée: {asset}")
+                return asset
+        except Exception as exc:  # noqa: BLE001
+            logger.warning(f"Échec upload image LinkedIn (post publié sans image): {exc}")
+            return None
+
     async def publish_job_post(
         self,
         access_token: str,
@@ -261,30 +335,59 @@ class LinkedInService:
             # Publier au nom du membre personnel
             author_urn = await self.get_member_urn(access_token)
             logger.info(f"👤 Publishing as personal member: {author_urn}")
-        
+
+        # Si une image est fournie, l'uploader et l'attacher comme média IMAGE.
+        # Sinon, utiliser une carte ARTICLE pointant vers l'offre (aperçu de lien).
+        image_url = job_data.get("image_url")
+        image_asset = None
+        if image_url:
+            image_asset = await self._upload_image_asset(access_token, author_urn, image_url)
+
+        if image_asset:
+            share_content = {
+                "shareCommentary": {
+                    "text": self._format_job_post(job_data)
+                },
+                "shareMediaCategory": "IMAGE",
+                "media": [
+                    {
+                        "status": "READY",
+                        "description": {
+                            "text": job_data.get("description", "")[:256]
+                        },
+                        "media": image_asset,
+                        "title": {
+                            "text": job_data.get("title", "")
+                        }
+                    }
+                ]
+            }
+        else:
+            share_content = {
+                "shareCommentary": {
+                    "text": self._format_job_post(job_data)
+                },
+                "shareMediaCategory": "ARTICLE",
+                "media": [
+                    {
+                        "status": "READY",
+                        "description": {
+                            "text": job_data.get("description", "")[:256]
+                        },
+                        "originalUrl": job_data.get("apply_url", ""),
+                        "title": {
+                            "text": job_data.get("title", "")
+                        }
+                    }
+                ]
+            }
+
         # Préparer le payload pour LinkedIn Share API
         share_payload = {
             "author": author_urn,
             "lifecycleState": "PUBLISHED",
             "specificContent": {
-                "com.linkedin.ugc.ShareContent": {
-                    "shareCommentary": {
-                        "text": self._format_job_post(job_data)
-                    },
-                    "shareMediaCategory": "ARTICLE",
-                    "media": [
-                        {
-                            "status": "READY",
-                            "description": {
-                                "text": job_data.get("description", "")[:256]
-                            },
-                            "originalUrl": job_data.get("apply_url", ""),
-                            "title": {
-                                "text": job_data.get("title", "")
-                            }
-                        }
-                    ]
-                }
+                "com.linkedin.ugc.ShareContent": share_content
             },
             "visibility": {
                 "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"
