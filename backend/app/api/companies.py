@@ -393,17 +393,12 @@ async def get_all_companies(
     try:
         offset = (page - 1) * limit
 
-        # Compter le total
-        count_result = await db.execute(
-            select(func.count()).select_from(Company)
-        )
-        total = count_result.scalar() or 0
-
-        # Récupérer les entreprises avec le compte de jobs
+        # Optimisation : une seule requête (window function pour le total) au lieu de 2 allers-retours DB
         result = await db.execute(
             select(
                 Company,
-                func.count(Job.id).label('total_jobs')
+                func.count(Job.id).label('total_jobs'),
+                func.count(Company.id).over().label('total_count')
             )
             .outerjoin(Job, Company.id == Job.company_id)
             .group_by(Company.id)
@@ -411,11 +406,14 @@ async def get_all_companies(
             .limit(limit)
             .order_by(Company.created_at.desc())
         )
-        
+
         companies_data = result.all()
+        total = companies_data[0].total_count if companies_data else 0
 
         companies_list = []
-        for company, job_count in companies_data:
+        for row in companies_data:
+            company = row[0]
+            job_count = row.total_jobs
             companies_list.append({
                 "id": company.id,
                 "name": company.name,

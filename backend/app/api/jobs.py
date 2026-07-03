@@ -135,31 +135,36 @@ async def get_jobs(
     if language:
         stmt = stmt.filter(Job.language == language)
 
-    # Pagination - Count total
-    count_stmt = select(func.count()).select_from(stmt.subquery())
-    total_result = await db.execute(count_stmt)
-    total = total_result.scalar()
+    # Optimisation : une seule requête au lieu de 3 allers-retours DB.
+    # - func.count().over() : total des lignes filtrées (avant LIMIT) sans requête COUNT séparée
+    # - sous-requête corrélée : nombre de candidatures par offre sans requête batch séparée
+    app_count_subq = (
+        select(func.count(JobApplication.id))
+        .where(JobApplication.job_id == Job.id)
+        .correlate(Job)
+        .scalar_subquery()
+    )
 
-    # Get paginated results
     offset = (page - 1) * limit
-    stmt = stmt.order_by(desc(Job.posted_at)).offset(offset).limit(limit)
+    stmt = (
+        stmt.add_columns(
+            func.count().over().label("total_count"),
+            app_count_subq.label("app_count"),
+        )
+        .order_by(desc(Job.posted_at))
+        .offset(offset)
+        .limit(limit)
+    )
     results_data = await db.execute(stmt)
     results = results_data.all()
 
-    # Calculer les vrais comptes de candidatures en une seule requête batch
-    job_ids = [job.id for job, _ in results]
-    app_counts_map: dict = {}
-    if job_ids:
-        app_counts_result = await db.execute(
-            select(JobApplication.job_id, func.count(JobApplication.id).label("cnt"))
-            .where(JobApplication.job_id.in_(job_ids))
-            .group_by(JobApplication.job_id)
-        )
-        app_counts_map = {row.job_id: row.cnt for row in app_counts_result}
+    total = results[0].total_count if results else 0
 
     # Construire la réponse
     jobs = []
-    for job, company in results:
+    for row in results:
+        job = row[0]
+        company = row[1]
         jobs.append(JobResponse(
             id=job.id,
             title=job.title,
@@ -179,7 +184,7 @@ async def get_jobs(
             posted_at=job.posted_at,
             is_featured=job.is_featured,
             views_count=job.views_count,
-            applications_count=app_counts_map.get(job.id, 0),
+            applications_count=row.app_count or 0,
             has_applied=job.id in user_applications
         ))
 
