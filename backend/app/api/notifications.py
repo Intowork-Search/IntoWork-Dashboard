@@ -51,20 +51,16 @@ async def get_notifications(
     if unread_only:
         query = query.filter(Notification.is_read == False)
 
-    # Compter le total
-    total_result = await db.execute(
-        select(func.count()).select_from(Notification).filter(Notification.user_id == current_user.id)
+    # Compter le total et les non lues en 1 seule requête
+    counts_result = await db.execute(
+        select(
+            func.count().label("total"),
+            func.count().filter(Notification.is_read == False).label("unread"),
+        ).select_from(Notification).filter(Notification.user_id == current_user.id)
     )
-    total = total_result.scalar()
-
-    # Compter les non lues
-    unread_result = await db.execute(
-        select(func.count()).select_from(Notification).filter(
-            Notification.user_id == current_user.id,
-            Notification.is_read == False
-        )
-    )
-    unread_count = unread_result.scalar()
+    counts = counts_result.one()
+    total = counts.total
+    unread_count = counts.unread
 
     # Récupérer les notifications paginées
     notifications_result = await db.execute(

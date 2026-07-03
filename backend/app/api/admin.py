@@ -103,34 +103,42 @@ async def get_admin_statistics(
     """
     Récupérer les statistiques globales de la plateforme
     """
-    # Compter les utilisateurs
-    result = await db.execute(select(func.count()).select_from(User))
-    total_users = result.scalar()
+    from datetime import timezone
+    seven_days_ago = datetime.now(timezone.utc) - timedelta(days=7)
 
-    result = await db.execute(select(func.count()).select_from(User).filter(User.role == UserRole.CANDIDATE))
-    total_candidates = result.scalar()
+    # Tous les counts basés sur User en 1 seule requête (filtres via func.count().filter())
+    result = await db.execute(
+        select(
+            func.count().label("total"),
+            func.count().filter(User.role == UserRole.CANDIDATE).label("candidates"),
+            func.count().filter(User.role == UserRole.EMPLOYER).label("employers"),
+            func.count().filter(User.is_active == True).label("active"),
+            func.count().filter(User.is_active == False).label("inactive"),
+            func.count().filter(User.created_at >= seven_days_ago).label("recent"),
+        ).select_from(User)
+    )
+    user_stats = result.one()
+    total_users = user_stats.total
+    total_candidates = user_stats.candidates
+    total_employers = user_stats.employers
+    active_users = user_stats.active
+    inactive_users = user_stats.inactive
+    recent_signups = user_stats.recent
 
-    result = await db.execute(select(func.count()).select_from(User).filter(User.role == UserRole.EMPLOYER))
-    total_employers = result.scalar()
-
-    result = await db.execute(select(func.count()).select_from(User).filter(User.is_active == True))
-    active_users = result.scalar()
-
-    result = await db.execute(select(func.count()).select_from(User).filter(User.is_active == False))
-    inactive_users = result.scalar()
-
-    # Compter les autres entités
-    result = await db.execute(select(func.count()).select_from(Company))
-    total_companies = result.scalar()
-
-    result = await db.execute(select(func.count()).select_from(Job))
-    total_jobs = result.scalar()
-
-    result = await db.execute(select(func.count()).select_from(JobApplication))
-    total_applications = result.scalar()
-
-    result = await db.execute(select(func.count()).select_from(Notification))
-    total_notifications = result.scalar()
+    # Counts des autres entités en 1 seule requête (sous-requêtes scalaires)
+    result = await db.execute(
+        select(
+            select(func.count()).select_from(Company).scalar_subquery().label("companies"),
+            select(func.count()).select_from(Job).scalar_subquery().label("jobs"),
+            select(func.count()).select_from(JobApplication).scalar_subquery().label("applications"),
+            select(func.count()).select_from(Notification).scalar_subquery().label("notifications"),
+        )
+    )
+    entity_stats = result.one()
+    total_companies = entity_stats.companies
+    total_jobs = entity_stats.jobs
+    total_applications = entity_stats.applications
+    total_notifications = entity_stats.notifications
 
     # Jobs par statut
     result = await db.execute(
@@ -140,12 +148,6 @@ async def get_admin_statistics(
     jobs_by_status_query = result.all()
 
     jobs_by_status = dict(jobs_by_status_query)
-
-    # Inscriptions récentes (7 derniers jours)
-    from datetime import timezone
-    seven_days_ago = datetime.now(timezone.utc) - timedelta(days=7)
-    result = await db.execute(select(func.count()).select_from(User).filter(User.created_at >= seven_days_ago))
-    recent_signups = result.scalar()
 
     return AdminStats(
         total_users=total_users,

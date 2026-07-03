@@ -74,21 +74,27 @@ async def export_candidate_pdf(
     if not candidate:
         raise HTTPException(status_code=404, detail="Profil candidat introuvable")
 
-    # Stats
-    app_count = (await db.execute(
-        select(func.count()).select_from(JobApplication).filter(JobApplication.candidate_id == candidate.id)
-    )).scalar() or 0
-
-    interview_count = (await db.execute(
-        select(func.count()).select_from(JobApplication).filter(
-            JobApplication.candidate_id == candidate.id,
-            JobApplication.status == ApplicationStatus.INTERVIEW,
+    # Stats — candidatures + entretiens + offres disponibles en 1 seule requête
+    counts_result = await db.execute(
+        select(
+            select(func.count()).select_from(JobApplication)
+                .filter(JobApplication.candidate_id == candidate.id)
+                .scalar_subquery().label("apps"),
+            select(func.count()).select_from(JobApplication)
+                .filter(
+                    JobApplication.candidate_id == candidate.id,
+                    JobApplication.status == ApplicationStatus.INTERVIEW,
+                )
+                .scalar_subquery().label("interviews"),
+            select(func.count()).select_from(Job)
+                .filter(Job.status == JobStatus.PUBLISHED)
+                .scalar_subquery().label("available_jobs"),
         )
-    )).scalar() or 0
-
-    available_jobs = (await db.execute(
-        select(func.count()).select_from(Job).filter(Job.status == "active")
-    )).scalar() or 0
+    )
+    counts = counts_result.one()
+    app_count = counts.apps or 0
+    interview_count = counts.interviews or 0
+    available_jobs = counts.available_jobs or 0
 
     # Complétion profil
     filled = sum(1 for v in [
@@ -183,15 +189,23 @@ async def export_employer_pdf(
     )
     jobs_list = jobs_result.scalars().all()
 
+    # Compter les candidatures de toutes ces offres en 1 seule requête (évite le N+1)
+    job_ids = [job.id for job in jobs_list]
+    app_counts_map: dict = {}
+    if job_ids:
+        counts_result = await db.execute(
+            select(JobApplication.job_id, func.count(JobApplication.id).label("cnt"))
+            .where(JobApplication.job_id.in_(job_ids))
+            .group_by(JobApplication.job_id)
+        )
+        app_counts_map = {row.job_id: row.cnt for row in counts_result}
+
     jobs_summary = []
     for job in jobs_list:
-        app_count = (await db.execute(
-            select(func.count()).select_from(JobApplication).filter(JobApplication.job_id == job.id)
-        )).scalar() or 0
         jobs_summary.append({
             "title": job.title,
             "status": job.status.value if hasattr(job.status, 'value') else job.status,
-            "applications_count": app_count,
+            "applications_count": app_counts_map.get(job.id, 0),
             "posted_at": job.posted_at.strftime("%d/%m/%Y") if job.posted_at else None,
         })
 

@@ -50,17 +50,18 @@ async def get_dashboard_data(
             # Les admins doivent utiliser /api/admin/* endpoints
             # Retourner un dashboard minimal pour éviter l'erreur
 
-            # Count users
-            result = await db.execute(select(func.count()).select_from(User))
-            users_count = result.scalar()
-
-            # Count jobs
-            result = await db.execute(select(func.count()).select_from(Job))
-            jobs_count = result.scalar()
-
-            # Count applications
-            result = await db.execute(select(func.count()).select_from(JobApplication))
-            applications_count = result.scalar()
+            # Totaux plateforme en 1 seule requête (sous-requêtes scalaires)
+            result = await db.execute(
+                select(
+                    select(func.count()).select_from(User).scalar_subquery().label("users"),
+                    select(func.count()).select_from(Job).scalar_subquery().label("jobs"),
+                    select(func.count()).select_from(JobApplication).scalar_subquery().label("applications"),
+                )
+            )
+            totals = result.one()
+            users_count = totals.users
+            jobs_count = totals.jobs
+            applications_count = totals.applications
 
             return {
                 "stats": [
@@ -168,15 +169,7 @@ async def get_dashboard_data(
                     "profileCompletion": 30  # 30% car profil créé mais pas d'entreprise
                 }
 
-            # Offres actives (COUNT en DB)
-            result = await db.execute(
-                select(func.count()).select_from(Job).filter(
-                    Job.employer_id == employer.id, Job.status == JobStatus.PUBLISHED
-                )
-            )
-            active_jobs_count = result.scalar() or 0
-
-            # Candidatures + entretiens + taux de réponse en 1 seule requête
+            # Offres actives + candidatures + entretiens + taux de réponse en 1 seule requête
             result = await db.execute(
                 select(
                     func.count().label("total"),
@@ -186,9 +179,13 @@ async def get_dashboard_data(
                         ApplicationStatus.INTERVIEW, ApplicationStatus.SHORTLISTED,
                         ApplicationStatus.VIEWED
                     ])).label("responded"),
+                    select(func.count()).select_from(Job).filter(
+                        Job.employer_id == employer.id, Job.status == JobStatus.PUBLISHED
+                    ).scalar_subquery().label("active_jobs"),
                 ).select_from(JobApplication).join(Job).filter(Job.employer_id == employer.id)
             )
             row = result.one()
+            active_jobs_count = row.active_jobs or 0
             applications_count = row.total or 0
             interviews_count = row.interviews or 0
             responded_applications = row.responded or 0
@@ -293,23 +290,27 @@ async def get_dashboard_data(
             if not candidate:
                 raise HTTPException(status_code=404, detail="Candidat non trouvé")
 
-            # Candidatures envoyées
-            stmt = select(func.count()).select_from(JobApplication).filter(JobApplication.candidate_id == candidate.id)
-            result = await db.execute(stmt)
-            applications_count = result.scalar()
-
-            # Offres disponibles (publiées)
-            stmt = select(func.count()).select_from(Job).filter(Job.status == JobStatus.PUBLISHED)
-            result = await db.execute(stmt)
-            available_jobs_count = result.scalar()
-
-            # Entretiens prévus
-            stmt = select(func.count()).select_from(JobApplication).filter(
-                JobApplication.candidate_id == candidate.id,
-                JobApplication.status == ApplicationStatus.INTERVIEW
+            # Candidatures envoyées + offres disponibles + entretiens en 1 seule requête
+            result = await db.execute(
+                select(
+                    select(func.count()).select_from(JobApplication)
+                        .filter(JobApplication.candidate_id == candidate.id)
+                        .scalar_subquery().label("applications"),
+                    select(func.count()).select_from(Job)
+                        .filter(Job.status == JobStatus.PUBLISHED)
+                        .scalar_subquery().label("available_jobs"),
+                    select(func.count()).select_from(JobApplication)
+                        .filter(
+                            JobApplication.candidate_id == candidate.id,
+                            JobApplication.status == ApplicationStatus.INTERVIEW,
+                        )
+                        .scalar_subquery().label("interviews"),
+                )
             )
-            result = await db.execute(stmt)
-            interviews_count = result.scalar()
+            counts = result.one()
+            applications_count = counts.applications or 0
+            available_jobs_count = counts.available_jobs or 0
+            interviews_count = counts.interviews or 0
 
             # Calcul du pourcentage de complétion du profil
             fields = [
