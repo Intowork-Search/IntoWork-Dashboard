@@ -442,6 +442,8 @@ class LinkedInService:
         """
         apply_url = job_data.get("apply_url", "")
         custom_message = (job_data.get("custom_message") or "").strip()
+        description = (job_data.get("description") or "").strip()
+        summary = (job_data.get("summary") or "").strip()
 
         if custom_message:
             text = custom_message
@@ -458,8 +460,14 @@ class LinkedInService:
             if job_type:
                 text += f"💼 Type : {job_type}\n"
 
-            text += f"\n{job_data.get('summary', '')}\n"
-            text += f"\n#Recrutement #Emploi #{job_type.replace(' ', '')}"
+            # Corps de l'annonce : description complète (fallback sur le résumé)
+            body = description or summary
+            if body:
+                text += f"\n{body}\n"
+
+            text += f"\n#Recrutement #Emploi"
+            if job_type:
+                text += f" #{job_type.replace(' ', '')}"
 
         # Toujours ajouter le lien vers l'offre IntoWork
         if apply_url:
