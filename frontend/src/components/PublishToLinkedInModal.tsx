@@ -25,7 +25,7 @@ export default function PublishToLinkedInModal({
   const [message, setMessage] = useState('');
   const [isPublishing, setIsPublishing] = useState(false);
   const [organizations, setOrganizations] = useState<{ id: string; name: string }[]>([]);
-  const [selectedTarget, setSelectedTarget] = useState('');
+  const [selectedTargets, setSelectedTargets] = useState<string[]>(['personal']);
   const [loadingOrgs, setLoadingOrgs] = useState(false);
 
   // Charger les pages entreprise LinkedIn disponibles à l'ouverture
@@ -53,7 +53,17 @@ export default function PublishToLinkedInModal({
     };
   }, [isOpen, getToken]);
 
+  const toggleTarget = (id: string) => {
+    setSelectedTargets((prev) =>
+      prev.includes(id) ? prev.filter((t) => t !== id) : [...prev, id]
+    );
+  };
+
   const handlePublish = async () => {
+    if (selectedTargets.length === 0) {
+      toast.error('Sélectionnez au moins une cible de publication.');
+      return;
+    }
     try {
       setIsPublishing(true);
       const token = await getToken();
@@ -66,15 +76,21 @@ export default function PublishToLinkedInModal({
         token,
         jobId,
         message || undefined,
-        selectedTarget || undefined
+        selectedTargets
       );
 
-      toast.success('✅ Offre publiée sur LinkedIn avec succès !');
+      const publishedCount = result.published?.length ?? 1;
+      const errorCount = result.errors?.length ?? 0;
+      if (errorCount > 0) {
+        toast.success(`✅ Publié sur ${publishedCount} cible(s), ${errorCount} échec(s).`);
+      } else {
+        toast.success(`✅ Offre publiée sur ${publishedCount} cible(s) LinkedIn !`);
+      }
       onClose();
       setMessage('');
-      setSelectedTarget('');
+      setSelectedTargets(['personal']);
 
-      // Ouvrir le post LinkedIn dans un nouvel onglet
+      // Ouvrir le premier post LinkedIn dans un nouvel onglet
       if (result.post_url) {
         window.open(result.post_url, '_blank');
       }
@@ -125,31 +141,47 @@ export default function PublishToLinkedInModal({
             </p>
           </div>
 
-          {/* Sélecteur de cible : page entreprise ou compte personnel */}
+          {/* Sélecteur de cibles : compte personnel et/ou pages entreprise (multi) */}
           <div>
-            <label htmlFor="linkedin-target" className="block text-sm font-semibold text-gray-900 mb-2">
+            <span className="block text-sm font-semibold text-gray-900 mb-2">
               Publier sur
-            </label>
-            <select
-              id="linkedin-target"
-              value={selectedTarget}
-              onChange={(e) => setSelectedTarget(e.target.value)}
-              disabled={loadingOrgs}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0A66C2] focus:border-transparent bg-white"
-            >
-              <option value="">Mon compte personnel</option>
+            </span>
+            <div className="space-y-2">
+              {/* Compte personnel */}
+              <label className="flex items-center gap-3 px-4 py-3 border border-gray-300 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors">
+                <input
+                  type="checkbox"
+                  className="checkbox checkbox-sm"
+                  checked={selectedTargets.includes('personal')}
+                  onChange={() => toggleTarget('personal')}
+                />
+                <span className="text-sm text-gray-900">Mon compte personnel</span>
+              </label>
+
+              {/* Pages entreprise */}
               {organizations.map((org) => (
-                <option key={org.id} value={org.id}>
-                  {org.name}
-                </option>
+                <label
+                  key={org.id}
+                  className="flex items-center gap-3 px-4 py-3 border border-gray-300 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors"
+                >
+                  <input
+                    type="checkbox"
+                    className="checkbox checkbox-sm"
+                    checked={selectedTargets.includes(org.id)}
+                    onChange={() => toggleTarget(org.id)}
+                  />
+                  <span className="text-sm text-gray-900">{org.name}</span>
+                </label>
               ))}
-            </select>
+            </div>
             {loadingOrgs && (
               <p className="text-xs text-gray-500 mt-2">Chargement de vos pages entreprise…</p>
             )}
             {!loadingOrgs && organizations.length === 0 && (
               <p className="text-xs text-gray-500 mt-2">
-                Aucune page entreprise disponible : la publication se fera sur votre compte personnel.
+                Aucune page entreprise détectée. La publication sur les pages nécessite
+                l&apos;approbation LinkedIn « Community Management API » pour votre application.
+                En attendant, la publication se fait sur votre compte personnel.
               </p>
             )}
           </div>

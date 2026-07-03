@@ -974,18 +974,25 @@ export const integrationsAPI = {
     return response.data;
   },
 
-  // Publier une offre sur LinkedIn
+  // Publier une offre sur LinkedIn (compte personnel et/ou pages entreprise)
   publishJobToLinkedIn: async (
     token: string,
     jobId: number,
     customMessage?: string,
-    organizationId?: string
-  ): Promise<{ post_id: string; post_url: string; job_id: number; message: string }> => {
+    organizationIds?: string[]
+  ): Promise<{
+    post_id: string;
+    post_url: string;
+    job_id: number;
+    message: string;
+    published?: { organization_id: string | null; target: string; post_id: string; post_url: string }[];
+    errors?: { organization_id: string | null; error: string }[];
+  }> => {
     const client = createAuthenticatedClient(token);
     const response = await client.post('/integrations/linkedin/publish-job', {
       job_id: jobId,
       custom_message: customMessage,
-      organization_id: organizationId,
+      organization_ids: organizationIds,
     });
     return response.data;
   },

@@ -121,6 +121,10 @@ class LinkedInPublishRequest(BaseModel):
     # URN de la page entreprise cible (ex: "urn:li:organization:123").
     # None => publication sur le compte personnel du recruteur.
     organization_id: Optional[str] = None
+    # Publication multi-pages : liste d'URN de pages entreprise. Si fourni,
+    # l'offre est publiée sur chacune. Une chaîne vide ou "personal" cible le
+    # compte personnel. Prioritaire sur organization_id.
+    organization_ids: Optional[list[str]] = None
 
 
 class LinkedInOrganization(BaseModel):
@@ -396,10 +400,22 @@ async def publish_job_to_linkedin(
     # Lien public vers l'offre (page publique IntoWork)
     apply_url = f"https://www.intowork.co/offres/{job.id}"
 
-    # Cible : page choisie par le recruteur, sinon page enregistrée, sinon compte perso
-    target_organization_id = request.organization_id or (
+    # Déterminer la liste des cibles de publication.
+    # Priorité : organization_ids (multi) > organization_id (single) > page enregistrée > compte perso.
+    # Une valeur vide / "personal" dans la liste = compte personnel (organization_id None).
+    saved_org_id = (
         credentials.provider_data.get("organization_id") if credentials.provider_data else None
     )
+    if request.organization_ids:
+        targets = [
+            (None if (t in (None, "", "personal")) else t)
+            for t in request.organization_ids
+        ]
+        # Dédupliquer en gardant l'ordre
+        seen: set = set()
+        targets = [t for t in targets if not (t in seen or seen.add(t))]
+    else:
+        targets = [request.organization_id or saved_org_id]
 
     # Préparer les données du job
     job_data = {
@@ -413,52 +429,69 @@ async def publish_job_to_linkedin(
         "custom_message": request.custom_message,
         "image_url": job.image_url,
     }
-    
-    try:
-        # Publier sur LinkedIn
-        post_id = await linkedin_service.publish_job_post(
-            access_token=credentials.get_access_token(),
-            organization_id=target_organization_id,
-            job_data=job_data
-        )
-        
-        # Mettre à jour last_used_at
-        credentials.last_used_at = datetime.now(timezone.utc)
-        await db.commit()
-        
-        return {
-            "message": "Job published to LinkedIn successfully",
-            "post_id": post_id,
-            "post_url": linkedin_service.build_post_url(post_id),
-            "job_id": job.id
-        }
 
-    except httpx.HTTPStatusError as e:
-        # 401/403 = token invalide ou scopes insuffisants (ex: ancien token sans
-        # 'openid profile'). L'utilisateur doit reconnecter son compte LinkedIn.
-        if e.response.status_code in (401, 403):
-            logger.warning(
-                "LinkedIn publish refusé (%s) pour user_id=%s: scopes insuffisants ou token expiré",
-                e.response.status_code, current_user.id
+    access_token = credentials.get_access_token()
+    results: list[dict] = []
+    errors: list[dict] = []
+
+    for target_organization_id in targets:
+        try:
+            post_id = await linkedin_service.publish_job_post(
+                access_token=access_token,
+                organization_id=target_organization_id,
+                job_data=job_data
             )
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=(
-                    "Votre connexion LinkedIn doit être renouvelée. "
-                    "Veuillez déconnecter puis reconnecter LinkedIn dans vos intégrations "
-                    "afin d'autoriser les nouvelles permissions de publication."
+            results.append({
+                "organization_id": target_organization_id,
+                "target": "page" if target_organization_id else "personal",
+                "post_id": post_id,
+                "post_url": linkedin_service.build_post_url(post_id),
+            })
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code in (401, 403):
+                logger.warning(
+                    "LinkedIn publish refusé (%s) pour employer_id=%s, target=%s: scopes insuffisants ou token expiré",
+                    e.response.status_code, employer.id, target_organization_id
                 )
-            )
+                detail = (
+                    "Votre connexion LinkedIn doit être renouvelée ou votre app n'a pas "
+                    "l'autorisation de publier sur les pages entreprise (Community Management API). "
+                    "Reconnectez LinkedIn dans vos intégrations."
+                    if target_organization_id else
+                    "Votre connexion LinkedIn doit être renouvelée. "
+                    "Déconnectez puis reconnectez LinkedIn dans vos intégrations."
+                )
+            else:
+                detail = f"Erreur LinkedIn ({e.response.status_code}) lors de la publication."
+            errors.append({"organization_id": target_organization_id, "error": detail})
+        except Exception as e:  # noqa: BLE001
+            logger.exception("Erreur inattendue publication LinkedIn pour employer_id=%s", employer.id)
+            errors.append({"organization_id": target_organization_id, "error": str(e)})
+
+    # Aucune publication réussie → erreur
+    if not results:
+        first_error = errors[0]["error"] if errors else "Échec de la publication sur LinkedIn."
         raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,
-            detail=f"Erreur LinkedIn ({e.response.status_code}) lors de la publication."
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=first_error
         )
-    except Exception as e:
-        logger.exception("Erreur inattendue publication LinkedIn pour user_id=%s", current_user.id)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to publish to LinkedIn: {str(e)}"
-        )
+
+    # Au moins une publication réussie
+    credentials.last_used_at = datetime.now(timezone.utc)
+    await db.commit()
+
+    return {
+        "message": (
+            f"Offre publiée sur {len(results)} cible(s) LinkedIn"
+            + (f", {len(errors)} échec(s)." if errors else ".")
+        ),
+        "job_id": job.id,
+        "published": results,
+        "errors": errors,
+        # Rétro-compatibilité : premier post publié
+        "post_id": results[0]["post_id"],
+        "post_url": results[0]["post_url"],
+    }
 
 
 # ========================================

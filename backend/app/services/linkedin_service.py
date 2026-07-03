@@ -16,6 +16,13 @@ LINKEDIN_CLIENT_ID = os.getenv("LINKEDIN_CLIENT_ID")
 LINKEDIN_CLIENT_SECRET = os.getenv("LINKEDIN_CLIENT_SECRET")
 LINKEDIN_REDIRECT_URI = os.getenv("LINKEDIN_REDIRECT_URI", "http://localhost:8001/api/integrations/linkedin/callback")
 
+# Activer les scopes "page entreprise" (Community Management API).
+# ⚠️ Nécessite que l'app LinkedIn soit approuvée pour le produit
+# "Community Management API". Sans approbation, demander ces scopes fait échouer
+# tout le flux OAuth (unauthorized_scope_error). Passer à "true" UNIQUEMENT
+# une fois l'approbation LinkedIn obtenue.
+LINKEDIN_ORG_SCOPES_ENABLED = os.getenv("LINKEDIN_ORG_SCOPES_ENABLED", "false").lower() == "true"
+
 # LinkedIn API URLs
 LINKEDIN_AUTH_URL = "https://www.linkedin.com/oauth/v2/authorization"
 LINKEDIN_TOKEN_URL = "https://www.linkedin.com/oauth/v2/accessToken"
@@ -59,7 +66,13 @@ class LinkedInService:
         # "Sign In with LinkedIn using OpenID Connect" est un produit standard
         # activable sans approbation manuelle dans le portail développeur LinkedIn.
         scopes = "openid profile w_member_social"
-        
+
+        # Scopes "page entreprise" ajoutés seulement si l'app est approuvée
+        # (Community Management API). Permet de lister les pages administrées et
+        # de publier en leur nom.
+        if LINKEDIN_ORG_SCOPES_ENABLED:
+            scopes += " r_organization_social w_organization_social rw_organization_admin"
+
         params = {
             "response_type": "code",
             "client_id": LINKEDIN_CLIENT_ID,
