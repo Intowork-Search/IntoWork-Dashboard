@@ -463,6 +463,15 @@ export default function JobsPage() {
                   className="group bg-white rounded-3xl shadow-lg shadow-gray-200/50 border border-gray-100 overflow-hidden hover:shadow-xl hover:shadow-[#6B9B5F]/10 hover:border-[#6B9B5F]/20 transition-all"
                   style={{ animation: `fadeIn 0.4s ease-out ${0.05 * index}s both` }}
                 >
+                  {/* Visuel de l'offre */}
+                  {job.image_url && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={job.image_url}
+                      alt={job.title}
+                      className="w-full h-36 object-cover"
+                    />
+                  )}
                   {/* Header avec logo */}
                   <div className="p-6 pb-0">
                     <div className="flex items-start gap-4">

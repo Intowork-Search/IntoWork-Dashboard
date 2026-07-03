@@ -37,6 +37,7 @@ interface JobDetail {
   salary_max?: number;
   currency: string;
   posted_at?: string;
+  image_url?: string;
   requirements?: string;
   responsibilities?: string;
   benefits?: string;
@@ -220,8 +221,17 @@ export default function JobDetailPage() {
 
             {/* Hero card — titre + entreprise */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
-              {/* Bande verte décorative */}
-              <div className="h-2 bg-gradient-to-r from-[#6B9B5F] to-[#93C587]" />
+              {/* Visuel de l'offre (ou bande verte décorative) */}
+              {job.image_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={job.image_url}
+                  alt={job.title}
+                  className="w-full h-48 sm:h-64 object-cover"
+                />
+              ) : (
+                <div className="h-2 bg-gradient-to-r from-[#6B9B5F] to-[#93C587]" />
+              )}
               <div className="p-6 sm:p-8">
                 <div className="flex items-start gap-4">
                   {job.company_logo_url ? (
