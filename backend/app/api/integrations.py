@@ -116,6 +116,20 @@ class LinkedInPublishRequest(BaseModel):
     """Requête de publication LinkedIn"""
     job_id: int
     custom_message: Optional[str] = None
+    # URN de la page entreprise cible (ex: "urn:li:organization:123").
+    # None => publication sur le compte personnel du recruteur.
+    organization_id: Optional[str] = None
+
+
+class LinkedInOrganization(BaseModel):
+    """Page entreprise LinkedIn administrée par le membre"""
+    id: str
+    name: str
+
+
+class LinkedInOrganizationsResponse(BaseModel):
+    """Liste des pages entreprise LinkedIn disponibles"""
+    organizations: list[LinkedInOrganization]
 
 
 class CalendarEventRequest(BaseModel):
@@ -253,7 +267,7 @@ async def linkedin_oauth_callback(
         
         if existing:
             # Mettre à jour
-            existing.access_token = token_data['access_token']
+            existing.set_access_token(token_data['access_token'])
             existing.token_expires_at = datetime.now(timezone.utc) + timedelta(seconds=token_data.get('expires_in', 5184000))
             existing.provider_data = provider_data
             existing.is_active = True
@@ -263,10 +277,10 @@ async def linkedin_oauth_callback(
                 company_id=employer.company_id,
                 user_id=employer.user_id,
                 provider=IntegrationProvider.LINKEDIN,
-                access_token=token_data['access_token'],
                 token_expires_at=datetime.now(timezone.utc) + timedelta(seconds=token_data.get('expires_in', 5184000)),
                 provider_data=provider_data
             )
+            integration.set_access_token(token_data['access_token'])
             db.add(integration)
         
         await db.commit()
@@ -282,6 +296,47 @@ async def linkedin_oauth_callback(
         return RedirectResponse(url=f"{redirect_url}?provider=linkedin&success=false&error={str(e)}")
 
 
+@router.get("/linkedin/organizations", response_model=LinkedInOrganizationsResponse)
+async def list_linkedin_organizations(
+    employer: Annotated[Employer, Depends(get_employer_profile)],
+    db: Annotated[AsyncSession, Depends(get_db)]
+):
+    """
+    Lister les pages entreprise LinkedIn administrées par le recruteur.
+
+    Renvoie une liste vide si le compte n'administre aucune page ou si l'app
+    LinkedIn ne dispose pas encore de l'approbation organisation (dans ce cas,
+    la publication se fait sur le compte personnel).
+    """
+    if not employer.company_id:
+        return LinkedInOrganizationsResponse(organizations=[])
+
+    result = await db.execute(
+        select(IntegrationCredential).where(
+            IntegrationCredential.company_id == employer.company_id,
+            IntegrationCredential.provider == IntegrationProvider.LINKEDIN,
+            IntegrationCredential.is_active == True
+        )
+    )
+    credentials = result.scalar_one_or_none()
+
+    if not credentials:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="LinkedIn integration not connected. Please connect first."
+        )
+
+    try:
+        orgs = await linkedin_service.get_organizations(credentials.get_access_token())
+    except Exception as e:  # noqa: BLE001
+        logger.warning(f"Could not list LinkedIn organizations: {e}")
+        orgs = []
+
+    return LinkedInOrganizationsResponse(
+        organizations=[LinkedInOrganization(id=o["id"], name=o["name"]) for o in orgs]
+    )
+
+
 @router.post("/linkedin/publish-job")
 async def publish_job_to_linkedin(
     request: LinkedInPublishRequest,
@@ -290,8 +345,10 @@ async def publish_job_to_linkedin(
 ):
     """
     Publier une offre d'emploi sur LinkedIn
-    
-    Nécessite une intégration LinkedIn active
+
+    Nécessite une intégration LinkedIn active. La cible peut être :
+    - une page entreprise (request.organization_id fourni), ou
+    - le compte personnel du recruteur (organization_id = None).
     """
     if not employer.company_id:
         raise HTTPException(
@@ -333,7 +390,15 @@ async def publish_job_to_linkedin(
     # Récupérer la company
     company_result = await db.execute(select(Company).where(Company.id == employer.company_id))
     company = company_result.scalar_one()
-    
+
+    # Lien public vers l'offre (page publique IntoWork)
+    apply_url = f"https://www.intowork.co/offres/{job.id}"
+
+    # Cible : page choisie par le recruteur, sinon page enregistrée, sinon compte perso
+    target_organization_id = request.organization_id or (
+        credentials.provider_data.get("organization_id") if credentials.provider_data else None
+    )
+
     # Préparer les données du job
     job_data = {
         "title": job.title,
@@ -342,14 +407,16 @@ async def publish_job_to_linkedin(
         "location": job.location,
         "job_type": job.job_type.value if job.job_type else "",
         "company_name": company.name,
-        "apply_url": f"https://intowork.co/jobs/{job.id}"  # TODO: Configurable
+        "apply_url": apply_url,
+        "custom_message": request.custom_message,
+        "image_url": job.image_url,
     }
     
     try:
         # Publier sur LinkedIn
         post_id = await linkedin_service.publish_job_post(
-            access_token=credentials.access_token,
-            organization_id=credentials.provider_data.get("organization_id"),
+            access_token=credentials.get_access_token(),
+            organization_id=target_organization_id,
             job_data=job_data
         )
         
@@ -357,11 +424,10 @@ async def publish_job_to_linkedin(
         credentials.last_used_at = datetime.now(timezone.utc)
         await db.commit()
         
-        # TODO: Créer un JobPosting record avec external_id=post_id
-        
         return {
             "message": "Job published to LinkedIn successfully",
             "post_id": post_id,
+            "post_url": linkedin_service.build_post_url(post_id),
             "job_id": job.id
         }
         

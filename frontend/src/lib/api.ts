@@ -397,6 +397,7 @@ export interface Job {
   country?: string;
   zone?: string;
   language?: string;
+  image_url?: string;
   status: string;
   posted_at?: string;
   is_featured: boolean;
@@ -557,6 +558,17 @@ export const jobsAPI = {
   updateJob: async (jobId: number, jobData: Partial<Job>, token: string): Promise<Job> => {
     const client = createAuthenticatedClient(token);
     const response = await client.put(`/jobs/${jobId}`, jobData);
+    return response.data;
+  },
+
+  // Uploader une image / visuel pour une offre (employeur)
+  uploadJobImage: async (jobId: number, file: File, token: string): Promise<Job> => {
+    const client = createAuthenticatedClient(token);
+    const formData = new FormData();
+    formData.append('image', file);
+    const response = await client.post(`/jobs/${jobId}/image`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
     return response.data;
   }
 };
@@ -963,9 +975,27 @@ export const integrationsAPI = {
   },
 
   // Publier une offre sur LinkedIn
-  publishJobToLinkedIn: async (token: string, jobId: number, message?: string): Promise<{ post_id: string; post_url: string }> => {
+  publishJobToLinkedIn: async (
+    token: string,
+    jobId: number,
+    customMessage?: string,
+    organizationId?: string
+  ): Promise<{ post_id: string; post_url: string; job_id: number; message: string }> => {
     const client = createAuthenticatedClient(token);
-    const response = await client.post('/integrations/linkedin/publish-job', { job_id: jobId, message });
+    const response = await client.post('/integrations/linkedin/publish-job', {
+      job_id: jobId,
+      custom_message: customMessage,
+      organization_id: organizationId,
+    });
+    return response.data;
+  },
+
+  // Lister les pages entreprise LinkedIn administrées par le recruteur
+  getLinkedInOrganizations: async (
+    token: string
+  ): Promise<{ organizations: { id: string; name: string }[] }> => {
+    const client = createAuthenticatedClient(token);
+    const response = await client.get('/integrations/linkedin/organizations');
     return response.data;
   },
 

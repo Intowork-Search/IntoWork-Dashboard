@@ -281,6 +281,10 @@ class Job(Base):
     salary_max = Column(Integer)
     currency = Column(String, default="XAF")
 
+    # Image / visuel de l'offre (Cloudinary) — optionnel, utilisé notamment pour LinkedIn
+    image_url = Column(String, nullable=True)
+    image_cloudinary_id = Column(String, nullable=True)
+
     # Paramètres
     status = Column(SQLEnum(JobStatus, native_enum=False, values_callable=lambda x: [e.value for e in x]), nullable=False, default=JobStatus.DRAFT)
     is_featured = Column(Boolean, default=False)

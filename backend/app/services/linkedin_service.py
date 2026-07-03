@@ -129,10 +129,10 @@ class LinkedInService:
     async def get_company_id(self, access_token: str) -> str:
         """
         Récupérer l'ID de l'organisation LinkedIn
-        
+
         Args:
             access_token: Token d'accès LinkedIn
-            
+
         Returns:
             Organization ID
         """
@@ -142,16 +142,79 @@ class LinkedInService:
                 params={"q": "roleAssignee"},
                 headers={"Authorization": f"Bearer {access_token}"}
             )
-            
+
             response.raise_for_status()
             data = response.json()
-            
+
             # Récupérer le premier organization ID
             if "elements" in data and len(data["elements"]) > 0:
                 org_urn = data["elements"][0].get("organizationalTarget")
                 return org_urn
-            
+
             raise ValueError("No organization found for this account")
+
+    async def get_organizations(self, access_token: str) -> list:
+        """
+        Lister TOUTES les pages entreprise LinkedIn dont le membre est administrateur.
+
+        Nécessite que le membre soit ADMINISTRATOR d'au moins une page ET que l'app
+        dispose des scopes organisation (Community Management API). Sans approbation
+        LinkedIn, cet appel échoue généralement → on renvoie une liste vide et la
+        publication se fera sur le compte personnel.
+
+        Args:
+            access_token: Token d'accès LinkedIn
+
+        Returns:
+            Liste de dicts: [{"id": "urn:li:organization:123", "name": "Ma Page"}]
+        """
+        headers = {"Authorization": f"Bearer {access_token}"}
+        organizations: list = []
+
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{LINKEDIN_API_BASE}/organizationalEntityAcls",
+                params={
+                    "q": "roleAssignee",
+                    "role": "ADMINISTRATOR",
+                    "state": "APPROVED",
+                },
+                headers=headers,
+            )
+            response.raise_for_status()
+            data = response.json()
+
+            org_urns = [
+                el.get("organizationalTarget")
+                for el in data.get("elements", [])
+                if el.get("organizationalTarget")
+            ]
+
+            # Récupérer le nom lisible de chaque page (best-effort)
+            for org_urn in org_urns:
+                org_id = org_urn.split(":")[-1]
+                name = f"Page {org_id}"
+                try:
+                    org_resp = await client.get(
+                        f"{LINKEDIN_API_BASE}/organizations/{org_id}",
+                        params={"projection": "(localizedName)"},
+                        headers=headers,
+                    )
+                    if org_resp.status_code == 200:
+                        name = org_resp.json().get("localizedName", name)
+                except Exception as e:  # noqa: BLE001
+                    logger.warning(f"Could not fetch org name for {org_urn}: {e}")
+
+                organizations.append({"id": org_urn, "name": name})
+
+        return organizations
+
+    @staticmethod
+    def build_post_url(post_id: str) -> str:
+        """Construire l'URL publique d'un post LinkedIn à partir de son URN/ID."""
+        if not post_id:
+            return ""
+        return f"https://www.linkedin.com/feed/update/{post_id}"
     
     async def publish_job_post(
         self,
@@ -234,29 +297,41 @@ class LinkedInService:
     def _format_job_post(self, job_data: Dict[str, Any]) -> str:
         """
         Formater le texte du post LinkedIn
-        
+
+        Si un message personnalisé (custom_message) est fourni, il est utilisé comme
+        base. Le lien vers l'offre (apply_url) est toujours ajouté à la fin.
+
         Args:
             job_data: Données du job
-            
+
         Returns:
             Texte formaté pour LinkedIn
         """
-        title = job_data.get("title", "Nouvelle opportunité")
-        location = job_data.get("location", "")
-        job_type = job_data.get("job_type", "").replace("_", " ").title()
-        company_name = job_data.get("company_name", "Notre entreprise")
-        
-        text = f"🚀 {company_name} recrute : {title}\n\n"
-        
-        if location:
-            text += f"📍 Localisation : {location}\n"
-        if job_type:
-            text += f"💼 Type : {job_type}\n"
-        
-        text += f"\n{job_data.get('summary', '')}\n\n"
-        text += "👉 Postulez dès maintenant via le lien ci-dessous !\n"
-        text += f"\n#Recrutement #Emploi #{job_type.replace(' ', '')}"
-        
+        apply_url = job_data.get("apply_url", "")
+        custom_message = (job_data.get("custom_message") or "").strip()
+
+        if custom_message:
+            text = custom_message
+        else:
+            title = job_data.get("title", "Nouvelle opportunité")
+            location = job_data.get("location", "")
+            job_type = job_data.get("job_type", "").replace("_", " ").title()
+            company_name = job_data.get("company_name", "Notre entreprise")
+
+            text = f"🚀 {company_name} recrute : {title}\n\n"
+
+            if location:
+                text += f"📍 Localisation : {location}\n"
+            if job_type:
+                text += f"💼 Type : {job_type}\n"
+
+            text += f"\n{job_data.get('summary', '')}\n"
+            text += f"\n#Recrutement #Emploi #{job_type.replace(' ', '')}"
+
+        # Toujours ajouter le lien vers l'offre IntoWork
+        if apply_url:
+            text += f"\n\n👉 Postulez maintenant : {apply_url}"
+
         return text[:3000]  # LinkedIn limit
     
     async def delete_job_post(self, access_token: str, post_id: str) -> bool:

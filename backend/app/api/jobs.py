@@ -8,7 +8,7 @@ This module implements job posting endpoints using FastAPI 0.100+ patterns:
 """
 
 from typing import Annotated, Optional
-from fastapi import status, APIRouter, Depends, HTTPException, Query, Response, Path
+from fastapi import status, APIRouter, Depends, HTTPException, Query, Response, Path, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import desc, select, func
 from sqlalchemy.orm import selectinload
@@ -29,6 +29,7 @@ from app.schemas import (
     RecentJobsCountResponse, MarketStatsResponse, MarketStatItem
 )
 from app.services.employer_service import get_or_create_employer
+from app.services.cloudinary_service import CloudinaryService
 
 router = APIRouter()
 
@@ -276,6 +277,7 @@ async def get_my_jobs(
             country=job.country or company.country,
             zone=job.zone,
             language=job.language,
+            image_url=job.image_url,
             posted_at=job.posted_at,
             is_featured=job.is_featured,
             views_count=job.views_count,
@@ -453,6 +455,7 @@ async def create_job(
             country=job.country or company.country,
             zone=job.zone,
             language=job.language,
+            image_url=job.image_url,
             requirements=job.requirements,
             responsibilities=job.responsibilities,
             benefits=job.benefits,
@@ -495,6 +498,7 @@ async def create_job(
         country=job_obj.country or company.country,
         zone=job_obj.zone,
         language=job_obj.language,
+        image_url=job_obj.image_url,
         posted_at=job_obj.posted_at,
         is_featured=job_obj.is_featured,
         views_count=job_obj.views_count,
@@ -558,6 +562,7 @@ async def update_job(
         job_obj.country = job.country or job_obj.country
         job_obj.zone = job.zone or job_obj.zone
         job_obj.language = job.language if job.language is not None else job_obj.language
+        job_obj.image_url = job.image_url if job.image_url is not None else job_obj.image_url
         job_obj.requirements = job.requirements
         job_obj.responsibilities = job.responsibilities
         job_obj.benefits = job.benefits
@@ -590,6 +595,7 @@ async def update_job(
             country=job_obj.country or company.country,
             zone=job_obj.zone,
             language=job_obj.language,
+            image_url=job_obj.image_url,
             posted_at=job_obj.posted_at,
             is_featured=job_obj.is_featured,
             views_count=job_obj.views_count,
@@ -599,6 +605,101 @@ async def update_job(
         await db.rollback()
         logger.error(f"Erreur lors de la mise à jour de l'offre id={job_id}: {e}")
         raise HTTPException(status_code=500, detail="Erreur lors de la mise à jour de l'offre")
+
+
+@router.post("/{job_id}/image", response_model=JobResponse)
+async def upload_job_image(
+    job_id: JobIdPath,
+    db: DBSession,
+    current_user: CurrentUser,
+    image: UploadFile = File(...),
+) -> JobResponse:
+    """
+    Uploader une image / visuel pour une offre (employeur propriétaire uniquement).
+    L'image est stockée sur Cloudinary et utilisée notamment comme visuel LinkedIn.
+    """
+    if current_user.role != UserRole.EMPLOYER:
+        raise HTTPException(status_code=403, detail="Seuls les employeurs peuvent modifier une offre")
+
+    # Récupérer l'offre + l'employeur propriétaire
+    job_result = await db.execute(select(Job).filter(Job.id == job_id))
+    job_obj = job_result.scalar_one_or_none()
+    if not job_obj:
+        raise HTTPException(status_code=404, detail="Offre introuvable")
+
+    employer_result = await db.execute(
+        select(Employer).options(selectinload(Employer.company)).filter(Employer.user_id == current_user.id)
+    )
+    employer = employer_result.scalar_one_or_none()
+    if not employer or job_obj.employer_id != employer.id:
+        raise HTTPException(status_code=403, detail="Vous n'êtes pas autorisé à modifier cette offre")
+
+    # Valider le type de fichier
+    if not (image.content_type or "").startswith("image/"):
+        raise HTTPException(status_code=400, detail="Le fichier doit être une image")
+
+    # Valider la taille (max 5MB)
+    content = await image.read()
+    max_size = 5 * 1024 * 1024
+    if len(content) > max_size:
+        raise HTTPException(
+            status_code=400,
+            detail=f"L'image ne peut pas dépasser 5MB (taille: {len(content) / (1024*1024):.2f}MB)"
+        )
+    await image.seek(0)
+
+    try:
+        # Supprimer l'ancienne image si présente
+        if job_obj.image_cloudinary_id:
+            await CloudinaryService.delete_image(job_obj.image_cloudinary_id)
+
+        # Upload vers Cloudinary (paysage 1200x627, ratio recommandé LinkedIn)
+        upload_result = await CloudinaryService.upload_image(
+            file=image,
+            folder=f"job_images/job_{job_obj.id}",
+            transformation={
+                "width": 1200,
+                "height": 627,
+                "crop": "fill",
+                "gravity": "auto",
+                "quality": "auto:good",
+            },
+        )
+
+        job_obj.image_url = upload_result["url"]
+        job_obj.image_cloudinary_id = upload_result["public_id"]
+        await db.commit()
+        await db.refresh(job_obj)
+    except HTTPException:
+        raise
+    except Exception as e:
+        await db.rollback()
+        logger.error(f"Erreur upload image offre id={job_id}: {e}")
+        raise HTTPException(status_code=500, detail="Erreur lors de l'upload de l'image")
+
+    company = employer.company
+    return JobResponse(
+        id=job_obj.id,
+        title=job_obj.title,
+        description=job_obj.description,
+        company_name=company.name,
+        company_logo_url=getattr(company, 'logo_url', None),
+        company_is_verified=getattr(company, 'is_verified', False),
+        location=job_obj.location,
+        location_type=job_obj.location_type.value,
+        job_type=job_obj.job_type.value,
+        salary_min=job_obj.salary_min,
+        salary_max=job_obj.salary_max,
+        currency=job_obj.currency,
+        country=job_obj.country or company.country,
+        zone=job_obj.zone,
+        language=job_obj.language,
+        image_url=job_obj.image_url,
+        posted_at=job_obj.posted_at,
+        is_featured=job_obj.is_featured,
+        views_count=job_obj.views_count,
+        applications_count=job_obj.applications_count,
+    )
 
 
 @router.delete("/{job_id}", status_code=204)
@@ -715,6 +816,7 @@ async def get_job(
         country=job.country or company.country,
         zone=job.zone,
         language=job.language,
+        image_url=job.image_url,
         salary_range=f"{job.salary_min:,} - {job.salary_max:,} {job.currency}" if job.salary_min and job.salary_max else None,
         posted_at=job.posted_at,
         is_featured=job.is_featured,

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { integrationsAPI } from '@/lib/api';
 import toast from 'react-hot-toast';
 import { XMarkIcon, LinkIcon } from '@heroicons/react/24/outline';
@@ -24,6 +24,34 @@ export default function PublishToLinkedInModal({
 }: PublishToLinkedInModalProps) {
   const [message, setMessage] = useState('');
   const [isPublishing, setIsPublishing] = useState(false);
+  const [organizations, setOrganizations] = useState<{ id: string; name: string }[]>([]);
+  const [selectedTarget, setSelectedTarget] = useState('');
+  const [loadingOrgs, setLoadingOrgs] = useState(false);
+
+  // Charger les pages entreprise LinkedIn disponibles à l'ouverture
+  useEffect(() => {
+    if (!isOpen) return;
+    let cancelled = false;
+    const loadOrganizations = async () => {
+      try {
+        setLoadingOrgs(true);
+        const token = await getToken();
+        if (!token) return;
+        const { organizations: orgs } = await integrationsAPI.getLinkedInOrganizations(token);
+        if (!cancelled) setOrganizations(orgs);
+      } catch (error: unknown) {
+        // Si l'app LinkedIn n'a pas l'approbation organisation, on reste sur le compte perso
+        logger.warn('Could not load LinkedIn organizations:', error);
+        if (!cancelled) setOrganizations([]);
+      } finally {
+        if (!cancelled) setLoadingOrgs(false);
+      }
+    };
+    loadOrganizations();
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen, getToken]);
 
   const handlePublish = async () => {
     try {
@@ -34,12 +62,18 @@ export default function PublishToLinkedInModal({
         return;
       }
 
-      const result = await integrationsAPI.publishJobToLinkedIn(token, jobId, message || undefined);
-      
+      const result = await integrationsAPI.publishJobToLinkedIn(
+        token,
+        jobId,
+        message || undefined,
+        selectedTarget || undefined
+      );
+
       toast.success('✅ Offre publiée sur LinkedIn avec succès !');
       onClose();
       setMessage('');
-      
+      setSelectedTarget('');
+
       // Ouvrir le post LinkedIn dans un nouvel onglet
       if (result.post_url) {
         window.open(result.post_url, '_blank');
@@ -85,18 +119,48 @@ export default function PublishToLinkedInModal({
         <div className="p-6 space-y-6">
           {/* Alerte */}
           <div className="bg-[#0A66C2]/10 border border-[#0A66C2]/20 rounded-xl p-4">
-            <h3 className="font-semibold text-gray-900 mb-2">📢 Publication sur votre page LinkedIn</h3>
+            <h3 className="font-semibold text-gray-900 mb-2">📢 Publication sur LinkedIn</h3>
             <p className="text-sm text-gray-600">
-              Cette offre sera publiée sur votre page entreprise LinkedIn. Vous pouvez personnaliser le message d'accompagnement.
+              Choisissez où publier cette offre. Le lien vers votre offre sur IntoWork sera automatiquement ajouté.
             </p>
+          </div>
+
+          {/* Sélecteur de cible : page entreprise ou compte personnel */}
+          <div>
+            <label htmlFor="linkedin-target" className="block text-sm font-semibold text-gray-900 mb-2">
+              Publier sur
+            </label>
+            <select
+              id="linkedin-target"
+              value={selectedTarget}
+              onChange={(e) => setSelectedTarget(e.target.value)}
+              disabled={loadingOrgs}
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0A66C2] focus:border-transparent bg-white"
+            >
+              <option value="">Mon compte personnel</option>
+              {organizations.map((org) => (
+                <option key={org.id} value={org.id}>
+                  {org.name}
+                </option>
+              ))}
+            </select>
+            {loadingOrgs && (
+              <p className="text-xs text-gray-500 mt-2">Chargement de vos pages entreprise…</p>
+            )}
+            {!loadingOrgs && organizations.length === 0 && (
+              <p className="text-xs text-gray-500 mt-2">
+                Aucune page entreprise disponible : la publication se fera sur votre compte personnel.
+              </p>
+            )}
           </div>
 
           {/* Message personnalisé */}
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-2">
+            <label htmlFor="linkedin-message" className="block text-sm font-semibold text-gray-900 mb-2">
               Message d'accompagnement (optionnel)
             </label>
             <textarea
+              id="linkedin-message"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder={`Exemple:\n\n🎯 Nouvelle opportunité chez [Votre Entreprise] !\n\nNous recherchons un(e) ${jobTitle}.\n\nPostulez dès maintenant ! 👇`}

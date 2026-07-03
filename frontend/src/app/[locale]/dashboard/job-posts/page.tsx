@@ -63,6 +63,8 @@ export default function JobPostsPage(): React.JSX.Element {
   const [isCreating, setIsCreating] = useState(false);
   const [formData, setFormData] = useState<Partial<Job>>({});
   const [saving, setSaving] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   
   // LinkedIn modal state
   const [linkedInModalOpen, setLinkedInModalOpen] = useState(false);
@@ -221,17 +223,23 @@ export default function JobPostsPage(): React.JSX.Element {
       profil_posture: job.profil_posture,
       profil_autre: job.profil_autre,
     });
+    setImageFile(null);
+    setImagePreview(job.image_url ?? null);
   };
 
   const handleCloseModal = () => {
     setEditingJob(null);
     setIsCreating(false);
     setFormData({});
+    setImageFile(null);
+    setImagePreview(null);
   };
 
   const handleCreateNew = () => {
     setIsCreating(true);
     setFormData({ currency: 'XAF' });
+    setImageFile(null);
+    setImagePreview(null);
   };
 
   const handleView = (job: Job) => {
@@ -253,6 +261,26 @@ export default function JobPostsPage(): React.JSX.Element {
     setFormData(prev => ({ ...prev, [name]: processedValue }));
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      toast.error('Le fichier doit être une image');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("L'image ne peut pas dépasser 5MB");
+      return;
+    }
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -266,10 +294,17 @@ export default function JobPostsPage(): React.JSX.Element {
 
       if (isCreating) {
         const newJob = await jobsAPI.createJob(formData, token);
-        setJobs([newJob, ...jobs]);
+        let finalJob = newJob;
+        if (imageFile) {
+          finalJob = await jobsAPI.uploadJobImage(newJob.id, imageFile, token);
+        }
+        setJobs([finalJob, ...jobs]);
         toast.success(t('createSuccess'));
       } else if (editingJob) {
         await jobsAPI.updateJob(editingJob.id, formData, token);
+        if (imageFile) {
+          await jobsAPI.uploadJobImage(editingJob.id, imageFile, token);
+        }
         await fetchJobs();
         toast.success(t('updateSuccess'));
       }
@@ -576,6 +611,50 @@ export default function JobPostsPage(): React.JSX.Element {
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="p-6 space-y-6">
+              {/* Image / visuel de l'offre (optionnel) */}
+              <div>
+                <label htmlFor="job-image" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Image de l'offre <span className="font-normal text-gray-400">(optionnel)</span>
+                </label>
+                {imagePreview ? (
+                  <div className="relative w-full max-w-md">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={imagePreview}
+                      alt="Aperçu du visuel de l'offre"
+                      className="w-full h-48 object-cover rounded-xl border-2 border-gray-200"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleRemoveImage}
+                      className="absolute top-2 right-2 p-1.5 rounded-lg bg-black/60 text-white hover:bg-black/80 transition-all"
+                      aria-label="Retirer l'image"
+                    >
+                      <XMarkIcon className="w-5 h-5" />
+                    </button>
+                  </div>
+                ) : (
+                  <label
+                    htmlFor="job-image"
+                    className="flex flex-col items-center justify-center w-full max-w-md h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all"
+                  >
+                    <SparklesIcon className="w-8 h-8 text-gray-400 mb-2" />
+                    <span className="text-sm text-gray-500">Cliquez pour ajouter une image (max 5MB)</span>
+                    <span className="text-xs text-gray-400 mt-1">Recommandé : 1200×627 px</span>
+                  </label>
+                )}
+                <input
+                  id="job-image"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
+                <p className="text-xs text-gray-400 mt-2">
+                  Cette image sera utilisée comme visuel lors du partage sur LinkedIn.
+                </p>
+              </div>
+
               {/* Titre */}
               <div data-tour="job-basics">
                 <label htmlFor="title" className="block text-sm font-semibold text-gray-700 mb-2">

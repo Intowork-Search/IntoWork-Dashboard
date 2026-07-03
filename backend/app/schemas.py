@@ -477,6 +477,7 @@ class JobCreateRequest(BaseModel):
     country: Optional[str] = None
     zone: Optional[str] = None
     language: Optional[str] = None
+    image_url: Optional[str] = None
     requirements: Optional[str] = None
     responsibilities: Optional[str] = None
     benefits: Optional[str] = None
@@ -510,6 +511,7 @@ class JobResponse(BaseModel):
     country: Optional[str] = None
     zone: Optional[str] = None
     language: Optional[str] = None
+    image_url: Optional[str] = None
     posted_at: Optional[datetime] = None
     is_featured: bool = False
     views_count: int = 0

@@ -106,7 +106,7 @@ Fichiers statiques : `backend/uploads/` servis via `/uploads` (FastAPI StaticFil
 | `targetym_service.py` | Intégration ATS TargetYM (plateforme AGILITYM) |
 | `google_calendar_service.py` | Planification entretiens Google |
 | `outlook_calendar_service.py` | Planification entretiens Outlook |
-| `linkedin_service.py` | Import profil LinkedIn |
+| `linkedin_service.py` | Publication d'offres sur LinkedIn (compte perso ou page entreprise), liste des pages, stats post |
 
 ---
 
@@ -383,7 +383,7 @@ Modèles core (`backend/app/models/base.py`) :
 | **Experience**, **Education**, **Skill** → Candidate | cascade delete |
 | **Company** | infos entreprise pour employeurs |
 | **Employer** → User + Company (1:1) | |
-| **Job** → Company | status : draft/published/closed/archived ; `job_type` en VARCHAR ; champs enrichis : `context`, `mission_principale`, `profil_formation`, `profil_experience`, `profil_competences`, `profil_posture`, `profil_autre` (migration `y9z0a1b2c3d4`) |
+| **Job** → Company | status : draft/published/closed/archived ; `job_type` en VARCHAR ; champs enrichis : `context`, `mission_principale`, `profil_formation`, `profil_experience`, `profil_competences`, `profil_posture`, `profil_autre` (migration `y9z0a1b2c3d4`) ; `image_url` + `image_cloudinary_id` (visuel Cloudinary, migration `a1b2c3d4e5f6`) |
 | **JobApplication** → Candidate + Job | status : applied/pending/viewed/shortlisted/interview/accepted/rejected ; champs `notes` et `cv_id` |
 | **CVDocument** → Candidate | CV Builder (5 templates), `slug` pour partage public |
 | **CVAnalytics** → CVDocument | tracking vues/téléchargements |
