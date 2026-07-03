@@ -325,83 +325,79 @@ export default function OffresPage() {
               <p className="text-slate-600">Essayez de modifier vos critères de recherche</p>
             </div>
           ) : (
-            <div className="grid gap-6">
+            <div className="grid gap-4">
               {filteredJobs.map((job) => (
                 <div
                   key={job.id}
-                  className="bg-white rounded-2xl border border-slate-200 hover:border-green-500 hover:shadow-xl transition-all duration-300 group overflow-hidden"
+                  className="bg-white rounded-2xl border border-slate-200 hover:border-green-500 hover:shadow-lg transition-all duration-300 group overflow-hidden flex flex-col sm:flex-row"
                 >
-                  {job.image_url && (
-                    <button
-                      onClick={() => handleJobClick(job.id)}
-                      className="block w-full"
-                      type="button"
-                      aria-label={`Voir l'offre ${job.title}`}
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                  {/* Vignette image (ou logo par défaut) */}
+                  <button
+                    onClick={() => handleJobClick(job.id)}
+                    className="block shrink-0 w-full sm:w-48 h-40 sm:h-auto overflow-hidden bg-slate-100"
+                    type="button"
+                    aria-label={`Voir l'offre ${job.title}`}
+                  >
+                    {job.image_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={job.image_url}
                         alt={job.title}
-                        className="w-full h-52 sm:h-64 object-cover group-hover:scale-[1.02] transition-transform duration-300"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
-                    </button>
-                  )}
-                  <div className="p-6 sm:p-8 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                    ) : (
+                      <div className="w-full h-full min-h-40 flex items-center justify-center bg-green-600">
+                        <BuildingOfficeIcon className="w-10 h-10 text-white/90" />
+                      </div>
+                    )}
+                  </button>
+
+                  {/* Contenu */}
+                  <div className="flex-1 p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <button
                       onClick={() => handleJobClick(job.id)}
                       className="flex-1 text-left hover:opacity-80 transition-opacity"
                       type="button"
                     >
-                      <div className="flex items-start gap-4 mb-4">
-                        <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl bg-green-600 flex items-center justify-center shrink-0">
-                          <BuildingOfficeIcon className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2 group-hover:text-green-600 transition-colors">
-                            {job.title}
-                          </h3>
-                          <p className="text-base sm:text-lg text-slate-700 font-medium mb-3">
-                            {job.company_name || 'Entreprise'}
-                          </p>
-                        </div>
-                      </div>
-
-                      <p className="text-slate-600 mb-4 line-clamp-2">
-                        {job.description}
+                      <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-1 group-hover:text-green-600 transition-colors line-clamp-1">
+                        {job.title}
+                      </h3>
+                      <p className="text-sm sm:text-base text-slate-700 font-medium mb-3">
+                        {job.company_name || 'Entreprise'}
                       </p>
 
-                      <div className="flex flex-wrap gap-3">
-                        <div className="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 px-3 py-1.5 rounded-lg">
+                      <div className="flex flex-wrap gap-2">
+                        <div className="flex items-center gap-1.5 text-xs sm:text-sm text-slate-600 bg-slate-50 px-2.5 py-1 rounded-lg">
                           <MapPinIcon className="w-4 h-4" />
                           <span>{job.location}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 px-3 py-1.5 rounded-lg">
+                        <div className="flex items-center gap-1.5 text-xs sm:text-sm text-slate-600 bg-slate-50 px-2.5 py-1 rounded-lg">
                           <BriefcaseIcon className="w-4 h-4" />
                           <span>{formatJobType(job.job_type)}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 px-3 py-1.5 rounded-lg">
+                        <div className="flex items-center gap-1.5 text-xs sm:text-sm text-slate-600 bg-slate-50 px-2.5 py-1 rounded-lg">
                           <CurrencyEuroIcon className="w-4 h-4" />
                           <span>{formatSalary(job)}</span>
                         </div>
                         {job.country && (
-                          <div className="flex items-center gap-2 text-sm text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg">
+                          <div className="flex items-center gap-1.5 text-xs sm:text-sm text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg">
                             <span>{getCountryLabel(job.country)}</span>
                           </div>
                         )}
-                        <div className="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 px-3 py-1.5 rounded-lg">
+                        <div className="flex items-center gap-1.5 text-xs sm:text-sm text-slate-600 bg-slate-50 px-2.5 py-1 rounded-lg">
                           <ClockIcon className="w-4 h-4" />
                           <span>{formatDate(job.posted_at)}</span>
                         </div>
                       </div>
                     </button>
 
-                    <div className="flex sm:flex-col items-center sm:items-end gap-3 sm:gap-4">
-                      <Link 
+                    <div className="shrink-0">
+                      <Link
                         href="/signin"
-                        className="flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold transition-all hover:shadow-lg"
+                        className="flex items-center justify-center gap-2 px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold transition-all hover:shadow-lg whitespace-nowrap"
                       >
                         <span>Postuler</span>
-                        <ArrowRightIcon className="w-5 h-5" />
+                        <ArrowRightIcon className="w-4 h-4" />
                       </Link>
                     </div>
                   </div>

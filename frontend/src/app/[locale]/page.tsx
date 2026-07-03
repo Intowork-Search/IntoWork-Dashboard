@@ -1197,56 +1197,58 @@ export default function Home() {
                 <Link
                   key={job.id}
                   href="/offres"
-                  className="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-[#6B9B5F]/40 hover:shadow-lg hover:shadow-green-500/5 hover:-translate-y-1 transition-all duration-300"
+                  className="group flex flex-col bg-white rounded-2xl border border-gray-100 hover:border-[#6B9B5F]/40 hover:shadow-lg hover:shadow-green-500/5 hover:-translate-y-1 transition-all duration-300 overflow-hidden"
                 >
                   {job.image_url && (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={job.image_url}
                       alt={job.title}
-                      className="w-full h-36 object-cover rounded-xl mb-4 -mt-1"
+                      className="w-full h-32 object-cover"
                     />
                   )}
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-bold text-gray-900 mb-1 group-hover:text-[#6B9B5F] transition-colors truncate">
-                        {job.title}
-                      </h3>
-                      <p className="text-sm text-gray-500 font-medium">{job.company_name}</p>
+                  <div className="flex flex-col flex-1 p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-lg font-bold text-gray-900 mb-1 group-hover:text-[#6B9B5F] transition-colors truncate">
+                          {job.title}
+                        </h3>
+                        <p className="text-sm text-gray-500 font-medium">{job.company_name}</p>
+                      </div>
+                      <div className="w-10 h-10 rounded-xl bg-[#6B9B5F]/10 flex items-center justify-center flex-shrink-0 ml-3">
+                        <IconBriefcase className="w-5 h-5 text-[#6B9B5F]" />
+                      </div>
                     </div>
-                    <div className="w-10 h-10 rounded-xl bg-[#6B9B5F]/10 flex items-center justify-center flex-shrink-0 ml-3">
-                      <IconBriefcase className="w-5 h-5 text-[#6B9B5F]" />
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {job.location && (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gray-50 text-gray-600 text-xs font-medium">
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                          {job.location}
+                        </span>
+                      )}
+                      {job.job_type && (
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-[#6B9B5F]/10 text-[#6B9B5F] text-xs font-medium">
+                          {job.job_type}
+                        </span>
+                      )}
                     </div>
-                  </div>
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {job.location && (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gray-50 text-gray-600 text-xs font-medium">
+                    {!job.image_url && job.description && (
+                      <p className="text-sm text-gray-500 line-clamp-2 mb-4">{job.description}</p>
+                    )}
+                    <div className="flex items-center justify-between pt-3 mt-auto border-t border-gray-100">
+                      <span className="text-xs text-gray-400">
+                        {job.posted_at ? new Date(job.posted_at).toLocaleDateString('fr-FR') : 'Recent'}
+                      </span>
+                      <span className="text-[#6B9B5F] font-semibold text-xs group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
+                        Voir l&apos;offre
                         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                         </svg>
-                        {job.location}
                       </span>
-                    )}
-                    {job.job_type && (
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-[#6B9B5F]/10 text-[#6B9B5F] text-xs font-medium">
-                        {job.job_type}
-                      </span>
-                    )}
-                  </div>
-                  {job.description && (
-                    <p className="text-sm text-gray-500 line-clamp-2 mb-4">{job.description}</p>
-                  )}
-                  <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                    <span className="text-xs text-gray-400">
-                      {job.posted_at ? new Date(job.posted_at).toLocaleDateString('fr-FR') : 'Recent'}
-                    </span>
-                    <span className="text-[#6B9B5F] font-semibold text-xs group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
-                      Voir l&apos;offre
-                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                      </svg>
-                    </span>
+                    </div>
                   </div>
                 </Link>
               ))}
