@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from app.rate_limiter import limiter
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete as sql_delete
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import selectinload, joinedload
 from app.database import get_db
 from app.models.base import User, Candidate, Experience, Education, Skill, SkillCategory, CandidateCV
 from app.auth import get_current_user, require_user
@@ -120,16 +120,18 @@ async def get_candidate_profile(
         )
 
     # Récupérer ou créer le profil candidat avec eager loading
+    # joinedload sur les 3 collections => 1 seul aller-retour DB au lieu de 4
+    # (crucial sur Railway où chaque round-trip coûte ~0.6-1s de latence réseau)
     result = await db.execute(
         select(Candidate)
         .options(
-            selectinload(Candidate.experiences),
-            selectinload(Candidate.educations),
-            selectinload(Candidate.skills)
+            joinedload(Candidate.experiences),
+            joinedload(Candidate.educations),
+            joinedload(Candidate.skills)
         )
         .filter(Candidate.user_id == current_user.id)
     )
-    candidate = result.scalar_one_or_none()
+    candidate = result.unique().scalar_one_or_none()
 
     if not candidate:
         # Créer un profil candidat vide
